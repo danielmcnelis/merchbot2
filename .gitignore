@@ -5,5 +5,4 @@ node_modules/
 .DS_Store
 .env
 *.swp
-*.json
 run_bot.sh

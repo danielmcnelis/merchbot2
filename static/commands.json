@@ -1,0 +1,21 @@
+{
+    "legalcom": ["!legal", "!check", "!checklegal", "!legalcheck", "!deckcheck", "!checkdeck", "!legaldeck", "!decklegal"],
+    "listcom": ["!list", "!banlist", "!bannedlist", "!bans"],
+    "pfpcom": ["!pfp", "!pic", "!avatar"],
+    "botcom": ["!bot", "!guide"],
+    "checklistcom": ["!checklist", "!check", "!list"],
+    "infocom": ["!help", "!info"],
+    "dbcom": ["!db", "!dbname", "!duelingbook"],
+    "rolecom": ["!role", "!rankedgoats"],
+    "statscom": ["!stats", "!statistics", "!mystats", "!goatstats", "!record", "!rating", "!elo"],
+    "manualcom": ["!manual"],
+    "noshowcom": ["!noshow"],
+    "profcom": ["!profile", "!prof"],
+    "losscom": ["!lossvs", "!loss", "!losevs", "!lose", "!lostvs", "!lost", "!loseto", "!lossto", "!lostto", "!goatloss","!goatlossvs"],
+    "h2hcom": ["!h2h", "!head2head", "!headtohead"],
+    "undocom": ["!undolast", "!undo", "!undoloss"],
+    "rankcom": ["!rank", "!rankings", "!top", "!ladder", "!leaderboard", "!leaders"],
+    "yescom": ["yes", "yeah", "yea", "ye", "ya", "yah", "yh", "y", "sure", "ok", "okay", "k", "sure", "si", "ja", "oui", "hai", "ha", "ee", "da"],
+    "nocom": ["no", "nah", "nope", "naw", "n", "na", "nein", "non", "iie", "iya", "nee", "nej", "net"],
+    "startcom": ["!start", "!starter", "!begin", "!go", "!starterdeck"]
+}

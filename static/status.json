@@ -1,4 +1,5 @@
 
 {
-    "transaction": "waiting"
+    "transaction": "waiting",
+    "shop":"open"
 }

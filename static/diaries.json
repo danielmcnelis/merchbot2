@@ -1,0 +1,57 @@
+{
+    "Easy": {
+        "e1": "Task 1",
+        "e2": "Task 2",
+        "e3": "Task 3",
+        "e4": "Task 4",
+        "e5": "Task 5",
+        "e6": "Task 6",
+        "e7": "Task 7",
+        "e8": "Task 8",
+        "e9": "Task 9",
+        "e10": "Task 10",
+        "e11": "Task 11",
+        "e12": "Task 12",
+        "bonuses": ["1) Bonus 1", "2) Bonus 2", "3) Bonus 3"]
+    },
+    "Moderate": {
+        "m1": "Task 1",
+        "m2": "Task 2",
+        "m3": "Task 3",
+        "m4": "Task 4",
+        "m5": "Task 5",
+        "m6": "Task 6",
+        "m7": "Task 7",
+        "m8": "Task 8",
+        "m9": "Task 9",
+        "m10": "Task 10",
+        "bonuses": ["1) Bonus 1", "2) Bonus 2", "3) Bonus 3"]
+    },
+    "Hard": {
+        "h1": "Task 1",
+        "h2": "Task 2",
+        "h3": "Task 3",
+        "h4": "Task 4",
+        "h5": "Task 5",
+        "h6": "Task 6",
+        "h7": "Task 7",
+        "h8": "Task 8",
+        "bonuses": ["1) Bonus 1", "2) Bonus 2", "3) Bonus 3"]
+    },
+    "Elite": {
+        "l1": "Task 1",
+        "l2": "Task 2",
+        "l3": "Task 3",
+        "l4": "Task 4",
+        "l5": "Task 5",
+        "l6": "Task 6",
+        "bonuses": ["1) Bonus", "2) Bonus 2", "3) Bonus 3"]
+    },
+    "Master": {
+        "s1": "Task 1",
+        "s2": "Task 2",
+        "s3": "Task 3",
+        "s4": "Task 4",
+        "bonuses": ["1) Bonus 1", "2) Bonus 2", "3) Bonus 3"]
+    }
+}

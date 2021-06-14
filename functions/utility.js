@@ -5,29 +5,48 @@ const { adminRole, modRole } = require('../static/roles.json')
 const { mad, sad, ROCK, bronze, silver, gold, platinum, diamond, master, legend, god, approve } = require('../static/emojis.json')
 const Names = require('../static/names.json')
 const {saveYDK} = require('./decks.js')
-const { Arena, Binder, Daily, Diary, Draft, Gauntlet, Inventory, Keeper, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist  } = require('../db/index.js')
+const { Arena, Binder, Card, Daily, Diary, Draft, Gauntlet, Inventory, Keeper, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist  } = require('../db/index.js')
 
-//CREATE PLAYER
-const createPlayer = async (id, username = null, tag = null, z = 0) => {
-    setTimeout(async function() {
-        try {
-            await Player.create({
-                id: `${id}`,
-                name: `${username}`,
-                tag: `${tag}`
-            })
-        } catch (err) {
-            console.log(err)
-        }
-    }, z*100)
+//FETCH CARDS
+const fetchAllCards = async () => {
+    const allCards = await Card.findAll().map(function(card) { return card.name })
+    return allCards
 }
 
+//FETCH UNIQUE PRINTS
+const fetchAllUniquePrints = async () => {
+    const prints = []
+    const allUniquePrints = []
+    const allPrints = await Print.findAll()
+    allPrints.forEach(function(print) { 
+        if (!prints.includes(print.card_name)) {
+            prints.push(print.card_name)
+            allUniquePrints.push(print.card_name)
+        }
+    })
+    allUniquePrints.sort()
+    return allUniquePrints
+}
+
+//CREATE PLAYER
+const createPlayer = async (id, username = null, tag = null) => {
+    try {
+        await Player.create({
+            id: `${id}`,
+            name: `${username}`,
+            tag: `${tag}`
+        })
+    } catch (err) {
+        console.log(err)
+    }
+}
 
 //CREATE PROFILE
-const createProfile = async (playerId, first_deck, z = 0) => {
+const createProfile = async (playerId, first_deck) => {
+    const favorite_card = first_deck === 'warrior' ? 'Freed the Matchless General' : 'Chaos Command Magician'
     const date = new Date()
-    const month = `${date.getMonth() + 1}`
-    const day = `${date.getDate()}`
+    const month = `0${date.getMonth() + 1}`
+    const day = `0${date.getDate()}`
     const year = `${date.getFullYear()}`
     
     try {
@@ -41,7 +60,8 @@ const createProfile = async (playerId, first_deck, z = 0) => {
         await Profile.create({
             playerId,
             first_deck,
-            start_date: `${[year, month, day].join('-')}`
+            favorite_card,
+            start_date: `${[year, month.slice(-2), day.slice(-2)].join('-')}`
         })
         await Trivia.create({playerId})
         await Wallet.create({playerId})
@@ -58,21 +78,17 @@ const revive = async (playerId, z) => {
         const player = await Player.findOne({ where: { id: playerId }})
 
         if (!player) {
-            console.log(`adding ${playerId} to the database`)
             const username = Names[playerId] ? Names[playerId] : null
             await createPlayer(playerId, username)
-        } else {
-            console.log(`${player.name} AKA player ${z} already exists`)
         }
     }, z*100)
 }
 
-
 //RESTORE
-const restore = async (winner, loser, format, z) => {
+const restore = async (winner, loser, z) => {
     return setTimeout(async function() {
-        const winnersRow = await eval(format).findOne({ where: { playerId: winner }})
-        const losersRow = await eval(format).findOne({ where: { playerId: loser }})
+        const winnersRow = await Match.findOne({ where: { playerId: winner }})
+        const losersRow = await Match.findOne({ where: { playerId: loser }})
 
         const statsLoser = losersRow.stats
         const statsWinner = winnersRow.stats
@@ -86,17 +102,17 @@ const restore = async (winner, loser, format, z) => {
 
         await winnersRow.save()
         await losersRow.save()
-        await Match.create({ format: format, winner: winner, loser: loser, delta })
-        console.log(`Match ${z}: a ${format} format loss by ${loser} to ${winner} has been added to the database.`)
+        await Match.create({ winner: winner, loser: loser, delta })
+        console.log(`Match ${z}: a loss by ${loser} to ${winner} has been added to the database.`)
     }, z*100)
 }
 
 
 //RECALCULATE
-const recalculate = async (match, winner, loser, format, z) => {
+const recalculate = async (match, winner, loser, z) => {
     return setTimeout(async function() {
-        const winnersRow = await eval(format).findOne({ where: { playerId: winner }})
-        const losersRow = await eval(format).findOne({ where: { playerId: loser }})
+        const winnersRow = await Match.findOne({ where: { playerId: winner }})
+        const losersRow = await Match.findOne({ where: { playerId: loser }})
 
         const statsLoser = losersRow.stats
         const statsWinner = winnersRow.stats
@@ -112,7 +128,7 @@ const recalculate = async (match, winner, loser, format, z) => {
         await losersRow.save()
         await match.update({ delta })
 
-        console.log(`Match ${z}: a ${format} format loss by ${loser} to ${winner} has been incorporated in the recalculation.`)
+        console.log(`Match ${z}: a loss by ${loser} to ${winner} has been incorporated in the recalculation.`)
     }, (z*100 + 10000))
 }
 
@@ -209,15 +225,12 @@ const checkDeckList = async (client, message, member, formatName, formatEmoji, f
 
 //GET RANDOM ELEMENT
 const getRandomElement = (arr) => {
-    console.log('arr.len', arr.length)
     const index = Math.floor((arr.length) * Math.random())
     return arr[index]
 }
 
 //GET RANDOM SUBSET
 const getRandomSubset = (arr, n) => {
-    console.log('arr.length', arr.length)
-    console.log('n', n)
     const shuffledArr = arr.slice(0)
     let i = arr.length
     let temp
@@ -233,11 +246,15 @@ const getRandomSubset = (arr, n) => {
     return shuffledArr.slice(0, n)
 }
 
+const isSameDay = (d1, d2) => d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate()
+
 module.exports = {
     capitalize,
     checkDeckList,
     createPlayer,
     createProfile,
+    fetchAllCards,
+    fetchAllUniquePrints,
     getMedal,
     getRandomElement,
     getRandomSubset,
@@ -245,6 +262,7 @@ module.exports = {
     isAdmin,
     isMod,
     isNewUser,
+    isSameDay,
     recalculate,
     restore,
     revive

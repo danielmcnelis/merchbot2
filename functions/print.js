@@ -3,8 +3,8 @@
 const { com, rar, sup, ult, scr, stardust } = require('../static/emojis.json')
 const { Print } = require('../db/index.js')
 
-const askForCardSlot = async (client, message, member, card_name, card_id, set_code, set_id) => {
-    const filter = m => m.author.id === member.user.id
+const askForCardSlot = async (message, card_name, card_id, set_code, set_id) => {
+    const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send(`What number card is this in the set?`)
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
@@ -15,15 +15,15 @@ const askForCardSlot = async (client, message, member, card_name, card_id, set_c
         const zeros = card_slot < 10 ? '00' : card_slot < 100 ? '0' : ''
         const card_code = `${set_code}-${zeros}${card_slot}`
 
-        return askForRarity(client, message, member, card_name, card_id, set_code, set_id, card_code, card_slot)
+        return askForRarity(message, card_name, card_id, set_code, set_id, card_code, card_slot)
     }).catch(err => {
         console.log(err)
         return member.user.send(`Sorry, time's up.`)
     })
 }
 
-const askForRarity = async (client, message, member, card_name, card_id, set_code, set_id, card_code, card_slot) => {
-    const filter = m => m.author.id === member.user.id
+const askForRarity = async (message, card_name, card_id, set_code, set_id, card_code, card_slot) => {
+    const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send(`What rarity is this print?`)
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
@@ -55,7 +55,38 @@ const askForRarity = async (client, message, member, card_name, card_id, set_cod
     })
 }
 
+const selectPrint = async (message, playerId, card_name) => {
+    const prints = await Print.findAll({ 
+        where: { card_name: card_name },
+        order: [['createdAt', 'ASC']]
+    })
+
+    if (!prints.length) return null
+    if (prints.length === 1) return prints[0]
+    const options = prints.map((print, index) => `(${index + 1}) ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+
+    const filter = m => m.author.id === playerId
+    const msg = await message.channel.send(`Please select a print:\n${options.join('\n')}`)
+    const collected = await msg.channel.awaitMessages(filter, {
+        max: 1,
+        time: 15000
+    }).then(collected => {
+        const num = parseInt(collected.first().content.match(/\d+/))
+        if (!num || !prints[num - 1]) {
+            message.channel.send(`Sorry, ${collected.first().content} is not a valid option.`)
+            return null
+        }
+        else return prints[num - 1]
+    }).catch(err => {
+        console.log(err)
+        return null
+    })
+
+    return collected
+}
+
 module.exports = {
     askForCardSlot,
-    askForRarity
+    askForRarity,
+    selectPrint
 }

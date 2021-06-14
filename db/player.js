@@ -40,6 +40,16 @@ const Player = db.define('player', {
         defaultValue: 0,           
         allowNull: false
     },
+    // vaniquished_foes: {
+    //     type: Sequelize.INTEGER,  
+    //     defaultValue: 0,           
+    //     allowNull: false
+    // },
+    // trade_partners: {
+    //     type: Sequelize.INTEGER,  
+    //     defaultValue: 0,           
+    //     allowNull: false
+    // },
     best_stats: {
         type: Sequelize.FLOAT,   
         defaultValue: 500.00,             

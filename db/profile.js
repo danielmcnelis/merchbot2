@@ -20,11 +20,13 @@ const Profile = db.define('profile', {
         allowNull: true
     },
     quote: {
-        type: Sequelize.TEXT,        
+        type: Sequelize.TEXT,  
+        defaultValue: `My grandpa's deck has no pathetic cards.`,      
         allowNull: true
     },
     author: {
-        type: Sequelize.STRING,        
+        type: Sequelize.STRING,     
+        defaultValue: `Yugi`,         
         allowNull: true
     },
     referral: {

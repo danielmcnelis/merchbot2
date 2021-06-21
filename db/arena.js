@@ -3,32 +3,11 @@ const Sequelize = require('sequelize')
 const {db} = require('./db')
 
 const Arena = db.define('arena', {
-    beast_wins: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,        
-        allowNull: false
+    active: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
     },
-    dragon_wins: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,        
-        allowNull: false
-    },
-    machine_wins: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,        
-        allowNull: false
-    },
-    spellcaster_wins: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,        
-        allowNull: false
-    },
-    warrior_wins: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,        
-        allowNull: false
-    },
-    zombie_wins: {
+    score: {
         type: Sequelize.INTEGER,
         defaultValue: 0,        
         allowNull: false
@@ -36,3 +15,4 @@ const Arena = db.define('arena', {
 })
 
 module.exports = Arena
+

@@ -1,27 +1,30 @@
 const { db, db2 } = require('./db')
 
-const Card = require('./card')
-const Match = require('./match')
-const Trade = require('./trade')
-const Player = require('./player')
-const Tournament = require('./tournament')
-const Print = require('./print')
-const Set = require('./set')
-const Wallet = require('./wallet')
-const Diary = require('./diary')
-const Inventory = require('./inventory')
 const Arena = require('./arena')
-const Trivia = require('./trivia')
-const Keeper = require('./keeper')
-const Gauntlet = require('./gauntlet')
-const Draft = require('./draft')
-const Daily = require('./daily')
 const Binder = require('./binder')
-const Wishlist = require('./wishlist')
+const Card = require('./card')
+const Daily = require('./daily')
+const Diary = require('./diary')
+const Draft = require('./draft')
+const Entry = require('./entry')
+const Gauntlet = require('./gauntlet')
+const Info = require('./info')
+const Inventory = require('./inventory')
+const Knowledge = require('./knowledge')
+const Match = require('./match')
+const Player = require('./player')
+const Print = require('./print')
 const Profile = require('./profile')
+const Set = require('./set')
+const Status = require('./status')
+const Tournament = require('./tournament')
+const Trade = require('./trade')
+const Trivia = require('./trivia')
+const Wallet = require('./wallet')
+const Wishlist = require('./wishlist')
 
-Tournament.belongsTo(Player)
-Player.hasOne(Tournament)
+Entry.belongsTo(Player)
+Player.hasOne(Entry)
 
 Set.hasMany(Print)
 Print.belongsTo(Set)
@@ -38,20 +41,23 @@ Inventory.belongsTo(Player)
 Print.hasMany(Inventory)
 Inventory.belongsTo(Print)
 
+Tournament.hasMany(Entry)
+Entry.belongsTo(Tournament)
+
 Player.hasOne(Arena)
 Arena.belongsTo(Player)
-
-Player.hasOne(Trivia)
-Trivia.belongsTo(Player)
-
-Player.hasOne(Keeper)
-Keeper.belongsTo(Player)
 
 Player.hasOne(Gauntlet)
 Gauntlet.belongsTo(Player)
 
+Player.hasOne(Trivia)
+Trivia.belongsTo(Player)
+
 Player.hasOne(Draft)
 Draft.belongsTo(Player)
+
+Player.hasOne(Knowledge)
+Knowledge.belongsTo(Player)
 
 Player.hasOne(Daily)
 Daily.belongsTo(Player)
@@ -68,23 +74,26 @@ Profile.belongsTo(Player)
 module.exports = {
   db,
   db2,
-  Card,
-  Match,
-  Trade,
-  Player,
-  Tournament,
-  Print,
-  Set,
-  Wallet,
-  Diary,
-  Inventory,
   Arena,
-  Trivia,
-  Keeper,
-  Gauntlet,
-  Draft,
-  Daily,
   Binder,
-  Wishlist,
-  Profile
+  Card,
+  Daily,
+  Diary,
+  Draft,
+  Entry,
+  Gauntlet,
+  Info,
+  Inventory,
+  Knowledge,
+  Match,
+  Player,
+  Print,
+  Profile,
+  Set,
+  Status,
+  Tournament,
+  Trade,
+  Trivia,
+  Wallet,
+  Wishlist
 }

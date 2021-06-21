@@ -79,6 +79,11 @@ const Set = db.define('set', {
     defaultValue: 15,
     allowNull: false
   },
+  unit_sales: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+    allowNull: false
+  },
   cards_per_pack: {
     type: Sequelize.INTEGER,
     defaultValue: null,

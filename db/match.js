@@ -3,7 +3,7 @@ const Sequelize = require('sequelize')
 const { db } = require('./db')
 
 const Match = db.define('match', {
-    game: {
+    game_mode: {
         type: Sequelize.STRING, 
         defaultValue: "ranked",       
         allowNull: false

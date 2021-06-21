@@ -21,7 +21,8 @@ const Print = db.define('print', {
   },
   card_code: {
     type: Sequelize.STRING,
-    allowNull: true
+    allowNull: true,
+    unique: true
   },
   rarity: {
     type: Sequelize.STRING,

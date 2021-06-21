@@ -2,8 +2,12 @@
     "legalcom": ["!legal", "!check", "!checklegal", "!legalcheck", "!deckcheck", "!checkdeck", "!legaldeck", "!decklegal"],
     "listcom": ["!list", "!banlist", "!bannedlist", "!bans"],
     "pfpcom": ["!pfp", "!pic", "!avatar"],
+    "calccom": ["!calc", "!calculate"],
+    "bracketcom":["!bracket", "!challonge", "!show", "!tournament", "!pairings"],
     "botcom": ["!bot", "!guide"],
+    "invcom": ["!inv", "!inventory"],
     "checklistcom": ["!checklist", "!check", "!list"],
+    "dropcom": ["!drop", "!leave"],
     "infocom": ["!help", "!info"],
     "dbcom": ["!db", "!dbname", "!duelingbook"],
     "rolecom": ["!role", "!rankedgoats"],
@@ -17,5 +21,6 @@
     "rankcom": ["!rank", "!rankings", "!top", "!ladder", "!leaderboard", "!leaders"],
     "yescom": ["yes", "yeah", "yea", "ye", "ya", "yah", "yh", "y", "sure", "ok", "okay", "k", "sure", "si", "ja", "oui", "hai", "ha", "ee", "da"],
     "nocom": ["no", "nah", "nope", "naw", "n", "na", "nein", "non", "iie", "iya", "nee", "nej", "net"],
-    "startcom": ["!start", "!starter", "!begin", "!go", "!starterdeck"]
+    "startcom": ["!start", "!starter", "!begin", "!go", "!starterdeck"],
+    "queuecom": ["!queue", "!q"]
 }

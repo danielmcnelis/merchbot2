@@ -1,281 +1,147 @@
 
 const { registrationChannel } = require('../static/channels.json')
 const { tourRole } = require('../static/roles.json')
-const { approve } = require('../static/emojis.json')
+const { approve, FiC } = require('../static/emojis.json')
 const status = require('../static/status.json')
-const { Match, Matchup, Player, Tournament, YugiKaiba, Critter, Android, Yata, Vampire, TradChaos, ChaosWarrior, Goat, CRVGoat, Reaper, ChaosReturn, Stein, TroopDup, PerfectCircle, DADReturn, GladBeast, TeleDAD, DarkStrike, Lightsworn, Edison, Frog, SixSamurai, Providence, TenguPlant, LongBeach, DinoRabbit, WindUp, Meadowlands, BabyRuler, RavineRuler, FireWater, HAT, Shaddoll, London, BurningAbyss, Charleston, Nekroz, Clown, PePe, DracoPal, Monarch, ABC, GrassZoo, DracoZoo, LinkZoo, QuickFix, Tough, Magician, Gouki, Danger, PrankKids, SkyStriker, ThunderDragon, LunalightOrcust, StrikerOrcust, Current, Traditional, Rush, Speed, Nova, Rebirth  } = require('../db/index.js')
-const { getCat } = require('./utility.js')
+const { Arena, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist } = require('../db')
 const { client, challongeClient } = require('../static/clients.js')
 const { saveYDK, saveAllYDK } = require('./decks.js')
 const types = require('../static/types.json')
 
 
 //ASK FOR DB USERNAME
-const askForDBUsername = async (client, message, member, error = false, attempt = 0) => {
+const askForDBUsername = async (member, player, error = false, attempt = 1) => {
     const filter = m => m.author.id === member.user.id
-    if (attempt >= 3) return member.user.send(`Sorry, time's up. You can also provide your DuelingBook username on the Discord server by using the **!db** command, followed by your username.`)
-    attempt++
-    const prompt = error ? `I think you're getting ahead of yourself. First, I need your DuelingBook username.` : `Hi! This appears to be your first tournament in our new system. Can you please provide your DuelingBook username?`
+    const prompt = error ? `I think you're getting ahead of yourself. First, I need your DuelingBook username.`
+    : `Hi! This appears to be your first tournament in our system. Can you please provide your DuelingBook username?`
 	const msg = await member.user.send(prompt)
+
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
-        time: 60000
-    }).then(async collected => {
-        if (collected.first().content.includes("duelingbook.com/deck") || collected.first().content.includes("imgur.com")) return askForDBUsername(client, message, member, true, attempt)
-        const player = await Player.findOne({ where: { id: member.user.id }})
-        await player.update({
-            duelingBook: collected.first().content
-        })
-        member.user.send(`Thanks! I've saved your DuelingBook username as: ${collected.first().content}. If that's not correct, you can update it on the Discord server by using the command **!db** followed by your username.`)
-        return setTimeout(function() {
-            getDeckListTournament(client, message, member, false)
-        }, 2000)	
-    }).catch(err => {
+        time: 30000
+    }).then(async (collected) => {
+        const dbName = collected.first().content
+        if (dbName.includes("duelingbook.com/deck") || dbName.includes("imgur.com")) {
+            if (attempt >= 3) {
+                member.user.send(`Sorry, time's up. Goodbye.`)
+                return false
+            } else {
+                return askForDBUsername(member, player, true, attempt++)
+            }
+        } else {
+            await player.update({
+                duelingBook: dbName
+            })
+            member.user.send(`Thanks! I saved your DuelingBook username as: ${dbName}. If that's wrong, go back to the Discord server and type **!db username**.`)
+            return dbName
+        }
+    }).catch((err) => {
         console.log(err)
-        return member.user.send(`Sorry, time's up. You can also provide your DuelingBook username on the Discord server by using the **!db** command, followed by your username.`)
+        member.user.send(`Sorry, time's up. Goodbye.`)
+        return false
     })
+
+    return collected
 }
 
-
 //GET DECK LIST TOURNAMENT
-const getDeckListTournament = async (client, message, member, resubmission = false, formatName, formatEmoji, formatChannel, formatDate, formatList) => {            
+const getDeckListTournament = async (member, player, resubmission = false) => {            
     const filter = m => m.author.id === member.user.id
     const msg = await member.user.send("Please provide a duelingbook.com/deck link for your tournament deck.");
     const collected = await msg.channel.awaitMessages(filter, {
         max: 1,
         time: 180000
-    }).then(async collected => {
-        if (collected.first().content.startsWith("https://www.duelingbook.com/deck") || collected.first().content.startsWith("www.duelingbook.com/deck") || collected.first().content.startsWith("duelingbook.com/deck")) {		
-            message.author.send('Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.')
-
-            const url = collected.first().content
-            const issues = await saveYDK(message.author, url, formatDate, formatList)
+    }).then(async (collected) => {
+        const url = collected.first().content
+        if (url.includes("www.duelingbook.com/deck")) {		
+            member.send('Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.')
+            const issues = await saveYDK(member, url)
             
             if (issues['illegalCards'].length || issues['forbiddenCards'].length || issues['limitedCards'].length || issues['semiLimitedCards'].length) {
-                let response = `I'm sorry, ${message.author.username}, your deck is not legal for ${formatName} Format. ${formatEmoji}`
-                if (issues['illegalCards'].length) response += `\n\nThe following cards are not included in this format:\n${issues['illegalCards'].join('\n')}`
+                let response = `I'm sorry, ${player.name}, your deck is not legal. ${FiC}`
+                if (issues['illegalCards'].length) response += `\n\nThe following cards are not in this game:\n${issues['illegalCards'].join('\n')}`
                 if (issues['forbiddenCards'].length) response += `\n\nThe following cards are forbidden:\n${issues['forbiddenCards'].join('\n')}`
                 if (issues['limitedCards'].length) response += `\n\nThe following cards are limited:\n${issues['limitedCards'].join('\n')}`
                 if (issues['semiLimitedCards'].length) response += `\n\nThe following cards are semi-limited:\n${issues['semiLimitedCards'].join('\n')}`
                 response += `\n\nPlease edit your deck and try again once it's legal. If you believe this message is in error, contact the Tournament Organizer.`
             
-                sendToTournamentChannel(client, member, url, null, false)
-                return message.author.send(response)
+                member.send(response)
+                sendToTournamentChannel(player, url, null, false)
+                return false
             } else if (issues['unrecognizedCards'].length) {
-                let response = `I'm sorry, ${message.author.username}, the following card IDs were not found in our database:\n${issues['unrecognizedCards'].join('\n')}`
-                response += `\n\nThese cards are either new to the TCG, OCG only, or incorrect in our database. Please contact the Tournament Organizer or the Admin.`
-
-                sendToTournamentChannel(client, member, url, null, false)
-                return message.author.send(response)
-             } {
-                message.author.send(`Thanks, ${member.user.username}, your ${formatName} Format ${formatEmoji} deck is perfectly legal. ${approve}`)
-                return getDeckTypeTournament(client, message, member, formatChannel, url, resubmission)
+                let response = `I'm sorry, ${player.name}, the following card IDs were not found in our database:\n${issues['unrecognizedCards'].join('\n')}`
+                response += `\n\nThese cards are either alternate artwork, new to the TCG, OCG only, or incorrect in our database. Please contact the Tournament Organizer or the Admin if you can't resolve this.`
+                
+                member.send(response)
+                sendToTournamentChannel(player, url, null, false)
+                return false
+             } else {
+                member.send(`Thanks, ${player.name}, your deck is perfectly legal. ${approve}`)
+                return url
             }
         } else {
-            return message.author.send("Sorry, I only accept duelingbook.com/deck links.")      
+            member.send("Sorry, I only accept duelingbook.com/deck links.")
+            return false
         }
-    }).catch(err => {
+    }).catch((err) => {
         console.log(err)
-        return message.author.send(`Sorry, time's up. If you wish to try again, go back to the Discord server and use the **!join** command.`)
+        member.send(`Sorry, time's up. To try again, go back to the Discord server and type **!join**. Goodbye.`)
+        return false
     })
+
+    return collected
 }
 
-
 //DIRECT SIGN UP
-const directSignUp = async (client, message, member, formatChannel, resubmission = false) => {            
-    const filter = m => m.author.id === message.author.id
-    const msg = await message.author.send(`Please provide a duelingbook.com/deck link for ${member.user.username}'s tournament deck.`);
+const directSignUp = async (message, player, resubmission = false) => {            
+    const filter = m => m.author.id === member.user.id
+    const msg = await message.author.send(`Please provide a duelingbook.com/deck link for ${player.name}'s tournament deck.`);
     const collected = await msg.channel.awaitMessages(filter, {
         max: 1,
         time: 60000
     }).then(async collected => {
-        if (collected.first().content.startsWith("https://www.duelingbook.com/deck") || collected.first().content.startsWith("www.duelingbook.com/deck") || collected.first().content.startsWith("duelingbook.com/deck")) {		
-            const url = collected.first().content
-
-            message.author.send(`Thanks, ${message.author.username}, I now have the link to ${member.user.username}'s tournament deck. ${approve}`)
-            return getDeckTypeTournament(client, message, member, formatChannel, url, resubmission, true)
+        const url = collected.first().content
+        if (url.includes("duelingbook.com/deck")) {		
+            message.author.send(`Thanks, ${message.author.username}, I now have the link to ${player.name}'s tournament deck. ${approve}`)
+            return url
         } else {
-            return message.author.send("Sorry, I only accept duelingbook.com/deck links.")      
+            message.author.send("Sorry, I only accept duelingbook.com/deck links.")
+            return false
         }
     }).catch(err => {
         console.log(err)
-        return message.author.send(`Sorry, time's up. If you wish to try again, go back to the Discord server and use the **!join** command.`)
+        member.user.send(`Sorry, time's up. To try again, go back to the Discord server type **!join**.`)
+        return false
     })
+
+    return collected
 }
 
-
-
-//GET DECK TYPE TOURNAMENT
-const getDeckTypeTournament = async (client, message, member, formatChannel, url, resubmission = false, override = false) => {
-    const keys = Object.keys(types)
-    const player = Player.findOne({ where: { id: member.user.id }})
-    let success = false
-    let filter
-
-	if (override) {
-        filter = m => m.author.id === message.member.user.id
-    } else {
-        filter = m => m.author.id === member.user.id
-    }
-
-	const msg = await message.author.send(`For our tournament coverage, please provide the common name for your deck (i.e. Chaos Control, Quickdraw Plant, Mermail, etc.).`)
+//GET DECK NAME TOURNAMENT
+const getDeckNameTournament = async (member, player) => {
+	const msg = await member.send(`Please provide the common name for your deck (i.e. Chaos Control, Quickdraw Plant, Mermail, etc.).`)
+    const filter = m => m.author.id === member.user.id
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
         time: 60000
     }).then(async collected => {
-        keys.forEach(async function (elem) {
-            if (types[elem].includes(collected.first().content.toLowerCase())) {
-                success = true
-                if (resubmission) {
-                    try {
-                        const tourDeck = await Tournament.findOne({
-                            where: { playerId: member.user.id }
-                        })
-    
-                        await tourDeck.update({
-                            url,
-                            name: collected.first().content.toLowerCase(),
-                            type: elem,
-                            category: getCat(elem)
-                        })
-                    } catch (err) {
-                        console.log(err)
-                    }
-                } else {
-                    await Tournament.create({
-                        url,
-                        pilot: member.user.username,
-                        name: collected.first().content.toLowerCase(),
-                        playerId: member.user.id,
-                        type: elem,
-                        category: getCat(elem)
-                    })
-                }
-
-                sendToTournamentChannel(client, member, url, types[elem][0])
-
-                const name = status['tournament']
-                const entry = await Tournament.findOne({ where: { playerId: member.user.id }})
-
-                if (!name || !entry) return message.channel.send(`Something went wrong. Please get the Tournament Organizer to help you sign-up.`)
-
-                if (!resubmission) {
-                    await challongeClient.tournaments.show({
-                        id: name,
-                        callback: async (err, data) => {
-                            if (err) {
-                                return message.channel.send(`Error: the tournament you provided, "${name}", could not be found.`)
-                            } else {
-                                if (data.tournament.state !== 'pending') return message.channel.send("Sorry, the tournament already started.")
-                                await challongeClient.participants.create({
-                                    id: name,
-                                    participant: {
-                                    name: member.user.username,
-                                    },
-                                    callback: async (err, data) => {
-                                        if (err) {
-                                            console.log(err)
-                                            return message.channel.send(`Error: the upcoming tournament, "${name}", could not be accessed.`)
-                                        } else {
-                                            member.roles.add(tourRole)
-                                            entry.update({ participantId: data.participant.id })
-                                            client.channels.cache.get(formatChannel).send(`<@${member.user.id}> is now registered for the tournament!`)
-                                        }
-                                    }
-                                })
-                            }
-                        }
-                    })
-                }
-                
-            const response = override ? `Thanks! ${member.user.username} should now be registered.` : `Thanks! I have all the information we need from you. Good luck in the tournament!`
-            return message.author.send(response)
-            }
-        })
-
-        if (!success && !resubmission) {
-            await Tournament.create({
-                url,
-                pilot: member.user.username,
-                name: collected.first().content.toLowerCase(),
-                playerId: member.user.id,
-                type: 'other',
-                category: 'other'
-            })
-
-            const name = status['tournament']
-            const entry = await Tournament.findOne({ where: { playerId: member.user.id }})
-
-            if (!name || !entry) return message.channel.send(`Something went wrong. Please get the Tournament Organizer to help you sign-up.`)
-
-            await challongeClient.tournaments.show({
-                id: name,
-                callback: async (err, data) => {
-                    if (err) {
-                        return message.channel.send(`Error: the tournament you provided, "${name}", could not be found.`)
-                    } else {
-                        if (data.tournament.state !== 'pending') return message.channel.send("Sorry, the tournament already started.")
-                        await challongeClient.participants.create({
-                            id: name,
-                            participant: {
-                            name: member.user.username,
-                            },
-                            callback: async (err, data) => {
-                                if (err) {
-                                    console.log(err)
-                                    return message.channel.send(`Error: the upcoming tournament, "${name}", could not be accessed.`)
-                                } else {
-                                    member.roles.add(tourRole)
-                                    entry.update({ participantId: data.participant.id })
-                                    client.channels.cache.get(formatChannel).send(`<@${member.user.id}> is now registered for the tournament!`)                                }
-                            }
-                        })
-                    }
-                }
-            })
-
-            sendToTournamentChannel(client, member, url, 'Other')
-            const response = override ? `Thanks! ${member.user.username} should now be registered.` : `Thanks! I have all the information we need from you. Good luck in the tournament!`
-            return message.author.send(response)
-        } else if (!success && resubmission) {
-                    try {
-                        const tourDeck = await Tournament.findOne({
-                            where: { playerId: member.user.id }
-                        })
-    
-                        await tourDeck.update({
-                            url,
-                            name: collected.first().content.toLowerCase(),
-                            type: 'other',
-                            category: 'other'
-                        })
-
-                        sendToTournamentChannel(client, member, url, 'Other')
-                        const response = override ? `Thanks! ${member.user.username} should now be registered.` : `Thanks! I have all the information we need from you. Good luck in the tournament!`
-                        return message.author.send(response)
-                    } catch (err) {
-                        console.log(err)
-                    }
-        }
+        const deckName = collected.first().content.toLowerCase()
+        return deckName
     }).catch(err => {    
-    console.log(err)
-    return member.user.send(`Sorry, time's up. If you wish to try again, go back to the Discord server and use the **!join** command.`)
-})
+        console.log(err)
+        member.send(`Sorry, time's up. To try again, go back to the Discord server type **!join**.`)
+        return false
+    })
 
+    return collected
 }
-
 
 //SEND TO TOURNAMENT CHANNEL
-const sendToTournamentChannel = async (client, member, deckUrl, deckType, legal = true) => {
-    if (!legal) {
-        return client.channels.cache.get(registrationChannel).send(`<@${member.user.id}> attempted to submit an **illegal** deck for the tournament:
-<${deckUrl}>`)
-    } else {
-        return client.channels.cache.get(registrationChannel).send(`<@${member.user.id}> submitted their ${deckType} deck for the tournament:
-<${deckUrl}>`)
-    }
+const sendToTournamentChannel = async (player, url, deckType, legal = true) => {
+    return client.channels.cache.get(registrationChannel).send(
+        `<@${player.id}> ${legal ? 'submitted': 'attempted to submit'} their ${legal ? deckType : 'illegal'} deck for the tournament:\n<${url}>`
+    )
 }
-
 
 //SEED
 const seed = async (message, challongeClient, name, participantId, index) => {
@@ -304,38 +170,60 @@ const seed = async (message, challongeClient, name, participantId, index) => {
     }
 }
 
+// SELECT TOURNAMENT
+const selectTournament = async (message, tournaments) => {
+    if (tournaments.length === 1) return tournaments[0]
+    const options = tournaments.map((tournament, index) => `(${index + 1}) ${tournament.name}`)
+    const filter = m => m.author.id === playerId
+    const msg = await message.channel.send(`Please select a tournament:\n${options.join('\n')}`)
+    const collected = await msg.channel.awaitMessages(filter, {
+        max: 1,
+        time: 15000
+    }).then(collected => {
+        const num = parseInt(collected.first().content.match(/\d+/))
+        if (!num || !tournaments[num - 1]) {
+            message.channel.send(`Sorry, ${collected.first().content} is not a valid option.`)
+            return null
+        }
+        else return tournaments[num - 1]
+    }).catch(err => {
+        console.log(err)
+        return null
+    })
+
+    return collected
+}
+
 
 //REMOVE PARTICIPANT
-const removeParticipant = async (message, participants, name, person, drop = false) => {    
+const removeParticipant = async (message, member, participants, participantId, tournamentId, drop = false) => {    
     let participantID
     let keys = Object.keys(participants)
-    const member = message.guild.members.cache.get(person.id)
 
-    keys.forEach(function(elem) {
-        if (participants[elem].participant.name === person.username) {
-            participantID = participants[elem].participant.id
+    keys.forEach(function(key) {
+        console.log('participants[key]', participants[key])
+        if (participants[key].participant.name === member.user.username) {
+            participantID = participants[key].participant.id
         }
     })
 
-    if (!member) return message.channel.send('I could not find that person in the server.')
-
-    challongeClient.participants.destroy({
-        id: name,
+    return challongeClient.participants.destroy({
+        id: tournamentId,
         participantID: participantID,
         callback: async (err) => {
             if (err) {
                 if (drop) {
                     return message.channel.send(`Hmm... I don't see you in the participants list.`)
                 } else {
-                    return message.channel.send(`Error: could not find "${person.username}" in the participants list.`)
+                    return message.channel.send(`I could not find ${member.user.username} in the participants list.`)
                 }
             } else {
-                const tourDeck = await Tournament.findOne({ where: { playerId: person.id } })
-                await tourDeck.destroy()
+                const entry = await Entry.findOne({ where: { playerId: member.user.id } })
+                await entry.destroy()
                 member.roles.remove(tourRole)
 
                 if (drop) return message.channel.send(`I removed you from the tournament. Better luck next time!`)
-                return message.channel.send(`${person.username} has been removed from the tournament.`)
+                else return message.channel.send(`${member.user.username} has been removed from the tournament.`)
             }
         }
     })
@@ -685,11 +573,32 @@ const checkMatches = async (message, matches, participants, matchId, loserId, wi
     return
 }
 
+const getTournamentType = async (message) => {
+    let tournamentType
+    const filter = m => m.author.id === message.author.id
+	const msg = await message.channel.send(`What type of tournament is this?\n(1) Double Elimination\n(2) Single Elimination\n(3) Swiss\n(4) Round Robin`)
+	const collected = await msg.channel.awaitMessages(filter, {
+		max: 1,
+		time: 30000
+	}).then(collected => {
+		const response = collected.first().content.toLowerCase()
+        if (response.includes(1) || response.startsWith('double')) tournamentType = 'double elimination'
+        else if (response.includes(2) || response.startsWith('single')) tournamentType = 'single elimination'
+        else if (response.includes(3) || response.startsWith('swiss')) tournamentType = 'swiss'
+        else if (response.includes(4) || response.startsWith('round')) tournamentType = 'round robin'
+        else return 
+	}).catch(err => {
+		console.log(err)
+        message.channel.send(`Sorry, time's up.`)
+	})
+
+    return tournamentType
+}
 
 module.exports = {
     askForDBUsername,
     getDeckListTournament,
-    getDeckTypeTournament,
+    getDeckNameTournament,
     sendToTournamentChannel,
     removeParticipant,
     directSignUp,
@@ -697,5 +606,7 @@ module.exports = {
     getParticipants,
     findOpponent,
     getUpdatedMatchesObject,
-    addMatchResult
+    addMatchResult,
+    getTournamentType,
+    selectTournament
 }

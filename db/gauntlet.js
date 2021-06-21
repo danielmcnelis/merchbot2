@@ -3,16 +3,20 @@ const Sequelize = require('sequelize')
 const {db} = require('./db')
 
 const Gauntlet = db.define('gauntlet', {
-    wins: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
-        allowNull: false
+    active: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
     },
-    losses: {
+    partner: {
+        type: Sequelize.STRING,
+        defaultValue: null
+    },
+    score: {
         type: Sequelize.INTEGER,
-        defaultValue: 0,
+        defaultValue: 0,        
         allowNull: false
     }
 })
 
 module.exports = Gauntlet
+

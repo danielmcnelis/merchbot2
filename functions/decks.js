@@ -5,55 +5,20 @@ const firefox = require('selenium-webdriver/firefox')
 const fs = require('fs')
 const { Tournament, Card, Status } = require('../db/index.js')
 const errors = require('../static/errors.json')
+const { approve } = require('../static/emojis.json')
 const { Op } = require('sequelize')
-
-const convertSortedArrayToObject = (arr) => {
-    const obj = {}
-
-    arr.forEach(elem => {
-        if (!obj[elem]) {
-            obj[elem] = 1
-        } else {
-            obj[elem]++
-        }
-    })
-
-    return obj
-}
-
-//SAVE ALL YDKs
-const saveAllYDK = async () => {
-    const allDecks = await Tournament.findAll()
-
-    for (let i = 0; i < allDecks.length; i++) {
-        const member = {
-            user: {
-                username: allDecks[i].pilot
-            }
-        }
-
-        const url = allDecks[i].url
-
-        setTimeout(async function () {
-            try {
-                await saveYDK(member, url)
-            } catch (err) {
-                console.log('Fudge. An error:', err)
-            }
-        }, (( i * 15000 ) + 1000))
-    }
-}
-
+const { convertCardsArrayToObject } = require('./utility.js')
+const { fetchAllForgedCards } = require('./search.js')
 
 //SAVE YDK
-const saveYDK = async (member, url, formatDate, formatList) => {
+const saveYDK = async (member, url) => {
     console.log('~~~SAVING YDK~~~')
-    console.log('formatDate', formatDate)
-    console.log('formatList', formatList)
     const options = new firefox.Options()
     options.addArguments("-headless")
     const username = member.user ? member.user.username : member.username    
+    console.log('username', username)
     const driver = await new Builder().forBrowser('firefox').setFirefoxOptions(options).build()
+    console.log('!!driver', !!driver)
     
     try {
         console.log(`Loading ${username}'s deck at ${url}...`)
@@ -84,51 +49,46 @@ const saveYDK = async (member, url, formatDate, formatList) => {
 		await driver.wait(until.elementLocated(By.id('deck_card1')))
 		const deck_arr = await driver.executeScript(get_deck)
         const file = deck_arr.join('\n')
-	  
-        let cards_arr = []
-
-        deck_arr.forEach(elem => {
-            if (elem.charAt(0) !== '#' && elem.charAt(0) !== '!' && elem !== '')
-            cards_arr.push(elem)
-        })
-
+        const cards_arr = deck_arr.filter(elem => elem.charAt(0) !== '#' && elem.charAt(0) !== '!' && elem !== '')
         cards_arr.sort()
+        console.log('cards_arr', cards_arr)
+        const cards_obj = convertCardsArrayToObject(cards_arr)
+        console.log('cards_obj', cards_obj)
+        const allForgedCards = await fetchAllForgedCards()
 
-        const cards_obj = convertSortedArrayToObject(cards_arr)
-
-        const allGoatCardsFromDB = await Card.findAll({
+        const allForbiddenCards = await Status.findAll({ 
             where: {
-                date: {
-                    [Op.lte]: formatDate,
-                }
+                current: 'forbidden'
             }
         })
 
-        const allforbiddenGoatCardsFromDB = await Status.findAll({ 
+        const allLimitedCards = await Status.findAll({ 
             where: {
-                [formatList]: 'forbidden'
-            },
-            include: Card 
+                current: 'limited'
+            }
         })
 
-        const allLimitedGoatCardsFromDB = await Status.findAll({ 
+        const allSemiLimitedCards = await Status.findAll({ 
             where: {
-                [formatList]: 'limited'
-            },
-            include: Card 
+                current: 'semi-limited'
+            }
         })
 
-        const allSemiLimitedGoatCardsFromDB = await Status.findAll({ 
-            where: {
-                [formatList]: 'semi-limited'
-            },
-            include: Card 
+        const cardIds = allForgedCards.map(card => {
+            let id = card.image.slice(0,-4)
+            while (id.length < 8) id = '0' + id
+            return id
         })
 
-        let goatCardIds = []
-        let forbiddenCardIds = []
-        let limitedCardIds = []
-        let semiLimitedCardIds = []
+        console.log('cardIds', cardIds)
+
+        const forbiddenCardIds = allForbiddenCards.map(card => card.konamiCode)
+        const limitedCardIds = allLimitedCards.map(card => card.konamiCode)
+        const semiLimitedCardIds = allSemiLimitedCards.map(card => card.konamiCode)
+
+        console.log('forbiddenCardIds', forbiddenCardIds)
+        console.log('limitedCardIds', limitedCardIds)
+        console.log('semiLimitedCardIds', semiLimitedCardIds)
 
         let illegalCards = []
         let forbiddenCards = []
@@ -136,46 +96,23 @@ const saveYDK = async (member, url, formatDate, formatList) => {
         let semiLimitedCards = []
         let unrecognizedCards = []
 
-        allGoatCardsFromDB.forEach(card => {
-            let id = card.image.slice(0,-4)
-            while (id.length < 8) id = '0' + id
-            goatCardIds.push(id)
-        })
-
-        allforbiddenGoatCardsFromDB.forEach(row => {
-            let id = row.card.image.slice(0,-4)
-            while (id.length < 8) id = '0' + id
-            forbiddenCardIds.push(id)
-        })
-
-        allLimitedGoatCardsFromDB.forEach(row => {
-            let id = row.card.image.slice(0,-4)
-            while (id.length < 8) id = '0' + id
-            limitedCardIds.push(id)
-        })
-
-        allSemiLimitedGoatCardsFromDB.forEach(row => {
-            let id = row.card.image.slice(0,-4)
-            while (id.length < 8) id = '0' + id
-            semiLimitedCardIds.push(id)
-        })
-
         const keys = Object.keys(cards_obj)
 
         for (let key of keys) {
+            console.log('key', key)
             let id = key
             while (key.length < 8) key = '0' + key
             while (id.charAt(0) === '0') id = id.slice(1)
             const imageFile = `${id}.jpg`
 
-            if (goatCardIds.includes(key)) {
-                if (forbiddenCardIds.includes(key)) {
+            if (cardIds.includes(key)) {
+               if (forbiddenCardIds.includes(key)) {
                     const forbiddenCard = await Card.findOne({
                         where: {
                             image: imageFile
                         }
                     })
-    
+
                     forbiddenCards.push(forbiddenCard.name)
                 } else if (limitedCardIds.includes(key) && cards_obj[key] > 1) {
                     const limitedCard = await Card.findOne({
@@ -188,11 +125,11 @@ const saveYDK = async (member, url, formatDate, formatList) => {
                 } else if (semiLimitedCardIds.includes(key) && cards_obj[key] > 2) {
                     const semiLimitedCard = await Card.findOne({
                         where: {
-                            image: imageFile
-                        }
-                    })
-    
-                    semiLimitedCards.push(semiLimitedCard.name)
+                                image: imageFile
+                            }
+                        })
+        
+                        semiLimitedCards.push(semiLimitedCard.name)
                 }
             } else {
                 const illegalCard = await Card.findOne({
@@ -204,14 +141,12 @@ const saveYDK = async (member, url, formatDate, formatList) => {
                 if (illegalCard) {
                     illegalCards.push(illegalCard.name)
                 } else {
-                    let rawdata = fs.readFileSync('./static/errors.json')
-                    let rawobj = JSON.parse(rawdata)
-                    let badCardIds = rawobj["badCardIds"]
-
+                    const jsonData = fs.readFileSync('./static/errors.json')
+                    const jsonParse = JSON.parse(jsonData)
+                    const badCardIds = jsonParse["badCardIds"]
                     if(!badCardIds.includes(id)) badCardIds.push(id)
-                    const newBadCardIds = badCardIds
             
-                    errors['badCardIds'] = newBadCardIds
+                    errors['badCardIds'] = badCardIds
                     fs.writeFile('./static/errors.json', JSON.stringify(errors), (err) => { 
                         if (err) console.log(err)
                     })
@@ -232,6 +167,7 @@ const saveYDK = async (member, url, formatDate, formatList) => {
         forbiddenCards.sort()
         limitedCards.sort()
         semiLimitedCards.sort()
+        unrecognizedCards.sort()
 
         const issues = {
             illegalCards,
@@ -249,7 +185,65 @@ const saveYDK = async (member, url, formatDate, formatList) => {
 	}
 }
 
+//SAVE ALL YDKs
+const saveAllYDK = async () => {
+    const allDecks = await Tournament.findAll()
+
+    for (let i = 0; i < allDecks.length; i++) {
+        const member = {
+            user: {
+                username: allDecks[i].pilot
+            }
+        }
+
+        const url = allDecks[i].url
+
+        setTimeout(async function () {
+            try {
+                await saveYDK(member, url)
+            } catch (err) {
+                console.log('Fudge. An error:', err)
+            }
+        }, (( i * 15000 ) + 1000))
+    }
+}
+
+//CHECK DECK LIST
+const checkDeckList = async (client, message, member, formatName, formatEmoji, formatDate, formatList) => {  
+    const filter = m => m.author.id === member.user.id
+    const msg = await member.user.send(`Please provide a duelingbook.com/deck link for the ${formatName} Format ${formatEmoji} deck you would like to check for legality.`);
+    const collected = await msg.channel.awaitMessages(filter, {
+        max: 1,
+        time: 180000
+    }).then(async collected => {
+        if (collected.first().content.startsWith("https://www.duelingbook.com/deck") || collected.first().content.startsWith("www.duelingbook.com/deck") || collected.first().content.startsWith("duelingbook.com/deck")) {		
+            message.author.send('Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.')
+
+            const url = collected.first().content
+            const issues = await saveYDK(message.author, url, formatDate, formatList)
+            
+            if (issues['illegalCards'].length || issues['forbiddenCards'].length || issues['limitedCards'].length || issues['semiLimitedCards'].length) {
+                let response = `I'm sorry, ${message.author.username}, your deck is not legal for ${formatName} Format. ${formatEmoji}`
+                if (issues['illegalCards'].length) response += `\n\nThe following cards are not included in this format:\n${issues['illegalCards'].join('\n')}`
+                if (issues['forbiddenCards'].length) response += `\n\nThe following cards are forbidden:\n${issues['forbiddenCards'].join('\n')}`
+                if (issues['limitedCards'].length) response += `\n\nThe following cards are limited:\n${issues['limitedCards'].join('\n')}`
+                if (issues['semiLimitedCards'].length) response += `\n\nThe following cards are semi-limited:\n${issues['semiLimitedCards'].join('\n')}`
+            
+                return message.author.send(response)
+            } else {
+                return message.author.send(`Your ${formatName} Format ${formatEmoji} deck is perfectly legal. You are good to go! ${approve}`)
+            }
+        } else {
+            return message.author.send("Sorry, I only accept duelingbook.com/deck links.")      
+        }
+    }).catch(err => {
+        console.log(err)
+        return message.author.send(`Sorry, time's up. If you wish to try again, go back to the Discord server and use the **!check** command.`)
+    })
+}
+
 module.exports = {
+    checkDeckList,
     saveAllYDK,
     saveYDK
 }

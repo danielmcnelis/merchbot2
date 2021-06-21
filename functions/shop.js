@@ -7,12 +7,41 @@ const { FOA, merchant, FiC, approve, lmfao, god, legend, master, diamond, platin
 const updateShop = async (channel) => {
     channel.bulkDelete(100)
     
-    // setTimeout(() => {
-    //     console.log('bulk deleting')
-    //     channel.bulkDelete(100)
-    // }, 2000)
+    setTimeout(() => {
+        channel.bulkDelete(100)
+    }, 2000)
     
+    setTimeout(() => {
+        channel.bulkDelete(100)
+    }, 4000)
+
     setTimeout(async () => {
+        const results = [`${merchant} --- Core Products --- ${merchant}`]
+    
+        const setsForSale = await Set.findAll({ 
+            where: { 
+                for_sale: true
+             }
+        })
+
+        for (let i = 0; i < setsForSale.length; i++) {
+            const set = setsForSale[i]
+            if (set.type === 'core') {
+                results.push(`${set.box_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji_1)} - Box`)
+                results.push(`${set.unit_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji_1)} - Pack`)
+            }
+        }
+    
+        for (let i = 0; i < setsForSale.length; i++) {
+            const set = setsForSale[i]
+            if (set.type === 'starter_deck') {
+                if (set.name === 'Starter Series 1') {
+                    results.push(`${set.unit_price}${eval(set.currency)} - Warrior's Pride ${eval(set.emoji_1)} - Starter`)
+                    results.push(`${set.unit_price}${eval(set.currency)} - Spellcaster's Wrath ${eval(set.emoji_2)} - Starter`)
+                }
+            }
+        }
+
         const shopInv = await Inventory.findAll({ 
             where: { 
                 playerId: merchbotId,
@@ -23,8 +52,8 @@ const updateShop = async (channel) => {
             include: Print,
             order: [[Print, 'market_price', 'DESC']]
         })
-    
-        const results = []
+
+        results.push(`\n${merchant} --- Single Cards --- ${merchant}`)
     
         for (let i = 0; i < shopInv.length; i++) {
             const row = shopInv[i]
@@ -34,10 +63,8 @@ const updateShop = async (channel) => {
             results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(row.print.rarity)}${row.card_code} - ${row.print.card_name} - ${row.quantity}`) 
         }
     
-        results.unshift(`${merchant} The Shop ${merchant}`)
-    
         for (let i = 0; i < results.length; i += 10) channel.send(results.slice(i, i+10))
-    }, 1000)
+    }, 5000)
 }
 
 module.exports = {

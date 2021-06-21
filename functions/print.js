@@ -1,6 +1,7 @@
 
 //PRINT FUNCTIONS
 const { com, rar, sup, ult, scr, stardust } = require('../static/emojis.json')
+const { yescom } = require('../static/commands.json')
 const { Print } = require('../db/index.js')
 
 const askForCardSlot = async (message, card_name, card_id, set_code, set_id) => {
@@ -85,8 +86,47 @@ const selectPrint = async (message, playerId, card_name) => {
     return collected
 }
 
+const askForAdjustConfirmation = async (message, card, market_price) => {
+    const filter = m => m.author.id === message.member.user.id
+	const msg = await message.channel.send(`${card} is valued at ${market_price}${stardust}, do you wish to change it?`)
+    const collected = await msg.channel.awaitMessages(filter, {
+		max: 1,
+        time: 15000
+    }).then(async collected => {
+        if (yescom.includes(collected.first().content.toLowerCase())) return true
+        else return false
+    }).catch(err => {
+        console.log(err)
+        member.user.send(`Sorry, time's up.`)
+        return false
+    })
+
+    return collected
+}
+
+const getNewMarketPrice = async (message) => {
+    const filter = m => m.author.id === message.member.user.id
+	const msg = await message.channel.send(`What should the new market price be in ${stardust}?`)
+    const collected = await msg.channel.awaitMessages(filter, {
+		max: 1,
+        time: 15000
+    }).then(async collected => {
+        const num = Math.round(parseInt(collected.first().content) * 100) / 100
+        if (isFinite(num)) return num
+        else return false
+    }).catch(err => {
+        console.log(err)
+        member.user.send(`Sorry, time's up.`)
+        return false
+    })
+
+    return collected
+}
+
 module.exports = {
+    askForAdjustConfirmation,
     askForCardSlot,
     askForRarity,
+    getNewMarketPrice,
     selectPrint
 }

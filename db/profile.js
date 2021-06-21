@@ -33,6 +33,41 @@ const Profile = db.define('profile', {
         type: Sequelize.BOOLEAN,  
         defaultValue: false,
         allowNull: false
+    },
+    arena_beast_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,        
+        allowNull: false
+    },
+    arena_dragon_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,        
+        allowNull: false
+    },
+    arena_machine_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,        
+        allowNull: false
+    },
+    arena_spellcaster_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,        
+        allowNull: false
+    },
+    arena_warrior_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,        
+        allowNull: false
+    },
+    arena_zombie_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,        
+        allowNull: false
+    },
+    trivia_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,  
+        allowNull: false
     }
 })
 

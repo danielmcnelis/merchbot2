@@ -4,29 +4,7 @@
 const { adminRole, modRole } = require('../static/roles.json')
 const { mad, sad, ROCK, bronze, silver, gold, platinum, diamond, master, legend, god, approve } = require('../static/emojis.json')
 const Names = require('../static/names.json')
-const {saveYDK} = require('./decks.js')
-const { Arena, Binder, Card, Daily, Diary, Draft, Gauntlet, Inventory, Keeper, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist  } = require('../db/index.js')
-
-//FETCH CARDS
-const fetchAllCards = async () => {
-    const allCards = await Card.findAll().map(function(card) { return card.name })
-    return allCards
-}
-
-//FETCH UNIQUE PRINTS
-const fetchAllUniquePrints = async () => {
-    const prints = []
-    const allUniquePrints = []
-    const allPrints = await Print.findAll()
-    allPrints.forEach(function(print) { 
-        if (!prints.includes(print.card_name)) {
-            prints.push(print.card_name)
-            allUniquePrints.push(print.card_name)
-        }
-    })
-    allUniquePrints.sort()
-    return allUniquePrints
-}
+const { Arena, Binder, Card, Daily, Diary, Draft, Gauntlet, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist  } = require('../db/index.js')
 
 //CREATE PLAYER
 const createPlayer = async (id, username = null, tag = null) => {
@@ -41,6 +19,28 @@ const createPlayer = async (id, username = null, tag = null) => {
     }
 }
 
+//GET RANDOM STRING
+const getRandomString = (length, chars) => {
+    let result = '';
+    for (let i = length; i > 0; --i) {
+        result += chars[Math.floor(Math.random() * chars.length)]
+    }
+    return result
+}
+
+//CONVERT CARDS ARRAY TO OBJECT
+const convertCardsArrayToObject = (arr) => {
+    const obj = {}
+    arr.forEach(elem => {
+        if (!obj[elem]) {
+            obj[elem] = 1
+        } else {
+            obj[elem]++
+        }
+    })
+    return obj
+}
+
 //CREATE PROFILE
 const createProfile = async (playerId, first_deck) => {
     const favorite_card = first_deck === 'warrior' ? 'Freed the Matchless General' : 'Chaos Command Magician'
@@ -50,20 +50,16 @@ const createProfile = async (playerId, first_deck) => {
     const year = `${date.getFullYear()}`
     
     try {
-        await Arena.create({playerId})
         await Binder.create({playerId})
         await Daily.create({playerId})
         await Diary.create({playerId})
-        await Draft.create({playerId})
-        await Gauntlet.create({playerId})
-        await Keeper.create({playerId})
+        await Knowledge.create({playerId})
         await Profile.create({
             playerId,
             first_deck,
             favorite_card,
             start_date: `${[year, month.slice(-2), day.slice(-2)].join('-')}`
         })
-        await Trivia.create({playerId})
         await Wallet.create({playerId})
         await Wishlist.create({playerId})
     } catch (err) {
@@ -151,6 +147,8 @@ const hasProfile = async (playerId) => {
     return !!profile
 }
 
+//IS VOWEL?
+const isVowel = (char) => /^[aeiou]$/.test(char.toLowerCase())
 
 //GET MEDAL
 const getMedal = (stats, title = false) => {
@@ -187,42 +185,6 @@ const capitalize = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-
-//CHECK DECK LIST
-const checkDeckList = async (client, message, member, formatName, formatEmoji, formatDate, formatList) => {  
-    const filter = m => m.author.id === member.user.id
-    const msg = await member.user.send(`Please provide a duelingbook.com/deck link for the ${formatName} Format ${formatEmoji} deck you would like to check for legality.`);
-    const collected = await msg.channel.awaitMessages(filter, {
-        max: 1,
-        time: 180000
-    }).then(async collected => {
-        if (collected.first().content.startsWith("https://www.duelingbook.com/deck") || collected.first().content.startsWith("www.duelingbook.com/deck") || collected.first().content.startsWith("duelingbook.com/deck")) {		
-            message.author.send('Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.')
-
-            const url = collected.first().content
-            const issues = await saveYDK(message.author, url, formatDate, formatList)
-            
-            if (issues['illegalCards'].length || issues['forbiddenCards'].length || issues['limitedCards'].length || issues['semiLimitedCards'].length) {
-                let response = `I'm sorry, ${message.author.username}, your deck is not legal for ${formatName} Format. ${formatEmoji}`
-                if (issues['illegalCards'].length) response += `\n\nThe following cards are not included in this format:\n${issues['illegalCards'].join('\n')}`
-                if (issues['forbiddenCards'].length) response += `\n\nThe following cards are forbidden:\n${issues['forbiddenCards'].join('\n')}`
-                if (issues['limitedCards'].length) response += `\n\nThe following cards are limited:\n${issues['limitedCards'].join('\n')}`
-                if (issues['semiLimitedCards'].length) response += `\n\nThe following cards are semi-limited:\n${issues['semiLimitedCards'].join('\n')}`
-            
-                return message.author.send(response)
-            } else {
-                return message.author.send(`Your ${formatName} Format ${formatEmoji} deck is perfectly legal. You are good to go! ${approve}`)
-            }
-        } else {
-            return message.author.send("Sorry, I only accept duelingbook.com/deck links.")      
-        }
-    }).catch(err => {
-        console.log(err)
-        return message.author.send(`Sorry, time's up. If you wish to try again, go back to the Discord server and use the **!check** command.`)
-    })
-}
-
-
 //GET RANDOM ELEMENT
 const getRandomElement = (arr) => {
     const index = Math.floor((arr.length) * Math.random())
@@ -246,23 +208,24 @@ const getRandomSubset = (arr, n) => {
     return shuffledArr.slice(0, n)
 }
 
+//IS SAME DAY
 const isSameDay = (d1, d2) => d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate()
 
 module.exports = {
     capitalize,
-    checkDeckList,
+    convertCardsArrayToObject,
     createPlayer,
     createProfile,
-    fetchAllCards,
-    fetchAllUniquePrints,
     getMedal,
     getRandomElement,
+    getRandomString,
     getRandomSubset,
     hasProfile,
     isAdmin,
     isMod,
     isNewUser,
     isSameDay,
+    isVowel,
     recalculate,
     restore,
     revive

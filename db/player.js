@@ -6,7 +6,8 @@ const Player = db.define('player', {
     id: {
         primaryKey: true,
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     name: {
         type: Sequelize.STRING,
@@ -14,7 +15,8 @@ const Player = db.define('player', {
     },
     tag: {
         type: Sequelize.STRING,        
-        allowNull: true
+        allowNull: true,
+        unique: true
     },
     duelingBook: {
         type: Sequelize.STRING,
@@ -40,16 +42,11 @@ const Player = db.define('player', {
         defaultValue: 0,           
         allowNull: false
     },
-    // vaniquished_foes: {
-    //     type: Sequelize.INTEGER,  
-    //     defaultValue: 0,           
-    //     allowNull: false
-    // },
-    // trade_partners: {
-    //     type: Sequelize.INTEGER,  
-    //     defaultValue: 0,           
-    //     allowNull: false
-    // },
+    vaniquished_foes: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
     best_stats: {
         type: Sequelize.FLOAT,   
         defaultValue: 500.00,             
@@ -63,6 +60,46 @@ const Player = db.define('player', {
     longest_streak: {
         type: Sequelize.INTEGER,  
         defaultValue: 0,     
+        allowNull: false
+    },
+    arena_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false
+    },
+    arena_losses: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false
+    },
+    keeper_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false
+    },
+    keeper_losses: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false
+    },
+    draft_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false
+    },
+    draft_losses: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false
+    },
+    gauntlet_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false
+    },
+    gauntlet_losses: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
         allowNull: false
     }
 })

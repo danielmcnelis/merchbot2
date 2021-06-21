@@ -163,7 +163,7 @@ if (cmd === `!update`) {
 	})
 
 	let created = 0
-	let cards_id = 9712
+	let id = 9712
 
 	for (let i = 0; i < newCards.length; i++) {
 		const newCard = newCards[i]
@@ -185,7 +185,7 @@ if (cmd === `!update`) {
 		
 		try {
 			await Card.create({
-				cards_id,
+				id,
 				image,
 				name,
 				card,

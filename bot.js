@@ -205,7 +205,7 @@ if (cmd === `!update`) {
 		}
 
 		created++
-		cards_id++
+		id++
 	}	
 
 	console.log('created', created)

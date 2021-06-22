@@ -27,7 +27,7 @@ const { uploadDeckFolder } = require('./functions/drive.js')
 const { fetchAllCardNames, fetchAllCards, fetchAllUniquePrintNames, findCard } = require('./functions/search.js')
 const { updateShop } = require('./functions/shop.js')
 const { awardPack } = require('./functions/packs.js')
-const { getInitiatorConfirmation, getPartnerSide, getPartnerConfirmation, getFinalConfirmation } = require('./functions/trade.js')
+const { getBuyerConfirmation, getFinalConfirmation, getInitiatorConfirmation, getPartnerSide, getPartnerConfirmation, getSellerConfirmation } = require('./functions/trade.js')
 const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard } = require('./functions/profile.js')
 const { client, challongeClient } = require('./static/clients.js')
 let fuzzyCards
@@ -656,7 +656,7 @@ if(infocom.includes(cmd)) {
 	}
 
 	if (message.channel.id == arenaChannel) { 
-		return message.channel.send(`${beast} ${dragon} ${machine} --- The Arena --- ${spellcaster} ${warrior} ${zombie}`+ 
+		return message.channel.send(`${beast} ${dinosaur} ${fish} --- The Arena --- ${plant} ${reptile} ${rock}`+ 
 		`\nIn this channel, you get to test out the game's most powerful cards.`+
 		` Simply align yourself with a Tribe and wage war at their side.`+
 		`\n\nTo compete in the Arena, type **!join** in <#${arenaChannel}>.`+
@@ -674,7 +674,7 @@ if(infocom.includes(cmd)) {
 		return message.channel.send(`${gloveEmoji} --- The Gauntlet --- ${gloveEmoji}`+ 
 		`\nThe Gauntlet is the ultimate test of endurance and technical play.`+
 		` In this 2-Player game-mode, you're asked to succeed with Starter Decks from every generation of Forged`+
-		` from Spellcaster's Wrath ${spellcaster} to Zombie's Curse ${zombie}.`
+		` from Fish's Ire ${fish} to Rock's Foundation ${rock}.`
 		`\n\nTo enter the Gauntlet, simply use **!challenge @opponent** <#${gauntletChannel}>.`+
 		` Once a challenge is accepted, each player will receive a Starter Deck via DM.`+
 		` The Gauntlet is separated into \"legs\" for each of the Starter Deck generations.`+
@@ -691,7 +691,7 @@ if(infocom.includes(cmd)) {
 	}
 
 	if (message.channel.id == keeperChannel) { 
-		return message.channel.send(`${beast} ${dragon} ${machine} --- Keeper of the Forge --- ${spellcaster} ${warrior} ${zombie}`+ 
+		return message.channel.send(`${fire} --- Keeper of the Forge --- ${fire}`+ 
 		`\nIn this channel, you get to test out the game's most powerful cards.`+
 		` Simply align yourself with a Tribe and wage war at their side.`+
 		`\n\nTo compete in the Arena, type **!join** in <#${arenaChannel}>.`+
@@ -705,26 +705,8 @@ if(infocom.includes(cmd)) {
 		` You can use **!barter "card"** to exchange 8 Vouchers for a Tribal prize card.`, {files: ["https://i.imgur.com/iYTTIUW.png"]})
 	}
 
-	if (message.channel.id == "603825650360647691") { 
-		return message.channel.send(fireEmoji + " --- Keeper of the Forge --- " + fireEmoji +
-		"\nThis is a constructed format intended to introduce the Deck Master concept. As the Keeper of the Forge, your job is simple: Keep the flame burning bright." +
-		"\n\nIn Keeper duels, each player places a Keeper on the Field to protect their flame. Should your Keeper ever leave the Field, it\'s game over. In addition to using card effects to protect your Keeper, you may also pay 1000 LP. It takes guts and ingenuity to succeed at this new style of dueling, so I wish you godspeed!" + 
-		"\n\nRules:" +
-		"\n1. Place your Keeper in the EMZ at the start of the duel. If placed from the Hand, draw a card." +
-		"\n2. The Keeper cannot leave the EMZ by its own effect." +
-		"\n3. The Keeper is unaffected by card effects on each player\'s first turn." +
-		"\n4. The Keeper cannot attack your opponent\'s Keeper." +
-		"\n5. The Keeper cannot attack directly, except with a card such as \"Overpowering Eye\"." +
-		"\n6. Other monsters you contol MAY attack directly." +
-		"\n7. The Keeper cannot be tributed." +
-		"\n8. Control of the Keeper cannot switch." +
-		"\n9. If your Keeper would leave the Field, you must pay 1000 LP to protect it." +
-		"\n\nKeeper games are played as singles (not matches). Losers must report in the <#603825650360647691> channel using the **!loss** command. Winners receive 6" + starchip + " while losers receive 2" + starchip + "." +
-		"\n\nIn addition, you must follow the Keeper-specific Forbidden and Limited List:", {files: ["https://i.imgur.com/Btlasys.png"]})
-	}
-
 	if (message.channel.id == triviaChannel) { 
-		return message.channel.send(`${beast} ${dragon} ${machine} --- Trivia Center --- ${spellcaster} ${warrior} ${zombie}`+ 
+		return message.channel.send(`${eye} --- Trivia Center --- ${eye}`+ 
 		`\nThe King of Games must also be a student of the game.`+
 		` That means you must be familiar with the old Champions and their decks,`+
 		` as well as the names, effects, and artworks of important cards.`+
@@ -740,7 +722,7 @@ if(infocom.includes(cmd)) {
 	}
 		
 	if (message.channel.id == draftChannel) { 
-		return message.channel.send(`${beast} --- Draft Room --- ${zombie}`+ 
+		return message.channel.send(`${puzzle} --- Draft Room --- ${puzzle}`+ 
 		`\nIn this channel, you get to test out the game's most powerful cards.`+
 		` Simply align yourself with a Tribe and wage war at their side.`+
 		`\n\nTo compete in the Arena, type **!join** in <#${arenaChannel}>.`+
@@ -754,7 +736,7 @@ if(infocom.includes(cmd)) {
 		` You can use **!barter "card"** to exchange 8 Vouchers for a Tribal prize card.`)
 	}
 
-	return message.channel.send("Use this command in channels such as <#${duelRequestChannel}>, <#${marketPlaceChannel}>, <#${tournamentChannel}>, <#${arenaChannel}>, <#${keeperChannel}>, <#${triviaChannel}>, and <#${gauntletChannel}> to learn how those parts of the game work.")
+	return message.channel.send(`Use this command in channels such as <#${duelRequestChannel}>, <#${marketPlaceChannel}>, <#${tournamentChannel}>, <#${arenaChannel}>, <#${keeperChannel}>, <#${triviaChannel}>, and <#${gauntletChannel}> to learn how those parts of the game work.`)
 }
 
 //EDIT
@@ -967,6 +949,76 @@ if(cmd === `!gift`) {
 	return Merch.data.awardStarchips(client, message, rMem, 30)
 }
 
+//SHOP
+if (cmd === `!shop`) {
+	if (!args.length) {
+
+		const date = new Date()
+		const day = date.getDay()
+		const hours = date.getHours()
+		const mins = date.getMinutes()
+	
+		let shopStatus
+		let dayShopReverts
+		let hourShopReverts
+		let hoursLeftInPeriod
+		const minsLeftInPeriod = 60 - mins
+	
+		if ((day === 6 && hours >= 14) || day === 0 || day === 1 || (day === 2 && hours < 16)) {
+			shopStatus = 'open'
+			dayShopReverts = 'Tuesday'
+			hourShopReverts = '4pm'
+			hoursLeftInPeriod = day === 6 ? 23 - hours + 24 * 2 + 16 :
+				day === 0 ? 23 - hours + 24 + 16 :
+				day === 1 ? 23 - hours + 16 :
+				day === 2 ? 16 - hours :
+				null
+		} else if ((day === 2 && hours >= 16) || (day === 3 && hours < 8)) {
+			shopStatus = 'closed'
+			dayShopReverts = 'Wednesday'
+			hourShopReverts = '8am'
+			hoursLeftInPeriod = day === 2 ? 23 - hours + 8 :
+				day === 3 ? 8 - hours :
+				null
+		} else if ((day === 3 && hours >= 8) || day === 4 || (day === 5 && hours < 22)) {
+			shopStatus = 'open'
+			dayShopReverts = 'Friday'
+			hourShopReverts = '10pm'
+			hoursLeftInPeriod = day === 3 ? 23 - hours + 24 + 22 :
+				day === 4 ? 23 - hours + 22 :
+				day === 5 ? 22 - hours :
+				null
+		} else if ((day === 5 && hours >= 22) || (day === 6 && hours < 14)) {
+			shopStatus = 'closed'
+			dayShopReverts = 'Saturday'
+			hourShopReverts = '2pm'
+			hoursLeftInPeriod = day === 5 ? 23 - hours + 14 :
+				day === 6 ? 14 - hours :
+				null
+		}
+	
+		return message.channel.send(`The Shop will ${shopStatus === 'open' ? 'close' : 'open'} in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes, on ${dayShopReverts} at ${hourShopReverts} EST.`)
+	} else {
+		const query = args.join(" ")
+		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
+		const card_name = findCard(query, fuzzyPrints, fuzzyPrints2)
+		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
+		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
+		if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+		const inv = await Inventory.findOne({ where: {
+			printId: print.id,
+			playerId: merchbotId,
+			quantity: { [Op.gt]: 0 }
+		}})
+		if (!inv) return message.channel.send(`Sorry, ${card} is Out of Stock.`)
+		const market_price = print.market_price
+		const selling_price = Math.ceil(market_price * 1.1)
+		const buying_price = Math.ceil(market_price * 0.7)
+		return message.channel.send(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - ${inv.quantity}`)
+	}
+}
+
 //COUNT
 if(cmd === `!count`) {
 	const allSetsForSale = await Set.findAll({ where: { for_sale: true }})
@@ -1010,56 +1062,56 @@ if(cmd === `!count`) {
 if(cmd === `!chart`) {
 	const allProfiles = await Profile.findAll()
 	let beastWins = 0
-	let dragonWins = 0
-	let machineWins = 0
-	let spellcasterWins = 0
-	let warriorWins = 0
-	let zombieWins = 0
+	let dinosaurWins = 0
+	let fishWins = 0
+	let plantWins = 0
+	let reptileWins = 0
+	let rockWins = 0
 
 	for (let i = 0; i < allProfiles.length; i++) {
 		const profile = allProfiles[i]
 		beastWins += profile.arena_beast_wins
-		dragonWins += profile.arena_dragon_wins
-		machineWins += profile.arena_machine_wins
-		spellcasterWins += profile.arena_spellcaster_wins
-		warriorWins += profile.arena_warrior_wins
-		zombieWins += profile.arena_zombie_wins
+		dinosaurWins += profile.arena_dinosaur_wins
+		fishWins += profile.arena_fish_wins
+		plantWins += profile.arena_plant_wins
+		reptileWins += profile.arena_reptile_wins
+		rockWins += profile.arena_rock_wins
 	}
 
-	const winsArr = [beastWins, dragonWins, machineWins, spellcasterWins, warriorWins, zombieWins]
+	const winsArr = [beastWins, dinosaurWins, fishWins, plantWins, reptileWins, rockWins]
 	winsArr.sort((a, b) => b - a)
 	const longest = winsArr[0]
-	const totalWinners = beastWins + dragonWins + machineWins + spellcasterWins + warriorWins + zombieWins
+	const totalWinners = beastWins + dinosaurWins + fishWins + plantWins + reptileWins + rockWins
 
 	const beastBars = Math.round((beastWins / longest) * 10)
-	const dragonBars = Math.round((dragonWins / longest) * 10)
-	const machineBars = Math.round((machineWins / longest) * 10)
-	const spellcasterBars = Math.round((spellcasterWins / longest) * 10)
-	const warriorBars = Math.round((warriorWins / longest) * 10)
-	const zombieBars = Math.round((zombieWins / longest) * 10)
+	const dinosaurBars = Math.round((dinosaurWins / longest) * 10)
+	const fishBars = Math.round((fishWins / longest) * 10)
+	const plantBars = Math.round((plantWins / longest) * 10)
+	const reptileBars = Math.round((reptileWins / longest) * 10)
+	const rockBars = Math.round((rockWins / longest) * 10)
 
 	let beasts = beast
-	let dragons = dragon
-	let machines = machine
-	let spellcasters = spellcaster
-	let warriors = warrior
-	let zombies = zombie
+	let dinosaurs = dinosaur
+	let fishs = fish
+	let plants = plant
+	let reptiles = reptile
+	let rocks = rock
 
 	for (let i = 1; i < beastBars; i++) beasts += beast
-	for (let i = 1; i < dragonBars; i++) dragons += dragon
-	for (let i = 1; i < machineBars; i++) machines += machine
-	for (let i = 1; i < spellcasterBars; i++) spellcasters += spellcaster
-	for (let i = 1; i < warriorBars; i++) warriors += warrior
-	for (let i = 1; i < zombieBars; i++) zombies += zombie
+	for (let i = 1; i < dinosaurBars; i++) dinosaurs += dinosaur
+	for (let i = 1; i < fishBars; i++) fishs += fish
+	for (let i = 1; i < plantBars; i++) plants += plant
+	for (let i = 1; i < reptileBars; i++) reptiles += reptile
+	for (let i = 1; i < rockBars; i++) rocks += rock
 
 	return message.channel.send(
 		`There have been ${totalWinners} Arena winners. Conquest breakdown:\n` +
 		`${beasts}\n` + 
-		`${dragons}\n` + 
-		`${machines}\n` + 
-		`${spellcasters}\n` + 
-		`${warriors}\n` +
-		`${zombies}`
+		`${dinosaurs}\n` + 
+		`${fishs}\n` + 
+		`${plants}\n` + 
+		`${reptiles}\n` +
+		`${rocks}`
 	)
 }
 
@@ -2052,7 +2104,7 @@ if(cmd === `!daily`) {
 	const hoursLeftInDay = 23 - date.getHours()
 	const minsLeftInHour = 60 - date.getMinutes()
 
-	if (isSameDay(daily.last_check_in, date)) return message.channel.send(`You already used **!daily** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
+	if (daily.last_check_in && isSameDay(daily.last_check_in, date)) return message.channel.send(`You already used **!daily** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
 
 	const daysPassed = daily.last_check_in ? (date.setHours(0, 0, 0, 0) - daily.last_check_in.setHours(0, 0, 0, 0)) / (1000*60*60*24) : 1
 
@@ -2659,7 +2711,7 @@ if(checklistcom.includes(cmd)) {
 
 //PACK
 if(cmd === `!pack`) {
-	const num = args.length === 1 && isFinite(args[0]) ? args[0] : args.length > 1 && isFinite(args[1]) ? args[1] : 1
+	const num = args.length === 1 && isFinite(args[0]) ? parseInt(args[0]) : args.length > 1 && isFinite(args[1]) ? parseInt(args[1]) : 1
 	const code = args.length === 1 && !isFinite(args[0]) ? args[0] : args.length > 1 && !isFinite(args[1]) ? args[1] : 'DOC'
 	if (code && code.startsWith('SS')) return message.channel.send(`Sorry, Starter Series cards are not sold by the pack.`)
 	const set = await Set.findOne({ where: { code: code.toUpperCase() }})
@@ -2785,12 +2837,12 @@ if(cmd === `!pack`) {
 		set.unit_sales += num
 		await set.save()
 
-		for (let i = 0; i < results.length; i += 29) {
-			if (results[i+30] && results[i+30].startsWith("\n")) {
-				message.author.send(results.slice(i, i+30))
+		for (let i = 0; i < results.length; i += 30) {
+			if (results[i+30] && results[i+30].includes(set.emoji)) {
+				message.author.send(results.slice(i, i+31))
 				i++
 			} else {
-				message.author.send(results.slice(i, i+29))
+				message.author.send(results.slice(i, i+30))
 			}
 		}
 
@@ -2950,6 +3002,7 @@ if(cmd === `!dump`) {
 //SELL
 if(cmd === `!sell`) {
 	if (!args.length) return message.channel.send(`Please specify the card(s) you wish to sell.`)
+	const seller = maid
 	const buyer = message.mentions.users.first() ? message.mentions.users.first().id : merchbotId	
 	if (buyer === maid) return message.channel.send(`You cannot sell cards to yourself.`)
 
@@ -3011,55 +3064,53 @@ if(cmd === `!sell`) {
 
 	if (buyer !== merchbotId && buyingPlayer.wallet.stardust < price) return message.channel.send(`Sorry, ${buyingPlayer.name} only has ${buyingPlayer.wallet.stardust}${stardust}.`)
 
-	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`Are you sure you want to sell${cards.length > 1 ? `:\n${cards.join('\n')}\nT` : ` ${cards[0]} t`}o ${buyer === merchbotId ? 'The Shop' : buyingPlayer.name} for ${price}${stardust}?`)
-	const collected = await msg.channel.awaitMessages(filter, {
-		max: 1,
-		time: 15000
-	}).then(async collected => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+	const sellerConfirmation = seller !== merchbotId ? await getSellerConfirmation(message, mention = false, seller, cards, price, buyer, buyingPlayer) : true
+	if (!sellerConfirmation) return
+	const buyerConfirmation = buyer !== merchbotId ? await getBuyerConfirmation(message, mention = true, buyer, cards, price, seller, sellingPlayer) : true
+	if (!buyerConfirmation) return
 
-		for (let i = 0; i < cards.length; i++) {
-			const buyerInv = await Inventory.findOne({ 
-				where: { 
-					card_code: prints[i].card_code,
-					printId: prints[i].id,
-					playerId: buyer
-				}
-			})
-	
-			if (buyerInv) {
-				buyerInv.quantity += quantities[i]
-				await buyerInv.save()
-			} else {
-				await Inventory.create({ 
-					card_code: prints[i].card_code,
-					quantity: quantities[i],
-					printId: prints[i].id,
-					playerId: buyer
-				})
+	for (let i = 0; i < cards.length; i++) {
+		const buyerInv = await Inventory.findOne({ 
+			where: { 
+				card_code: prints[i].card_code,
+				printId: prints[i].id,
+				playerId: buyer
 			}
-	
-			sellerInvs[i].quantity -= quantities[i]
-			await sellerInvs[i].save()
+		})
+
+		if (buyerInv) {
+			buyerInv.quantity += quantities[i]
+			await buyerInv.save()
+		} else {
+			await Inventory.create({ 
+				card_code: prints[i].card_code,
+				quantity: quantities[i],
+				printId: prints[i].id,
+				playerId: buyer
+			})
 		}
 
-		buyingPlayer.wallet.stardust -= parseInt(price)
-		await buyingPlayer.wallet.save()
+		sellerInvs[i].quantity -= quantities[i]
+		await sellerInvs[i].save()
+	}
 
-		sellingPlayer.wallet.stardust += parseInt(price)
-		await sellingPlayer.wallet.save()
-		
-		return message.channel.send(`You sold ${cards.length > 1 ? `the following to The Shop for ${price}${stardust}:\n${cards.join('\n')}` : `${quantities[0]} ${quantities[0] > 1 ? 'copies' : 'copy'} of ${cards[0]} to ${buyingPlayer.name} for ${price}${stardust}.`}`)
-	}).catch(err => {
-		console.log(err)
-		return message.channel.send(`Sorry, time's up.`)
-	})
+	buyingPlayer.wallet.stardust -= parseInt(price)
+	await buyingPlayer.wallet.save()
+
+	sellingPlayer.wallet.stardust += parseInt(price)
+	await sellingPlayer.wallet.save()
+
+	if (buyer === merchbotId) {
+		return message.channel.send(`You sold ${cards.length > 1 ? `the following to The Shop for ${price}${stardust}:\n${cards.join('\n')}` : `${cards[0]} to The Shop for ${price}${stardust}`}.`)
+	} else {
+		return message.channel.send(`${sellingPlayer.name} sold ${cards.length > 1 ? `the following to ${buyingPlayer.name} for ${price}${stardust}:\n${cards.join('\n')}` : `${cards[0]} to ${buyingPlayer.name} for ${price}${stardust}.`}`)
+	}
 }
 
 //BUY
 if(cmd === `!buy`) {
 	if (!args.length) return message.channel.send(`Please specify the card(s) you wish to buy.`)
+	const buyer = maid
 	const seller = message.mentions.users.first() ? message.mentions.users.first().id : merchbotId	
 	if (seller === maid) return message.channel.send(`You cannot buy cards from yourself.`)
 
@@ -3121,50 +3172,47 @@ if(cmd === `!buy`) {
 
 	if (buyingPlayer.wallet.stardust < price) return message.channel.send(`Sorry, you only have ${buyingPlayer.wallet.stardust}${stardust} and ${cards.length === 1 ? `${cards[0]} costs ${price}${stardust}.` : `the following cards cost ${price}${stardust}:\n${cards.join('\n')}`}`)
 
-	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`Are you sure you want to buy${cards.length > 1 ? `:\n${cards.join('\n')}\nF` : ` ${cards[0]} f`}rom ${seller === merchbotId ? 'The Shop' : sellingPlayer.name} for ${price}${stardust}?`)
-	const collected = await msg.channel.awaitMessages(filter, {
-		max: 1,
-		time: 15000
-	}).then(async collected => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+	const buyerConfirmation = buyer !== merchbotId ? await getBuyerConfirmation(message, mention = false, buyer, cards, price, seller, sellingPlayer) : true
+	if (!buyerConfirmation) return
+	const sellerConfirmation = seller !== merchbotId ? await getSellerConfirmation(message, mention = true, seller, cards, price, buyer, buyingPlayer) : true
+	if (!sellerConfirmation) return
 
-		for (let i = 0; i < cards.length; i++) {
-			const buyerInv = await Inventory.findOne({ 
-				where: { 
-					card_code: prints[i].card_code,
-					printId: prints[i].id,
-					playerId: maid
-				}
-			})
-	
-			if (buyerInv) {
-				buyerInv.quantity += quantities[i]
-				await buyerInv.save()
-			} else {
-				await Inventory.create({ 
-					card_code: prints[i].card_code,
-					quantity: quantities[i],
-					printId: prints[i].id,
-					playerId: maid
-				})
+	for (let i = 0; i < cards.length; i++) {
+		const buyerInv = await Inventory.findOne({ 
+			where: { 
+				card_code: prints[i].card_code,
+				printId: prints[i].id,
+				playerId: maid
 			}
-	
-			sellerInvs[i].quantity -= quantities[i]
-			await sellerInvs[i].save()
+		})
+
+		if (buyerInv) {
+			buyerInv.quantity += quantities[i]
+			await buyerInv.save()
+		} else {
+			await Inventory.create({ 
+				card_code: prints[i].card_code,
+				quantity: quantities[i],
+				printId: prints[i].id,
+				playerId: maid
+			})
 		}
 
-		buyingPlayer.wallet.stardust -= parseInt(price)
-		await buyingPlayer.wallet.save()
+		sellerInvs[i].quantity -= quantities[i]
+		await sellerInvs[i].save()
+	}
 
-		sellingPlayer.wallet.stardust += parseInt(price)
-		await sellingPlayer.wallet.save()
-		
-		return message.channel.send(`You bought ${cards.length > 1 ? `the following from The Shop for ${price}${stardust}:\n${cards.join('\n')}` : `${quantities[0]} ${quantities[0] > 1 ? 'copies' : 'copy'} of ${cards[0]} from ${sellingPlayer.name} for ${price}${stardust}.`}`)
-	}).catch(err => {
-		console.log(err)
-		return message.channel.send(`Sorry, time's up.`)
-	})
+	buyingPlayer.wallet.stardust -= parseInt(price)
+	await buyingPlayer.wallet.save()
+
+	sellingPlayer.wallet.stardust += parseInt(price)
+	await sellingPlayer.wallet.save()
+	
+	if (seller === merchbotId) {
+		return message.channel.send(`You bought ${cards.length > 1 ? `the following from The Shop for ${price}${stardust}:\n${cards.join('\n')}` : `${cards[0]} from The Shop for ${price}${stardust}`}.`)
+	} else {
+		return message.channel.send(`${buyingPlayer.name} bought ${cards.length > 1 ? `the following from ${sellingPlayer.name} for ${price}${stardust}:\n${cards.join('\n')}` : `${cards[0]} from ${sellingPlayer.name} for ${price}${stardust}.`}`)
+	}
 }
 
 //BARTER
@@ -3300,11 +3348,11 @@ if(cmd === `!trade`) {
 	})
 
 	if (!tradeHistory) {
-		const senderProfile = Profile.findOne({where: { playerId: maid } })
+		const senderProfile = await Profile.findOne({where: { playerId: maid } })
 		senderProfile.trade_partners++
 		await senderProfile.save()
 
-		const receiverProfile = Profile.findOne({where: { playerId: partner } })
+		const receiverProfile = await Profile.findOne({where: { playerId: partner } })
 		receiverProfile.trade_partners++
 		await receiverProfile.save()
 	}

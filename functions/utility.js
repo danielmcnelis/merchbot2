@@ -2,7 +2,7 @@
 //UTILITY FUNCTIONS
 
 const { adminRole, modRole } = require('../static/roles.json')
-const { mad, sad, ROCK, bronze, silver, gold, platinum, diamond, master, legend, god, approve } = require('../static/emojis.json')
+const { mad, sad, rocks, bronze, silver, gold, platinum, diamond, master, legend, god, approve } = require('../static/emojis.json')
 const Names = require('../static/names.json')
 const { Arena, Binder, Card, Daily, Diary, Draft, Gauntlet, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist  } = require('../db/index.js')
 
@@ -220,7 +220,7 @@ const getMedal = (stats, title = false) => {
     if (title) {
         return stats <= 230 ? `Tilted ${mad}`
         : (stats > 230 && stats <= 290) ?  `Chump ${sad}`
-        : (stats > 290 && stats <= 350) ?  `Rock ${ROCK}`
+        : (stats > 290 && stats <= 350) ?  `Rock ${rocks}`
         : (stats > 350 && stats <= 410) ?  `Bronze ${bronze}`
         : (stats > 410 && stats <= 470) ?  `Silver ${silver}`
         : (stats > 470 && stats <= 530) ?  `Gold ${gold}`
@@ -232,7 +232,7 @@ const getMedal = (stats, title = false) => {
     } else {
         return stats <= 230 ? mad
         : (stats > 230 && stats <= 290) ? sad
-        : (stats > 290 && stats <= 350) ? ROCK
+        : (stats > 290 && stats <= 350) ? rocks
         : (stats > 350 && stats <= 410) ? bronze
         : (stats > 410 && stats <= 470) ? silver
         : (stats > 470 && stats <= 530) ? gold

@@ -16,15 +16,15 @@ const Set = db.define('set', {
     defaultValue: "core",
     allowNull: false
   },
-  emoji_1: {
+  emoji: {
     type: Sequelize.STRING,
     allowNull: false
   },
-  emoji_2: {
+  alt_emoji: {
     type: Sequelize.STRING,
     allowNull: false
   },
-  set_size: {
+  size: {
     type: Sequelize.INTEGER,
     defaultValue: 0,
     allowNull: false

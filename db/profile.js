@@ -7,26 +7,24 @@ const Profile = db.define('profile', {
         type: Sequelize.STRING,        
         allowNull: false
     },
-    first_deck: {
+    starter: {
         type: Sequelize.STRING,        
         allowNull: false
     },
-    favorite_card: {
+    card: {
         type: Sequelize.STRING,
         allowNull: true
     },
-    favorite_color: {
+    color: {
         type: Sequelize.STRING,        
         allowNull: true
     },
     quote: {
-        type: Sequelize.TEXT,  
-        defaultValue: `My grandpa's deck has no pathetic cards.`,      
+        type: Sequelize.TEXT,    
         allowNull: true
     },
     author: {
-        type: Sequelize.STRING,     
-        defaultValue: `Yugi`,         
+        type: Sequelize.STRING,    
         allowNull: true
     },
     referral: {
@@ -34,32 +32,32 @@ const Profile = db.define('profile', {
         defaultValue: false,
         allowNull: false
     },
-    arena_beast_wins: {
+    beast_wins: {
         type: Sequelize.INTEGER,
         defaultValue: 0,        
         allowNull: false
     },
-    arena_dragon_wins: {
+    dinosaur_wins: {
         type: Sequelize.INTEGER,
         defaultValue: 0,        
         allowNull: false
     },
-    arena_machine_wins: {
+    fish_wins: {
         type: Sequelize.INTEGER,
         defaultValue: 0,        
         allowNull: false
     },
-    arena_spellcaster_wins: {
+    plant_wins: {
         type: Sequelize.INTEGER,
         defaultValue: 0,        
         allowNull: false
     },
-    arena_warrior_wins: {
+    reptile_wins: {
         type: Sequelize.INTEGER,
         defaultValue: 0,        
         allowNull: false
     },
-    arena_zombie_wins: {
+    rock_wins: {
         type: Sequelize.INTEGER,
         defaultValue: 0,        
         allowNull: false

@@ -1,7 +1,7 @@
 
 const { Print, Set, Inventory } = require('../db')
 const { getRandomElement, getRandomSubset } = require('./utility.js')
-const { blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, FOA, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
+const { blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
 
 const awardPack = async (message, set, num) => {
     if (!set) return console.log('No set found.')
@@ -77,7 +77,7 @@ const awardPack = async (message, set, num) => {
     
         const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil]
     
-        results.push(`\n${eval(set.emoji_1)} - ${set.name} Pack${j > 0 ? j + 1 : ''} - ${eval(set.emoji_2)}`)
+        results.push(`\n${eval(set.emoji)} - ${set.name} Pack${j > 0 ? j + 1 : ''} - ${eval(set.alt_emoji)}`)
     
         for (let i = 0; i < yourPack.length; i++) {
             const print = await Print.findOne({ where: {

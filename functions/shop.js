@@ -2,7 +2,7 @@
 const { Card, Match, Player, Tournament, Print, Set, Wallet, Diary, Inventory, Arena, Trivia, Keeper, Gauntlet, Draft, Daily, Binder, Wishlist, Profile } = require('../db')
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
-const { FOA, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
+const { DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, fish, rock, dinosaur, plant, reptile, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
 
 const updateShop = async (channel) => {
     channel.bulkDelete(100)
@@ -27,8 +27,8 @@ const updateShop = async (channel) => {
         for (let i = 0; i < setsForSale.length; i++) {
             const set = setsForSale[i]
             if (set.type === 'core') {
-                results.push(`${set.box_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji_1)} - Box`)
-                results.push(`${set.unit_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji_1)} - Pack`)
+                results.push(`${set.box_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Box`)
+                results.push(`${set.unit_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Pack`)
             }
         }
     
@@ -36,8 +36,8 @@ const updateShop = async (channel) => {
             const set = setsForSale[i]
             if (set.type === 'starter_deck') {
                 if (set.name === 'Starter Series 1') {
-                    results.push(`${set.unit_price}${eval(set.currency)} - Warrior's Pride ${eval(set.emoji_1)} - Starter`)
-                    results.push(`${set.unit_price}${eval(set.currency)} - Spellcaster's Wrath ${eval(set.emoji_2)} - Starter`)
+                    results.push(`${set.unit_price}${eval(set.currency)} - Warrior's Pride ${eval(set.emoji)} - Starter`)
+                    results.push(`${set.unit_price}${eval(set.currency)} - Spellcaster's Wrath ${eval(set.emoji)} - Starter`)
                 }
             }
         }

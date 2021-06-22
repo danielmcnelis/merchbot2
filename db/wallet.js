@@ -5,7 +5,7 @@ const {db} = require('./db')
 const Wallet = db.define('wallet', {
     starchips: {
         type: Sequelize.INTEGER,  
-        defaultValue: 100,           
+        defaultValue: 150,           
         allowNull: false
     },
     stardust: {
@@ -23,32 +23,32 @@ const Wallet = db.define('wallet', {
         defaultValue: 0,           
         allowNull: false
     },
-    voucher_A: {
+    cactus: {
         type: Sequelize.INTEGER,  
         defaultValue: 0,           
         allowNull: false
     },
-    voucher_B: {
+    egg: {
         type: Sequelize.INTEGER,  
         defaultValue: 0,           
         allowNull: false
     },
-    voucher_C: {
+    hook: {
         type: Sequelize.INTEGER,  
         defaultValue: 0,           
         allowNull: false
     },
-    voucher_D: {
+    moai: {
         type: Sequelize.INTEGER,  
         defaultValue: 0,           
         allowNull: false
     },
-    voucher_E: {
+    mushroom: {
         type: Sequelize.INTEGER,  
         defaultValue: 0,           
         allowNull: false
     },
-    voucher_F: {
+    rose: {
         type: Sequelize.INTEGER,  
         defaultValue: 0,           
         allowNull: false

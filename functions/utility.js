@@ -42,13 +42,75 @@ const convertCardsArrayToObject = (arr) => {
 }
 
 //CREATE PROFILE
-const createProfile = async (playerId, first_deck) => {
-    const favorite_card = first_deck === 'warrior' ? 'Freed the Matchless General' : 'Chaos Command Magician'
+const createProfile = async (playerId, starter) => {
+    const card = starter === 'fish' ? 'Rage of the Deep Sea' : starter === 'rock' ? 'Guadian Sphinx' : null
     const date = new Date()
     const month = `0${date.getMonth() + 1}`
     const day = `0${date.getDate()}`
     const year = `${date.getFullYear()}`
+
+    const quotes = [
+        {
+            quote: `My grandpa's deck has no pathetic cards.`,
+            author: `Yami Yugi`
+        },
+        {
+            quote: `"Man-Eater Bug"? Glad, I'm a *girl*.`,
+            author: `Tea Gardner`
+        },
+        {
+            quote: `So let me get this straight. You’re going to defeat me with a creampuff and an elf?`,
+            author: `Seto Kaiba`
+        },
+        {
+            quote: `I don’t understand a word you just said. Try speaking American: it's the only language I understand.`,
+            author: `Bandit Keith`
+        },
+        {
+            quote: `But what if he knows that I know that he knows? Oh, forget it. I'm just gonna attack.`,
+            author: `Joey Wheeler`
+        },
+        {
+            quote: `Bruh, this is war. Each and every game 2 men go in and 1 man comes out.`,
+            author: `Gracco`
+        },
+        {
+            quote: `It was pretty cut and dry tbh.`,
+            author: `Di4na`
+        },
+        {
+            quote: `Yu-Gi-Oh! players are the reason liberal democracies fail.`,
+            author: `Noelle`
+        },
+        {
+            quote: `Literally no excuse for me to not be mod.`,
+            author: `iamawesome3000`
+        },
+        {
+            quote: `Sorry dog pissed everywhere I gotta it up before it stains.`,
+            author: `moxies`
+        },
+        {
+            quote: `Hello guys name is Insect_Player24, and today I will activate return and win the game.`,
+            author: `Livd`
+        },
+        {
+            quote: `I'll host. Remember, this time, we're going to have to state the moves in chat, since we're too far away to talk.`,
+            author: `DolphyBlueDrake`
+        },
+        {
+            quote: `Peacekeeper was first mentioned by Cameron iirc.`,
+            author: `Kizaru`
+        }
+    ]
+
+    const elem = getRandomElement(quotes)
+    const quote = elem.quote
+    const author = elem.author
     
+    const colors = ['#f53636', '#fc842d', '#fceb77', '#63d46d', '#3c91e6', '#5c5fab', '#ed1a79', '#eb7cad', '#f0bf3a', '#bccbd6']
+    const color = getRandomElement(colors)
+
     try {
         await Binder.create({playerId})
         await Daily.create({playerId})
@@ -56,8 +118,11 @@ const createProfile = async (playerId, first_deck) => {
         await Knowledge.create({playerId})
         await Profile.create({
             playerId,
-            first_deck,
-            favorite_card,
+            starter,
+            card,
+            color,
+            quote,
+            author,
             start_date: `${[year, month.slice(-2), day.slice(-2)].join('-')}`
         })
         await Wallet.create({playerId})

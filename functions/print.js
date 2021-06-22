@@ -2,7 +2,35 @@
 //PRINT FUNCTIONS
 const { com, rar, sup, ult, scr, stardust } = require('../static/emojis.json')
 const { yescom } = require('../static/commands.json')
-const { Print } = require('../db/index.js')
+const { Info, Print, Set } = require('../db/index.js')
+
+const askForSetToPrint = async (message) => {
+    const filter = m => m.author.id === message.member.user.id
+	const msg = await message.channel.send(`What set would you like to work on printing?`)
+    const collected = await msg.channel.awaitMessages(filter, {
+		max: 1,
+        time: 15000
+    }).then(async collected => {
+        const set_code = collected.first().content.toUpperCase()
+        const set = await Set.findOne({ where: { code: set_code }}) 
+        if (!set) {
+            message.channel.send(`That set outline is not in the system.`)
+            return false
+        } else {
+            await Info.create({
+                element: 'set_to_print',
+                status: set_code
+            })
+            return set
+        }
+    }).catch(err => {
+        console.log(err)
+        member.user.send(`Sorry, time's up.`)
+        return false
+    })
+
+    return collected
+}
 
 const askForCardSlot = async (message, card_name, card_id, set_code, set_id) => {
     const filter = m => m.author.id === message.member.user.id
@@ -23,7 +51,16 @@ const askForCardSlot = async (message, card_name, card_id, set_code, set_id) => 
     })
 }
 
-const askForRarity = async (message, card_name, card_id, set_code, set_id, card_code, card_slot) => {
+const askForRarity = async (message, set, currentPrints) => {
+    if (set.type === 'starter_deck') {
+        let ultras = 0
+        currentPrints.forEach((print) => {
+            if (print.rarity === 'ult') ultras++
+        })
+
+        if (ultras === 2) return 'com'
+    }
+
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send(`What rarity is this print?`)
     const collected = await msg.channel.awaitMessages(filter, {
@@ -31,29 +68,19 @@ const askForRarity = async (message, card_name, card_id, set_code, set_id, card_
         time: 15000
     }).then(async collected => {
         const rarity = collected.first().content.toLowerCase()
-        if (rarity !== 'com' && rarity !== 'rar' && rarity !== 'sup' && rarity !== 'ult' && rarity !== 'scr') return message.channel.send(`Please specify a rarity.`)
-        
-        const market_price = rarity === 'com' ? 10 : rarity === 'rar' ? 20 : rarity === 'sup' ? 40 : rarity === 'ult' ? 80 : 160 
-        const emoji = eval(rarity)
-
-        const print = {
-            card_name,
-            card_id,
-            set_code,
-            setId: set_id,
-            card_code,
-            card_slot,
-            rarity,
-            market_price
+        if (rarity !== 'com' && rarity !== 'rar' && rarity !== 'sup' && rarity !== 'ult' && rarity !== 'scr') {
+            message.channel.send(`Please specify a rarity.`)
+            return false
+        } else {
+            return rarity
         }
-
-        await Print.create(print)
-
-        return message.channel.send(`Created a new print: ${emoji}${card_code} - ${card_name} - ${stardust}${market_price}`)
     }).catch(err => {
         console.log(err)
-        return member.user.send(`Sorry, time's up.`)
+        member.user.send(`Sorry, time's up.`)
+        return false
     })
+
+    return collected
 }
 
 const selectPrint = async (message, playerId, card_name) => {
@@ -127,6 +154,7 @@ module.exports = {
     askForAdjustConfirmation,
     askForCardSlot,
     askForRarity,
+    askForSetToPrint,
     getNewMarketPrice,
     selectPrint
 }

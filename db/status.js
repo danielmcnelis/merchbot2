@@ -7,7 +7,7 @@ const Status = db.define('status', {
         type: Sequelize.STRING,        
         allowNull: false
     },
-    konamiCode: {
+    konami_code: {
         type: Sequelize.STRING,        
         allowNull: false
     },

@@ -36,8 +36,8 @@ const updateShop = async (channel) => {
             const set = setsForSale[i]
             if (set.type === 'starter_deck') {
                 if (set.name === 'Starter Series 1') {
-                    results.push(`${set.unit_price}${eval(set.currency)} - Warrior's Pride ${eval(set.emoji)} - Starter`)
-                    results.push(`${set.unit_price}${eval(set.currency)} - Spellcaster's Wrath ${eval(set.emoji)} - Starter`)
+                    results.push(`${set.unit_price}${eval(set.currency)} - Fish's Ire ${eval(set.emoji)} - Starter`)
+                    results.push(`${set.unit_price}${eval(set.currency)} - Rock's Foundation ${eval(set.alt_emoji)} - Starter`)
                 }
             }
         }

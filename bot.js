@@ -35,6 +35,7 @@ let fuzzyCards2
 
 //READY
 client.on('ready', async () => {
+	console.log('MerchBot is online!')
 	const allCards = await fetchAllCardNames()
 	const allUniquePrints = await fetchAllUniquePrintNames()
 	fuzzyCards = FuzzySet([], false)
@@ -104,8 +105,6 @@ client.on('ready', async () => {
 	} else if (shopShouldBe === 'open') {
 		return setTimeout(() => closeShop(), hoursLeftInPeriod * 60 * 60 * 1000 + minsLeftInPeriod * 1000)
 	}
-
-	console.log('MerchBot is online!')
 })
   
 //WELCOME

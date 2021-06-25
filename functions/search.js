@@ -1,6 +1,42 @@
 
 //SEARCH FUNCTIONS
-const { Card, Print  } = require('../db/index.js')
+const Discord = require('discord.js')
+const { Op } = require('sequelize')
+const { Card, Print } = require('../db/index.js')
+
+//CARD SEARCH
+const search = async (query, fuzzyCards, fuzzyCards2) => {
+	const card_name = findCard(query, fuzzyCards, fuzzyCards2)
+	if (!card_name) return false
+
+	const card = await Card.findOne({ 
+		where: { 
+			name: {
+				[Op.iLike]: card_name
+			}
+		}
+	})
+
+	if (!card) return false
+	const color = card.card === "Spell" ? "#42f578" : card.card === "Trap" ? "#e624ed" : (card.card === "Monster" && card.category === "Normal") ? "#faf18e" : (card.card === "Monster" && card.category === "Effect") ? "#f5b042" : (card.card === "Monster" && card.category === "Fusion") ? "#a930ff" : (card.card === "Monster" && card.category === "Ritual") ? "#3b7cf5" : (card.card === "Monster" && card.category === "Synchro") ? "#ebeef5" : (card.card === "Monster" && card.category === "Xyz") ? "#6e6e6e" : null
+
+	const classes = []
+	if (card.type) classes.push(card.type)
+	if (card.class) classes.push(card.class)
+	if (card.subclass) classes.push(card.subclass)
+	if (card.category) classes.push(card.category)
+
+	const labels = card.card === "Monster" ? `**Attribute:** ${card.attribute}\n**Level:** ${card.level}\n**[** ${classes.join(" / ")} **]**` : `**Category:** ${card.category}` 
+	const stats = card.card === "Monster" ? `**ATK:** ${card.atk} **DEF:** ${card.def}` : ''
+
+	const cardEmbed = new Discord.MessageEmbed()
+		.setColor(color)
+		.setTitle(card.name)
+		.setThumbnail(`https://ygoprodeck.com/pics/${card.image}`)
+		.setDescription(`${labels}\n\n${card.description}\n\n${stats}`)
+
+	return cardEmbed
+}
 
 //FETCH ALL CARDS
 const fetchAllCardNames = async () => {
@@ -79,5 +115,6 @@ module.exports = {
 	fetchAllCards,
 	fetchAllForgedCards,
 	fetchAllUniquePrintNames,
-    findCard
+    findCard,
+	search
 }

@@ -49,41 +49,51 @@ const getFavoriteColor = async (message) => {
 }
 
 const getFavoriteQuote = async (message) => {
-    let favorite_quote
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send(`Please respond with a new quote.`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 30000
 	}).then(collected => {
-		favorite_quote = collected.first().content
+		const favorite_quote = collected.first().content
+		if (favorite_quote.length > 200) {
+			message.channel.send(`Sorry, that quote is too long. It should be no more than 200 characters.`)
+			return false
+		} else {
+			return favorite_quote
+		}
 	}).catch(err => {
 		console.log(err)
         message.channel.send(`Sorry, time's up.`)
+		return false
 	})
 
-    return favorite_quote
+    return collected
 }
 
 const getFavoriteAuthor = async (message) => {
-    let favorite_author = "unknown"
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send(`To whom is this quote attributed?`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 30000
 	}).then(collected => {
-		favorite_author = collected.first().content
+		const favorite_author = collected.first().content
+		if (favorite_author.length > 50) {
+			message.channel.send(`Sorry, that author is too long. It should be no more than 50 characters.`)
+			return false
+		} else {
+			return favorite_author
+		}
 	}).catch(err => {
 		console.log(err)
         message.channel.send(`Sorry, time's up.`)
 	})
 
-    return favorite_author
+    return collected
 }
 
 const getFavoriteCard = async (message, fuzzyPrints, fuzzyPrints2) => {
-    let favorite_card
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send(`Please name a card in Forged in Chaos.`)
 	const collected = await msg.channel.awaitMessages(filter, {
@@ -91,14 +101,17 @@ const getFavoriteCard = async (message, fuzzyPrints, fuzzyPrints2) => {
 		time: 30000
 	}).then(collected => {
 		const response = collected.first().content
-        favorite_card = findCard(response, fuzzyPrints, fuzzyPrints2) || 'not found'
-        if (favorite_card === 'not found') message.channel.send(`Could not find card: ${response}`)
+		if (response === 'none') return 'none'
+        const favorite_card = findCard(response, fuzzyPrints, fuzzyPrints2) || false
+		if (!favorite_card) message.channel.send(`Could not find card: "${response}".`)
+		return favorite_card
 	}).catch(err => {
 		console.log(err)
         message.channel.send(`Sorry, time's up.`)
+		return false
 	})
 
-    return favorite_card
+    return collected
 }
 
 module.exports = {

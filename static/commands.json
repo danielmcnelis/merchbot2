@@ -8,6 +8,8 @@
     "invcom": ["!inv", "!inventory", "!cards", "!mycards", "!collection"],
     "checklistcom": ["!checklist", "!check", "!list"],
     "joincom": ["!join", "!enter", "!play", "!in"],
+    "bindercom": ["!binder", "!bind"],
+    "wishlistcom": ["!wishlist", "!wish"],
     "dropcom": ["!drop", "!leave", "!exit", "!out"],
     "infocom": ["!info", "!information"],
     "dbcom": ["!db", "!mydb", "!setdb", "!changedb", "!dbname", "!duelingbook"],

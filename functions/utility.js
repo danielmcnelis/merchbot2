@@ -51,26 +51,6 @@ const createProfile = async (playerId, starter) => {
 
     const quotes = [
         {
-            quote: `My grandpa's deck has no pathetic cards.`,
-            author: `Yami Yugi`
-        },
-        {
-            quote: `"Man-Eater Bug"? Glad, I'm a *girl*.`,
-            author: `Tea Gardner`
-        },
-        {
-            quote: `So let me get this straight. You’re going to defeat me with a creampuff and an elf?`,
-            author: `Seto Kaiba`
-        },
-        {
-            quote: `I don’t understand a word you just said. Try speaking American: it's the only language I understand.`,
-            author: `Bandit Keith`
-        },
-        {
-            quote: `But what if he knows that I know that he knows? Oh, forget it. I'm just gonna attack.`,
-            author: `Joey Wheeler`
-        },
-        {
             quote: `Bruh, this is war. Each and every game 2 men go in and 1 man comes out.`,
             author: `Gracco`
         },
@@ -112,6 +92,9 @@ const createProfile = async (playerId, starter) => {
     const color = getRandomElement(colors)
 
     try {
+        const newbies = Info.findOne({ where: { element: 'newbies' }})
+        newbies.count++
+        await newbies.save()
         await Binder.create({playerId})
         await Daily.create({playerId})
         await Diary.create({playerId})

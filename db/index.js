@@ -1,6 +1,8 @@
 const { db, db2 } = require('./db')
 
 const Arena = require('./arena')
+const Auction = require('./auction')
+const Bid = require('./bid')
 const Binder = require('./binder')
 const Card = require('./card')
 const Daily = require('./daily')
@@ -36,11 +38,17 @@ Wallet.belongsTo(Player)
 Player.hasOne(Diary)
 Diary.belongsTo(Player)
 
+Player.hasMany(Bid)
+Bid.belongsTo(Player)
+
 Player.hasMany(Inventory)
 Inventory.belongsTo(Player)
 
 Print.hasMany(Inventory)
 Inventory.belongsTo(Print)
+
+Print.hasMany(Auction)
+Auction.belongsTo(Print)
 
 Tournament.hasMany(Entry)
 Entry.belongsTo(Tournament)
@@ -76,6 +84,8 @@ module.exports = {
   db,
   db2,
   Arena,
+  Auction,
+  Bid,
   Binder,
   Card,
   Daily,

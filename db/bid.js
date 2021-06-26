@@ -7,7 +7,7 @@ const Bid = db.define('bid', {
         type: Sequelize.TEXT,
         allowNull: false
     },
-    offer: {
+    amount: {
         type: Sequelize.INTEGER,
         allowNull: false
     }

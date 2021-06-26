@@ -197,7 +197,7 @@ const awardPacksToShop = async (num) => {
     
         const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil]
     
-        results.push(`\n${eval(set.emoji)} - ${set.name} Pack${j > 0 ? ` ${j + 1}` : ''} - ${eval(set.alt_emoji)}`)
+        results.push(`\n${eval(set.emoji)} - ${set.name} Pack${num > 0 ? ` ${j + 1}` : ''} - ${eval(set.alt_emoji)}`)
     
         for (let i = 0; i < yourPack.length; i++) {
             const print = await Print.findOne({ where: {
@@ -213,10 +213,19 @@ const awardPacksToShop = async (num) => {
                 playerId: merchbotId
             }})
     
+            const auction = await Auction.findOne({ where: { 
+                card_code: print.card_code
+            }})
+
+            if (auction) {
+                auction.quantity++
+                await auction.save()
+            }
+
             if (!inv || inv.quantity === 0) {
                 newlyInStock.push(print.card_code)
                 await Auction.create({
-                    card_code,
+                    card_code: print.card_code,
                     printId: print.id
                 })
             } 

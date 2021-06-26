@@ -1,5 +1,5 @@
 
-const { Card, Match, Player, Tournament, Print, Set, Wallet, Diary, Inventory, Arena, Trivia, Keeper, Gauntlet, Draft, Daily, Binder, Wishlist, Profile, Info } = require('../db')
+const { Auction, Bid, Card, Match, Player, Tournament, Print, Set, Wallet, Diary, Inventory, Arena, Trivia, Keeper, Gauntlet, Draft, Daily, Binder, Wishlist, Profile, Info } = require('../db')
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { yescom } = require('../static/commands.json')
@@ -7,79 +7,53 @@ const { ygocard, pack, open, closed, DOC, merchant, FiC, approve, lmfao, god, le
 const { awardPacksToShop } = require('./packs')
 const adminId = '194147938786738176'
 const { client } = require('../static/clients.js')
-const { shopChannel } = require('../static/channels.json')
+const { fpRole } = require('../static/roles.json')
+const { announcementsChannel, botSpamChannel, shopChannel } = require('../static/channels.json')
 
-const openShop = async (channel, error) => {
+// OPEN SHOP
+const openShop = async () => {
 	const shop = await Info.findOne({ where: { element: 'shop' }})
-	if (!shop) return channel.send(`Could not find game element: "shop".`)
+	if (!shop) return client.channels.cache.get(botSpamChannel).send(`Could not find game element: "shop".`)
+
 	if (shop.status === 'open') {
-		return channel.send(`The Shop status was already open. ${open}`)
+		return client.channels.cache.get(botSpamChannel).send(`The Shop ${merchant} was already open. ${open}`)
 	} else {
 		shop.status = 'open'
 		await shop.save()
-        const permissionToProcessBids = error ? await askAdminToProcessBids(channel) : true
-        if (permissionToProcessBids) await processBids()
-		return channel.send(`The Shop status is now open. ${open}`)
+        await processBids()
+        updateShop()
+        return client.channels.cache.get(announcementsChannel).send(`Good morning, <@&${fpRole}>, The Shop ${merchant} is now open! ${open}`)
 	} 
 }
-const closeShop = async (channel, error) => {
+
+// CLOSE SHOP
+const closeShop = async () => {
     const shop = await Info.findOne({ where: { element: 'shop' }})
-	if (!shop) return channel.send(`Could not find game element: "shop".`)
+	if (!shop) return client.channels.cache.get(botSpamChannel).send(`Could not find game element: "shop".`)
 	if (shop.status === 'closed') {
-		return channel.send(`The Shop status was already closed. ${close}`)
+		return client.channels.cache.get(botSpamChannel).send(`The Shop ${merchant} was already closed. ${closed}`)
 	} else {
 		shop.status = 'closed'
 		await shop.save()
-        const permissionToRestock = error ? await askAdminToRestock(channel) : true
-        if (permissionToRestock) await restock()
-		return channel.send(`The Shop status is now closed. ${close}`)
+
+        const allAuctions = await Auction.findAll()
+        for (let i = 0; i < allAuctions.length; i++) {
+            const auction = allAuctions[i]
+            await auction.destroy()
+        }
+
+        const allBids = await Bid.findAll()
+        for (let i = 0; i < allBids.length; i++) {
+            const bid = allBids[i]
+            await bid.destroy()
+        }
+
+        await restock()
+		return client.channels.cache.get(announcementsChannel).send(`Good evening, <@&${fpRole}>, The Shop ${merchant} is now closed! ${closed}`)
 	} 
 }
 
-const askAdminToRestock = async (channel) => {
-    const filter = m => m.author.id === adminId
-	const msg = await channel.send(`<@${adminId}>, The Shop was unexpectedly open. Now that it's closing, would you like The Shop to restock?`)
-    const collected = await msg.channel.awaitMessages(filter, {
-		max: 1,
-        time: 20000
-    }).then(async collected => {
-        if (yescom.includes(collected.first().content.toLowerCase())) {
-            return true
-        } else {
-            msg.channel.send(`No problem. Have a nice day.`)
-            return false
-        }  
-    }).catch(err => {
-		console.log(err)
-        msg.channel.send(`Sorry, time's up.`)
-        return false
-	})
-
-    return collected
-}
-
-const askAdminToProcessBids = async (channel) => {
-    const filter = m => m.author.id === adminId
-	const msg = await channel.send(`<@${adminId}>, The Shop was unexpectedly closed. Now that it's opening, would you like The Shop to process bids?`)
-    const collected = await msg.channel.awaitMessages(filter, {
-		max: 1,
-        time: 20000
-    }).then(async collected => {
-        if (yescom.includes(collected.first().content.toLowerCase())) {
-            return true
-        } else {
-            msg.channel.send(`No problem. Have a nice day.`)
-            return false
-        }  
-    }).catch(err => {
-		console.log(err)
-        msg.channel.send(`Sorry, time's up.`)
-        return false
-	})
-
-    return collected
-}
-
+// CHECK SHOP OPEN
 const checkShopOpen = async () => {
     const shopIsOpen = await Info.count({ where: {
         element: 'shop',
@@ -89,16 +63,78 @@ const checkShopOpen = async () => {
     return shopIsOpen
 }
 
+// PROCESS BIDS
 const processBids = async () => {
-    return console.log('processBids()')
+    const channel = client.channels.cache.get(announcementsChannel)
+    const allBids = await Bid.findAll({ include: Auction , order: [["amount", "DESC"]] })
+
+    for (let i = 0; i < allBids.length; i++) {
+        const bid = allBids[i]
+        const wallet = await Wallet.findOne({ where: { playerId: bid.playerId }, include: Player })
+        if (!wallet) continue
+
+        const print = await Print.findOne({ where: { card_code: bid.card_code } })
+        if (!print) continue
+
+        const inv = await Inventory.findOne({ where: { 
+            playerId: merchbotId,
+            card_code: bid.card_code,
+			quantity: { [Op.gt]: 0 }
+         } })
+
+        if (!inv) {
+            channel.send(`${wallet.player.name} placed a ${bid.amount}${stardust} bid on ${print.card_name} but they were outbid.`)
+            continue
+        }
+        if (wallet.stardust < bid.amount) {
+            channel.send(`${wallet.player.name} would have won ${print.card_name} for ${bid.amount}${stardust} but they are too poor.`) 
+            continue
+        }
+        
+        const winnerInv = await Inventory.findOne({ where: {
+            playerId: bid.playerId,
+            card_code: bid.card_code
+        }})
+
+        if (winnerInv) {
+            winnerInv.quantity++
+            await winnerInv.save()
+        } else {
+            await Inventory.create({ 
+                card_code: bid.card_code,
+                quantity: 1,
+                printId: print.id,
+                playerId: bid.playerId
+            })
+        }
+
+        wallet.stardust -= bid.amount
+        await wallet.save()
+
+        inv.quantity--
+        await inv.save()
+
+        const newPrice = ( bid.amount + 15 * print.market_price ) / 16
+        print.market_price = newPrice
+        await print.save()
+
+        await bid.destroy()
+        channel.send(`<@${wallet.player.id}> won a copy of ${eval(print.rarity)}${print.card_code} - ${print.card_name} for ${bid.amount}${stardust}. Congratulations!`) 
+    }
+
+    const allAuctions = await Auction.findAll()
+    for (let i = 0; i < allAuctions.length; i++) {
+        const auction = allAuctions[i]
+        await auction.destroy()
+    }
 }
 
+// RESTOCK
 const restock = async () => {
 	const allSetsForSale = await Set.findAll({ where: { for_sale: true }})
 	const newbies = await Info.findOne({ where: { element: "newbies" }})
 
-	let weightedCount = 0
-    weightedCount -= 10 * newbies.count
+	let weightedCount = -10 * newbies.count
 
 	for (let i = 0; i < allSetsForSale.length; i++) {
 		const set = allSetsForSale[i]
@@ -118,16 +154,20 @@ const restock = async () => {
 
         set.unit_sales = 0
         await set.save()
+        newbies.count = 0
+        await newbies.save()
 	}
 
-    const channel = client.channels.cache.get(shopChannel)
-	const count = Math.ceil(weightedCount / 8) > 0 ? Math.ceil(weightedCount / 8) : 1
+    if (weightedCount < 1) weightedCount = 1
+	const count = Math.ceil(weightedCount / 8)
     const newlyInStock = await awardPacksToShop(count)
-    if (!newlyInStock) return channel.send(`Error awarding ${count} packs to shop.`)
-    else return postBids(channel, newlyInStock)
+    if (!newlyInStock) return client.channels.cache.get(shopChannel).send(`Error awarding ${count} packs to shop.`)
+    else return postBids(newlyInStock)
 }
 
-const updateShop = async (channel) => {
+// UPDATE SHOP
+const updateShop = async () => {
+    const channel = client.channels.cache.get(shopChannel)
     channel.bulkDelete(100)
 
     setTimeout(() => {
@@ -140,8 +180,8 @@ const updateShop = async (channel) => {
 
     setTimeout(async () => {
         const results = [
-            //`${merchant} --- The Magical MerchBot Shop --- ${merchant}`,
-            `${master} --- Core Products --- ${master}`
+            `Good day, The Shop ${merchant} is open. ${open}`,
+            `\n${master} --- Core Products --- ${master}`
         ]
     
         const setsForSale = await Set.findAll({ 
@@ -189,12 +229,13 @@ const updateShop = async (channel) => {
             results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(row.print.rarity)}${row.card_code} - ${row.print.card_name} - ${row.quantity}`) 
         }
     
-        for (let i = 0; i < results.length; i += 10) channel.send(results.slice(i, i+10))
+        for (let i = 0; i < results.length; i += 10) client.channels.cache.get(shopChannel).send(results.slice(i, i+10))
     }, 5000)
 }
 
-const postBids = async (channel, newlyInStock) => {
-    console.log('newlyInStock', newlyInStock)
+// POST BIDS
+const postBids = async (newlyInStock) => {
+    const channel = client.channels.cache.get(shopChannel)
     channel.bulkDelete(100)
     
     setTimeout(() => {
@@ -207,8 +248,8 @@ const postBids = async (channel, newlyInStock) => {
 
     setTimeout(async () => {
         const results = [
-            `${master} ${merchant} --- The Magical MerchBot Shop --- ${merchant} ${master}`,
-            `${pack} --- Core Products --- ${pack}`
+            `Good evening, The Shop ${merchant} is closed. ${closed}`,
+            `\n${master} --- Core Products --- ${master}`
         ]
     
         const setsForSale = await Set.findAll({ 
@@ -235,7 +276,7 @@ const postBids = async (channel, newlyInStock) => {
             }
         }
 
-        results.push(`\n${ygocard} --- Cards For Auction --- ${ygocard}`)
+        results.push(`\n${ygocard} --- Singles Auction --- ${ygocard}`)
     
         if (!newlyInStock.length) results.push('N/A')
         for (let i = 0; i < newlyInStock.length; i++) {
@@ -256,6 +297,7 @@ const postBids = async (channel, newlyInStock) => {
     }, 5000)
 }
 
+// ASK FOR DUMP CONFIRMATION
 const askForDumpConfirmation = async (message, set_code, cards, compensation) => {
     cards.unshift(`Are you sure you want to sell the following ${set_code} ${eval(set_code)} cards:`)
     for (let i = 0; i < cards.length; i+=30) {
@@ -282,21 +324,22 @@ const askForDumpConfirmation = async (message, set_code, cards, compensation) =>
     return collected
 }
 
+// GET DUMP RARITY
 const getDumpRarity = async (message) => {
     let rarity
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send(`What rarity would you like to bulk sell?\n(1) common\n(2) rare\n(3) super\n(4) ultra\n(5) secret\n(6) all`)
+	const msg = await message.channel.send(`What rarity would you like to bulk sell?\n(1) all\n(2) common\n(3) rare\n(4) super\n(5) ultra\n(6) secret`)
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
         time: 15000
     }).then(async collected => {
 		const response = collected.first().content.toLowerCase()
-        if(response.includes('com') || response.includes('1') && !response.includes('0')) rarity = 'com' 
-        else if(response.includes('rar') || response.includes('2')) rarity = 'rar'
-        else if(response.includes('sur') || response.includes('3')) rarity = 'sup'
-        else if(response.includes('ult') || response.includes('4')) rarity = 'ult'
-        else if(response.includes('sec') || response.includes('scr') || response.includes('5')) rarity = 'scr'
-        else if(response.includes('all') || response.includes('any') || response.includes('6')) rarity = 'all'
+        if(response.includes('all') || response.includes('any') || response.includes('1')) rarity = 'all'
+        else if(response.includes('com') || response.includes('2')) rarity = 'com' 
+        else if(response.includes('rar') || response.includes('3')) rarity = 'rar'
+        else if(response.includes('sur') || response.includes('4')) rarity = 'sup'
+        else if(response.includes('ult') || response.includes('5')) rarity = 'ult'
+        else if(response.includes('sec') || response.includes('scr') || response.includes('6')) rarity = 'scr'
         else rarity = 'unrecognized'
     }).catch(err => {
 		console.log(err)
@@ -306,6 +349,7 @@ const getDumpRarity = async (message) => {
     return rarity
 }
 
+// GET DUMP QUANTITY
 const getDumpQuantity = async (message, rarity) => {
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send(`How many of each ${rarity === 'all' ? 'card' : eval(rarity)} do you want to keep?`)

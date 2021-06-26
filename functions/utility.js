@@ -4,7 +4,8 @@
 const { adminRole, modRole } = require('../static/roles.json')
 const { mad, sad, rocks, bronze, silver, gold, platinum, diamond, master, legend, god, approve } = require('../static/emojis.json')
 const Names = require('../static/names.json')
-const { Arena, Binder, Card, Daily, Diary, Draft, Gauntlet, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist  } = require('../db/index.js')
+const { Arena, Binder, Card, Daily, Diary, Draft, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist  } = require('../db/index.js')
+const merchbotId = '584215266586525696'
 
 //CREATE PLAYER
 const createPlayer = async (id, username = null, tag = null) => {
@@ -92,9 +93,11 @@ const createProfile = async (playerId, starter) => {
     const color = getRandomElement(colors)
 
     try {
-        const newbies = Info.findOne({ where: { element: 'newbies' }})
-        newbies.count++
-        await newbies.save()
+        if (playerId !== merchbotId) {
+            const newbies = await Info.findOne({ where: { element: 'newbies' }})
+            newbies.count++
+            await newbies.save()
+        }
         await Binder.create({playerId})
         await Daily.create({playerId})
         await Diary.create({playerId})

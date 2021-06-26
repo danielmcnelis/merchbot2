@@ -5,10 +5,10 @@ const fs = require('fs')
 const axios = require('axios')
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
-const { tix, credits, blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('./static/emojis.json')
+const { fire, tix, credits, blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('./static/emojis.json')
 const { bindercom, wishlistcom, invcom, calccom, bracketcom, dropcom, queuecom, checklistcom, startcom, infocom, dbcom, noshowcom, legalcom, listcom, pfpcom, botcom, rolecom, statscom, profcom, losscom, h2hcom, undocom, rankcom, manualcom, deckscom, replayscom, yescom, nocom } = require('./static/commands.json')
 const { botRole, modRole, adminRole, tourRole, toRole, fpRole, muteRole, arenaRole } = require('./static/roles.json')
-const { botSpamChannel, welcomeChannel, announcementsChannel, registrationChannel, duelRequestsChannel, marketPlaceChannel, shopChannel, tournamentChannel, arenaChannel, keeperChannel, triviaChannel, draftChannel, gauntletChannel } = require('./static/channels.json')
+const { staffChannel, botSpamChannel, welcomeChannel, announcementsChannel, registrationChannel, duelRequestsChannel, marketPlaceChannel, shopChannel, tournamentChannel, arenaChannel, keeperChannel, triviaChannel, draftChannel, gauntletChannel } = require('./static/channels.json')
 const { ss1_fish, ss1_rock } = require('./static/starter_decks.json')
 const types = require('./static/types.json')
 const diaries = require('./static/diaries.json')
@@ -20,6 +20,7 @@ const prints = require('./static/prints.json')
 const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Game, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist } = require('./db')
 const { getRandomString, isSameDay, hasProfile, capitalize, restore, recalculate, revive, createProfile, createPlayer, isNewUser, isAdmin, isMod, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
 const { checkDeckList, saveYDK, saveAllYDK } = require('./functions/decks.js')
+const { askForBidCancellation, askForBidPlacement, manageBidding } = require('./functions/bids.js')
 const { selectTournament, getTournamentType, seed, askForDBUsername, getDeckListTournament, getDeckNameTournament, sendToTournamentChannel, directSignUp, removeParticipant, getParticipants, findOpponent } = require('./functions/tournament.js')
 const { makeSheet, addSheet, writeToSheet } = require('./functions/sheets.js')
 const { askForAdjustConfirmation, askForCardSlot, getNewMarketPrice, askForSetToPrint, selectPrint, askForRarity } = require('./functions/print.js')
@@ -54,8 +55,6 @@ client.on('ready', async () => {
         fuzzyPrints2.add(card)
     })
 
-	const channel = client.channels.cache.get(shopChannel)
-	const channel2 = client.channels.cache.get(botSpamChannel)
 	const date = new Date()
 	const day = date.getDay()
 	const hours = date.getHours()
@@ -90,15 +89,15 @@ client.on('ready', async () => {
 			null
 	}
 
-	if (await checkShopOpen()) updateShop(channel)
+	if (await checkShopOpen()) updateShop()
 
 	setInterval(async () =>  {
-		if (await checkShopOpen()) updateShop(channel)
+		if (await checkShopOpen()) updateShop()
 	}, 1000 * 60 * 5)
 
 	const shopOpen = await checkShopOpen()
-	if (!shopOpen && shopShouldBe === 'open') return openShop(channel2, error = true)
-	if (shopOpen && shopShouldBe === 'closed') return closeShop(channel2, error = true)
+	if (!shopOpen && shopShouldBe === 'open') client.channels.cache.get(staffChannel).send(`<@&${modRole}>, The Shop is unexpectedly closed. Type **!open** to manually open it.`)
+	if (shopOpen && shopShouldBe === 'closed') client.channels.cache.get(staffChannel).send(`<@&${modRole}>, The Shop is unexpectedly open. Type **!close** to manually close it.`)
 
 	if (shopShouldBe === 'closed') {
 		return setTimeout(() => openShop(), hoursLeftInPeriod * 60 * 60 * 1000 + minsLeftInPeriod * 1000)
@@ -266,6 +265,16 @@ if (cmd === `!init`) {
 	const count = await Info.count()
 	if (count) return message.channel.send(`The game has already been initialized.`)
 
+	await Info.create({
+		element: "newbies",
+		count: 0
+	})
+
+	await Info.create({
+		element: "shop",
+		status: "open"
+	})
+	
 	const SS1 = {
 		code: "SS1",
 		name: "Starter Series 1",
@@ -309,13 +318,20 @@ if (cmd === `!init`) {
 		specs_per_spec: 2
 	}
 
+	const APC = {
+		code: "APC",
+		name: "Arena Prize Cards",
+		type: "promot",
+		emoji: "master",
+		alt_emoji: "master",
+		size: 8,
+		ultras: 8,
+		unit_price: 24
+	}
+
 	await Set.create(SS1)
 	await Set.create(DOC)
-
-	await Info.create({
-		element: "newbies",
-		count: 0
-	})
+	await Set.create(APC)
 
 	for (let i = 0; i < prints.length; i++) {
 		await Print.create({
@@ -330,21 +346,11 @@ if (cmd === `!init`) {
 		})
 	}
 
-	message.channel.send(`I created 2 sets (SS1 and DOC) and ${prints.length} prints. Please reset the bot for these changes to take full effect.`)
+	message.channel.send(`I created 3 sets (SS1, DOC, APC) and ${prints.length} prints. Please reset the bot for these changes to take full effect.`)
 
 	if (!(await isNewUser(merchbotId))) return message.channel.send(`The Shop has already been initiated.`)
 	await createPlayer(merchbotId, 'MerchBot', 'MerchBot#1002')
 	await createProfile(merchbotId, 'none')
-
-	await Info.create({
-		element: "transaction",
-		status: "pending"
-	})
-
-	await Info.create({
-		element: "shop",
-		status: "open"
-	})
 
 	return message.channel.send(`You initialized The Shop!`)
 }
@@ -531,10 +537,14 @@ if(startcom.includes(cmd)) {
 		}
 
 		await createProfile(maid, starterDeck.slice(4))
-
-		return message.channel.send('Congratulations, you have begun the game!')
+		message.member.roles.add(fpRole)
+		return message.channel.send(`Excellent choice, ${message.author.username}! ${legend}` +
+		`\nYou received a copy of ${starterDeck === "ss1_fish" ? `Fish's Ire ${fish}` : `Rock's Foundation ${rock}`} , 150${starchips}, and the **Forged Players** role!` +
+		`\nYou can type **!pack 10** to buy 10 packs of Dawn of Chaos ${DOC} to start your collection. ${wokeaf}` +
+		`\n\nI wish you luck on your journey, new duelist! ${master}`)
 	}).catch(err => {
-		return message.channel.send('You did not respond in time. Please type the **!start** command to try again.')
+		console.log(err)
+		return message.channel.send(`Sorry, time's up.`)
 	})
 }
 
@@ -718,7 +728,7 @@ if(infocom.includes(cmd)) {
 		` You can check ratings with the **!stats** command.`+
 		`\n\nDisclaimer: Logs exist and admins can view inventories.`+
 		` Playing with cards you don't own will not be tolerated.`+
-		`\n\nIn addition, you must follow the Forbidden and Limited List:`, {files: ["./public/banlist.png"]})
+		`\n\nIn addition, you must follow the Forbidden and Limited List.`)
 	}
 
 	if (message.channel.id == marketPlaceChannel) { 
@@ -730,7 +740,7 @@ if(infocom.includes(cmd)) {
 		` Then come to the <#${marketPlaceChannel}> to use the **!trade** command.`+
 		`\n\nIf you can't find a trading partner, you can also browse the <#${shopChannel}>.`+
 		` Each card has two prices: the cost to buy and the price to sell.`+
-		` Sick of using Discord? Visit the Shop online at https://forgedinchaos.com.`+
+		// ` Sick of using Discord? Visit the Shop online at https://forgedinchaos.com.`+
 		`\n\nOn Tuesday and Friday nights, the Shop closes and opens some packs to restock.`+
 		` During the Night, players use the **!bid** command in private.`+
 		` The next Day, the Shop opens and the cards are sold to the highest bidders!`)
@@ -738,9 +748,7 @@ if(infocom.includes(cmd)) {
 
 	if (message.channel.id == tournamentChannel) { 
 		return message.channel.send(`${legend} --- Tournaments --- ${legend}`+ 
-		`\nHere at the Forged Discord server, we host Tournaments with the help of bots and humans alike.`+
-		`\n\nLarger Tournaments will be announced in advance by our Event Staff in the <#${tournamentChannel}>.`+
-		` To sign up for a Tournament, simply come to the <#${tournamentChannel}> and use the **!join** command.`+
+		`\nTo sign up for a Tournament, simply come to the <#${tournamentChannel}> and use the **!join** command.`+
 		` The Tournament Organizer will handle the rest, so keep an eye out for their instructions.`+
 		`\n\nAs a token of our appreciation, each tournament participant gets a Chaos Pack just for entering.`+
 		` If you do well, you can win additional Chaos Packs and other prizes.`)
@@ -754,11 +762,11 @@ if(infocom.includes(cmd)) {
 		` It requires 6 players to launch.`+
 		` When it starts, you are loaned a 60-card deck, and you get 5 minutes to cut up to 20 cards.`+
 		`\n\nThe Arena is a Round Robin, singles-games tournament.`+
-		` Winners receive 6${starchips}, losers receive 2${starchips}.`+
+		` Winners receive 3${starchips}, losers receive 1${starchips}.`+
 		` To report a loss, type **!loss @opponent**, then wait for the next round.`+
-		`\n\nThe Champion of the Arena walks away with an ${ultEmoji}Arena-exclusive Prize Card according to their Tribe!`+
-		` Everyone else receives Vouchers for each game they won.`+
-		` You can use **!barter "card"** to exchange 8 Vouchers for a Tribal prize card.`, {files: ["https://i.imgur.com/iYTTIUW.png"]})
+		`\n\nThe Champion of the Arena walks away with an ${ult}Arena Prize Card according to their Tribe!`+
+		` Everyone else receives Vouchers for their wins.`+
+		` You can use **!barter** to exchange Vouchers for APCs.`, {files: ["https://i.imgur.com/iYTTIUW.png"]})
 	}
 
 	if (message.channel.id == gauntletChannel) { 
@@ -783,33 +791,21 @@ if(infocom.includes(cmd)) {
 
 	if (message.channel.id == keeperChannel) { 
 		return message.channel.send(`${fire} --- Keeper of the Forge --- ${fire}`+ 
-		`\nIn this channel, you get to test out the game's most powerful cards.`+
-		` Simply align yourself with a Tribe and wage war at their side.`+
-		`\n\nTo compete in the Arena, type **!join** in <#${arenaChannel}>.`+
-		` It requires 6 players to launch.`+
-		` When it starts, you are loaned a 60-card deck, and you get 5 minutes to cut up to 20 cards.`+
-		`\n\nThe Arena is a Round Robin, singles-games tournament.`+
-		` Winners receive 6${starchips}, losers receive 2${starchips}.`+
-		` To report a loss, type **!loss @opponent**, then wait for the next round.`+
-		`\n\nThe Champion of the Arena walks away with an ${ultEmoji}Arena-exclusive Prize Card according to their Tribe!`+
-		` Everyone else receives Vouchers for each game they won.`+
-		` You can use **!barter "card"** to exchange 8 Vouchers for a Tribal prize card.`, {files: ["https://i.imgur.com/iYTTIUW.png"]})
-	}
+		`\nIn this channel, you get to `+
+		` woof.`)	}
 
 	if (message.channel.id == triviaChannel) { 
-		return message.channel.send(`${eye} --- Trivia Center --- ${eye}`+ 
+		return message.channel.send(`${stoned} --- Trivia Center --- ${stoned}`+ 
 		`\nThe King of Games must also be a student of the game.`+
-		` That means you must be familiar with the old Champions and their decks,`+
-		` as well as the names, effects, and artworks of important cards.`+
-		` In addition, we\'ll keep you on your toes with some non-Yu-Gi-Oh! questions, covering topics such as:`+
-		` \n- TV, Anime, Film\n- Science\n- Geography\n- History\n- Pop Culture\n- Forged Facts (!)`+
-		`\n\nTo enter Trivia contests, simply use the **!trivia** command in the <#603825673404022822> channel.`+
-		` It requires 5 players to launch.`+
-		` When it starts, you will have 16 seconds to respond to each question sent via DM.`+
-		`\n\nThe Arena is a Round Robin, singles-games tournament.`+
-		` If you get them right--you get a point! After 10 rounds, the top 2 bookworms will split 6" + starchip + " for their performance.`+
+		` That means being familiar with the old Champions and their decks,`+
+		` as well as historically important cards.`+
+		` We'll also keep you on your toes with some non-Yu-Gi-Oh! questions, covering topics such as:`+
+		` \n- TV, Anime, Film\n- Science\n- Geography\n- History\n- Pop Culture\n- FiC Facts (!)`+
+		`\n\nTo enter a Trivia contest, simply find 4 friends and get everyone to type **!join**.`+
+		` You will have 16 seconds to respond to each question via DM.`+
+		` After 10 rounds, the top 2 bookworms split 6 ${starchips} for their performance.`+
 		`\n\nAs you play more Trivia, your Profile will keep a record of your acumen.`+
-		` There are 500 total questions, so hit the books and then hit those keys! <:approve:586704386617507840>`)
+		` There are 1000 total questions, so hit the books and then hit those keys! ${red}`)
 	}
 		
 	if (message.channel.id == draftChannel) { 
@@ -822,12 +818,12 @@ if(infocom.includes(cmd)) {
 		`\n\nThe Arena is a Round Robin, singles-games tournament.`+
 		` Winners receive 6${starchips}, losers receive 2${starchips}.`+
 		` To report a loss, type **!loss @opponent**, then wait for the next round.`+
-		`\n\nThe Champion of the Arena walks away with an ${ultEmoji}Arena-exclusive Prize Card according to their Tribe!`+
+		`\n\nThe Champion of the Arena walks away with an ${ult}Arena-exclusive Prize Card according to their Tribe!`+
 		` Everyone else receives Vouchers for each game they won.`+
 		` You can use **!barter "card"** to exchange 8 Vouchers for a Tribal prize card.`)
 	}
 
-	return message.channel.send(`Use this command in channels such as <#${duelRequestChannel}>, <#${marketPlaceChannel}>, <#${tournamentChannel}>, <#${arenaChannel}>, <#${keeperChannel}>, <#${triviaChannel}>, and <#${gauntletChannel}> to learn how those parts of the game work.`)
+	return message.channel.send(`Use this command in channels such as <#${duelRequestChannel}>, <#${marketPlaceChannel}>, <#${tournamentChannel}>, <#${arenaChannel}>, <#${keeperChannel}>, and <#${triviaChannel}> to learn how those parts of the game work.`)
 }
 
 //EDIT
@@ -1103,10 +1099,10 @@ if (cmd === `!shop`) {
 			playerId: merchbotId,
 			quantity: { [Op.gt]: 0 }
 		}})
-		if (!inv) return message.channel.send(`Sorry, ${card} is Out of Stock.`)
 		const market_price = print.market_price
 		const selling_price = Math.ceil(market_price * 1.1)
 		const buying_price = Math.ceil(market_price * 0.7)
+		if (!inv) return message.channel.send(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - Out of Stock.`)
 		return message.channel.send(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - ${inv.quantity}`)
 	}
 }
@@ -1117,7 +1113,7 @@ if(cmd === `!count`) {
 	const newbies = await Info.findOne({ where: { element: "newbies" }})
 
 	const results = [`In this cycle ${newbies.count} ${newbies.count === 1 ? 'Newbie' : 'Newbies'} began playing and The Shop has sold:`]
-	let weightedCount = 0
+	let weightedCount = -10 * newbies.count
 
 	for (let i = 0; i < allSetsForSale.length; i++) {
 		const set = allSetsForSale[i]
@@ -1145,6 +1141,7 @@ if(cmd === `!count`) {
 		}
 	}
 
+	if (weightedCount < 1) weightedCount = 1 
 	const count = Math.ceil(weightedCount / 8)
 	results.push(`\nIf The Shop closed now, we'd open ${count} ${count === 1 ? 'Pack' : 'Packs'} of DOC ${DOC} to restock our inventory.`)
 	return message.channel.send(results.join("\n"))
@@ -1207,9 +1204,37 @@ if(cmd === `!chart`) {
 	)
 }
 
-//MYTRADES //not working
+//TRADES
 if(cmd === `!trades`) {
-	return
+	const player = await Player.findOne({ where: { id: maid } })
+	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+
+	const trades = await Trade.findAll({ where: { 
+		[Op.or]: [{ sender: maid }, { receiver: maid }]
+	}})
+
+	if (!trades.length) return message.channel.send(`You have not made any trades.`)
+
+	const partners = []
+
+	trades.forEach((trade) => {
+		const sender = trade.sender
+		const receiver = trade.receiver
+		if (sender !== maid && !partners.includes(sender)) partners.push(sender)
+		if (receiver !== maid && !partners.includes(receiver)) partners.push(receiver)
+	})
+
+	const players = []
+
+	for (let i = 0; i < partners.length; i++) {
+		const player = await Player.findOne({ where: { id: partners[i] }})
+		if (!player) continue
+		players.push(player.name)
+	}
+
+	players.sort()
+
+	return message.channel.send(`You have traded with the following players:\n${players.join("\n")}`)
 }
 
 //RNG
@@ -1470,18 +1495,17 @@ if(cmd === `!search`) {
 
 	allBinders.forEach(function(binder) {
 		for (let i = 0; i < 18; i++) {
-			if (binder[`slot_${(i + 1)}`] === card) binderResults.push(binder.player.name)
+			if (binder[`slot_${(i + 1)}`] === print.card_code) binderResults.push(binder.player.name)
+		}
+	})
+	
+	allWishlists.forEach(function(wishlist) {
+		for (let i = 0; i < 10; i++) {
+			if (wishlist[`slot_${(i + 1)}`] === print.card_code) wishlistResults.push(wishlist.player.name)
 		}
 	})
 
 	binderResults.sort()
-	
-	allWishlists.forEach(function(wishlist) {
-		for (let i = 0; i < 10; i++) {
-			if (wishlist[`slot_${(i + 1)}`] === card) wishlistResults.push(wishlist.player.name)
-		}
-	})
-
 	wishlistResults.sort()
 
 	return message.channel.send(`Search results for ${card}:\n**Binders:**\n${binderResults.length ? binderResults.join('\n') : 'N/A'}\n\n**Wishlists:**\n${wishlistResults.length ? wishlistResults.join('\n') : 'N/A'}`)
@@ -1495,10 +1519,17 @@ if(wishlistcom.includes(cmd)) {
 	if (!wishlist && playerId !== maid) return message.channel.send(`That user is not in the database.`)
 
 	if (!args.length || playerId !== maid) {
-		const results = []
+		const prints = []
+		
 		for (let i = 0; i < 18; i++) {
-			if(wishlist[`slot_${i + 1}`]) results.push(wishlist[`slot_${i + 1}`])
+			const card_code = wishlist[`slot_${i + 1}`]
+			if (!card_code) continue
+			const print = await Print.findOne({ where: { card_code }})
+			prints.push(print)
 		}
+
+		prints.sort((a, b) => b.market_price - a.market_price)
+		const results = prints.map((print) => `${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
 
 		if (!results.length) return message.channel.send(`${playerId === maid ? 'Your' : `${wishlist.player.name}'s`} wishlist is empty.`)
 		else return message.channel.send(`**${wishlist.player.name}'s Wishlist**\n${results.join('\n')}`)
@@ -1520,29 +1551,65 @@ if(wishlistcom.includes(cmd)) {
 		return message.channel.send(`Your wishlist has been emptied.`)
 	}
 
-	const query = args.join(' ')
-	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-	const card_name = findCard(query, fuzzyPrints, fuzzyPrints2)
-	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-	if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
-	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
-
-	let success = false
-	let i = 0
-
-	while (!success && i < 18) {
-		if (!wishlist[`slot_${i + 1}`]) {
-			success = true
-			wishlist[`slot_${i + 1}`] = card
-			await wishlist.save()
-		} else {
-			i++
+	const inputs = args.join(' ').split("; ")
+	for (let j = 0; j < inputs.length; j++) {
+		const query = inputs[j]
+		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
+		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
+		const card_name = findCard(query, fuzzyPrints, fuzzyPrints2)
+		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
+		if (!print) {
+			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+			continue
 		}
+		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+
+		const wishlistKeys = Object.keys(wishlist.dataValues)
+		let foundCopy = false
+		
+		for (let i = 0; i < wishlistKeys.length; i++) {
+			const key = wishlistKeys[i]
+			if (wishlist[key] === print.card_code) {
+				wishlist[key] = null
+				await wishlist.save()
+				message.channel.send(`You removed ${card} from your wishlist.`)
+				foundCopy = true
+				break
+			}
+		}
+
+		if (foundCopy) continue
+
+		const inv = await Inventory.findOne({ 
+			where: { 
+				printId: print.id,
+				playerId: maid,
+				quantity: { [Op.gt]: 0 }
+			}
+		})
+
+		if (!inv) {
+			message.channel.send(`You do not have any copies of ${card}.`)
+			continue
+		} 
+
+		let success = false
+		let i = 0
+		while (!success && i < 18) {
+			if (!wishlist[`slot_${i + 1}`]) {
+				success = true
+				wishlist[`slot_${i + 1}`] = print.card_code
+				await wishlist.save()
+				message.channel.send(`You added ${card} to your wishlist.`)
+			} else {
+				i++
+			}
+		}
+
+		if (!success) return message.channel.send(`Your wishlist is full. Please remove a card or empty it to make room.`)
 	}
 
-	if (!success) return message.channel.send(`Your wishlist is full. Please remove a card or empty it to make room.`)
-	else return message.channel.send(`You added ${card} to your wishlist.`)
+	return
 }
 
 
@@ -2668,7 +2735,7 @@ if(invcom.includes(cmd)) {
 	const player = await Player.findOne({ where: { id: playerId }})
 	if (!player) return message.channel.send(playerId === maid ? `You are not in the database. Type **!start** to begin the game.` : `That person is not in the database.`)
 
-	const query = playerId === maid ? args.join(' ') : args.length > 1 ? args.slice(1).join(' ') : null
+	const query = playerId === maid ? args.join(' ') : args.length > 1 ? args.slice(1).join(' ') : ''
 	const set_code = query.toUpperCase()
 	const valid_set_code = !!(set_code.length === 3 && await Set.count({where: { code: set_code }}))
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
@@ -2677,7 +2744,7 @@ if(invcom.includes(cmd)) {
 	const print = valid_card_code ? await Print.findOne({ where: { card_code } }) : card_name ? await selectPrint(message, maid, card_name) : null
 	if (card_name && !print) return
 
-	const inventory = !query ? await Inventory.findAll({ 
+	const inventory = !query.length ? await Inventory.findAll({ 
 		where: { 
 			playerId,
 			quantity: {
@@ -3201,7 +3268,7 @@ if(cmd === `!dump`) {
 	merchbot_wallet.stardust -= compensation
 	await merchbot_wallet.save()
 
-	return message.channel.send(`You sold ${count}${rarity === 'all' ? '' : ` ${eval(rarity)}`}${set_code} ${eval(set_code)} cards to The Shop for ${compensation}${stardust}.`)
+	return message.channel.send(`You sold ${count} ${rarity === 'all' ? '' : eval(rarity)}${set_code} ${eval(set_code)} cards to The Shop for ${compensation}${stardust}.`)
 }
 
 //SELL
@@ -3420,7 +3487,24 @@ if(cmd === `!barter`) {
 
 //BID
 if(cmd === `!bid`) {
-	return
+	const player = await Player.findOne({  
+		where: { id: maid }, 
+		include: [Bid, Wallet],
+		order: [[Bid, 'amount', 'DESC']]})
+	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+
+    const count = await Auction.count()
+    if (!count) message.channel.send(`Sorry, there are no singles up for auction tonight.`)
+    
+	message.channel.send(`Please check your DMs.`)
+
+	if (player.bids.length === 3) {
+		return askForBidCancellation(message, player)
+	} else if (player.bids.length) {
+		return manageBidding(message, player)
+	} else {
+		return askForBidPlacement(message, player)
+	}
 }
 
 //TRADE
@@ -3671,13 +3755,15 @@ if(cmd === `!nicknames` || cmd === `!nicks`) {
 //OPEN
 if(cmd === `!open`) {
 	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
-	return openShop(message.channel)
+	message.channel.send(`Opening the shop now.`)
+	return openShop()
 }
 
 //CLOSE
 if(cmd === `!close`) {
 	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
-	return closeShop(message.channel)
+	message.channel.send(`Closing the shop now.`)
+	return closeShop()
 }
 
 //ADJUST

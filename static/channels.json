@@ -1,6 +1,6 @@
 {
    "welcomeChannel":"842476300807176214",
-   "announcementsChannel":"842476554339876944xw",
+   "announcementsChannel":"842476554339876944",
    "registrationChannel":"845016654467432499",
    "botSpamChannel":"842477670608404521",
    "duelRequestsChannel":"842476817226793021",
@@ -11,5 +11,6 @@
    "keeperChannel":"842477569021575188",
    "triviaChannel":"842477458094686229",
    "draftChannel":"842477525858516993",
-   "gauntletChannel":"842477542358122507"
+   "gauntletChannel":"842477542358122507",
+   "staffChannel":"842480886255714414"
 }

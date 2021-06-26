@@ -41,6 +41,9 @@ Diary.belongsTo(Player)
 Player.hasMany(Bid)
 Bid.belongsTo(Player)
 
+Auction.hasMany(Bid)
+Bid.belongsTo(Auction)
+
 Player.hasMany(Inventory)
 Inventory.belongsTo(Player)
 

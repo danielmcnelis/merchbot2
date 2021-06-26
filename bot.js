@@ -17,7 +17,8 @@ const ygoprodeck = require('./static/ygoprodeck.json')
 const status = require('./static/status.json')
 const muted = require('./static/muted.json')
 const prints = require('./static/prints.json')
-const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Game, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist } = require('./db')
+const { getNewStatus } = require('./functions/status.js')
+const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Game, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
 const { getRandomString, isSameDay, hasProfile, capitalize, restore, recalculate, revive, createProfile, createPlayer, isNewUser, isAdmin, isMod, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
 const { checkDeckList, saveYDK, saveAllYDK } = require('./functions/decks.js')
 const { askForBidCancellation, askForBidPlacement, manageBidding } = require('./functions/bids.js')
@@ -26,7 +27,7 @@ const { makeSheet, addSheet, writeToSheet } = require('./functions/sheets.js')
 const { askForAdjustConfirmation, askForCardSlot, getNewMarketPrice, askForSetToPrint, selectPrint, askForRarity } = require('./functions/print.js')
 const { uploadDeckFolder } = require('./functions/drive.js')
 const { fetchAllCardNames, fetchAllCards, fetchAllUniquePrintNames, findCard, search } = require('./functions/search.js')
-const { openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, getDumpQuantity, postBids, updateShop } = require('./functions/shop.js')
+const { getBarterCard, checkShopShouldBe, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
 const { awardPack } = require('./functions/packs.js')
 const { getBuyerConfirmation, getFinalConfirmation, getInitiatorConfirmation, getPartnerSide, getPartnerConfirmation, getSellerConfirmation } = require('./functions/trade.js')
 const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard } = require('./functions/profile.js')
@@ -55,54 +56,26 @@ client.on('ready', async () => {
         fuzzyPrints2.add(card)
     })
 
-	const date = new Date()
-	const day = date.getDay()
-	const hours = date.getHours()
-	const mins = date.getMinutes()
-
-	let shopShouldBe
-	let hoursLeftInPeriod
-	const minsLeftInPeriod = 60 - mins
-
-	if ((day === 6 && hours >= 14) || day === 0 || day === 1 || (day === 2 && hours < 16)) {
-		shopShouldBe = 'open'
-		hoursLeftInPeriod = day === 6 ? 23 - hours + 24 * 2 + 16 :
-			day === 0 ? 23 - hours + 24 + 16 :
-			day === 1 ? 23 - hours + 16 :
-			day === 2 ? 16 - hours :
-			null
-	} else if ((day === 2 && hours >= 16) || (day === 3 && hours < 8)) {
-		shopShouldBe = 'closed'
-		hoursLeftInPeriod = day === 2 ? 23 - hours + 8 :
-			day === 3 ? 8 - hours :
-			null
-	} else if ((day === 3 && hours >= 8) || day === 4 || (day === 5 && hours < 22)) {
-		shopShouldBe = 'open'
-		hoursLeftInPeriod = day === 3 ? 23 - hours + 24 + 22 :
-			day === 4 ? 23 - hours + 22 :
-			day === 5 ? 22 - hours :
-			null
-	} else if ((day === 5 && hours >= 22) || (day === 6 && hours < 14)) {
-		shopShouldBe = 'closed'
-		hoursLeftInPeriod = day === 5 ? 23 - hours + 14 :
-			day === 6 ? 14 - hours :
-			null
-	}
-
-	if (await checkShopOpen()) updateShop()
-
+	const shopShouldBe = checkShopShouldBe()
+	const shopCountdown = getShopCountdown()
+	const shopOpen = await checkShopOpen()
+	
+	if (shopOpen) updateShop()
 	setInterval(async () =>  {
-		if (await checkShopOpen()) updateShop()
+		const shopOpen = await checkShopOpen()
+		if (shopOpen) updateShop()
 	}, 1000 * 60 * 5)
 
-	const shopOpen = await checkShopOpen()
-	if (!shopOpen && shopShouldBe === 'open') client.channels.cache.get(staffChannel).send(`<@&${modRole}>, The Shop is unexpectedly closed. Type **!open** to manually open it.`)
-	if (shopOpen && shopShouldBe === 'closed') client.channels.cache.get(staffChannel).send(`<@&${modRole}>, The Shop is unexpectedly open. Type **!close** to manually close it.`)
+	if (!shopShouldBe) return client.channels.cache.get(staffChannel).send(`<@&${adminRole}>, The Shop status could not be read from the database.`)
+	if (!shopOpen && shopShouldBe === 'open') client.channels.cache.get(staffChannel).send(`<@& ${modRole}>, The Shop is unexpectedly closed. Type **!open** to manually open it.`)
+	if (shopOpen && shopShouldBe === 'closed') client.channels.cache.get(staffChannel).send(`<@& ${modRole}>, The Shop is unexpectedly open. Type **!close** to manually close it.`)
 
 	if (shopShouldBe === 'closed') {
-		return setTimeout(() => openShop(), hoursLeftInPeriod * 60 * 60 * 1000 + minsLeftInPeriod * 1000)
+		console.log('setting timeout for openShop():', shopCountdown)
+		return setTimeout(() => openShop(), shopCountdown)
 	} else if (shopShouldBe === 'open') {
-		return setTimeout(() => closeShop(), hoursLeftInPeriod * 60 * 60 * 1000 + minsLeftInPeriod * 1000)
+		console.log('setting timeout for closeShop():', shopCountdown)
+		return setTimeout(() => closeShop(), shopCountdown)
 	}
 })
   
@@ -2722,11 +2695,6 @@ if(cmd === `!grindall`) {
 	})
 }
 
-//HOLIDAYCHEER
-if(cmd === `!holidaycheer`) {
-	return
-}
-
 //INVENTORY
 if(invcom.includes(cmd)) { 
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
@@ -3482,7 +3450,57 @@ if(cmd === `!buy`) {
 
 //BARTER
 if(cmd === `!barter`) {
-	return
+	const wallet = await Wallet.findOne({  
+		where: { playerId: maid }, 
+		include: Player
+	})
+
+	if (!wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+
+	const card_name = await getBarterCard(message)
+	if (!card_name) return
+
+	const print = await Print.findOne({ where: {
+		card_name,
+		set_code: 'APC'
+	}})
+
+	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+
+	if (!print) return message.channel.send(`Could not find APC: "card_name".`)
+
+	const currency = card_name === 'Desmanian Devil' ? 'mushroom' :
+		card_name === `Koa'ki Meiru Guardian` ? 'moai' :
+		card_name === 'Rose Lover' ? 'rose' :
+		card_name === 'Moray of Greed' ? 'hook' :
+		card_name === 'Spacetime Transcendence' ? 'egg' :
+		card_name === `Viper's Rebirth` ? 'cactus' :
+		null
+
+	if (wallet[currency] < 8) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${wallet[currency]}${eval(currency)} and ${card} costs 8${eval(currency)}.`)
+
+	const inv = await Inventory.findOne({ where: {
+		printId: print.id,
+		card_code: print.card_code,
+		playerId: maid 
+	}})
+
+	if (inv) {
+		inv.quantity++
+		await inv.save()
+	} else {
+		await Inventory.create({
+			printId: print.id,
+			card_code: print.card_code,
+			playerId: maid,
+			quantity: 1
+		})
+	}
+
+	wallet[currency] -= 8
+	await wallet.save()
+
+	return message.channel.send(`Thanks! You exchanged 8${eval(currency)} for a copy of ${card}.`)
 }
 
 //BID
@@ -3789,6 +3807,67 @@ if(cmd === `!adjust`) {
 	await print.save()
 
 	return message.channel.send(`The market price of ${card} has been adjusted to ${newPrice}${stardust}.`)
+}
+
+//MOVE
+if(cmd === `!move`) {
+	if (!isAdmin(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!args.length) return message.channel.send(`Please specify the card you wish to move on the Forbidden & Limited list.`)
+	
+	const query = args.join(' ')
+	const card_name = findCard(query, fuzzyPrints, fuzzyPrints2)
+	const card = card_name ? await Card.findOne({ where: { name: card_name }}) : null
+	if (!card) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+	let konami_code = card.image.slice(0, -4)
+	console.log('konami_code', konami_code)
+	while (konami_code.length < 8) konami_code = '0' + konami_code
+	console.log('card_name', card_name)
+	console.log('konami_code', konami_code)
+	
+	const status = await Status.findOne({ where: {
+		name: card_name,
+		konami_code
+	} })
+
+	const old_status = status ? status.current : 'unlimited'
+	const new_status = await getNewStatus(message, card, old_status)
+	if (!new_status) return
+	if (new_status === 'do not change') return message.channel.send(`Okay, ${card_name} will remain ${old_status}.`)
+	else {
+		if (status) {
+			status.current = new_status
+			await status.save()
+		} else {
+			await Status.create({
+				name: card_name,
+				konami_code,
+				current: new_status
+			})
+		}
+
+		return message.channel.send(`Okay, ${card_name} has been moved from "${old_status}" to "${new_status}".`)
+	}
+}
+
+//BANLIST
+if (listcom.includes(cmd)) {
+	const forbidden = await Status.findAll({  where: { current: 'forbidden' } })
+	const limited = await Status.findAll({  where: { current: 'limited' } })
+	const semi_limited = await Status.findAll({  where: { current: 'semi-limited' } })
+
+	const forbiddenNames = forbidden.length ? forbidden.map((card) => card.name).sort() : [`N/A`]
+	const limitedNames = limited.length ? limited.map((card) => card.name).sort() : [`N/A`]
+	const semi_limitedNames = semi_limited.length ? semi_limited.map((card) => card.name).sort() : [`N/A`]
+
+	message.author.send(`**~ ${FiC} - FORBIDDEN & LIMITED LIST ${FiC} ~**` +
+	`\n\n**The following cards are forbidden:**` + 
+	`\n${forbiddenNames.join('\n')}` + 
+	`\n\n**The following cards are limited:**` + 
+	`\n${limitedNames.join('\n')}` + 
+	`\n\n**The following cards are semi-limited:**` + 
+	`\n${semi_limitedNames.join('\n')}`)	
+
+	return message.channel.send(`I messaged you the Forbidden & Limited list. ${FiC}`)
 }
 
 })

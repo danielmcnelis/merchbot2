@@ -22,7 +22,10 @@ const openShop = async () => {
 		await shop.save()
         await processBids()
         updateShop()
-        return client.channels.cache.get(announcementsChannel).send(`Good morning, <@&${fpRole}>, The Shop ${merchant} is now open! ${open}`)
+        client.channels.cache.get(announcementsChannel).send(`Good morning, <@&${fpRole}>, The Shop ${merchant} is now open! ${open}`)
+        const shopCountdown = getShopCountdown()
+        console.log('setting timeout to closeShop():', shopCountdown)
+		return setTimeout(() => closeShop(), shopCountdown)
 	} 
 }
 
@@ -49,7 +52,10 @@ const closeShop = async () => {
         }
 
         await restock()
-		return client.channels.cache.get(announcementsChannel).send(`Good evening, <@&${fpRole}>, The Shop ${merchant} is now closed! ${closed}`)
+		client.channels.cache.get(announcementsChannel).send(`Good evening, <@&${fpRole}>, The Shop ${merchant} is now closed! ${closed}`)
+        const shopCountdown = getShopCountdown()
+        console.log('setting timeout to openShop():', shopCountdown)
+		return setTimeout(() => openShop(), shopCountdown)
 	} 
 }
 
@@ -61,6 +67,67 @@ const checkShopOpen = async () => {
     } })
 
     return shopIsOpen
+}
+
+// GET SHOP COUNTDOWN
+const getShopCountdown = () => {
+	const date = new Date()
+	const day = date.getDay()
+	const hours = date.getHours()
+	const mins = date.getMinutes()
+
+	let hoursLeftInPeriod
+	const minsLeftInPeriod = 60 - mins
+
+	if ((day === 6 && hours >= 14) || day === 0 || day === 1 || (day === 2 && hours < 16)) {
+		hoursLeftInPeriod = day === 6 ? 24 - hours + 24 * 2 + 15 :
+			day === 0 ? 24 - hours + 24 + 15 :
+			day === 1 ? 24 - hours + 15 :
+			day === 2 ? 15 - hours :
+			null
+	} else if ((day === 2 && hours >= 16) || (day === 3 && hours < 8)) {
+		hoursLeftInPeriod = day === 2 ? 24 - hours + 8 :
+			day === 3 ? 7 - hours :
+			null
+	} else if ((day === 3 && hours >= 8) || day === 4 || (day === 5 && hours < 22)) {
+		hoursLeftInPeriod = day === 3 ? 24 - hours + 24 + 22 :
+			day === 4 ? 24 - hours + 21 :
+			day === 5 ? 21 - hours :
+			null
+	} else if ((day === 5 && hours >= 22) || (day === 6 && hours < 14)) {
+		hoursLeftInPeriod = day === 5 ? 24 - hours + 13 :
+			day === 6 ? 13 - hours :
+			null
+	}
+
+    console.log('hoursLeftInPeriod', hoursLeftInPeriod)
+    console.log('minsLeftInPeriod', minsLeftInPeriod)
+
+    const shopCountdown = ( hoursLeftInPeriod * 60 + minsLeftInPeriod ) * 60 * 1000
+    return shopCountdown
+}
+
+//CHECK SHOP SHOULD BE
+const checkShopShouldBe = () => {
+	const date = new Date()
+	const day = date.getDay()
+	const hours = date.getHours()
+	const mins = date.getMinutes()
+
+    let shopShouldBe
+	if ((day === 6 && hours >= 14) || day === 0 || day === 1 || (day === 2 && hours < 16)) {
+		shopShouldBe = 'open'
+	} else if ((day === 2 && hours >= 16) || (day === 3 && hours < 8)) {
+		shopShouldBe = 'closed'
+	} else if ((day === 3 && hours >= 8) || day === 4 || (day === 5 && hours < 22)) {
+		shopShouldBe = 'open'
+	} else if ((day === 5 && hours >= 22) || (day === 6 && hours < 14)) {
+		shopShouldBe = 'closed'
+	} else {
+        return false
+    }
+
+    return shopShouldBe
 }
 
 // PROCESS BIDS
@@ -202,8 +269,8 @@ const updateShop = async () => {
             const set = setsForSale[i]
             if (set.type === 'starter_deck') {
                 if (set.name === 'Starter Series 1') {
-                    results.push(`${set.unit_price}${eval(set.currency)} - Fish's Ire ${eval(set.emoji)} - Starter`)
-                    results.push(`${set.unit_price}${eval(set.currency)} - Rock's Foundation ${eval(set.alt_emoji)} - Starter`)
+                    results.push(`${set.unit_price}${eval(set.currency)} - Fish's Ire ${eval(set.emoji)} - Deck`)
+                    results.push(`${set.unit_price}${eval(set.currency)} - Rock's Foundation ${eval(set.alt_emoji)} - Deck`)
                 }
             }
         }
@@ -374,12 +441,62 @@ const getDumpQuantity = async (message, rarity) => {
     return collected
 }
 
+// GET BARTER CARD
+const getBarterCard = async (message) => {
+    const options = [
+        `(1) Desmanian Devil`,
+        `(2) Koa'ki Meiru Guardian`,
+        `(3) Rose Lover`,
+        `(4) Moray of Greed`,
+        `(5) Spacetime Transcendence`,
+        `(6) Viper's Rebirth`
+    ]
+
+    const filter = m => m.author.id === message.member.user.id
+	const msg = await message.channel.send(`Which card would you like to barter for?\n${options.join("\n")}`)
+    const collected = await msg.channel.awaitMessages(filter, {
+		max: 1,
+        time: 15000
+    }).then(async collected => {
+		const response = collected.first().content.toLowerCase()
+        let index
+        if(response.includes('1')) {
+            index = 0
+        } else if(response.includes('2')) {
+            index = 1
+        } else if(response.includes('3')) {
+            index = 2
+        } else if(response.includes('4')) {
+            index = 3
+        } else if(response.includes('5')) {
+            index = 4
+        } else if(response.includes('6')) {
+            index = 5
+        } else {
+            message.channel.send(`You did not select a valid option.`)
+            return false
+        }
+
+        const selected_option = options[index]
+        return selected_option.slice(4)
+    }).catch(err => {
+		console.log(err)
+        message.channel.send(`Sorry, time's up.`)
+        return false
+	})
+
+    return collected
+}
+
 module.exports = {
     askForDumpConfirmation,
     checkShopOpen,
+    checkShopShouldBe,
     closeShop,
+    getBarterCard,
     getDumpRarity,
     getDumpQuantity,
+    getShopCountdown,
     openShop,
     postBids,
     updateShop

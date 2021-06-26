@@ -2347,6 +2347,10 @@ if(cmd === `!daily`) {
 
 	if (!print.id) return console.log(`${card} does not exist in the Print database.`)
 
+	const card = await Card.findOne({ where: {
+		name: print.card_name
+	}})
+
 	const inv = await Inventory.findOne({ where: { 
 		card_code: print.card_code,
 		printId: print.id,
@@ -2389,7 +2393,7 @@ if(cmd === `!daily`) {
 	await daily.save()
 
 	message.channel.send(`1... 2...`)
-	return setTimeout(() => message.channel.send(`${enthusiasm} ${daily.player.name} pulled ${eval(print.rarity)}${print.card_code} - ${print.card_name} from the grab bag! ${emoji}`), 2000)
+	return setTimeout(() => message.channel.send(`${enthusiasm} ${daily.player.name} pulled ${eval(print.rarity)}${print.card_code} - ${print.card_name} from the grab bag! ${emoji}`, {files: [`https://ygoprodeck.com/pics/${card.image}`]}), 2000)
 }
 
 //ALCHEMY

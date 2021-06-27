@@ -37,6 +37,7 @@
   "bundleDependencies": false,
   "dependencies": {
     "axios": "^0.21.1",
+    "canvas": "^2.8.0",
     "challonge": "^2.2.0",
     "challonge-js": "^1.1.1",
     "discord.js": "^12.2.0",

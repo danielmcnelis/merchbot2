@@ -1,5 +1,6 @@
 
 const Discord = require('discord.js')
+const Canvas = require('canvas')
 const FuzzySet = require('fuzzyset')
 const fs = require('fs')
 const axios = require('axios')
@@ -2210,6 +2211,7 @@ if (cmd.toLowerCase() === `!destroy`) {
 	})
 }
 
+
 //GRIND
 if(cmd === `!grind`) {
 	const x = parseInt(args[0])
@@ -2250,7 +2252,7 @@ if(cmd === `!daily`) {
 	const hoursLeftInDay = 23 - date.getHours()
 	const minsLeftInHour = 60 - date.getMinutes()
 
-	if (daily.last_check_in && isSameDay(daily.last_check_in, date)) return message.channel.send(`You already used **!daily** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
+	//if (daily.last_check_in && isSameDay(daily.last_check_in, date)) return message.channel.send(`You already used **!daily** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
 
 	const daysPassed = daily.last_check_in ? (date.setHours(0, 0, 0, 0) - daily.last_check_in.setHours(0, 0, 0, 0)) / (1000*60*60*24) : 1
 
@@ -2378,8 +2380,14 @@ if(cmd === `!daily`) {
 	daily.last_check_in = date
 	await daily.save()
 
+	const canvas = Canvas.createCanvas(105, 158)
+	const context = canvas.getContext('2d')
+	const background = await Canvas.loadImage(`https://ygoprodeck.com/pics/${card.image}`)
+	context.drawImage(background, 0, 0, canvas.width, canvas.height)
+	const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `${card.name}.png`)
+
 	message.channel.send(`1... 2...`)
-	return setTimeout(() => message.channel.send(`${enthusiasm} ${daily.player.name} pulled ${eval(print.rarity)}${print.card_code} - ${print.card_name} from the grab bag! ${emoji}`, {files: [`https://ygoprodeck.com/pics/${card.image}`]}), 2000)
+	return setTimeout(() => message.channel.send(`${enthusiasm} ${daily.player.name} pulled ${eval(print.rarity)}${print.card_code} - ${print.card_name} from the grab bag! ${emoji}`, attachment), 2000)
 }
 
 //ALCHEMY

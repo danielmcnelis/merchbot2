@@ -14,7 +14,6 @@ const types = require('./static/types.json')
 const diaries = require('./static/diaries.json')
 const errors = require('./static/errors.json')
 const ygoprodeck = require('./static/ygoprodeck.json')
-const status = require('./static/status.json')
 const muted = require('./static/muted.json')
 const prints = require('./static/prints.json')
 const { getNewStatus } = require('./functions/status.js')
@@ -513,7 +512,7 @@ if(startcom.includes(cmd)) {
 		message.member.roles.add(fpRole)
 		return message.channel.send(`Excellent choice, ${message.author.username}! ${legend}` +
 		`\nYou received a copy of ${starterDeck === "ss1_fish" ? `Fish's Ire ${fish}` : `Rock's Foundation ${rock}`} , 150${starchips}, and the **Forged Players** role!` +
-		`\nYou can type **!pack 10** to buy 10 packs of Dawn of Chaos ${DOC} to start your collection. ${wokeaf}` +
+		`\nYou can type **!pack 10** to buy 10 Packs of Dawn of Chaos ${DOC} to start your collection. ${wokeaf}` +
 		`\n\nI wish you luck on your journey, new duelist! ${master}`)
 	}).catch(err => {
 		console.log(err)
@@ -858,7 +857,7 @@ if(calccom.includes(cmd)) {
 	+ (avgUltPrice * set.ultras_per_box) 
 	+ (avgScrPrice * set.secrets_per_box) 
 
-	return message.channel.send(`The average resale value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} box is ${avgBoxPrice}${stardust}.`)
+	return message.channel.send(`The average resale value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Box is ${avgBoxPrice}${stardust}.`)
 }
 
 //PROFILE
@@ -1013,7 +1012,6 @@ if(cmd === `!gift`) {
 //SHOP
 if (cmd === `!shop`) {
 	if (!args.length) {
-
 		const date = new Date()
 		const day = date.getDay()
 		const hours = date.getHours()
@@ -1025,37 +1023,36 @@ if (cmd === `!shop`) {
 		let hoursLeftInPeriod
 		const minsLeftInPeriod = 60 - mins
 	
-		if ((day === 6 && hours >= 14) || day === 0 || day === 1 || (day === 2 && hours < 16)) {
+		if ((day === 6 && hours >= 18) || day === 0 || day === 1 || (day === 2 && hours < 20)) {
 			shopStatus = 'open'
 			dayShopReverts = 'Tuesday'
 			hourShopReverts = '4pm'
-			hoursLeftInPeriod = day === 6 ? 23 - hours + 24 * 2 + 16 :
-				day === 0 ? 23 - hours + 24 + 16 :
-				day === 1 ? 23 - hours + 16 :
-				day === 2 ? 16 - hours :
+			hoursLeftInPeriod = day === 6 ? 23 - hours + 24 * 2 + 20 :
+				day === 0 ? 23 - hours + 24 + 20 :
+				day === 1 ? 23 - hours + 20 :
+				day === 2 ? 19 - hours :
 				null
-		} else if ((day === 2 && hours >= 16) || (day === 3 && hours < 8)) {
+		} else if ((day === 2 && hours >= 20) || (day === 3 && hours < 12)) {
 			shopStatus = 'closed'
 			dayShopReverts = 'Wednesday'
 			hourShopReverts = '8am'
-			hoursLeftInPeriod = day === 2 ? 23 - hours + 8 :
-				day === 3 ? 8 - hours :
+			hoursLeftInPeriod = day === 2 ? 23 - hours + 12 :
+				day === 3 ? 11 - hours :
 				null
-		} else if ((day === 3 && hours >= 8) || day === 4 || (day === 5 && hours < 22)) {
+		} else if ((day === 3 && hours >= 12) || day === 4 || day === 5 || (day === 6 && hours < 2)) {
 			shopStatus = 'open'
 			dayShopReverts = 'Friday'
 			hourShopReverts = '10pm'
-			hoursLeftInPeriod = day === 3 ? 23 - hours + 24 + 22 :
-				day === 4 ? 23 - hours + 22 :
-				day === 5 ? 22 - hours :
+			hoursLeftInPeriod = day === 3 ? 23 - hours + 24 * 2 + 2 :
+				day === 4 ? 23 - hours + 24 + 2 :
+				day === 5 ? 23 - hours + 2 :
+				day === 6 ? 1 - hours :
 				null
-		} else if ((day === 5 && hours >= 22) || (day === 6 && hours < 14)) {
+		} else if ((day === 6 && hours >= 2 && hours < 18)) {
 			shopStatus = 'closed'
 			dayShopReverts = 'Saturday'
 			hourShopReverts = '2pm'
-			hoursLeftInPeriod = day === 5 ? 23 - hours + 14 :
-				day === 6 ? 14 - hours :
-				null
+			hoursLeftInPeriod = 17 - hours
 		}
 	
 		return message.channel.send(`The Shop will ${shopStatus === 'open' ? 'close' : 'open'} in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes, on ${dayShopReverts} at ${hourShopReverts} EST.`)
@@ -1552,19 +1549,6 @@ if(wishlistcom.includes(cmd)) {
 		}
 
 		if (foundCopy) continue
-
-		const inv = await Inventory.findOne({ 
-			where: { 
-				printId: print.id,
-				playerId: maid,
-				quantity: { [Op.gt]: 0 }
-			}
-		})
-
-		if (!inv) {
-			message.channel.send(`You do not have any copies of ${card}.`)
-			continue
-		} 
 
 		let success = false
 		let i = 0
@@ -2926,16 +2910,16 @@ if(cmd === `!pack`) {
 	})
 
 	if (!set) return message.channel.send(`There is no set with the code "${code.toUpperCase()}".`)
-	if (!set.for_sale) return message.channel.send(`Sorry, ${set.name}${eval(set.emoji)} is out of stock.`)
+	if (!set.for_sale) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} is out of stock.`)
 
 	const wallet = await Wallet.findOne( { where: { playerId: maid }, include: Player })
 	const merchbot_wallet = await Wallet.findOne( { where: { playerId: merchbotId } })
 	if (!wallet || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	const money = wallet[set.currency]
-	if (money < (set.unit_price * num)) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${money}${eval(set.currency)} and ${num > 1 ? `${num} ` : ''}${set.name}${eval(set.emoji)} packs cost ${num * set.unit_price}${eval(set.currency)}.`)
+	if (money < (set.unit_price * num)) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${money}${eval(set.currency)} and ${num > 1 ? `${num} ` : ''}${set.name} ${eval(set.emoji)} Packs cost ${num * set.unit_price}${eval(set.currency)}.`)
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`${wallet.player.name}, have ${money}${eval(set.currency)}. Do you want to spend ${num * set.unit_price}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name}${eval(set.emoji)} pack${num > 1 ? 's' : ''}?`)
+	const msg = await message.channel.send(`${wallet.player.name}, have ${money}${eval(set.currency)}. Do you want to spend ${num * set.unit_price}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
@@ -3022,14 +3006,14 @@ if(cmd === `!box`) {
 	if (code.startsWith('SS')) return message.channel.send(`Sorry, Starter Series cards are not sold by the box.`)
 	const set = await Set.findOne({ where: { code: code.toUpperCase() }})
 	if (!set) return message.channel.send(`There is no set with the code "${code.toUpperCase()}".`)
-	if (!set.for_sale) return message.channel.send(`Sorry, ${set.name}${eval(set.emoji)} is out of stock.`)
-	if (!set.packs_per_box) return message.channel.send(`Sorry, ${set.name}${eval(set.emoji)} is experiencing a glitch in the database. Please get an Admin to help you.`)
+	if (!set.for_sale) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} is out of stock.`)
+	if (!set.packs_per_box) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} is experiencing a glitch in the database. Please get an Admin to help you.`)
 
 	const wallet = await Wallet.findOne( { where: { playerId: maid }, include: Player })
 	const merchbot_wallet = await Wallet.findOne( { where: { playerId: merchbotId } })
 	if (!wallet || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	const money = wallet[set.currency]
-	if (money < set.box_price) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${money}${eval(set.currency)} and ${set.name}${eval(set.emoji)} packs cost ${set.box_price}${eval(set.currency)}.`)
+	if (money < set.box_price) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Packs cost ${set.box_price}${eval(set.currency)}.`)
 
 	const commons = await Print.findAll({ 
 		where: {
@@ -3082,7 +3066,7 @@ if(cmd === `!box`) {
 	})
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`${wallet.player.name}, have ${money}${eval(set.currency)}. Do you want to spend ${set.box_price}${eval(set.currency)} on a ${set.name}${eval(set.emoji)} box?`)
+	const msg = await message.channel.send(`${wallet.player.name}, have ${money}${eval(set.currency)}. Do you want to spend ${set.box_price}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
@@ -3153,7 +3137,7 @@ if(cmd === `!box`) {
 			message.author.send(results.slice(i, i + (set.cards_per_pack * 3) + 1))
 		}
 
-		return message.channel.send(`Thank you for your purchase! I messaged you the contents of your ${set.name} Box.`)
+		return message.channel.send(`Thank you for your purchase! I messaged you the contents of your ${set.name} ${eval(set.emoji)} Box.`)
 	}).catch(err => {
 		console.log(err)
 		return message.channel.send(`Sorry, time's up.`)

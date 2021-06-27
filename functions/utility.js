@@ -44,7 +44,7 @@ const convertCardsArrayToObject = (arr) => {
 
 //CREATE PROFILE
 const createProfile = async (playerId, starter) => {
-    const card = starter === 'fish' ? 'Rage of the Deep Sea' : starter === 'rock' ? 'Guadian Sphinx' : null
+    const card = starter === 'fish' ? 'Rage of the Deep Sea' : starter === 'rock' ? 'Guardian Sphinx' : null
     const date = new Date()
     const month = `0${date.getMonth() + 1}`
     const day = `0${date.getDate()}`

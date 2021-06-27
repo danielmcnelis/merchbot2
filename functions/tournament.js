@@ -2,7 +2,6 @@
 const { registrationChannel } = require('../static/channels.json')
 const { tourRole } = require('../static/roles.json')
 const { approve, FiC } = require('../static/emojis.json')
-const status = require('../static/status.json')
 const { Arena, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist } = require('../db')
 const { client, challongeClient } = require('../static/clients.js')
 const { saveYDK, saveAllYDK } = require('./decks.js')

@@ -79,26 +79,26 @@ const getShopCountdown = () => {
 	let hoursLeftInPeriod
 	const minsLeftInPeriod = 60 - mins
 
-	if ((day === 6 && hours >= 14) || day === 0 || day === 1 || (day === 2 && hours < 16)) {
-		hoursLeftInPeriod = day === 6 ? 24 - hours + 24 * 2 + 15 :
+    if ((day === 6 && hours >= 18) || day === 0 || day === 1 || (day === 2 && hours < 20)) {
+        hoursLeftInPeriod = day === 6 ? 24 - hours + 24 * 2 + 15 :
 			day === 0 ? 24 - hours + 24 + 15 :
 			day === 1 ? 24 - hours + 15 :
 			day === 2 ? 15 - hours :
 			null
-	} else if ((day === 2 && hours >= 16) || (day === 3 && hours < 8)) {
-		hoursLeftInPeriod = day === 2 ? 24 - hours + 8 :
-			day === 3 ? 7 - hours :
-			null
-	} else if ((day === 3 && hours >= 8) || day === 4 || (day === 5 && hours < 22)) {
-		hoursLeftInPeriod = day === 3 ? 24 - hours + 24 + 22 :
+    } else if ((day === 2 && hours >= 20) || (day === 3 && hours < 12)) {
+        hoursLeftInPeriod = day === 2 ? 24 - hours + 8 :
+        day === 3 ? 7 - hours :
+        null
+    } else if ((day === 3 && hours >= 12) || day === 4 || day === 5 || (day === 6 && hours < 2)) {
+        hoursLeftInPeriod = day === 3 ? 24 - hours + 24 + 22 :
 			day === 4 ? 24 - hours + 21 :
 			day === 5 ? 21 - hours :
 			null
-	} else if ((day === 5 && hours >= 22) || (day === 6 && hours < 14)) {
-		hoursLeftInPeriod = day === 5 ? 24 - hours + 13 :
+    } else if ((day === 6 && hours >= 2 && hours < 18)) {
+        hoursLeftInPeriod = day === 5 ? 24 - hours + 13 :
 			day === 6 ? 13 - hours :
 			null
-	}
+    }
 
     console.log('hoursLeftInPeriod', hoursLeftInPeriod)
     console.log('minsLeftInPeriod', minsLeftInPeriod)
@@ -112,18 +112,17 @@ const checkShopShouldBe = () => {
 	const date = new Date()
 	const day = date.getDay()
 	const hours = date.getHours()
-	const mins = date.getMinutes()
-
+    
     let shopShouldBe
-	if ((day === 6 && hours >= 14) || day === 0 || day === 1 || (day === 2 && hours < 16)) {
-		shopShouldBe = 'open'
-	} else if ((day === 2 && hours >= 16) || (day === 3 && hours < 8)) {
-		shopShouldBe = 'closed'
-	} else if ((day === 3 && hours >= 8) || day === 4 || (day === 5 && hours < 22)) {
-		shopShouldBe = 'open'
-	} else if ((day === 5 && hours >= 22) || (day === 6 && hours < 14)) {
-		shopShouldBe = 'closed'
-	} else {
+    if ((day === 6 && hours >= 18) || day === 0 || day === 1 || (day === 2 && hours < 20)) {
+        shopShouldBe = 'open'
+    } else if ((day === 2 && hours >= 20) || (day === 3 && hours < 12)) {
+        shopShouldBe = 'closed'
+    } else if ((day === 3 && hours >= 12) || day === 4 || day === 5 || (day === 6 && hours < 2)) {
+        shopShouldBe = 'open'
+    } else if ((day === 6 && hours >= 2 && hours < 18)) {
+        shopShouldBe = 'closed'
+    } else {
         return false
     }
 

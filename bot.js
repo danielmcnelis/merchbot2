@@ -17,6 +17,7 @@ const ygoprodeck = require('./static/ygoprodeck.json')
 const muted = require('./static/muted.json')
 const prints = require('./static/prints.json')
 const { getNewStatus } = require('./functions/status.js')
+const { askForGrindAllConfirmation } = require('./functions/mod.js')
 const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Game, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
 const { getRandomString, isSameDay, hasProfile, capitalize, restore, recalculate, revive, createProfile, createPlayer, isNewUser, isAdmin, isMod, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
 const { checkDeckList, saveYDK, saveAllYDK } = require('./functions/decks.js')
@@ -2659,28 +2660,27 @@ if(cmd === `!steal`) {
 //GRINDALL
 if(cmd === `!grindall`) {
 	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
+
+	const confirmation_1 = await askForGrindAllConfirmation(message, 0)
+	if (!confirmation_1) return
+	const confirmation_2 = await askForGrindAllConfirmation(message, 1)
+	if (!confirmation_2) return
+	const confirmation_3 = await askForGrindAllConfirmation(message, 2)
+	if (!confirmation_3) return
+	const confirmation_4 = await askForGrindAllConfirmation(message, 3)
+	if (!confirmation_4) return
+
 	const allWallets = await Wallet.findAll()
+	for (let i = 0; i < allWallets.length; i++) {
+		const wallet = allWallets[i]
+		wallet.stardust += wallet.starchips * 10
+		wallet.starchips = 0
+		await wallet.save()
+	}
 
-	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`Are you sure you want to grind everyone's ${starchips}s into ${stardust}?`)
-	const collected = await msg.channel.awaitMessages(filter, {
-		max: 1,
-		time: 15000
-	}).then(async collected => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+	return message.channel.send(`Every player's ${starchips}s have been ground into ${stardust}!`)
 
-		for (let i = 0; i < allWallets.length; i++) {
-			const wallet = allWallets[i]
-			wallet.stardust += wallet.starchips * 10
-			wallet.starchips = 0
-			await wallet.save()
-		}
-	
-		return message.channel.send(`Every player's ${starchips}s have been ground into ${stardust}!`)
-	}).catch(err => {
-		console.log(err)
-		return message.channel.send(`Sorry, time's up.`)
-	})
+
 }
 
 //INVENTORY

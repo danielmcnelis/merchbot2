@@ -137,6 +137,127 @@ if (!message.content.startsWith("!") && message.content.includes(`[`) && message
     if (cmd === `!ping`) return message.channel.send('pong')
 
 
+//TEST
+if(cmd === `!test`) {
+	//return message.channel.send(`Use **!pack** idiot.`)
+	const code = args.length === 1 && !isFinite(args[0]) ? args[0] : args.length > 1 && !isFinite(args[1]) ? args[1] : 'DOC'
+	if (code && code.startsWith('SS')) return message.channel.send(`Sorry, Starter Series cards are not sold by the pack.`)
+	const set = await Set.findOne({ where: { code: code.toUpperCase() }})
+
+	const commons = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "com"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map(function(print) {
+		return print.card_code
+	})
+
+	const rares = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "rar"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map(function(print) {
+		return print.card_code
+	})
+
+	const supers = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "sup"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map(function(print) {
+		return print.card_code
+	})
+
+	const ultras = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "ult"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map(function(print) {
+		return print.card_code
+	})
+
+	const secrets = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "scr"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map(function(print) {
+		return print.card_code
+	})
+
+	const results = []
+	const imageURLs = []
+
+	results.push(`\n${eval(set.emoji)} - ${set.name} Pack - ${eval(set.alt_emoji)}`)
+	const yourCommons = set.commons_per_pack > 1 ? getRandomSubset(commons, set.commons_per_pack) : set.secrets_per_pack === 1 ? [getRandomElement(commons)] : []
+	const yourRares = set.rares_per_pack > 1 ? getRandomSubset(rares, set.rares_per_pack) : set.rares_per_pack === 1 ? [getRandomElement(rares)] : []
+	const yourSupers = set.supers_per_pack > 1 ? getRandomSubset(supers, set.supers_per_pack) : set.supers_per_pack === 1 ? [getRandomElement(supers)] : []
+	const yourUltras = set.ultras_per_pack > 1 ? getRandomSubset(ultras, set.ultras_per_pack) : set.ultras_per_pack === 1 ? [getRandomElement(ultras)] : []
+	const yourSecrets = set.secrets_per_pack > 1 ? getRandomSubset(secrets, set.secrets_per_pack) : set.secrets_per_pack === 1 ? [getRandomElement(secrets)] :  []
+
+	const odds = []
+	if (!yourCommons.length) for (let i = 0; i < set.commons_per_box; i++) odds.push("commons")
+	if (!yourRares.length) for (let i = 0; i < set.rares_per_box; i++) odds.push("rares")
+	if (!yourSupers.length) for (let i = 0; i < set.supers_per_box; i++) odds.push("supers")
+	if (!yourUltras.length) for (let i = 0; i < set.ultras_per_box; i++) odds.push("ultras")
+	if (!yourSecrets.length) for (let i = 0; i < set.secrets_per_box; i++) odds.push("secrets")
+
+	const luck = getRandomElement(odds)
+	const yourFoil = getRandomElement(eval(luck))
+
+	const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil]
+
+	for (let i = 0; i < yourPack.length; i++) {
+		const print = await Print.findOne({ where: {
+			card_code: yourPack[i]
+		}})
+
+		if (!print.id) return console.log(`${card} does not exist in the Print database.`)
+		results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+
+		const card = await Card.findOne({ where: {
+			name: print.card_name
+		}})
+
+		imageURLs.push(`${card.image}`)
+	}
+
+	const card_1 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[0]}`)
+	const card_2 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[1]}`)
+	const card_3 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[2]}`)
+	const card_4 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[3]}`)
+	const card_5 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[4]}`)
+	const card_6 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[5]}`)
+	const card_7 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[6]}`)
+	const card_8 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[7]}`)
+	const card_9 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[8]}`)
+
+	const card_width = 57
+	const canvas = Canvas.createCanvas(card_width * 9, 80);
+	const context = canvas.getContext('2d');
+	
+	context.drawImage(card_1, 0, 0, card_width, canvas.height);
+	context.drawImage(card_2, card_width, 0, card_width, canvas.height);
+	context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height);
+	context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height);
+	context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height);
+	context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height);
+	context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height);
+	context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height);
+	context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height);
+	const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
+	message.channel.send(`Behold!\n${results.join("\n")}`, attachment)
+}
+
 //IMPORT 
 if (cmd === `!import`) {
 	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
@@ -466,6 +587,12 @@ if(startcom.includes(cmd)) {
 	if(await isNewUser(maid)) await createPlayer(maid, message.author.username, message.author.tag)
 	if(await hasProfile(maid)) return message.channel.send("You already received your first Starter Deck.")
 
+	const set = await Set.findOne({ where: {
+		code: 'DOC'
+	}})
+
+	if (!set) return message.channel.send(`Could not find set: "DOC".`)
+
 	const filter = m => m.author.id === maid
 	await message.channel.send(`Greetings, champ! Which deck would you like to start?\n- (1) Fish\'s Ire  ${fish}\n- (2) Rock\'s Foundation ${rock}`)
 	
@@ -510,12 +637,17 @@ if(startcom.includes(cmd)) {
 			}
 		}
 
+
+
 		await createProfile(maid, starterDeck.slice(4))
 		message.member.roles.add(fpRole)
-		return message.channel.send(`Excellent choice, ${message.author.username}! ${legend}` +
-		`\nYou received a copy of ${starterDeck === "ss1_fish" ? `Fish's Ire ${fish}` : `Rock's Foundation ${rock}`} , 150${starchips}, and the **Forged Players** role!` +
-		`\nYou can type **!pack 10** to buy 10 Packs of Dawn of Chaos ${DOC} to start your collection. ${wokeaf}` +
-		`\n\nI wish you luck on your journey, new duelist! ${master}`)
+		message.channel.send(`Excellent choice, ${message.author.username}! ${legend}` +
+		`\nYou received a copy of ${starterDeck === "ss1_fish" ? `Fish's Ire ${fish}` : `Rock's Foundation ${rock}`} and the **Forged Players** role! ${wokeaf}` +
+		`\n\nPlease wait while I look for some packs... ${blue}`
+		)
+
+		await awardPack(message, set, 10, artwork = true)
+		return message.channel.send(`I wish you luck on your journey, new duelist! ${master}`)
 	}).catch(err => {
 		console.log(err)
 		return message.channel.send(`Sorry, time's up.`)
@@ -2368,7 +2500,7 @@ if(cmd === `!daily`) {
 		let num = master_complete ? 5 : elite_complete ? 4 : hard_complete ? 3 : moderate_complete ? 2 :  easy_complete ? 1 : 1
 		if (num) setTimeout(() => {
 			message.channel.send(`Oh look, ${daily.player.name}, you cobbled together a pack!`, {files:[`./public/packs/7outof7.png`]})
-			awardPack(message, set, num)
+			awardPack(message, set, num, artwork = true)
 		}, 4000)
 	} else {
 		daily.cobble_progress += (daysPassed + 1)
@@ -2935,6 +3067,7 @@ if(cmd === `!pack`) {
 	}).then(async collected => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
 		const results = []
+		const images = []
 
 		for (let j = 0; j < num; j++) {
 			results.push(`\n${eval(set.emoji)} - ${set.name} Pack${num > 1 ? ` ${j + 1}` : ''} - ${eval(set.alt_emoji)}`)
@@ -2961,8 +3094,16 @@ if(cmd === `!pack`) {
 					card_code: yourPack[i]
 				}})
 
-				if (!print.id) return console.log(`${card} does not exist in the Print database.`)
+				if (!print.id) return console.log(`${yourPack[i]} does not exist in the Print database.`)
 				results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+
+				if (num === 1) {
+					const card = await Card.findOne({ where: {
+						name: print.card_name
+					}})
+			
+					images.push(`${card.image}`)
+				}
 
 				const inv = await Inventory.findOne({ where: { 
 					card_code: print.card_code,
@@ -2983,6 +3124,35 @@ if(cmd === `!pack`) {
 				}
 			}
 		}
+		
+		let attachment
+		if (num === 1) {
+			message.channel.send(`Ah. So you want high quality goods! One moment please...`)
+			const card_1 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[0]}`)
+			const card_2 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[1]}`)
+			const card_3 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[2]}`)
+			const card_4 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[3]}`)
+			const card_5 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[4]}`)
+			const card_6 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[5]}`)
+			const card_7 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[6]}`)
+			const card_8 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[7]}`)
+			const card_9 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[8]}`)
+	
+			const card_width = 57
+			const canvas = Canvas.createCanvas(card_width * 9, 80)
+			const context = canvas.getContext('2d')
+	
+			context.drawImage(card_1, 0, 0, card_width, 80)
+			context.drawImage(card_2, card_width, 0, card_width, canvas.height)
+			context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
+			context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
+			context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
+			context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
+			context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
+			context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
+			context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
+			attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'pack.png')
+		}
 
 		wallet[set.currency] -= (set.unit_price * num)
 		await wallet.save()
@@ -2993,16 +3163,20 @@ if(cmd === `!pack`) {
 		set.unit_sales += num
 		await set.save()
 
-		for (let i = 0; i < results.length; i += 30) {
-			if (results[i+30] && results[i+30].includes(set.emoji)) {
-				message.author.send(results.slice(i, i+31))
-				i++
-			} else {
-				message.author.send(results.slice(i, i+30))
+		if (num === 1) {
+			message.author.send(results.join("\n"), attachment)
+		} else {
+			for (let i = 0; i < results.length; i += 30) {
+				if (results[i+30] && results[i+30].includes(set.emoji)) {
+					message.author.send(results.slice(i, i+31))
+					i++
+				} else {
+					message.author.send(results.slice(i, i+30))
+				}
 			}
 		}
 
-		return message.channel.send(`Thank you for your purchase! I messaged you the contents of your ${set.name} Pack${num > 1 ? 's' : ''}.`)
+		return message.channel.send(`Thank you for your purchase! I messaged you the contents of your ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}.`)
 	}).catch(err => {
 		console.log(err)
 		return message.channel.send(`Sorry, time's up.`)

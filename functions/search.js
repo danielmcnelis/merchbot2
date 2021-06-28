@@ -26,7 +26,7 @@ const search = async (query, fuzzyCards, fuzzyCards2) => {
 	if (card.subclass) classes.push(card.subclass)
 	if (card.category) classes.push(card.category)
 
-	const labels = card.card === "Monster" ? `**Attribute:** ${card.attribute}\n**Level:** ${card.level}\n**[** ${classes.join(" / ")} **]**` : `**Category:** ${card.category}` 
+	const labels = card.card === "Monster" ? `**Attribute:** ${card.attribute}\n**Level:** ${card.level}\n**Release Date:** ${card.date}\n**[** ${classes.join(" / ")} **]**` : `**Category:** ${card.category}\n**Release Date:** ${card.date}` 
 	const stats = card.card === "Monster" ? `**ATK:** ${card.atk} **DEF:** ${card.def}` : ''
 
 	const cardEmbed = new Discord.MessageEmbed()

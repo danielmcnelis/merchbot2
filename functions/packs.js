@@ -62,7 +62,6 @@ const awardPack = async (message, set, num, artwork = false) => {
 	})
 
     const packs = []
-    const attachments = []
 
     for (let j = 0; j < num; j++) {
         const images = []
@@ -120,8 +119,6 @@ const awardPack = async (message, set, num, artwork = false) => {
             }
         }
 
-        packs.push(results)
-
         if (artwork === true) {
 			const card_1 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[0]}`)
 			const card_2 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[1]}`)
@@ -147,19 +144,24 @@ const awardPack = async (message, set, num, artwork = false) => {
 			context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
 			context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
 			const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'pack.png')
-            attachments.push(attachment)
-		}
+
+            message.member.send(results.join('\n'), attachment)
+		} else {
+            packs.push(...results)
+        }
     }
 
-    console.log('attachments', attachments)
     console.log('packs', packs)
-    
-    if (artwork === true) {
-        for (let i = 0; i < num; i++) {
-            message.member.send(packs[i].join('\n'), attachments[i])
+
+    if (artwork !== true) {
+        for (let i = 0; i < packs.length; i += 30) {
+            if (packs[i+30] && packs[i+30].includes(set.emoji)) {
+                message.author.send(packs.slice(i, i+31))
+                i++
+            } else {
+                message.author.send(packs.slice(i, i+30))
+            }
         }
-    } else {
-        message.member.send(results.join('\n'))
     }
 
     return message.channel.send(`<@${message.member.id}> was awarded ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'}. Congratulations!`)

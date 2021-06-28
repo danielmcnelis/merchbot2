@@ -5,7 +5,7 @@ const {db} = require('./db')
 const Wallet = db.define('wallet', {
     starchips: {
         type: Sequelize.INTEGER,  
-        defaultValue: 150,           
+        defaultValue: 0,           
         allowNull: false
     },
     stardust: {

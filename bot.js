@@ -139,123 +139,7 @@ if (!message.content.startsWith("!") && message.content.includes(`[`) && message
 
 //TEST
 if(cmd === `!test`) {
-	//return message.channel.send(`Use **!pack** idiot.`)
-	const code = args.length === 1 && !isFinite(args[0]) ? args[0] : args.length > 1 && !isFinite(args[1]) ? args[1] : 'DOC'
-	if (code && code.startsWith('SS')) return message.channel.send(`Sorry, Starter Series cards are not sold by the pack.`)
-	const set = await Set.findOne({ where: { code: code.toUpperCase() }})
-
-	const commons = await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "com"
-		},
-		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
-
-	const rares = await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "rar"
-		},
-		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
-
-	const supers = await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "sup"
-		},
-		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
-
-	const ultras = await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "ult"
-		},
-		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
-
-	const secrets = await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "scr"
-		},
-		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
-
-	const results = []
-	const imageURLs = []
-
-	results.push(`\n${eval(set.emoji)} - ${set.name} Pack - ${eval(set.alt_emoji)}`)
-	const yourCommons = set.commons_per_pack > 1 ? getRandomSubset(commons, set.commons_per_pack) : set.secrets_per_pack === 1 ? [getRandomElement(commons)] : []
-	const yourRares = set.rares_per_pack > 1 ? getRandomSubset(rares, set.rares_per_pack) : set.rares_per_pack === 1 ? [getRandomElement(rares)] : []
-	const yourSupers = set.supers_per_pack > 1 ? getRandomSubset(supers, set.supers_per_pack) : set.supers_per_pack === 1 ? [getRandomElement(supers)] : []
-	const yourUltras = set.ultras_per_pack > 1 ? getRandomSubset(ultras, set.ultras_per_pack) : set.ultras_per_pack === 1 ? [getRandomElement(ultras)] : []
-	const yourSecrets = set.secrets_per_pack > 1 ? getRandomSubset(secrets, set.secrets_per_pack) : set.secrets_per_pack === 1 ? [getRandomElement(secrets)] :  []
-
-	const odds = []
-	if (!yourCommons.length) for (let i = 0; i < set.commons_per_box; i++) odds.push("commons")
-	if (!yourRares.length) for (let i = 0; i < set.rares_per_box; i++) odds.push("rares")
-	if (!yourSupers.length) for (let i = 0; i < set.supers_per_box; i++) odds.push("supers")
-	if (!yourUltras.length) for (let i = 0; i < set.ultras_per_box; i++) odds.push("ultras")
-	if (!yourSecrets.length) for (let i = 0; i < set.secrets_per_box; i++) odds.push("secrets")
-
-	const luck = getRandomElement(odds)
-	const yourFoil = getRandomElement(eval(luck))
-
-	const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil]
-
-	for (let i = 0; i < yourPack.length; i++) {
-		const print = await Print.findOne({ where: {
-			card_code: yourPack[i]
-		}})
-
-		if (!print.id) return console.log(`${card} does not exist in the Print database.`)
-		results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
-
-		const card = await Card.findOne({ where: {
-			name: print.card_name
-		}})
-
-		imageURLs.push(`${card.image}`)
-	}
-
-	const card_1 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[0]}`)
-	const card_2 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[1]}`)
-	const card_3 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[2]}`)
-	const card_4 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[3]}`)
-	const card_5 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[4]}`)
-	const card_6 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[5]}`)
-	const card_7 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[6]}`)
-	const card_8 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[7]}`)
-	const card_9 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${imageURLs[8]}`)
-
-	const card_width = 57
-	const canvas = Canvas.createCanvas(card_width * 9, 80);
-	const context = canvas.getContext('2d');
-	
-	context.drawImage(card_1, 0, 0, card_width, canvas.height);
-	context.drawImage(card_2, card_width, 0, card_width, canvas.height);
-	context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height);
-	context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height);
-	context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height);
-	context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height);
-	context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height);
-	context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height);
-	context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height);
-	const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
-	message.channel.send(`Behold!\n${results.join("\n")}`, attachment)
+	return
 }
 
 //IMPORT 
@@ -637,13 +521,11 @@ if(startcom.includes(cmd)) {
 			}
 		}
 
-
-
 		await createProfile(maid, starterDeck.slice(4))
 		message.member.roles.add(fpRole)
 		message.channel.send(`Excellent choice, ${message.author.username}! ${legend}` +
 		`\nYou received a copy of ${starterDeck === "ss1_fish" ? `Fish's Ire ${fish}` : `Rock's Foundation ${rock}`} and the **Forged Players** role! ${wokeaf}` +
-		`\n\nPlease wait while I look for some packs... ${blue}`
+		`\n\nPlease wait while I open up some packs... ${blue}`
 		)
 
 		await awardPack(message, set, 10, artwork = true)
@@ -720,61 +602,71 @@ if (botcom.includes(cmd)) {
 		.setAuthor('Jazz#2704', 'https://i.imgur.com/wz5TqmR.png', 'https://formatlibrary.com/')
 		.setThumbnail('https://i.imgur.com/sKugBHQ.png')
 		.addField('Player Commands',
-			`!start - Start the game.
-			!inv (set or card) - View your inventory.
-			!checklist (set or card) - View your checklist.
-			!wallet (@user) - Post a player’s currencies.
-			!grind (num) - Convert some Starchips into Stardust.
-			!daily - Get daily rewards for checking in.
-			!alc (card) - Convert a card into Starchips.
-			!prof (@user) - Post a player’s profile.
-			!edit - Edit your profile.
-			!diary (e, m, h, l, or s) - Check your achievement diaries.
-			!db (name) - Set your DuelingBook name.
-			!role - Add or remove the Forged Players role.
-			!gift (@user + card) - Gift a card to another player.
-			!ref (@user) - Send a referral bonus to another player.`
+			`!start - Start the game.`
+			+ `\n!prof (@user) - Post a player’s profile.`
+			+ `\n!edit - Edit your profile.`
+			+ `\n!diary (e, m, h, l, or s) - Check your Achievement Diaries.`
+			+ `\n!db (name) - Set your DuelingBook name.`
+			+ `\n!role - Add or remove the Forged Players role.`
+		)
+		.addField('Daily Commands',
+			`!daily - Get daily rewards for checking in.`
+			+ `\n!alc (card) - Convert a card into Starchips${starchips}.`
+			//+ `\n!gift (@user + card) - Gift a card to another player.`
+		)
+		.addField('Inventory Commands',
+			`!inv (set or card) - View your Inventory.`
+			+ `\n!checklist (set or card) - View your Checklist.`
+			+ `\n!wallet (@user) - Post a player’s Wallet.`
+			+ `\n!grind (num) - Convert some Starchips${starchips} into Stardust${stardust}.`
+		)
+		.addField('Shop Commands', 
+			`!pack (set + num) - Buy 1 or more Packs.`
+			+ `\n!box (set) - Buy a box of 24 Packs.`
+			+ `\n!deck (name) - Buy a Starter Deck.`
+			+ `\n!shop (card) - Check the shop value of a card.`
+			+ `\n!buy (num + card) - Buy a card from The Shop.`
+			+ `\n!sell (num + card) - Sell a card to The Shop.`
+			+ `\n!dump (set) - Bulk sell cards to the The Shop.`
+			+ `\n!barter (card) - Exchange vouchers for certain cards.`
+			+ `\n!count - Post how many packs The Shop will open.`
+			+ `\n!bid - Bid on new cards when The Shop is closed.`
+			+ `\n!calc (set) - Post the resale value of a set.`
 		)
 		.addField('Marketplace Commands', 
-			`!pack (set + num) - Buy 1 or more packs.
-			!box (set) - Buy a box of 24 packs.
-			!deck (name) - Buy a starter deck.
-			!shop (card) - Check the shop value of a card.
-			!buy (@user + num + card + price) - Buy a card.
-			!sell (@user + num + card + price) - Sell a card.
-			!dump (set) - Bulk sell cards to the the shop.
-			!trade (@user + num + card) - Trade with another player.
-			!binder (card) - Add or remove a card from your binder.
-			!wish (card) - Add or remove a card from your wishlist.
-			!search (card) - Search for cards in binders and wishlists.
-			!barter (card) - Exchange vouchers for certain cards.
-			!count - Post how many packs the shop will open.
-			!bid - Bid on new cards when the shop is closed.
-			!calc (set) - Post the resale value of a set.`
+			`!buy (@user + num + card + price) - Buy a card from another player.`
+			+ `\n!sell (@user + num + card + price) - Sell a card to another player.`
+			+ `\n!trade (@user + num + card) - Trade with another player.`
+			+ `\n!binder (card) - Add or remove a card from your Binder.`
+			+ `\n!wish (card) - Add or remove a card from your Wishlist.`
+			+ `\n!search (card) - Search for cards in Binders and Wishlists.`
 		)
 		.addField('Duel Commands',
-			`!stats (@user) - Post a player’s stats.
-			!loss (@user) - Report a loss to another player.
-			!top (number) - Post the server’s top rated players.
-			!h2h (@user + @user) - Post the H2H record between 2 players.
-			!undo - Undo the last loss if you made a mistake.
-			!legal - Check if your deck is legal.
-			!banlist - View the Forbidden and Limited list.
-			!join - Register for a tournament.
-			!resubmit - Resubmit your deck for a tournament.
-			!drop - Drop from a tournament.
-			!bracket - Post the bracket for a tournament.`
+			`!stats (@user) - Post a player’s stats.`
+			+ `\n!loss (@user) - Report a loss to another player.`
+			+ `\n!top (number) - Post the server’s top rated players.`
+			+ `\n!h2h (@user + @user) - Post the H2H record between 2 players.`
+			+ `\n!undo - Undo the last loss if you made a mistake.`
+			+ `\n!legal - Check if your deck is legal.`
+			+ `\n!banlist - View the Forbidden and Limited list.`
+		)
+		.addField('Tournament Commands',
+			`!join - Register for a tournament.`
+			+ `\n!resubmit - Resubmit your deck for a tournament.`
+			+ `\n!drop - Drop from a tournament.`
+			+ `\n!bracket - Post the bracket for a tournament.`
 		)
 		.addField('Minigame Commands', 
-			`!join - Join the minigame queue.
-			!leave - Leave the minigame queue.
-			!q - Check the minigame queue.
-			!challenge (@user) - Challenge a player to the Gauntlet.`
+			`!join - Join the minigame queue.`
+			+ `\n!leave - Leave the minigame queue.`
+			+ `\n!q - Check the minigame queue.`
+			//+ `\n!challenge (@user) - Challenge a player to the Gauntlet.`
 		)
-		.addField('Server Commands',
-			`!bot - View the MerchBot User Manual.
-			!mod - View the Moderator User Manual.
-			!info - Post information about a channel.`
+		.addField('Misc. Commands',
+			`!bot - View the MerchBot User Manual.`
+			+ isMod(message.member) ? `\n!mod - View the Moderator User Manual.` : ''
+			+ `\n!info - Post information about a channel.`
+			+ `\n!ref (@user) - Send a referral bonus to another player.`
 		)
 	
 	message.author.send(botEmbed)
@@ -792,29 +684,29 @@ if (cmd === `!mod`) {
 		.setAuthor('Jazz#2704', 'https://i.imgur.com/wz5TqmR.png', 'https://formatlibrary.com/')
 		.setThumbnail('https://i.imgur.com/sKugBHQ.png')
 		.addField('Mod-Only Game Commands',
-			`!manual (@winner + @loser) - Manually record a match result.
-			!undo - Undo the last match, even if you did not report it.
-			!award (@user + num + item) - Award an item to a player.
-			!steal (@user + num + item) - Steal an item from a player.
-			!adjust (card) - Adjust the market price of a card.`
+			`!manual (@winner + @loser) - Manually record a match result.`
+			+ `\n!undo - Undo the last match, even if you did not report it.`
+			+ `\n!award (@user + num + item) - Award an item to a player.`
+			+ `\n!steal (@user + num + item) - Steal an item from a player.`
+			+ `\n!adjust (card) - Adjust the market price of a card.`
 		)
 		.addField('Mod-Only Tournament Commands',
-			`!create (tournament name) - Create a new tournament.
-			!signup (@user) - Directly add a player to the bracket.
-			!remove (@user) - Remove a player from the bracket.
-			!seed - Assign seeds to participants based on rankings.
-			!start - Start the next tournament.
-			!noshow (@user) - Report a tournament no-show.
-			!end - End the current tournament.`
+			`!create (tournament name) - Create a new tournament.`
+			+ `\n!signup (@user) - Directly add a player to the bracket.`
+			+ `\n!remove (@user) - Remove a player from the bracket.`
+			//+ `\n!seed - Assign seeds to participants based on rankings.`
+			+ `\n!start - Start the next tournament.`
+			+ `\n!noshow (@user) - Report a tournament no-show.`
+			+ `\n!end - End the current tournament.`
 		)
 		.addField('Mod-Only Discipline Commands',
-			`!mute (@user) - Mute a user.
-			!unmute (@user) - Unmute a user.`
+			`!mute (@user) - Mute a user.`
+			+ `\n!unmute (@user) - Unmute a user.`
 		)
 		.addField('Admin-Only Commands', 
-			`!census - Update the information of all players in the database.
-			!recalc - Recaluate all player stats if needed.
-			!grindall - Grind everyone\'s Starchips into Stardust.`
+			`!census - Update the information of all players in the database.`
+			+ `\n!recalc - Recaluate all player stats if needed.`
+			+ `\n!grindall - Grind everyone\'s Starchips into Stardust.`
 		)
 		
 	message.author.send(botEmbed)
@@ -3066,11 +2958,12 @@ if(cmd === `!pack`) {
 		time: 15000
 	}).then(async collected => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
-		const results = []
-		const images = []
+		
+		message.channel.send(`Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}.`)
 
 		for (let j = 0; j < num; j++) {
-			results.push(`\n${eval(set.emoji)} - ${set.name} Pack${num > 1 ? ` ${j + 1}` : ''} - ${eval(set.alt_emoji)}`)
+			const images = []
+			const results = [`\n${eval(set.emoji)} - ${set.name} Pack${num > 1 ? ` ${j + 1}` : ''} - ${eval(set.alt_emoji)}`]
 			const yourCommons = set.commons_per_pack > 1 ? getRandomSubset(commons, set.commons_per_pack) : set.secrets_per_pack === 1 ? [getRandomElement(commons)] : []
 			const yourRares = set.rares_per_pack > 1 ? getRandomSubset(rares, set.rares_per_pack) : set.rares_per_pack === 1 ? [getRandomElement(rares)] : []
 			const yourSupers = set.supers_per_pack > 1 ? getRandomSubset(supers, set.supers_per_pack) : set.supers_per_pack === 1 ? [getRandomElement(supers)] : []
@@ -3097,14 +2990,12 @@ if(cmd === `!pack`) {
 				if (!print.id) return console.log(`${yourPack[i]} does not exist in the Print database.`)
 				results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
 
-				if (num === 1) {
-					const card = await Card.findOne({ where: {
-						name: print.card_name
-					}})
+				const card = await Card.findOne({ where: {
+					name: print.card_name
+				}})
+		
+				images.push(`${card.image}`)
 			
-					images.push(`${card.image}`)
-				}
-
 				const inv = await Inventory.findOne({ where: { 
 					card_code: print.card_code,
 					printId: print.id,
@@ -3123,11 +3014,7 @@ if(cmd === `!pack`) {
 					})
 				}
 			}
-		}
-		
-		let attachment
-		if (num === 1) {
-			message.channel.send(`Ah. So you want high quality goods! One moment please...`)
+
 			const card_1 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[0]}`)
 			const card_2 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[1]}`)
 			const card_3 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[2]}`)
@@ -3151,8 +3038,14 @@ if(cmd === `!pack`) {
 			context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
 			context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
 			context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
-			attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'pack.png')
+			const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`)
+			message.author.send(results.join("\n"), attachment)
 		}
+		
+		// let attachment
+		// if (num === 1) {
+		// 	message.channel.send(`Ah. So you want high quality goods! One moment please...`)
+		// }
 
 		wallet[set.currency] -= (set.unit_price * num)
 		await wallet.save()
@@ -3163,20 +3056,18 @@ if(cmd === `!pack`) {
 		set.unit_sales += num
 		await set.save()
 
-		if (num === 1) {
-			message.author.send(results.join("\n"), attachment)
-		} else {
-			for (let i = 0; i < results.length; i += 30) {
-				if (results[i+30] && results[i+30].includes(set.emoji)) {
-					message.author.send(results.slice(i, i+31))
-					i++
-				} else {
-					message.author.send(results.slice(i, i+30))
-				}
-			}
-		}
-
-		return message.channel.send(`Thank you for your purchase! I messaged you the contents of your ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}.`)
+		// if (num === 1) {
+		// 	message.author.send(results.join("\n"), attachment)
+		// } else {
+		// 	for (let i = 0; i < results.length; i += 30) {
+		// 		if (results[i+30] && results[i+30].includes(set.emoji)) {
+		// 			message.author.send(results.slice(i, i+31))
+		// 			i++
+		// 		} else {
+		// 			message.author.send(results.slice(i, i+30))
+		// 		}
+		// 	}
+		// }
 	}).catch(err => {
 		console.log(err)
 		return message.channel.send(`Sorry, time's up.`)
@@ -3196,7 +3087,7 @@ if(cmd === `!box`) {
 	const merchbot_wallet = await Wallet.findOne( { where: { playerId: merchbotId } })
 	if (!wallet || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	const money = wallet[set.currency]
-	if (money < set.box_price) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Packs cost ${set.box_price}${eval(set.currency)}.`)
+	if (money < set.box_price) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Boxes cost ${set.box_price}${eval(set.currency)}.`)
 
 	const commons = await Print.findAll({ 
 		where: {
@@ -3330,8 +3221,8 @@ if(cmd === `!box`) {
 //DUMP
 if(cmd === `!dump`) {
 	const set_code = args.length ? args[0].toUpperCase() : 'DOC'
-	const valid_set_code = !!(set_code.length === 3 && await Set.count({where: { code: set_code }}))
-	if (!valid_set_code) return message.channel.send(`Sorry, I do not recognized the set code: "${set_code}".`)
+	const set = await Set.findOne({where: { code: set_code }})
+	if (!set) return message.channel.send(`Sorry, I do not recognized the set code: "${set_code}".`)
 	const player = await Player.findOne({ where: { id: maid }, include: Wallet })
 	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	const merchbot_wallet = await Wallet.findOne({ where: { playerId: merchbotId } })
@@ -3342,7 +3233,7 @@ if(cmd === `!dump`) {
 	if (!rarity) return
 
 	const quantityToKeep = await getDumpQuantity(message, rarity)
-	if (!quantityToKeep) return message.channel.send(`Please specify a valid quanity.`)
+	if (!quantityToKeep && quantityToKeep !== 0) return message.channel.send(`Please specify a valid quanity.`)
 
 	const unfilteredInv = await Inventory.findAll({
 		where: {
@@ -3369,7 +3260,7 @@ if(cmd === `!dump`) {
 		compensation += price
 	}
 
-	const dumpConfirmation = await askForDumpConfirmation(message, set_code, cards, compensation)
+	const dumpConfirmation = await askForDumpConfirmation(message, set, cards, compensation)
 	if (!dumpConfirmation) return
 
 	for (let i = 0; i < inv.length; i++) {
@@ -3407,7 +3298,7 @@ if(cmd === `!dump`) {
 	merchbot_wallet.stardust -= compensation
 	await merchbot_wallet.save()
 
-	return message.channel.send(`You sold ${count} ${rarity === 'all' ? '' : eval(rarity)}${set_code} ${eval(set_code)} cards to The Shop for ${compensation}${stardust}.`)
+	return message.channel.send(`You sold ${count} ${rarity === 'all' ? '' : eval(rarity)}${set.code} ${set.emoji === set.alt_emoji ? eval(set.emoji) : `${eval(set.emoji)} ${eval(set.alt_emoji)}`} ${count === 1 ? 'card' : 'cards'} to The Shop for ${compensation}${stardust}.`)
 }
 
 //SELL
@@ -3939,6 +3830,12 @@ if(cmd === `!challenge` || cmd === `!gauntlet`) {
 //NICKNAMES
 if(cmd === `!nicknames` || cmd === `!nicks`) {
 	return
+}
+
+//CLEAR
+if(cmd === `!clear`) {
+	if (!isAdmin(message.member)) return message.channel.send("You do not have permission to do that.")
+    return message.channel.bulkDelete(100)
 }
 
 //OPEN

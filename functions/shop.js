@@ -364,8 +364,8 @@ const postBids = async (newlyInStock) => {
 }
 
 // ASK FOR DUMP CONFIRMATION
-const askForDumpConfirmation = async (message, set_code, cards, compensation) => {
-    cards.unshift(`Are you sure you want to sell the following ${set_code} ${eval(set_code)} cards:`)
+const askForDumpConfirmation = async (message, set, cards, compensation) => {
+    cards.unshift(`Are you sure you want to sell the following ${set.code} ${set.emoji === set.alt_emoji ? eval(set.emoji) : `${eval(set.emoji)} ${eval(set.alt_emoji)}`} cards:`)
     for (let i = 0; i < cards.length; i+=30) {
         message.channel.send(cards.slice(i, i+30).join("\n"))
     }
@@ -424,7 +424,7 @@ const getDumpQuantity = async (message, rarity) => {
         time: 15000
     }).then(async collected => {
 		const response = Math.round(parseInt(collected.first().content.toLowerCase()))
-        if (!isFinite(response) && response > 0) {
+        if (!Number.isInteger(response) && response >= 0) {
             message.channel.send(`Please provide a positive number.`)
             return false
         } else {

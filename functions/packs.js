@@ -151,8 +151,6 @@ const awardPack = async (message, set, num, artwork = false) => {
         }
     }
 
-    console.log('packs', packs)
-
     if (artwork !== true) {
         for (let i = 0; i < packs.length; i += 30) {
             if (packs[i+30] && packs[i+30].includes(set.emoji)) {

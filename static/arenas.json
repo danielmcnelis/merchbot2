@@ -1,0 +1,26 @@
+{
+    "beast": {
+        "url":"https://www.duelingbook.com/deck?id=8405187",
+        "screenshot":"https://i.imgur.com/NcZv0M2.png"
+    },
+    "dinosaur": {
+        "url":"https://www.duelingbook.com/deck?id=8405185",
+        "screenshot":"https://i.imgur.com/YjcmfLj.png"
+    },
+    "fish": {
+        "url":"https://www.duelingbook.com/deck?id=8405183",
+        "screenshot":"https://i.imgur.com/9HT7aaJ.png"
+    },
+    "plant": {
+        "url":"https://www.duelingbook.com/deck?id=8405182",
+        "screenshot":"https://i.imgur.com/w99F1Ix.png"
+    },
+    "reptile": {
+        "url":"https://www.duelingbook.com/deck?id=8405181",
+        "screenshot":"https://i.imgur.com/UOnBT60.png"
+    },
+    "rock": {
+        "url":"https://www.duelingbook.com/deck?id=8405179",
+        "screenshot":"https://i.imgur.com/1Vv6dJZ.png"
+    }
+}

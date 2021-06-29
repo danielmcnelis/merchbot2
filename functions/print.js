@@ -17,10 +17,17 @@ const askForSetToPrint = async (message) => {
             message.channel.send(`That set outline is not in the system.`)
             return false
         } else {
-            await Info.create({
-                element: 'set_to_print',
-                status: set_code
-            })
+            const info = await Info.findOne({ where: { element: 'set_to_print'}})
+            if (info) {
+                info.status = set_code
+                await info.save()
+            } else {
+                await Info.create({
+                    element: 'set_to_print',
+                    status: set_code
+                })
+            }
+
             return set
         }
     }).catch(err => {

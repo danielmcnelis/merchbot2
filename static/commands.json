@@ -12,6 +12,7 @@
     "wishlistcom": ["!wishlist", "!wish"],
     "dropcom": ["!drop", "!leave", "!exit", "!out"],
     "infocom": ["!info", "!information"],
+    "deckcom": ["!deck", "!decks"],
     "dbcom": ["!db", "!mydb", "!setdb", "!changedb", "!dbname", "!duelingbook"],
     "rolecom": ["!role", "!forgedrole", "!fogrole", "!forged", "!fog", "!forgedplayers", "!fogplayers", "!ranked", "!rankedrole"],
     "statscom": ["!stats", "!mystats", "!statistics", "!mystatistics", "!rank", "!myrank", "!ranking", "!myranking", "!rating", "!myating", "!elo", "!myelo"],

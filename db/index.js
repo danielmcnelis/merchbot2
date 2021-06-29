@@ -9,7 +9,6 @@ const Daily = require('./daily')
 const Diary = require('./diary')
 const Draft = require('./draft')
 const Entry = require('./entry')
-const Game = require('./game')
 const Gauntlet = require('./gauntlet')
 const Info = require('./info')
 const Inventory = require('./inventory')
@@ -95,7 +94,6 @@ module.exports = {
   Diary,
   Draft,
   Entry,
-  Game,
   Gauntlet,
   Info,
   Inventory,

@@ -259,6 +259,22 @@ const getRandomSubset = (arr, n) => {
     return shuffledArr.slice(0, n)
 }
 
+//SHUFFLE ARRAY
+const shuffleArray = (arr) => {
+    let i = arr.length
+    let temp
+    let index
+
+    while (i--) {
+        index = Math.floor((i + 1) * Math.random())
+        temp = arr[index]
+        arr[index] = arr[i]
+        arr[i] = temp
+    }
+
+    return arr
+}
+
 //IS SAME DAY
 const isSameDay = (d1, d2) => d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate()
 
@@ -279,5 +295,6 @@ module.exports = {
     isVowel,
     recalculate,
     restore,
-    revive
+    revive,
+    shuffleArray
 }

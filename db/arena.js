@@ -11,6 +11,14 @@ const Arena = db.define('arena', {
         type: Sequelize.INTEGER,
         defaultValue: 0,        
         allowNull: false
+    },
+    tribe: {
+        type: Sequelize.TEXT,
+        defaultValue: null
+    },
+    contestant: {
+        type: Sequelize.TEXT,
+        defaultValue: null
     }
 })
 

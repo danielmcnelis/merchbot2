@@ -14,6 +14,10 @@ const Info = db.define('info', {
     count: {
         type: Sequelize.INTEGER,
         allowNull: true
+    },
+    round: {
+        type: Sequelize.INTEGER,
+        allowNull: true
     }
 })
 

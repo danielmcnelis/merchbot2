@@ -3,12 +3,67 @@
 const {Builder, By, until} = require('selenium-webdriver')
 const firefox = require('selenium-webdriver/firefox')
 const fs = require('fs')
-const { Tournament, Card, Status } = require('../db/index.js')
 const errors = require('../static/errors.json')
 const { approve } = require('../static/emojis.json')
 const { Op } = require('sequelize')
 const { convertCardsArrayToObject } = require('./utility.js')
 const { fetchAllForgedCards } = require('./search.js')
+const { Auction, Bid, Card, Print, Set, Inventory,  Tournament, Status } = require('../db')
+const decks = require('../static/decks.json')
+
+//GET SHOP DECK
+const getShopDeck = async (message) => {
+    const filter = m => m.author.id === message.author.id
+	const msg = await message.channel.send(`Please select a deck:\n(1) Fish's Ire\n(2) Rock's Foundation`)
+	const collected = await msg.channel.awaitMessages(filter, {
+		max: 1,
+		time: 15000
+	}).then(collected => {
+        let deck
+		const response = collected.first().content.toLowerCase()
+        if(response.includes('fish') || response.includes('1')) deck = 'fish' 
+        else if(response.includes('rock') || response.includes('2')) deck = 'rock'
+        else message.channel.send(`Please specify a valid deck.`)
+        return deck
+	}).catch(err => {
+		console.log(err)
+        message.channel.send(`Sorry, time's up.`)
+        return false
+	})
+
+    return collected
+}
+
+
+
+// AWARD STARTER DECK
+const awardStarterDeck = async (playerId, starter) => {
+    const keys = Object.keys(decks[starter].cards)
+
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i]
+        const print = await Print.findOne( { where: { card_code: key } })
+        if (!print.id) return console.log(`${key} does not exist in the Print database.`)
+    
+        const inv = await Inventory.findOne({ where: { 
+            card_code: print.card_code,
+            printId: print.id,
+            playerId: playerId
+        }})
+    
+        if (inv) {
+            inv.quantity += decks[starter].cards[key]
+            await inv.save()
+        } else {
+            await Inventory.create({ 
+                card_code: print.card_code,
+                quantity: decks[starter].cards[key],
+                printId: print.id,
+                playerId: playerId
+            })
+        }
+    }
+}
 
 //SAVE YDK
 const saveYDK = async (member, url) => {
@@ -243,7 +298,9 @@ const checkDeckList = async (client, message, member, formatName, formatEmoji, f
 }
 
 module.exports = {
+    awardStarterDeck,
     checkDeckList,
+    getShopDeck,
     saveAllYDK,
     saveYDK
 }

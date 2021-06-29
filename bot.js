@@ -7,21 +7,24 @@ const axios = require('axios')
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { fire, tix, credits, blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('./static/emojis.json')
-const { bindercom, wishlistcom, invcom, calccom, bracketcom, dropcom, queuecom, checklistcom, startcom, infocom, dbcom, noshowcom, legalcom, listcom, pfpcom, botcom, rolecom, statscom, profcom, losscom, h2hcom, undocom, rankcom, manualcom, deckscom, replayscom, yescom, nocom } = require('./static/commands.json')
+const { bindercom, wishlistcom, invcom, calccom, bracketcom, dropcom, queuecom, checklistcom, startcom, infocom, dbcom, noshowcom, legalcom, listcom, pfpcom, botcom, rolecom, statscom, profcom, losscom, h2hcom, undocom, rankcom, manualcom, yescom, nocom, deckcom } = require('./static/commands.json')
 const { botRole, modRole, adminRole, tourRole, toRole, fpRole, muteRole, arenaRole } = require('./static/roles.json')
 const { staffChannel, botSpamChannel, welcomeChannel, announcementsChannel, registrationChannel, duelRequestsChannel, marketPlaceChannel, shopChannel, tournamentChannel, arenaChannel, keeperChannel, triviaChannel, draftChannel, gauntletChannel } = require('./static/channels.json')
-const { ss1_fish, ss1_rock } = require('./static/starter_decks.json')
+const decks = require('./static/decks.json')
 const types = require('./static/types.json')
 const diaries = require('./static/diaries.json')
+const arenas = require('./static/arenas.json')
 const errors = require('./static/errors.json')
 const ygoprodeck = require('./static/ygoprodeck.json')
 const muted = require('./static/muted.json')
 const prints = require('./static/prints.json')
 const { getNewStatus } = require('./functions/status.js')
+const { checkArenaProgress, getArenaSample, resetArena, startArena, startRound } = require('./functions/arena.js')
+const { runTrivia } = require('./functions/trivia.js')
 const { askForGrindAllConfirmation } = require('./functions/mod.js')
-const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Game, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
+const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
 const { getRandomString, isSameDay, hasProfile, capitalize, restore, recalculate, revive, createProfile, createPlayer, isNewUser, isAdmin, isMod, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
-const { checkDeckList, saveYDK, saveAllYDK } = require('./functions/decks.js')
+const { checkDeckList, saveYDK, saveAllYDK, awardStarterDeck, getShopDeck } = require('./functions/decks.js')
 const { askForBidCancellation, askForBidPlacement, manageBidding } = require('./functions/bids.js')
 const { selectTournament, getTournamentType, seed, askForDBUsername, getDeckListTournament, getDeckNameTournament, sendToTournamentChannel, directSignUp, removeParticipant, getParticipants, findOpponent } = require('./functions/tournament.js')
 const { makeSheet, addSheet, writeToSheet } = require('./functions/sheets.js')
@@ -139,7 +142,12 @@ if (!message.content.startsWith("!") && message.content.includes(`[`) && message
 
 //TEST
 if(cmd === `!test`) {
-	return
+	const info = await Info.findOne({ where: { element: 'arena' } })
+    if (!info) return channel.send(`Critical error. Missing info in the database.`) 
+    const entries = await Arena.findAll({ include: Player, order: [["score", "DESC"]]})
+    if (!entries) return channel.send(`Critical error. Missing entries in the database.`) 
+
+	return startRound(info, entries)
 }
 
 //IMPORT 
@@ -253,7 +261,17 @@ if (cmd === `!init`) {
 		element: "shop",
 		status: "open"
 	})
+
+	await Info.create({
+		element: "arena",
+		status: "pending"
+	})
 	
+	await Info.create({
+		element: "trivia",
+		status: "pending"
+	})
+
 	const SS1 = {
 		code: "SS1",
 		name: "Starter Series 1",
@@ -485,47 +503,22 @@ if(startcom.includes(cmd)) {
 		time: 30000
 	}).then(async collected => {
 		const response = collected.first().content.toLowerCase()
-		let starterDeck
+		let starter
 
 		if(response.includes('fish') || response.includes(fish) || response.includes("(1)") || response === "1") {
-			starterDeck = "ss1_fish"
+			starter = 'fish'
 		} else if(response.includes('rock') || response.includes(rock) || response.includes === "(2)" || response === "2") {
-			starterDeck = "ss1_rock"
+			starter = 'rock'
 		}
 
-		if (!starterDeck) return message.channel.send('You did not select a valid Starter Deck. Please type **!start** to try again.')
+		if (!starter) return message.channel.send('You did not select a valid Starter Deck. Please type **!start** to try again.')
 
-		const keys = Object.keys(eval(starterDeck))
-
-		for (let i = 0; i < keys.length; i++) {
-			const key = keys[i]
-			const print = await Print.findOne( { where: { card_code: key } })
-			if (!print.id) return console.log(`${key} does not exist in the Print database.`)
-
-			const inv = await Inventory.findOne({ where: { 
-				card_code: print.card_code,
-				printId: print.id,
-				playerId: maid
-			}})
-
-			if (inv) {
-				inv.quantity += eval(starterDeck)[key]
-				await inv.save()
-			} else {
-				await Inventory.create({ 
-					card_code: print.card_code,
-					quantity: eval(starterDeck)[key],
-					printId: print.id,
-					playerId: maid
-				})
-			}
-		}
-
-		await createProfile(maid, starterDeck.slice(4))
+		await awardStarterDeck(maid, starter)
+		await createProfile(maid, starter)
 		message.member.roles.add(fpRole)
 		message.channel.send(`Excellent choice, ${message.author.username}! ${legend}` +
-		`\nYou received a copy of ${starterDeck === "ss1_fish" ? `Fish's Ire ${fish}` : `Rock's Foundation ${rock}`} and the **Forged Players** role! ${wokeaf}` +
-		`\n\nPlease wait while I open up some packs... ${blue}`
+		`\nYou received a copy of ${starter === "fish" ? `Fish's Ire ${fish}` : `Rock's Foundation ${rock}`} and the **Forged Players** role! ${wokeaf}` +
+		`\nPlease wait while I open some packs... ${blue}`
 		)
 
 		await awardPack(message, set, 10, artwork = true)
@@ -822,6 +815,51 @@ if(infocom.includes(cmd)) {
 	}
 
 	return message.channel.send(`Use this command in channels such as <#${duelRequestChannel}>, <#${marketPlaceChannel}>, <#${tournamentChannel}>, <#${arenaChannel}>, <#${keeperChannel}>, and <#${triviaChannel}> to learn how those parts of the game work.`)
+}
+
+
+//DECK
+if(deckcom.includes(cmd)) {
+	if (message.channel.id === arenaChannel) {
+		const deck = args[0] || await getArenaSample(message)
+		if (!deck) return
+		if (!arenas[deck]) return message.channel.send(`I do not recognize that tribe.`)
+
+		return message.channel.send(`Arena ${capitalize(deck)} ${eval(deck)} Deck (staples in the side):\n<${arenas[deck].url}>\n${arenas[deck].screenshot}`)
+	} else {
+		const wallet = await Wallet.findOne( { where: { playerId: maid }, include: Player })
+		const merchbot_wallet = await Wallet.findOne( { where: { playerId: merchbotId } })
+		if (!wallet || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+
+		const deck = args[0] || await getShopDeck(message)
+		const valid_decks = ["fish", "rock"]
+		if (!deck) return
+		if (!valid_decks.includes(deck)) return message.channel.send(`Sorry, I do not have that deck for sale.`)
+
+		const set = await Set.findOne({ where: { 
+			code: decks[deck].set_code
+		 }})
+
+		if (!set) return message.channel.send(`Could not find set with code "${decks[deck].set_code}".`)
+		if (!set.for_sale) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} ${eval(set.alt_emoji)} is out of stock.`)
+		const money = wallet[set.currency]
+		if (money < set.unit_price) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${money}${eval(set.currency)} and ${decks[deck].name} ${eval(deck)} costs ${set.unit_price}${eval(set.currency)}.`)
+
+		const filter = m => m.author.id === message.author.id
+		const msg = await message.channel.send(`${wallet.player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.unit_price}${eval(set.currency)} on a copy of ${decks[deck].name} ${eval(deck)}?`)
+		const collected = await msg.channel.awaitMessages(filter, {
+			max: 1,
+			time: 15000
+		}).then(async collected => {
+			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+			
+			await awardStarterDeck(maid, deck)
+			return message.channel.send(`Thank you for your purchase! I updated your Inventory with a copy of ${decks[deck].name} ${eval(deck)}.`)
+		}).catch(err => {
+			console.log(err)
+			return message.channel.send(`Sorry, time's up.`)
+		})
+	}
 }
 
 //EDIT
@@ -1685,6 +1723,47 @@ if (losscom.includes(cmd)) {
 	// 	}) 
 	// }
 
+	if (message.member.roles.cache.some(role => role.id === arenaRole)) {
+		if (message.channel !== client.channels.cache.get(arenaChannel)) return message.channel.send(`Please report your loss in: <#${arenaChannel}>`)
+		
+		const losingContestant = await Arena.findOne({ where: { playerId: maid }})
+		if (!losingContestant) return message.channel.send(`You are not in the current Arena.`)
+		const winningContestant = await Arena.findOne({ where: { playerId: oppo }})
+		if (!winningContestant) return message.channel.send(`That player is not your Arena opponent.`)
+
+		const info = await Info.findOne({ where: { element: 'arena' } })
+		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
+
+		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"], ["P5", "P6"]] :
+            info.round === 2 ? [["P1", "P3"], ["P2", "P5"], ["P4", "P6"]] :
+            info.round === 3 ? [["P1", "P4"], ["P2", "P6"], ["P3", "P5"]] : 
+            info.round === 4 ? [["P1", "P5"], ["P2", "P4"], ["P3", "P6"]] : 
+            info.round === 5 ? [["P1", "P6"], ["P2", "P3"], ["P4", "P5"]] : 
+            null
+	
+		let correct_pairing = false
+		for (let i = 0; i < 3; i++) {
+			if ((pairings[i][0] === losingContestant.contestant && 
+					pairings[i][1] === winningContestant.contestant) ||
+				(pairings[i][0] === winningContestant.contestant &&
+					pairings[i][1] === losingContestant.contestant)) correct_pairing = true
+		}
+
+		if (!correct_pairing) return message.channel.send(`That player is not your Arena opponent.`)
+		
+		winnersWallet.starchips += 2
+		await winnersWallet.save()
+		losersWallet.starchips++
+		await losersWallet.save()
+	
+		winningContestant.score++
+		await winningContestant.save()
+
+		await Match.create({ game_mode: "arena", winner: winningPlayer.id, loser: losingPlayer.id, delta: 0, chipsWinner: 2, chipsLoser: 1 })
+		message.channel.send(`${losingPlayer.name} (+1${starchips}), your Arena loss to ${winner.user.username} (+2${starchips}) has been recorded.`)
+		return checkArenaProgress(info)
+	}
+
 	const origStatsWinner = winningPlayer.stats
 	const origStatsLoser = losingPlayer.stats
 	const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
@@ -1723,8 +1802,8 @@ if (losscom.includes(cmd)) {
 		await winningPlayer.save()
 	}
 
-	await Match.create({ game: "ranked", winner: winner.user.id, loser: loser.user.id, delta: delta, chipsWinner: chipsWinner, chipsLoser: chipsLoser })
-	return message.reply(`Your loss to ${winner.user.username} has been recorded. ${winner.user.username} earned ${chipsWinner}${starchips}, and you earned ${chipsLoser}${starchips}.`)
+	await Match.create({ game_mode: "ranked", winner: winner.user.id, loser: loser.user.id, delta: delta, chipsWinner: chipsWinner, chipsLoser: chipsLoser })
+	return message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your loss to ${winner.user.username} (+${chipsWinner}${starchips}) has been recorded.`)
 }
 
 //MANUAL
@@ -1761,6 +1840,47 @@ if (manualcom.includes(cmd)) {
 	// 		}
 	// 	}) 
 	// }
+
+	if (winner.roles.cache.some(role => role.id === arenaRole) || loser.roles.cache.some(role => role.id === arenaRole)) {
+		if (message.channel !== client.channels.cache.get(arenaChannel)) return message.channel.send(`Please report this loss in: <#${arenaChannel}>`)
+		
+		const losingContestant = await Arena.findOne({ where: { playerId: loserId }})
+		if (!losingContestant) return message.channel.send(`You are not in the current Arena.`)
+		const winningContestant = await Arena.findOne({ where: { playerId: winnerId }})
+		if (!winningContestant) return message.channel.send(`That player is not your Arena opponent.`)
+
+		const info = await Info.findOne({ where: { element: 'arena' } })
+		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
+
+		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"], ["P5", "P6"]] :
+            info.round === 2 ? [["P1", "P3"], ["P2", "P5"], ["P4", "P6"]] :
+            info.round === 3 ? [["P1", "P4"], ["P2", "P6"], ["P3", "P5"]] : 
+            info.round === 4 ? [["P1", "P5"], ["P2", "P4"], ["P3", "P6"]] : 
+            info.round === 5 ? [["P1", "P6"], ["P2", "P3"], ["P4", "P5"]] : 
+            null
+	
+		let correct_pairing = false
+		for (let i = 0; i < 3; i++) {
+			if ((pairings[i][0] === losingContestant.contestant && 
+					pairings[i][1] === winningContestant.contestant) ||
+				(pairings[i][0] === winningContestant.contestant &&
+					pairings[i][1] === losingContestant.contestant)) correct_pairing = true
+		}
+
+		if (!correct_pairing) return message.channel.send(`That player is not your Arena opponent.`)
+		
+		winnersWallet.starchips += 2
+		await winnersWallet.save()
+		losersWallet.starchips++
+		await losersWallet.save()
+	
+		winningContestant.score++
+		await winningContestant.save()
+
+		await Match.create({ game_mode: "arena", winner: winningPlayer.id, loser: losingPlayer.id, delta: 0, chipsWinner: 2, chipsLoser: 1 })
+		message.channel.send(`A manual Arena loss by ${losingPlayer.name} (+1${starchips}) to ${winningPlayer.name} (+2${starchips}) has been recorded.`)
+		return checkArenaProgress(info)
+	}
 
 	const origStatsWinner = winningPlayer.stats
 	const origStatsLoser = losingPlayer.stats
@@ -1933,7 +2053,7 @@ if (rankcom.includes(cmd)) {
 //QUEUE
 if(queuecom.includes(cmd)) {
 	if (message.channel === client.channels.cache.get(arenaChannel)) {
-		const queue = await Arena.findAll({ where: { active: false }, include: Player })
+		const queue = await Arena.findAll({ include: Player })
 		if (!queue.length) return message.channel.send(`The Arena queue is empty.`)
 		const results = []
 		queue.forEach((row) => {
@@ -1949,7 +2069,7 @@ if(queuecom.includes(cmd)) {
 		})
 		return message.channel.send(results.join("\n"))
 	} else if (message.channel === client.channels.cache.get(triviaChannel)) {
-		const queue = await Trivia.findAll({ where: { active: false }, include: Player })
+		const queue = await Trivia.findAll({ include: Player })
 		if (!queue.length) return message.channel.send(`The Trivia queue is empty.`)
 		const results = []
 		queue.forEach((row) => {
@@ -1971,15 +2091,16 @@ if(cmd === `!join`) {
 
 	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${tournamentChannel}>, <#${arenaChannel}>, <#${draftChannel}>, or <#${triviaChannel}>.`)
 	
+	const player = await Player.findOne({ where: { id: maid }})
+	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+
 	if (game === 'Tournament') {
 		const tournament = await Tournament.findOne({ where: { state: 'pending' } })
 		const count = await Tournament.count({ where: { state: 'underway' } })
-		const player = await Player.findOne({ where: { id: maid }})
 		const member = message.member
 
 		if (!tournament && count) return message.channel.send(`Sorry, the tournament already started.`)
 		if (!tournament && !count) return message.channel.send(`There is no active tournament.`)
-		if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 		
 		return challongeClient.tournaments.show({
 			id: tournament.id,
@@ -2041,13 +2162,69 @@ if(cmd === `!join`) {
 	}
 
 	const alreadyIn = await eval(game).count({ where: { playerId: maid} })
+	const info = await Info.findOne({ where: { element: game.toLowerCase() } })
+	if (!info) return message.channel.send(`Could not find game-mode: "${game}".`)
+	if (info.status !== 'pending') return message.channel.send(`Sorry, ${ game === 'Trivia' ? 'Trivia' : `the ${game}` } already started.`)
+
 	if (!alreadyIn) {
+		const count = await eval(game).count()
+		console.log('count', count)
+		console.log('game', game)
+		if (game === 'Arena' && count >= 6 || game === 'Trivia' && count === 5) {
+			return message.channel.send(`Sorry, ${player.name}, ${ game === 'Trivia' ? 'Trivia' : `the ${game}` } is full.`)
+		} 
+
 		await eval(game).create({ playerId: maid })
-		return message.channel.send(`You joined the ${game} queue.`)
+		message.channel.send(`You joined the ${game} queue.`)
+		
+		if (game === 'Arena' && count === 5) {
+			console.log(`RUN THE ARENA!!!`)
+			info.status = 'confirming'
+			await info.save()
+			return startArena(message.guild)
+		} else if (game === 'Trivia' && count === 4) {
+			console.log(`RUN THE TRIVIA!!!`)
+			info.status = 'confirming'
+			await info.save()
+			return runTrivia(message.guild)
+		}
+
 	} else {
 		return message.channel.send(`You were already in the ${game} queue.`)
 	}
 }
+
+//RESET
+if (cmd === `!reset`) {
+	const game = message.channel === client.channels.cache.get(arenaChannel) ? "Arena"
+	: message.channel === client.channels.cache.get(triviaChannel) ? "Trivia"
+	: message.channel === client.channels.cache.get(draftChannel) ? "Draft"
+	: null
+
+	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannel}>, <#${draftChannel}>, or <#${triviaChannel}>.`)
+	
+	const info = await Info.findOne({ where: { element: game.toLowerCase() }})
+	if (!info) return message.channel.send(`Could not find game-mode: "${game}".`)
+
+	const entries = await eval(game).findAll()
+	if (!entries) return message.channel.send(`Could not find any entries for: "${game}".`)
+
+	info.status = 'pending'
+	await info.save()
+
+	if (game === 'Arena') {
+		resetArena(info, entries)
+	} else if (game === 'Trivia') {
+		for (let i = 0; i < entries.length; i++) {
+			const entry = entries[i]
+			entry.active = false
+			await entry.save()
+		}
+	}
+
+	return message.channel.send(`${game === 'Trivia' ? 'Trivia' : `The ${game}`} has been reset.`)
+}
+
 
 //DROP
 if(dropcom.includes(cmd)) {
@@ -2276,7 +2453,7 @@ if(cmd === `!daily`) {
 	const hoursLeftInDay = 23 - date.getHours()
 	const minsLeftInHour = 60 - date.getMinutes()
 
-	//if (daily.last_check_in && isSameDay(daily.last_check_in, date)) return message.channel.send(`You already used **!daily** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
+	if (daily.last_check_in && isSameDay(daily.last_check_in, date)) return message.channel.send(`You already used **!daily** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
 
 	const daysPassed = daily.last_check_in ? (date.setHours(0, 0, 0, 0) - daily.last_check_in.setHours(0, 0, 0, 0)) / (1000*60*60*24) : 1
 

@@ -3,7 +3,7 @@ const Discord = require('discord.js')
 const Canvas = require('canvas')
 const { Auction, Bid, Card, Print, Set, Inventory } = require('../db')
 const { getRandomElement, getRandomSubset } = require('./utility.js')
-const { botSpamChannel } = require('../static/channels.json')
+const { botSpamChannelId } = require('../static/channels.json')
 const { client } = require('../static/clients.js')
 const merchbotId = '584215266586525696'
 const { blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
@@ -166,8 +166,8 @@ const awardPack = async (message, set, num, artwork = false) => {
 }
 
 const awardPacksToShop = async (num) => {
-	const channel = client.channels.cache.get(botSpamChannel)
-    if (!channel) return console.log('Could not find #bot-spam channel.')
+	const botSpamChannel = client.channels.cache.get(botSpamChannelId)
+    if (!botSpamChannel) return console.log('Could not find #bot-spam channel.')
 
     const coreSets = await Set.findAll({ where: {
         type: 'core'
@@ -274,7 +274,7 @@ const awardPacksToShop = async (num) => {
             }
 
             if (!inv || inv.quantity === 0) {
-                newlyInStock.push(print.card_code)
+                newlyInStock.push(print)
                 await Auction.create({
                     card_code: print.card_code,
                     printId: print.id
@@ -295,15 +295,15 @@ const awardPacksToShop = async (num) => {
         }
     }
 
-    newlyInStock.sort()
-    channel.send(`<@${merchbotId}> opened ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'} of ${set.name} ${eval(set.emoji)}!`)
+    newlyInStock.sort((a, b) => b.market_price - a.market_price)
+    botSpamChannel.send(`<@${merchbotId}> opened ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'} of ${set.name} ${eval(set.emoji)}!`)
 
     for (let i = 0; i < results.length; i += 30) {
         if (results[i+30] && results[i+30].includes(set.emoji)) {
-            channel.send(results.slice(i, i+31))
+            botSpamChannel.send(results.slice(i, i+31))
             i++
         } else {
-            channel.send(results.slice(i, i+30))
+            botSpamChannel.send(results.slice(i, i+30))
         }
     }
     

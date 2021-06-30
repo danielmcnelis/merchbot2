@@ -1,26 +1,118 @@
 {
-    "beast": {
-        "url":"https://www.duelingbook.com/deck?id=8405187",
-        "screenshot":"https://i.imgur.com/NcZv0M2.png"
+    "decks": {
+        "beast": {
+            "url":"https://www.duelingbook.com/deck?id=8405187",
+            "screenshot":"https://i.imgur.com/NcZv0M2.png"
+        },
+        "dinosaur": {
+            "url":"https://www.duelingbook.com/deck?id=8405185",
+            "screenshot":"https://i.imgur.com/YjcmfLj.png"
+        },
+        "fish": {
+            "url":"https://www.duelingbook.com/deck?id=8405183",
+            "screenshot":"https://i.imgur.com/9HT7aaJ.png"
+        },
+        "plant": {
+            "url":"https://www.duelingbook.com/deck?id=8405182",
+            "screenshot":"https://i.imgur.com/w99F1Ix.png"
+        },
+        "reptile": {
+            "url":"https://www.duelingbook.com/deck?id=8405181",
+            "screenshot":"https://i.imgur.com/UOnBT60.png"
+        },
+        "rock": {
+            "url":"https://www.duelingbook.com/deck?id=8405179",
+            "screenshot":"https://i.imgur.com/1Vv6dJZ.png"
+        }
     },
-    "dinosaur": {
-        "url":"https://www.duelingbook.com/deck?id=8405185",
-        "screenshot":"https://i.imgur.com/YjcmfLj.png"
+    "vouchers": {
+        "beast":"mushroom",
+        "dinosaur":"egg",
+        "fish":"hook",
+        "plant":"rose",
+        "reptile":"cactus",
+        "rock":"moai"
     },
-    "fish": {
-        "url":"https://www.duelingbook.com/deck?id=8405183",
-        "screenshot":"https://i.imgur.com/9HT7aaJ.png"
+    "prizes": {
+        "beast":"APC-001",
+        "dinosaur":"APC-005",
+        "fish":"APC-004",
+        "plant":"APC-003",
+        "reptile":"APC-006",
+        "rock":"APC-002"
     },
-    "plant": {
-        "url":"https://www.duelingbook.com/deck?id=8405182",
-        "screenshot":"https://i.imgur.com/w99F1Ix.png"
+    "victories": {
+        "beast":"Today, you attacked your foes with the viciousness of a wolverine!",
+        "dinosaur":"Today, you crushed your foes with the weight of a sauropod!",
+        "fish":"Today, you rushed your foes with the quickness of a marlin!",
+        "plant":"Today, you astonished your foes with the beauty of a princess!",
+        "reptile":"Today, you paralyzed your foes with the venom of a cobra!",
+        "rock":"Today, you rolled your foes with the ease of a boulder!"
     },
-    "reptile": {
-        "url":"https://www.duelingbook.com/deck?id=8405181",
-        "screenshot":"https://i.imgur.com/UOnBT60.png"
+    "apcs": {
+        "beast":"<:ult:845483716888887297>APC-001 - Desmanian Devil",
+        "dinosaur":"<:ult:845483716888887297>APC-005 - Spacetime Transcendence",
+        "fish":"<:ult:845483716888887297>APC-004 - Moray of Greed",
+        "plant":"<:ult:845483716888887297>APC-003 - Rose Lover",
+        "reptile":"<:ult:845483716888887297>APC-006 - Viper's Rebirth",
+        "rock":"<:ult:845483716888887297>APC-002 - Koa'ki Meiru Guardian"
     },
-    "rock": {
-        "url":"https://www.duelingbook.com/deck?id=8405179",
-        "screenshot":"https://i.imgur.com/1Vv6dJZ.png"
-    }
+    "verbs": [
+        "salvaged",
+        "recovered",
+        "collected",
+        "picked up",
+        "walked away with",
+        "smuggled",
+        "copped",
+        "pocketed",
+        "lifted",
+        "boosted",
+        "nabbed",
+        "grabbed",
+        "yanked",
+        "hoisted",
+        "snagged",
+        "stole",
+        "ran off with",
+        "swiped",
+        "claimed",
+        "brought back",
+        "got their paws on",
+        "banked",
+        "looted",
+        "found",
+        "took",
+        "banked"
+    ],
+    "encouragements": [
+        "Pretty sweet!",
+        "Hey it's something.",
+        "We take those.",
+        "No cap.",
+        "You'll get 'em next time, kid.",
+        "Not bad!",
+        "Good looks!",
+        "All in a day's work.",
+        "Nice job!",
+        "Cool!",
+        "Maybe nobody will notice.",
+        "Better than nothing.",
+        "Legit.",
+        "Can't wait to cross this off the Diary!",
+        "This is better than what you're gonna get with Daily tomorrow...",
+        "Sick score!",
+        "Better than Woawa probably.",
+        "Got sacked hard.",
+        "Lost to a topper.",
+        "Life's a grind.",
+        "That's solid.",
+        "Progress is progress.",
+        "So close to that APC!",
+        "Farming was good today.",
+        "At least you didn't waste 2 hours playing Arena...",
+        "Be happy you got something.",
+        "Maybe throw Jazz a tip!",
+        "Who the hell writes these things?"
+    ]
 }

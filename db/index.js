@@ -14,6 +14,7 @@ const Info = require('./info')
 const Inventory = require('./inventory')
 const Knowledge = require('./knowledge')
 const Match = require('./match')
+const Nickname = require('./nickname')
 const Player = require('./player')
 const Print = require('./print')
 const Profile = require('./profile')
@@ -45,6 +46,9 @@ Bid.belongsTo(Auction)
 
 Player.hasMany(Inventory)
 Inventory.belongsTo(Player)
+
+// Card.hasMany(Nickname)
+// Nickname.belongsTo(Card)
 
 Print.hasMany(Inventory)
 Inventory.belongsTo(Print)
@@ -99,6 +103,7 @@ module.exports = {
   Inventory,
   Knowledge,
   Match,
+  Nickname,
   Player,
   Print,
   Profile,

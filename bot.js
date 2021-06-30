@@ -7,9 +7,9 @@ const axios = require('axios')
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { fire, tix, credits, blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('./static/emojis.json')
-const { bindercom, wishlistcom, invcom, calccom, bracketcom, dropcom, queuecom, checklistcom, startcom, infocom, dbcom, noshowcom, legalcom, listcom, pfpcom, botcom, rolecom, statscom, profcom, losscom, h2hcom, undocom, rankcom, manualcom, yescom, nocom, deckcom } = require('./static/commands.json')
+const { aliuscom, nicknamecom, joincom, bindercom, wishlistcom, invcom, calccom, bracketcom, dropcom, queuecom, checklistcom, startcom, infocom, dbcom, noshowcom, legalcom, listcom, pfpcom, botcom, rolecom, statscom, profcom, losscom, h2hcom, undocom, rankcom, manualcom, yescom, nocom, deckcom } = require('./static/commands.json')
 const { botRole, modRole, adminRole, tourRole, toRole, fpRole, muteRole, arenaRole } = require('./static/roles.json')
-const { staffChannel, botSpamChannel, welcomeChannel, announcementsChannel, registrationChannel, duelRequestsChannel, marketPlaceChannel, shopChannel, tournamentChannel, arenaChannel, keeperChannel, triviaChannel, draftChannel, gauntletChannel } = require('./static/channels.json')
+const { discussionChannelId, staffChannelId, botSpamChannelId, welcomeChannelId, announcementsChannelId, registrationChannelId, duelRequestsChannelId, marketPlaceChannelId, shopChannelId, tournamentChannelId, arenaChannelId, keeperChannelId, triviaChannelId, draftChannelId, gauntletChannelId } = require('./static/channels.json')
 const decks = require('./static/decks.json')
 const types = require('./static/types.json')
 const diaries = require('./static/diaries.json')
@@ -18,17 +18,18 @@ const errors = require('./static/errors.json')
 const ygoprodeck = require('./static/ygoprodeck.json')
 const muted = require('./static/muted.json')
 const prints = require('./static/prints.json')
+const nicknames = require('./static/nicknames.json')
 const { getNewStatus } = require('./functions/status.js')
 const { checkArenaProgress, getArenaSample, resetArena, startArena, startRound } = require('./functions/arena.js')
 const { runTrivia } = require('./functions/trivia.js')
 const { askForGrindAllConfirmation } = require('./functions/mod.js')
-const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
+const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Nickname, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
 const { getRandomString, isSameDay, hasProfile, capitalize, restore, recalculate, revive, createProfile, createPlayer, isNewUser, isAdmin, isMod, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
 const { checkDeckList, saveYDK, saveAllYDK, awardStarterDeck, getShopDeck } = require('./functions/decks.js')
 const { askForBidCancellation, askForBidPlacement, manageBidding } = require('./functions/bids.js')
-const { selectTournament, getTournamentType, seed, askForDBUsername, getDeckListTournament, getDeckNameTournament, sendToTournamentChannel, directSignUp, removeParticipant, getParticipants, findOpponent } = require('./functions/tournament.js')
+const { selectTournament, getTournamentType, seed, askForDBUsername, getDeckListTournament, getDeckNameTournament, sendTotournamentChannelId, directSignUp, removeParticipant, getParticipants, findOpponent } = require('./functions/tournament.js')
 const { makeSheet, addSheet, writeToSheet } = require('./functions/sheets.js')
-const { askForAdjustConfirmation, askForCardSlot, getNewMarketPrice, askForSetToPrint, selectPrint, askForRarity } = require('./functions/print.js')
+const { askForAdjustConfirmation, askForCardSlot, collectNicknames, getNewMarketPrice, askForSetToPrint, selectPrint, askForRarity } = require('./functions/print.js')
 const { uploadDeckFolder } = require('./functions/drive.js')
 const { fetchAllCardNames, fetchAllCards, fetchAllUniquePrintNames, findCard, search } = require('./functions/search.js')
 const { getBarterCard, checkShopShouldBe, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
@@ -70,9 +71,9 @@ client.on('ready', async () => {
 		if (shopOpen) updateShop()
 	}, 1000 * 60 * 5)
 
-	if (!shopShouldBe) return client.channels.cache.get(staffChannel).send(`<@&${adminRole}>, The Shop status could not be read from the database.`)
-	if (!shopOpen && shopShouldBe === 'open') client.channels.cache.get(staffChannel).send(`<@& ${modRole}>, The Shop is unexpectedly closed. Type **!open** to manually open it.`)
-	if (shopOpen && shopShouldBe === 'closed') client.channels.cache.get(staffChannel).send(`<@& ${modRole}>, The Shop is unexpectedly open. Type **!close** to manually close it.`)
+	if (!shopShouldBe) return client.channels.cache.get(staffChannelId).send(`<@&${adminRole}>, The Shop status could not be read from the database.`)
+	if (!shopOpen && shopShouldBe === 'open') client.channels.cache.get(staffChannelId).send(`<@& ${modRole}>, The Shop is unexpectedly closed. Type **!open** to manually open it.`)
+	if (shopOpen && shopShouldBe === 'closed') client.channels.cache.get(staffChannelId).send(`<@& ${modRole}>, The Shop is unexpectedly open. Type **!close** to manually close it.`)
 
 	if (shopShouldBe === 'closed') {
 		console.log('setting timeout for openShop():', shopCountdown)
@@ -85,28 +86,31 @@ client.on('ready', async () => {
   
 //WELCOME
 client.on('guildMemberAdd', async (member) => {
-    const channel = client.channels.cache.get(welcomeChannel)
+    const welcomeChannel = client.channels.cache.get(welcomeChannelId)
     const mutedPeople = JSON.parse(fs.readFileSync('./static/muted.json'))['mutedPeople']
 
     if (mutedPeople.includes(member.user.id)) {
             member.roles.add(muteRole)
-            return channel.send(`${member} Nice mute evasion, punk. LOL! ${lmfao}`)
+            return welcomeChannel.send(`${member} Nice mute evasion, punk. LOL! ${lmfao}`)
         }
 
     if (await isNewUser(member.user.id)) {
         createPlayer(member.user.id, member.user.username, member.user.tag) 
-        return channel.send(`${member} Welcome to the Forged in Chaos ${FiC} Discord server! Type **!start** to begin playing. ${legend}`)
+        return welcomeChannel.send(`${member} Welcome to the Forged in Chaos ${FiC} Discord server! Type **!start** to begin playing. ${legend}`)
     } else {
-        return channel.send(`${member} Welcome back to the Forged in Chaos ${FiC} Discord server! We missed you. ${approve}`)
+        return welcomeChannel.send(`${member} Welcome back to the Forged in Chaos ${FiC} Discord server! We missed you. ${approve}`)
     }
 })
     
 //GOODBYE
-client.on('guildMemberRemove', member => client.channels.cache.get(welcomeChannel).send(`Oh dear. ${member.user.username} has left the server. ${sad}`))
+client.on('guildMemberRemove', member => client.channels.cache.get(welcomeChannelId).send(`Oh dear. ${member.user.username} has left the server. ${sad}`))
 
 //COMMANDS
 client.on('message', async (message) => {
-    if (!message.guild || message.author.bot || (!message.content.startsWith("!") && !message.content.includes("{") && !message.content.includes("["))) return
+    if (!message.guild || 
+		message.author.bot || 
+		(!message.content.startsWith("!") && !message.content.includes("{") && !message.content.includes("["))
+	) return
 
     const messageArray = message.content.split(" ")
 	for(let zeta = 0; zeta < messageArray.length; zeta ++) {
@@ -142,10 +146,20 @@ if (!message.content.startsWith("!") && message.content.includes(`[`) && message
 
 //TEST
 if(cmd === `!test`) {
+	const count = await Arena.count({ where: {
+		active: true
+	} })
+
+	return message.channel.send(count)
+}
+
+//TEST
+if(cmd === `!test2`) {
+	const arenaChannel = client.channels.cache.get(arenaChannelId)
 	const info = await Info.findOne({ where: { element: 'arena' } })
-    if (!info) return channel.send(`Critical error. Missing info in the database.`) 
+    if (!info) return arenaChannel.send(`Critical error. Missing info in the database.`) 
     const entries = await Arena.findAll({ include: Player, order: [["score", "DESC"]]})
-    if (!entries) return channel.send(`Critical error. Missing entries in the database.`) 
+    if (!entries) return arenaChannel.send(`Critical error. Missing entries in the database.`) 
 
 	return startRound(info, entries)
 }
@@ -352,6 +366,57 @@ if (cmd === `!init`) {
 	return message.channel.send(`You initialized The Shop!`)
 }
 
+//ALIUS 
+if (aliuscom.includes(cmd)) {
+	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
+
+	const query = args.join(' ')
+	if (!query) return message.channel.send(`Please specify a card you would like to create aliuses for.`)
+	const card_name = await findCard(query, fuzzyCards, fuzzyCards2)
+	if (!card_name) return message.channel.send(`Could not find card: "${query}".`)
+	const card = await Card.findOne({ where: { name: card_name }})
+	if (!card) return message.channel.send(`I could not find "${card_name}" in the Format Library database.`)
+
+	const new_nicknames = await collectNicknames(message, card_name)
+	const values = [...new_nicknames.values()]
+	if (!values.length) return message.channel.send(`Sorry, time's up.`)
+	let count = 0
+
+	for (let i = 0; i < values.length; i++) {
+		console.log('values[i].content.toLowerCase().split(" ")[0]', values[i].content.toLowerCase().split(" ")[0])
+		const alius = values[i].content.toLowerCase().split(" ")[0]
+		const row = await Nickname.create({
+			alius,
+			card_name
+		})
+
+		if (!row) {
+			message.channel.send(`Error: "${alius}" is already being used.`)
+		} else {
+			message.channel.send(`Created an alius for ${card_name}: ${alius}`)
+		} 
+	}
+}
+
+//NICKNAME 
+if (nicknamecom.includes(cmd)) {
+	const query = args.join(' ')
+	if (!query) return message.channel.send(`Please specify a card you would like to nickname.`)
+	const card_name = await findCard(query, fuzzyCards, fuzzyCards2)
+	if (!card_name) return message.channel.send(`Could not find card: "${query}".`)
+	const card = await Card.findOne({ where: { name: card_name }})
+	if (!card) return message.channel.send(`I could not find "${card_name}" in the Format Library database.`)
+
+	const allNicknames = await Nickname.findAll({ where: { card_name: card_name } })
+	if (!allNicknames) return message.channel.send(`Could not find any nicknames for: ${card_name}.`)
+	const names_only =  allNicknames.map((nick) => nick.alius )
+	
+	return message.channel.send(`Nicknames for ${card_name}:\n${names_only.sort().join("\n")}`)
+}
+
+
+
+
 //PRINT 
 if (cmd === `!print`) {
 	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
@@ -421,13 +486,46 @@ if (cmd === `!print`) {
 	return message.channel.send(`Created a new print: ${eval(rarity)}${card_code} - ${card_name} - ${stardust}${market_price}`)
 }
 
+
+//SAVE_NICKNAMES
+if (cmd === `!save_nicknames`) {
+	if (!isAdmin(message.member)) return message.channel.send('You do not have permission to do that.')
+	
+	const nicknamesArr = []
+	const allNicknames = await Nickname.findAll()
+	let i
+	for (i = 0; i < allNicknames.length; i++) {
+		const nickname = allNicknames[i]
+		const elem = {
+			"alius": nickname.alius,
+			"card_name": nickname.card_name
+		}
+		nicknamesArr.push(elem)
+	}
+
+	return fs.writeFile("./static/nicknames.json", JSON.stringify(nicknamesArr), (err) => { 
+		if (err) console.log(err)
+		else message.channel.send(`You saved ${i} nicknames(s) to a local file!`)
+	})
+}
+ 
+
 //SAVE_PRINTS
 if (cmd === `!save_prints`) {
-	const arr = []
+	if (!isAdmin(message.member)) return message.channel.send('You do not have permission to do that.')
+	const printsArr = []
 	const allPrints = await Print.findAll()
 	let i
 	for (i = 0; i < allPrints.length; i++) {
 		const print = allPrints[i]
+		const market_price = print.rarity === 'com' ? 9 :
+			print.rarity === 'rar' ? 40 :
+			print.rarity === 'sup' ? 64 :
+			print.rarity === 'ult' && print.set_code.startsWith("SS") ? 109 :
+			print.rarity === 'ult' && !print.set_code.startsWith("SS") ? 184 :
+			print.rarity === 'scr' ? 256 :
+			10
+
 		const elem = {
 			"card_name": print.card_name,
 			"card_id": print.card_id,
@@ -435,14 +533,13 @@ if (cmd === `!save_prints`) {
 			"card_slot": print.card_slot,
 			"card_code": print.card_code,
 			"rarity": print.rarity,
-			"market_price": print.market_price,
+			"market_price": market_price,
 			"setId": print.setId
 		}
-		arr.push(elem)
+		printsArr.push(elem)
 	}
 
-
-	return fs.writeFile("./static/prints.json", JSON.stringify(arr), (err) => { 
+	return fs.writeFile("./static/prints.json", JSON.stringify(printsArr), (err) => { 
 		if (err) console.log(err)
 		else message.channel.send(`You saved ${i} print(s) to a local file!`)
 	})
@@ -522,7 +619,7 @@ if(startcom.includes(cmd)) {
 		)
 
 		await awardPack(message, set, 10, artwork = true)
-		return message.channel.send(`I wish you luck on your journey, new duelist! ${master}`)
+		return message.channel.send(`I wish you luck on your journey, duelist! ${master}`)
 	}).catch(err => {
 		console.log(err)
 		return message.channel.send(`Sorry, time's up.`)
@@ -708,11 +805,11 @@ if (cmd === `!mod`) {
 
 //INFO
 if(infocom.includes(cmd)) {
-	if (message.channel.id == duelRequestsChannel) { 
+	if (message.channel.id == duelRequestsChannelId) { 
 		return message.channel.send(`${master} --- Ranked Play --- ${master}`+ 
 		`\nThis is a Constructed Format based on the cards that you own.`+
 		` You can check your Inventory with the **!inv** command.`+
-		` After you build a deck, go to <#${duelRequestsChannel}> and tag **@Forged Players** to find an opponent.`+
+		` After you build a deck, go to <#${duelRequestsChannelId}> and tag **@Forged Players** to find an opponent.`+
 		`\n\nWe designed this game to reward effort.`+
 		` The lower your rating, the more ${starchips} you'll earn.`+
 		` This discourages farming and helps new players get better cards.`+
@@ -722,14 +819,14 @@ if(infocom.includes(cmd)) {
 		`\n\nIn addition, you must follow the Forbidden and Limited List.`)
 	}
 
-	if (message.channel.id == marketPlaceChannel) { 
+	if (message.channel.id == marketPlaceChannelId) { 
 		return message.channel.send(`${merchant} --- Market Place --- ${merchant}`+ 
 		`\nTo get the cards you need in Forged in Chaos, you need to buy, sell, and trade.`+
 		`\n\nPut cards in your Binder with **!bind**,`+
 		` add cards to your Wishlist with **!wish**,`+
 		` and find what you're looking for with **!search**.`+
-		` Then come to the <#${marketPlaceChannel}> to use the **!trade** command.`+
-		`\n\nIf you can't find a trading partner, you can also browse the <#${shopChannel}>.`+
+		` Then come to the <#${marketPlaceChannelId}> to use the **!trade** command.`+
+		`\n\nIf you can't find a trading partner, you can also browse the <#${shopChannelId}>.`+
 		` Each card has two prices: the cost to buy and the price to sell.`+
 		// ` Sick of using Discord? Visit the Shop online at https://forgedinchaos.com.`+
 		`\n\nOn Tuesday and Friday nights, the Shop closes and opens some packs to restock.`+
@@ -737,35 +834,35 @@ if(infocom.includes(cmd)) {
 		` The next Day, the Shop opens and the cards are sold to the highest bidders!`)
 	}
 
-	if (message.channel.id == tournamentChannel) { 
+	if (message.channel.id == tournamentChannelId) { 
 		return message.channel.send(`${legend} --- Tournaments --- ${legend}`+ 
-		`\nTo sign up for a Tournament, simply come to the <#${tournamentChannel}> and use the **!join** command.`+
+		`\nTo sign up for a Tournament, simply come to the <#${tournamentChannelId}> and use the **!join** command.`+
 		` The Tournament Organizer will handle the rest, so keep an eye out for their instructions.`+
 		`\n\nAs a token of our appreciation, each tournament participant gets a Chaos Pack just for entering.`+
 		` If you do well, you can win additional Chaos Packs and other prizes.`)
 	}
 
-	if (message.channel.id == arenaChannel) { 
-		return message.channel.send(`${beast} ${dinosaur} ${fish} --- The Arena --- ${plant} ${reptile} ${rock}`+ 
+	if (message.channel.id == arenaChannelId) { 
+		return message.channel.send(`${beast}   ${dinosaur}   ${fish}  ----- The Arena -----  ${plant}   ${reptile}   ${rock}`+ 
 		`\nIn this channel, you get to test out the game's most powerful cards.`+
 		` Simply align yourself with a Tribe and wage war at their side.`+
-		`\n\nTo compete in the Arena, type **!join** in <#${arenaChannel}>.`+
+		`\n\nTo compete in the Arena, type **!join** in <#${arenaChannelId}>.`+
 		` It requires 6 players to launch.`+
-		` When it starts, you are loaned a 60-card deck, and you get 5 minutes to cut up to 20 cards.`+
+		` When it starts, you are loaned a 60-card deck, and you get 5 minutes to cut it down to no fewer than 40 cards.`+
 		`\n\nThe Arena is a Round Robin, singles-games tournament.`+
-		` Winners receive 3${starchips}, losers receive 1${starchips}.`+
+		` Winners receive 2${starchips}, losers receive 1${starchips}.`+
 		` To report a loss, type **!loss @opponent**, then wait for the next round.`+
 		`\n\nThe Champion of the Arena walks away with an ${ult}Arena Prize Card according to their Tribe!`+
 		` Everyone else receives Vouchers for their wins.`+
-		` You can use **!barter** to exchange Vouchers for APCs.`, {files: ["https://i.imgur.com/iYTTIUW.png"]})
+		` You can use **!barter** to exchange Vouchers for APCs.`)
 	}
 
-	if (message.channel.id == gauntletChannel) { 
+	if (message.channel.id == gauntletChannelId) { 
 		return message.channel.send(`${gloveEmoji} --- The Gauntlet --- ${gloveEmoji}`+ 
 		`\nThe Gauntlet is the ultimate test of endurance and technical play.`+
 		` In this 2-Player game-mode, you're asked to succeed with Starter Decks from every generation of Forged`+
 		` from Fish's Ire ${fish} to Rock's Foundation ${rock}.`
-		`\n\nTo enter the Gauntlet, simply use **!challenge @opponent** <#${gauntletChannel}>.`+
+		`\n\nTo enter the Gauntlet, simply use **!challenge @opponent** <#${gauntletChannelId}>.`+
 		` Once a challenge is accepted, each player will receive a Starter Deck via DM.`+
 		` The Gauntlet is separated into \"legs\" for each of the Starter Deck generations.`+
 		`\n\nIn addition, there are a few Gauntlet-specific rules:`+
@@ -780,12 +877,12 @@ if(infocom.includes(cmd)) {
 		` Whoever wins the most legs wins the Gauntlet, and receives an additional 10" + starchip + ".`)
 	}
 
-	if (message.channel.id == keeperChannel) { 
+	if (message.channel.id == keeperChannelId) { 
 		return message.channel.send(`${fire} --- Keeper of the Forge --- ${fire}`+ 
 		`\nIn this channel, you get to `+
 		` woof.`)	}
 
-	if (message.channel.id == triviaChannel) { 
+	if (message.channel.id == triviaChannelId) { 
 		return message.channel.send(`${stoned} --- Trivia Center --- ${stoned}`+ 
 		`\nThe King of Games must also be a student of the game.`+
 		` That means being familiar with the old Champions and their decks,`+
@@ -799,11 +896,11 @@ if(infocom.includes(cmd)) {
 		` There are 1000 total questions, so hit the books and then hit those keys! ${red}`)
 	}
 		
-	if (message.channel.id == draftChannel) { 
+	if (message.channel.id == draftChannelId) { 
 		return message.channel.send(`${puzzle} --- Draft Room --- ${puzzle}`+ 
 		`\nIn this channel, you get to test out the game's most powerful cards.`+
 		` Simply align yourself with a Tribe and wage war at their side.`+
-		`\n\nTo compete in the Arena, type **!join** in <#${arenaChannel}>.`+
+		`\n\nTo compete in the Arena, type **!join** in <#${arenaChannelId}>.`+
 		` It requires 6 players to launch.`+
 		` When it starts, you are loaned a 60-card deck, and you get 5 minutes to cut up to 20 cards.`+
 		`\n\nThe Arena is a Round Robin, singles-games tournament.`+
@@ -814,18 +911,18 @@ if(infocom.includes(cmd)) {
 		` You can use **!barter "card"** to exchange 8 Vouchers for a Tribal prize card.`)
 	}
 
-	return message.channel.send(`Use this command in channels such as <#${duelRequestChannel}>, <#${marketPlaceChannel}>, <#${tournamentChannel}>, <#${arenaChannel}>, <#${keeperChannel}>, and <#${triviaChannel}> to learn how those parts of the game work.`)
+	return message.channel.send(`Use this command in channels such as <#${duelRequestChannel}>, <#${marketPlaceChannelId}>, <#${tournamentChannelId}>, <#${arenaChannelId}>, <#${keeperChannelId}>, and <#${triviaChannelId}> to learn how those parts of the game work.`)
 }
 
 
 //DECK
 if(deckcom.includes(cmd)) {
-	if (message.channel.id === arenaChannel) {
+	if (message.channel.id === arenaChannelId) {
 		const deck = args[0] || await getArenaSample(message)
 		if (!deck) return
-		if (!arenas[deck]) return message.channel.send(`I do not recognize that tribe.`)
+		if (!arenas.decks[deck]) return message.channel.send(`I do not recognize that tribe.`)
 
-		return message.channel.send(`Arena ${capitalize(deck)} ${eval(deck)} Deck (staples in the side):\n<${arenas[deck].url}>\n${arenas[deck].screenshot}`)
+		return message.channel.send(`Arena ${capitalize(deck)} ${eval(deck)} Deck (staples in the side):\n<${arenas.decks[deck].url}>\n${arenas.decks[deck].screenshot}`)
 	} else {
 		const wallet = await Wallet.findOne( { where: { playerId: maid }, include: Player })
 		const merchbot_wallet = await Wallet.findOne( { where: { playerId: merchbotId } })
@@ -956,6 +1053,7 @@ if(profcom.includes(cmd)) {
 			name: player.profile.card
 		}
 	})
+	
 	const card_image = card ? `https://ygoprodeck.com/pics/${card.image}` : ''
 	const quote = player.profile.quote ? `"${player.profile.quote}" -- ${player.profile.author}` : ''
 
@@ -1634,7 +1732,6 @@ if(wishlistcom.includes(cmd)) {
 	return
 }
 
-
 //WALLET
 if(cmd === `!wallet`) {
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
@@ -1645,14 +1742,14 @@ if(cmd === `!wallet`) {
 	const results = [`${FiC} --- ${wallet.player.name}'s Wallet --- ${FiC}`]
 	results.push(`Starchips: ${wallet.starchips}${starchips}`)
 	results.push(`Stardust: ${wallet.stardust}${stardust}`)
-	results.push(`Tickets: ${wallet.tickets} ${tix}`)
-	results.push(`Credits: ${wallet.credits} ${credits}`)
+	//results.push(`Tickets: ${wallet.tickets} ${tix}`)
+	//results.push(`Credits: ${wallet.credits} ${credits}`)
 	results.push(`Mushrooms: ${wallet.mushroom} ${mushroom}`)
-	results.push(`Eggs: ${wallet.egg} ${egg}`)
-	results.push(`Hooks: ${wallet.hook} ${hook}`)
-	results.push(`Roses: ${wallet.rose} ${rose}`)
-	results.push(`Cacti: ${wallet.cactus} ${cactus}`)
 	results.push(`Moai: ${wallet.moai} ${moai}`)
+	results.push(`Roses: ${wallet.rose} ${rose}`)
+	results.push(`Hooks: ${wallet.hook} ${hook}`)
+	results.push(`Eggs: ${wallet.egg} ${egg}`)
+	results.push(`Cacti: ${wallet.cactus} ${cactus}`)
 
 	return message.channel.send(results.join('\n'))
 }
@@ -1693,10 +1790,8 @@ if (losscom.includes(cmd)) {
 	const oppo = messageArray[1].replace(/[\\<>@#&!]/g, "")
 	const winner = message.guild.members.cache.get(oppo)
 	const loser = message.guild.members.cache.get(maid)
-	const winningPlayer = await Player.findOne({ where: { id: oppo } })
-	const losingPlayer = await Player.findOne({ where: { id: maid } })
-	const winnersWallet = await Wallet.findOne({ where: {playerId: oppo } })
-	const losersWallet = await Wallet.findOne({ where: {playerId: maid } })
+	const winningPlayer = await Player.findOne({ where: { id: oppo }, include: Wallet })
+	const losingPlayer = await Player.findOne({ where: { id: maid }, include: Wallet })
 
 	if (!oppo || oppo == '@') return message.channel.send(`No player specified.`)
 	if (oppo == maid) return message.channel.send(`You cannot lose a match to yourself.`)
@@ -1712,9 +1807,9 @@ if (losscom.includes(cmd)) {
 	// 			if (err) {
 	// 				return message.channel.send(`Error: the current tournament, "${name}", could not be accessed.`)
 	// 			} else {
-	// 				const tournamentChannel = formats[status['format']] ? formats[status['format']].channel : null
-	// 				if (formatChannel !== tournamentChannel) {
-	// 					return message.channel.send(`Please report this match in the appropriate channel: <#${tournamentChannel}>.`)
+	// 				const tournamentChannelId = formats[status['format']] ? formats[status['format']].channel : null
+	// 				if (formatChannel !== tournamentChannelId) {
+	// 					return message.channel.send(`Please report this match in the appropriate channel: <#${tournamentChannelId}>.`)
 	// 				} else {
 	// 					return getParticipants(message, data, loser, winner, formatName, formatDatabase)
 	// 				}
@@ -1724,12 +1819,13 @@ if (losscom.includes(cmd)) {
 	// }
 
 	if (message.member.roles.cache.some(role => role.id === arenaRole)) {
-		if (message.channel !== client.channels.cache.get(arenaChannel)) return message.channel.send(`Please report your loss in: <#${arenaChannel}>`)
+		if (message.channel !== client.channels.cache.get(arenaChannelId)) return message.channel.send(`Please report your loss in: <#${arenaChannelId}>`)
 		
 		const losingContestant = await Arena.findOne({ where: { playerId: maid }})
 		if (!losingContestant) return message.channel.send(`You are not in the current Arena.`)
 		const winningContestant = await Arena.findOne({ where: { playerId: oppo }})
 		if (!winningContestant) return message.channel.send(`That player is not your Arena opponent.`)
+		if (!losingContestant.is_playing || !winningContestant.is_playing) return message.channel.send(`Your match result was already recorded for this round of the Arena.`)
 
 		const info = await Info.findOne({ where: { element: 'arena' } })
 		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
@@ -1750,13 +1846,24 @@ if (losscom.includes(cmd)) {
 		}
 
 		if (!correct_pairing) return message.channel.send(`That player is not your Arena opponent.`)
-		
-		winnersWallet.starchips += 2
-		await winnersWallet.save()
-		losersWallet.starchips++
-		await losersWallet.save()
+
+		winningPlayer.arena_wins++
+		await winningPlayer.save()
+
+		winningPlayer.wallet.starchips += 2
+		await winningPlayer.wallet.save()
+
+		losingPlayer.arena_losses++
+		await losingPlayer.save()
 	
+		losingPlayer.wallet.starchips++
+		await losingPlayer.wallet.save()
+
+		losingContestant.is_playing = false
+		await losingContestant.save()
+
 		winningContestant.score++
+		winningContestant.is_playing = false
 		await winningContestant.save()
 
 		await Match.create({ game_mode: "arena", winner: winningPlayer.id, loser: losingPlayer.id, delta: 0, chipsWinner: 2, chipsLoser: 1 })
@@ -1777,6 +1884,9 @@ if (losscom.includes(cmd)) {
 	if (winningPlayer.current_streak > winningPlayer.longest_streak) winningPlayer.longest_streak = winningPlayer.current_streak
 	if (winningPlayer.stats > winningPlayer.best_stats) winningPlayer.best_stats = winningPlayer.stats
 	await winningPlayer.save()
+
+	winningPlayer.wallet.starchips += chipsWinner
+	await winningPlayer.wallet.save()
 	
 	losingPlayer.stats -= delta
 	losingPlayer.backup = origStatsLoser
@@ -1784,11 +1894,8 @@ if (losscom.includes(cmd)) {
 	losingPlayer.current_streak = 0
 	await losingPlayer.save()
 
-	winnersWallet.starchips += chipsWinner
-	await winnersWallet.save()
-
-	losersWallet.starchips += chipsLoser
-	await losersWallet.save()
+	losingPlayer.wallet.starchips += chipsLoser
+	await losingPlayer.wallet.save()
 
 	const previouslyDefeated = await Match.count({
 		where: {
@@ -1812,10 +1919,8 @@ if (manualcom.includes(cmd)) {
 	const loserId = messageArray[2].replace(/[\\<>@#&!]/g, "")
 	const winner = message.guild.members.cache.get(winnerId)
 	const loser = message.guild.members.cache.get(loserId)
-	const winningPlayer = await Player.findOne({ where: { id: winnerId } })
-	const losingPlayer = await Player.findOne({ where: { id: loserId } })
-	const winnersWallet = await Wallet.findOne({ where: { playerId: winnerId } })
-	const losersWallet = await Wallet.findOne({ where: { playerId: loserId } })
+	const winningPlayer = await Player.findOne({ where: { id: winnerId }, include: Wallet })
+	const losingPlayer = await Player.findOne({ where: { id: loserId }, include: Wallet })
 
 	if (!isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	if (!winner || !loser) return message.channel.send(`Please specify 2 players.`)
@@ -1831,8 +1936,8 @@ if (manualcom.includes(cmd)) {
 	// 			if (err) {
 	// 				return message.channel.send(`Error: the current tournament, "${name}", could not be accessed.`)
 	// 			} else {
-	// 				if (message.channel !== tournamentChannel) {
-	// 					return message.channel.send(`Please report this match in the appropriate channel: <#${tournamentChannel}>.`)
+	// 				if (message.channel !== tournamentChannelId) {
+	// 					return message.channel.send(`Please report this match in the appropriate channel: <#${tournamentChannelId}>.`)
 	// 				} else {
 	// 					return getParticipants(message, data, loser, winner)
 	// 				}
@@ -1842,7 +1947,7 @@ if (manualcom.includes(cmd)) {
 	// }
 
 	if (winner.roles.cache.some(role => role.id === arenaRole) || loser.roles.cache.some(role => role.id === arenaRole)) {
-		if (message.channel !== client.channels.cache.get(arenaChannel)) return message.channel.send(`Please report this loss in: <#${arenaChannel}>`)
+		if (message.channel !== client.channels.cache.get(arenaChannelId)) return message.channel.send(`Please report this loss in: <#${arenaChannelId}>`)
 		
 		const losingContestant = await Arena.findOne({ where: { playerId: loserId }})
 		if (!losingContestant) return message.channel.send(`You are not in the current Arena.`)
@@ -1859,69 +1964,82 @@ if (manualcom.includes(cmd)) {
             info.round === 5 ? [["P1", "P6"], ["P2", "P3"], ["P4", "P5"]] : 
             null
 	
-		let correct_pairing = false
-		for (let i = 0; i < 3; i++) {
-			if ((pairings[i][0] === losingContestant.contestant && 
-					pairings[i][1] === winningContestant.contestant) ||
-				(pairings[i][0] === winningContestant.contestant &&
-					pairings[i][1] === losingContestant.contestant)) correct_pairing = true
-		}
+		if (pairings) {
+			let correct_pairing = false
+			for (let i = 0; i < 3; i++) {
+				if ((pairings[i][0] === losingContestant.contestant && 
+						pairings[i][1] === winningContestant.contestant) ||
+					(pairings[i][0] === winningContestant.contestant &&
+						pairings[i][1] === losingContestant.contestant)) correct_pairing = true
+			}
 
-		if (!correct_pairing) return message.channel.send(`That player is not your Arena opponent.`)
+			if (!correct_pairing) return message.channel.send(`That player is not your Arena opponent.`)
+		}
 		
-		winnersWallet.starchips += 2
-		await winnersWallet.save()
-		losersWallet.starchips++
-		await losersWallet.save()
+		losingPlayer.arena_losses++
+		await losingPlayer.save()
+
+		losingPlayer.wallet.starchips++
+		await losingPlayer.wallet.save()
 	
+		losingContestant.is_playing = false
+		await losingContestant.save()
+
+		winningPlayer.arena_wins++
+		await winningPlayer.save()
+
+		winningPlayer.wallet.starchips += 2
+		await winningPlayer.wallet.save()
+
 		winningContestant.score++
+		winningContestant.is_playing = false
 		await winningContestant.save()
 
 		await Match.create({ game_mode: "arena", winner: winningPlayer.id, loser: losingPlayer.id, delta: 0, chipsWinner: 2, chipsLoser: 1 })
 		message.channel.send(`A manual Arena loss by ${losingPlayer.name} (+1${starchips}) to ${winningPlayer.name} (+2${starchips}) has been recorded.`)
 		return checkArenaProgress(info)
-	}
+	} else {
+		const origStatsWinner = winningPlayer.stats
+		const origStatsLoser = losingPlayer.stats
+		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
+		const chipsWinner = Math.round((delta)) < 6 ? 6 : Math.round((delta)) > 20 ? 20 : Math.round((delta))
+		const chipsLoser = (origStatsLoser - origStatsWinner) < 72 ? 3 : (origStatsLoser - origStatsWinner) >=150 ? 1 : 2
 
-	const origStatsWinner = winningPlayer.stats
-	const origStatsLoser = losingPlayer.stats
-	const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
-	const chipsWinner = Math.round((delta+5)) < 9 ? 9 : Math.round((delta)) > 30 ? 30 : Math.round((delta+5))
-	const chipsLoser = (origStatsLoser - origStatsWinner) < 72 ? 5 : (origStatsLoser - origStatsWinner) >=150 ? 3 : 4
-
-	winningPlayer.stats += delta
-	winningPlayer.backup = origStatsWinner
-	winningPlayer.wins++
-	winningPlayer.current_streak++
-	if (winningPlayer.current_streak > winningPlayer.longest_streak) winningPlayer.longest_streak = winningPlayer.current_streak
-	if (winningPlayer.stats > winningPlayer.best_stats) winningPlayer.best_stats = winningPlayer.stats
-	await winningPlayer.save()
-	
-	losingPlayer.stats -= delta
-	losingPlayer.backup = origStatsLoser
-	losingPlayer.losses++
-	losingPlayer.current_streak = 0
-	await losingPlayer.save()
-
-	winnersWallet.starchips += chipsWinner
-	await winnersWallet.save()
-
-	losersWallet.starchips += chipsLoser
-	await losersWallet.save()
-
-	const previouslyDefeated = await Match.count({
-		where: {
-			winner: winnerId,
-			loser: loserId
-		}
-	})
-
-	if (!previouslyDefeated) {
-		winningPlayer.vanquished_foes++
+		winningPlayer.stats += delta
+		winningPlayer.backup = origStatsWinner
+		winningPlayer.wins++
+		winningPlayer.current_streak++
+		if (winningPlayer.current_streak > winningPlayer.longest_streak) winningPlayer.longest_streak = winningPlayer.current_streak
+		if (winningPlayer.stats > winningPlayer.best_stats) winningPlayer.best_stats = winningPlayer.stats
 		await winningPlayer.save()
+		
+		losingPlayer.stats -= delta
+		losingPlayer.backup = origStatsLoser
+		losingPlayer.losses++
+		losingPlayer.current_streak = 0
+		await losingPlayer.save()
+	
+		winningPlayer.wallet.starchips += chipsWinner
+		await winningPlayer.wallet.save()
+	
+		losingPlayer.wallet.starchips += chipsLoser
+		await losingPlayer.wallet.save()
+	
+		const previouslyDefeated = await Match.count({
+			where: {
+				winner: winnerId,
+				loser: loserId
+			}
+		})
+	
+		if (!previouslyDefeated) {
+			winningPlayer.vanquished_foes++
+			await winningPlayer.save()
+		}
+	
+		await Match.create({ game: "ranked", winner: winner.user.id, loser: loser.user.id, delta: delta, chipsWinner: chipsWinner, chipsLoser: chipsLoser })
+		return message.channel.send(`A manual loss by ${loser.user.username} (+${chipsLoser}${starchips}) to ${winner.user.username} (+${chipsWinner}${starchips}) has been recorded.`)
 	}
-
-	await Match.create({ game: "ranked", winner: winner.user.id, loser: loser.user.id, delta: delta, chipsWinner: chipsWinner, chipsLoser: chipsLoser })
-	return message.channel.send(`A manual loss by ${loser.user.username} to ${winner.user.username} has been recorded. ${winner.user.username} earned ${chipsWinner}${starchips}, and ${loser.user.username} earned ${chipsLoser}${starchips}.`)
 }
 
 //NO SHOW
@@ -1980,44 +2098,72 @@ if (h2hcom.includes(cmd)) {
 
 //UNDO
 if (undocom.includes(cmd)) {
-	const allMatches = await Match.findAll()
+	const game_mode = message.channel === client.channels.cache.get(arenaChannelId) ? 'arena' :
+		message.channel === client.channels.cache.get(keeperChannelId) ? 'keeper' :
+		message.channel === client.channels.cache.get(draftChannelId) ? 'draft' :
+		'ranked'
+
+	const allMatches = await Match.findAll({ where: { game_mode } })
 	const lastMatch = allMatches.slice(-1)[0]
 	const winnerId = lastMatch.winner
 	const loserId = lastMatch.loser
-	const winner = message.guild.members.cache.get(winnerId)
-	const loser = message.guild.members.cache.get(loserId)
-	const winningPlayer = await Player.findOne({ where: { id: winnerId } })
-	const losingPlayer = await Player.findOne({ where: { id: loserId } })
-	const winnersWallet = await Wallet.findOne({ where: { playerId: winnerId } })
-	const losersWallet = await Wallet.findOne({ where: { playerId: loserId } })
-	const prompt = (isMod(message.member) ? '' : ' Please get a Moderator to help you.')
-
-	if (maid !== loserId && !isMod(message.member)) return message.channel.send(`The last recorded match was ${loser.name}'s loss to ${winner.name}.${prompt}`)
-	if (winningPlayer.backup === null && maid !== loserId) return message.channel.send(`${winner.name} has no backup stats.${prompt}`)
-	if (winningPlayer.backup === null && maid === loserId) return message.channel.send(`Your last opponent, ${winner.name}, has no backup stats.${prompt}`)
-	if (losingPlayer.backup === null  && maid !== loserId) return message.channel.send(`${loser.name} has no backup stats.${prompt}`)
-	if (losingPlayer.backup === null && maid === loserId) return message.channel.send(`You have no backup stats.${prompt}`)
-
-	winningPlayer.stats = winningPlayer.backup
-	winningPlayer.backup = null
-	winningPlayer.wins--
-	winningPlayer.current_streak--
-	await winningPlayer.save()
-
-	losingPlayer.stats = losingPlayer.backup
-	losingPlayer.backup = null
-	losingPlayer.losses--
-	await losingPlayer.save()
+	const winningPlayer = await Player.findOne({ where: { id: winnerId }, include: Wallet })
+	const losingPlayer = await Player.findOne({ where: { id: loserId }, include: Wallet })
 	
-	winnersWallet.starchips -= lastMatch.chipsWinner
-	await winnersWallet.save()
+	const prompt = (isMod(message.member) ? '' : ' Please get a Moderator to help you.')
+	if (maid !== loserId && !isMod(message.member)) return message.channel.send(`You did not participate in the last recorded match.${prompt}`)
 
-	losersWallet.starchips -= lastMatch.chipsLoser
-	await losersWallet.save()
+	if (game_mode === 'arena') {
+		const winningContestant = await Arena.findOne({ where: { playerId: winnerId }})
+		const losingContestant = await Arena.findOne({ where: { playerId: loserId }})
 
-	await lastMatch.destroy()
+		winningContestant.score--
+		winningContestant.is_playing = true
+		await winningContestant.save()
 
-	return message.channel.send(`The last match in which ${winner.user.username} defeated ${loser.user.username} has been erased.`)
+		losingContestant.is_playing = true
+		await losingContestant.save()
+
+		winningPlayer.arena_wins--
+		await winningPlayer.save()
+
+		winningPlayer.wallet.starchips -= lastMatch.chipsWinner
+		await winningPlayer.wallet.save()
+
+		losingPlayer.arena_losses--
+		await losingPlayer.save()
+
+		losingPlayer.wallet.starchips -= lastMatch.chipsLoser
+		await losingPlayer.wallet.save()
+	
+		await lastMatch.destroy()
+		return message.channel.send(`The last Arena match in which ${winningPlayer.name} (-${lastMatch.chipsWinner}${starchips}) defeated ${losingPlayer.name} (-${lastMatch.chipsLoser}${starchips}) has been erased.`)
+	} else {
+		if (!winningPlayer.backup && maid !== loserId) return message.channel.send(`${winningPlayer.name} has no backup stats.${prompt}`)
+		if (!winningPlayer.backup && maid === loserId) return message.channel.send(`Your last opponent, ${winningPlayer.name}, has no backup stats.${prompt}`)
+		if (!losingPlayer.backup && maid !== loserId) return message.channel.send(`${losingPlayer.name} has no backup stats.${prompt}`)
+		if (!losingPlayer.backup && maid === loserId) return message.channel.send(`You have no backup stats.${prompt}`)
+	
+		winningPlayer.stats = winningPlayer.backup
+		winningPlayer.backup = null
+		winningPlayer.wins--
+		winningPlayer.current_streak--
+		await winningPlayer.save()
+	
+		losingPlayer.stats = losingPlayer.backup
+		losingPlayer.backup = null
+		losingPlayer.losses--
+		await losingPlayer.save()
+		
+		winningPlayer.wallet.starchips -= lastMatch.chipsWinner
+		await winningPlayer.wallet.save()
+	
+		losingPlayer.wallet.starchips -= lastMatch.chipsLoser
+		await losingPlayer.wallet.save()
+	
+		await lastMatch.destroy()
+		return message.channel.send(`The last match in which ${winningPlayer.name} (-${lastMatch.chipsWinner}${starchips}) defeated ${losingPlayer.name} (-${lastMatch.chipsLoser}${starchips}) has been erased.`)
+	}
 }
 
 //RANK
@@ -2052,7 +2198,7 @@ if (rankcom.includes(cmd)) {
     
 //QUEUE
 if(queuecom.includes(cmd)) {
-	if (message.channel === client.channels.cache.get(arenaChannel)) {
+	if (message.channel === client.channels.cache.get(arenaChannelId)) {
 		const queue = await Arena.findAll({ include: Player })
 		if (!queue.length) return message.channel.send(`The Arena queue is empty.`)
 		const results = []
@@ -2060,7 +2206,7 @@ if(queuecom.includes(cmd)) {
 			results.push(row.player.name)
 		})
 		return message.channel.send(results.join("\n"))
-	} else if (message.channel === client.channels.cache.get(draftChannel)) {
+	} else if (message.channel === client.channels.cache.get(draftChannelId)) {
 		const queue = await Draft.findAll({ where: { active: false }, include: Player })
 		if (!queue.length) return message.channel.send(`The Draft queue is empty.`)
 		const results = []
@@ -2068,7 +2214,7 @@ if(queuecom.includes(cmd)) {
 			results.push(row.player.name)
 		})
 		return message.channel.send(results.join("\n"))
-	} else if (message.channel === client.channels.cache.get(triviaChannel)) {
+	} else if (message.channel === client.channels.cache.get(triviaChannelId)) {
 		const queue = await Trivia.findAll({ include: Player })
 		if (!queue.length) return message.channel.send(`The Trivia queue is empty.`)
 		const results = []
@@ -2077,19 +2223,19 @@ if(queuecom.includes(cmd)) {
 		})
 		return message.channel.send(results.join("\n"))
 	} else {
-		return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannel}>, <#${draftChannel}>, or <#${triviaChannel}>.`)
+		return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannelId}>, <#${draftChannelId}>, or <#${triviaChannelId}>.`)
 	}
 }
 
 //JOIN
-if(cmd === `!join`) {
-	const game = message.channel === client.channels.cache.get(arenaChannel) ? "Arena"
-	: message.channel === client.channels.cache.get(triviaChannel) ? "Trivia"
-	: message.channel === client.channels.cache.get(draftChannel) ? "Draft"
-	: message.channel === client.channels.cache.get(tournamentChannel) ? "Tournament"
+if(joincom.includes(cmd)) {
+	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
+	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
+	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
+	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
 	: null
 
-	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${tournamentChannel}>, <#${arenaChannel}>, <#${draftChannel}>, or <#${triviaChannel}>.`)
+	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${tournamentChannelId}>, <#${arenaChannelId}>, <#${draftChannelId}>, or <#${triviaChannelId}>.`)
 	
 	const player = await Player.findOne({ where: { id: maid }})
 	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
@@ -2116,7 +2262,7 @@ if(cmd === `!join`) {
 					if (!deckListUrl) return
 					const deckName = await getDeckNameTournament(member, player)
 					if (!deckName) return
-					sendToTournamentChannel(player, deckListUrl, deckName)
+					sendTotournamentChannelId(player, deckListUrl, deckName)
 
 					if (resubmission) {
 						const entry = await Entry.findOne({ where: { playerId: player.id } })
@@ -2151,7 +2297,7 @@ if(cmd === `!join`) {
 									})
 
 									message.author.send(`Thanks! I have all the information we need from you. Good luck in the tournament!`)
-									return client.channels.cache.get(tournamentChannel).send(`<@${player.id}> is now registered for the tournament!`)
+									return client.channels.cache.get(tournamentChannelId).send(`<@${player.id}> is now registered for the tournament!`)
 								}
 							}
 						})	
@@ -2168,8 +2314,6 @@ if(cmd === `!join`) {
 
 	if (!alreadyIn) {
 		const count = await eval(game).count()
-		console.log('count', count)
-		console.log('game', game)
 		if (game === 'Arena' && count >= 6 || game === 'Trivia' && count === 5) {
 			return message.channel.send(`Sorry, ${player.name}, ${ game === 'Trivia' ? 'Trivia' : `the ${game}` } is full.`)
 		} 
@@ -2178,7 +2322,6 @@ if(cmd === `!join`) {
 		message.channel.send(`You joined the ${game} queue.`)
 		
 		if (game === 'Arena' && count === 5) {
-			console.log(`RUN THE ARENA!!!`)
 			info.status = 'confirming'
 			await info.save()
 			return startArena(message.guild)
@@ -2196,12 +2339,13 @@ if(cmd === `!join`) {
 
 //RESET
 if (cmd === `!reset`) {
-	const game = message.channel === client.channels.cache.get(arenaChannel) ? "Arena"
-	: message.channel === client.channels.cache.get(triviaChannel) ? "Trivia"
-	: message.channel === client.channels.cache.get(draftChannel) ? "Draft"
+	if (!isMod(message.member)) return message.channel.send('You do not have permission to do that.')
+	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
+	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
+	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
 	: null
 
-	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannel}>, <#${draftChannel}>, or <#${triviaChannel}>.`)
+	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannelId}>, <#${draftChannelId}>, or <#${triviaChannelId}>.`)
 	
 	const info = await Info.findOne({ where: { element: game.toLowerCase() }})
 	if (!info) return message.channel.send(`Could not find game-mode: "${game}".`)
@@ -2228,15 +2372,15 @@ if (cmd === `!reset`) {
 
 //DROP
 if(dropcom.includes(cmd)) {
-	const game = message.channel === client.channels.cache.get(arenaChannel) ? "Arena"
-	: message.channel === client.channels.cache.get(triviaChannel) ? "Trivia"
-	: message.channel === client.channels.cache.get(draftChannel) ? "Draft"
-	: message.channel === client.channels.cache.get(tournamentChannel) ? "Tournament"
+	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
+	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
+	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
+	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
 	: null
 
 	if (!game) return message.channel.send(
 		`Try using **${cmd}** in channels like: 
-		<#${tournamentChannel}>, <#${arenaChannel}>, <#${draftChannel}>, or <#${triviaChannel}>.`
+		<#${tournamentChannelId}>, <#${arenaChannelId}>, <#${draftChannelId}>, or <#${triviaChannelId}>.`
 		)
 	
 	if (game === 'Tournament') {
@@ -2276,13 +2420,13 @@ if (cmd.toLowerCase() === `!remove`) {
 	if (!isMod(message.member)) return message.channel.send('You do not have permission to do that.')
 	const member = message.mentions.members.first()
 	const playerId = member && member.user ? member.user.id : null
-	const game = message.channel === client.channels.cache.get(arenaChannel) ? "Arena"
-	: message.channel === client.channels.cache.get(triviaChannel) ? "Trivia"
-	: message.channel === client.channels.cache.get(draftChannel) ? "Draft"
-	: message.channel === client.channels.cache.get(tournamentChannel) ? "Tournament"
+	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
+	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
+	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
+	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
 	: null
 
-	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${tournamentChannel}>, <#${arenaChannel}>, <#${draftChannel}>, or <#${triviaChannel}>.`)
+	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${tournamentChannelId}>, <#${arenaChannelId}>, <#${draftChannelId}>, or <#${triviaChannelId}>.`)
 	if (!playerId) return message.channel.send(`Please specify the player you wish to remove from ${game !== 'Trivia' ? 'the' : ''} ${game}.`)
 
 	if (game === 'Tournament') {
@@ -3716,7 +3860,7 @@ if(cmd === `!barter`) {
 		card_name === `Viper's Rebirth` ? 'cactus' :
 		null
 
-	if (wallet[currency] < 8) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${wallet[currency]}${eval(currency)} and ${card} costs 8${eval(currency)}.`)
+	if (wallet[currency] < 10) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${wallet[currency]} ${eval(currency)} and ${card} costs 10 ${eval(currency)}.`)
 
 	const inv = await Inventory.findOne({ where: {
 		printId: print.id,
@@ -3736,10 +3880,10 @@ if(cmd === `!barter`) {
 		})
 	}
 
-	wallet[currency] -= 8
+	wallet[currency] -= 10
 	await wallet.save()
 
-	return message.channel.send(`Thanks! You exchanged 8${eval(currency)} for a copy of ${card}.`)
+	return message.channel.send(`Thanks! You exchanged 10 ${eval(currency)} for a copy of ${card}.`)
 }
 
 //BID
@@ -4002,11 +4146,6 @@ if(cmd === `!challenge` || cmd === `!gauntlet`) {
 	if(!person2) { return message.channel.send("<@" + rMem + ">, You are not cached in the server, so you cannot play in the Gauntlet. Please change your visibility to \"Online\" to cache yourself."); }
 
 	return Merch.data.getGauntletConfirmation(client, message, maid, rMem);
-}
-
-//NICKNAMES
-if(cmd === `!nicknames` || cmd === `!nicks`) {
-	return
 }
 
 //CLEAR

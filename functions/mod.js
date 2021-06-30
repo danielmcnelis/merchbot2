@@ -3,7 +3,6 @@ const { yescom } = require('../static/commands.json')
 const { capitalize } = require('./utility')
 
 const askForGrindAllConfirmation = async (message, index = 0) => {
-    
     const prompts = [
         `Are you sure you want to grind everyone's ${starchips}s into ${stardust}?`,
         `${capitalize(message.author.username)}, Listen pal. Hold on just a moment there. Are you sure you **ABSOLUTELY CERTAIN** you want to grind everyone's ${starchips}s into ${stardust}?`,

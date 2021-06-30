@@ -8,21 +8,21 @@ const { awardPacksToShop } = require('./packs')
 const adminId = '194147938786738176'
 const { client } = require('../static/clients.js')
 const { fpRole } = require('../static/roles.json')
-const { announcementsChannel, botSpamChannel, shopChannel } = require('../static/channels.json')
+const { announcementsChannelId, botSpamChannelId, shopChannelId } = require('../static/channels.json')
 
 // OPEN SHOP
 const openShop = async () => {
 	const shop = await Info.findOne({ where: { element: 'shop' }})
-	if (!shop) return client.channels.cache.get(botSpamChannel).send(`Could not find game element: "shop".`)
+	if (!shop) return client.channels.cache.get(botSpamChannelId).send(`Could not find game element: "shop".`)
 
 	if (shop.status === 'open') {
-		return client.channels.cache.get(botSpamChannel).send(`The Shop ${merchant} was already open. ${open}`)
+		return client.channels.cache.get(botSpamChannelId).send(`The Shop ${merchant} was already open. ${open}`)
 	} else {
 		shop.status = 'open'
 		await shop.save()
         await processBids()
         updateShop()
-        client.channels.cache.get(announcementsChannel).send(`Good morning, <@&${fpRole}>, The Shop ${merchant} is now open! ${open}`)
+        client.channels.cache.get(announcementsChannelId).send(`Good morning, <@&${fpRole}>, The Shop ${merchant} is now open! ${open}`)
         const shopCountdown = getShopCountdown()
         console.log('setting timeout to closeShop():', shopCountdown)
 		return setTimeout(() => closeShop(), shopCountdown)
@@ -32,9 +32,9 @@ const openShop = async () => {
 // CLOSE SHOP
 const closeShop = async () => {
     const shop = await Info.findOne({ where: { element: 'shop' }})
-	if (!shop) return client.channels.cache.get(botSpamChannel).send(`Could not find game element: "shop".`)
+	if (!shop) return client.channels.cache.get(botSpamChannelId).send(`Could not find game element: "shop".`)
 	if (shop.status === 'closed') {
-		return client.channels.cache.get(botSpamChannel).send(`The Shop ${merchant} was already closed. ${closed}`)
+		return client.channels.cache.get(botSpamChannelId).send(`The Shop ${merchant} was already closed. ${closed}`)
 	} else {
 		shop.status = 'closed'
 		await shop.save()
@@ -52,7 +52,7 @@ const closeShop = async () => {
         }
 
         await restock()
-		client.channels.cache.get(announcementsChannel).send(`Good evening, <@&${fpRole}>, The Shop ${merchant} is now closed! ${closed}`)
+		client.channels.cache.get(announcementsChannelId).send(`Good evening, <@&${fpRole}>, The Shop ${merchant} is now closed! ${closed}`)
         const shopCountdown = getShopCountdown()
         console.log('setting timeout to openShop():', shopCountdown)
 		return setTimeout(() => openShop(), shopCountdown)
@@ -100,9 +100,6 @@ const getShopCountdown = () => {
             null
     }
 
-    console.log('hoursLeftInPeriod', hoursLeftInPeriod)
-    console.log('minsLeftInPeriod', minsLeftInPeriod)
-
     const shopCountdown = ( hoursLeftInPeriod * 60 + minsLeftInPeriod ) * 60 * 1000
     return shopCountdown
 }
@@ -131,7 +128,7 @@ const checkShopShouldBe = () => {
 
 // PROCESS BIDS
 const processBids = async () => {
-    const channel = client.channels.cache.get(announcementsChannel)
+    const announcementsChannel = client.channels.cache.get(announcementsChannelId)
     const allBids = await Bid.findAll({ include: Auction , order: [["amount", "DESC"]] })
 
     for (let i = 0; i < allBids.length; i++) {
@@ -149,11 +146,11 @@ const processBids = async () => {
          } })
 
         if (!inv) {
-            channel.send(`${wallet.player.name} placed a ${bid.amount}${stardust} bid on ${print.card_name} but they were outbid.`)
+            announcementsChannel.send(`${wallet.player.name} placed a ${bid.amount}${stardust} bid on ${print.card_name} but they were outbid.`)
             continue
         }
         if (wallet.stardust < bid.amount) {
-            channel.send(`${wallet.player.name} would have won ${print.card_name} for ${bid.amount}${stardust} but they are too poor.`) 
+            announcementsChannel.send(`${wallet.player.name} would have won ${print.card_name} for ${bid.amount}${stardust} but they are too poor.`) 
             continue
         }
         
@@ -185,7 +182,7 @@ const processBids = async () => {
         await print.save()
 
         await bid.destroy()
-        channel.send(`<@${wallet.player.id}> won a copy of ${eval(print.rarity)}${print.card_code} - ${print.card_name} for ${bid.amount}${stardust}. Congratulations!`) 
+        announcementsChannel.send(`<@${wallet.player.id}> won a copy of ${eval(print.rarity)}${print.card_code} - ${print.card_name} for ${bid.amount}${stardust}. Congratulations!`) 
     }
 
     const allAuctions = await Auction.findAll()
@@ -227,21 +224,21 @@ const restock = async () => {
     if (weightedCount < 1) weightedCount = 1
 	const count = Math.ceil(weightedCount / 8)
     const newlyInStock = await awardPacksToShop(count)
-    if (!newlyInStock) return client.channels.cache.get(shopChannel).send(`Error awarding ${count} packs to shop.`)
+    if (!newlyInStock) return client.channels.cache.get(shopChannelId).send(`Error awarding ${count} packs to shop.`)
     else return postBids(newlyInStock)
 }
 
 // UPDATE SHOP
 const updateShop = async () => {
-    const channel = client.channels.cache.get(shopChannel)
-    channel.bulkDelete(100)
+    const shopChannel = client.channels.cache.get(shopChannelId)
+    shopChannel.bulkDelete(100)
 
     setTimeout(() => {
-        channel.bulkDelete(100)
+        shopChannel.bulkDelete(100)
     }, 2000)
     
     setTimeout(() => {
-        channel.bulkDelete(100)
+        shopChannel.bulkDelete(100)
     }, 4000)
 
     setTimeout(async () => {
@@ -295,21 +292,21 @@ const updateShop = async () => {
             results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(row.print.rarity)}${row.card_code} - ${row.print.card_name} - ${row.quantity}`) 
         }
     
-        for (let i = 0; i < results.length; i += 10) client.channels.cache.get(shopChannel).send(results.slice(i, i+10))
+        for (let i = 0; i < results.length; i += 10) shopChannel.send(results.slice(i, i+10))
     }, 5000)
 }
 
 // POST BIDS
 const postBids = async (newlyInStock) => {
-    const channel = client.channels.cache.get(shopChannel)
-    channel.bulkDelete(100)
+    const shopChannel = client.channels.cache.get(shopChannelId)
+    shopChannel.bulkDelete(100)
     
     setTimeout(() => {
-        channel.bulkDelete(100)
+        shopChannel.bulkDelete(100)
     }, 2000)
     
     setTimeout(() => {
-        channel.bulkDelete(100)
+        shopChannel.bulkDelete(100)
     }, 4000)
 
     setTimeout(async () => {
@@ -346,7 +343,7 @@ const postBids = async (newlyInStock) => {
     
         if (!newlyInStock.length) results.push('N/A')
         for (let i = 0; i < newlyInStock.length; i++) {
-            const card_code = newlyInStock[i]
+            const card_code = newlyInStock[i].card_code
             const row = await Inventory.findOne({
                 where: {
                     playerId: merchbotId,
@@ -359,7 +356,7 @@ const postBids = async (newlyInStock) => {
             results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(row.print.rarity)}${row.card_code} - ${row.print.card_name} - ${row.quantity}`) 
         }
     
-        for (let i = 0; i < results.length; i += 10) channel.send(results.slice(i, i+10))
+        for (let i = 0; i < results.length; i += 10) shopChannel.send(results.slice(i, i+10))
     }, 5000)
 }
 
@@ -459,17 +456,17 @@ const getBarterCard = async (message) => {
     }).then(async collected => {
 		const response = collected.first().content.toLowerCase()
         let index
-        if(response.includes('1')) {
+        if(response.includes('1') || response.includes('desm') || response.includes('devil')) {
             index = 0
-        } else if(response.includes('2')) {
+        } else if(response.includes('2') || response.includes('koa') || response.includes('meiru') || response.includes('guardian')) {
             index = 1
-        } else if(response.includes('3')) {
+        } else if(response.includes('3') || response.includes('rose') || response.includes('lover')) {
             index = 2
-        } else if(response.includes('4')) {
+        } else if(response.includes('4') || response.includes('moray') || response.includes('greed')) {
             index = 3
-        } else if(response.includes('5')) {
+        } else if(response.includes('5') || response.includes('space') || response.includes('time') || response.includes('trans')) {
             index = 4
-        } else if(response.includes('6')) {
+        } else if(response.includes('6') || response.includes('viper') || response.includes('rebirth')) {
             index = 5
         } else {
             message.channel.send(`You did not select a valid option.`)

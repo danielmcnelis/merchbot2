@@ -155,7 +155,7 @@ const seed = async (message, challongeClient, name, participantId, index) => {
                 if (err) {
                     console.log(err)
                     // status['seeded'] = false
-                    // fs.writeFile("./static/status.json", JSON.stringify(status), (err) => { 
+                    // fs.writeFile("./static/ChannelId", JSON.stringify(status), (err) => { 
                     //     if (err) console.log(err)
                     // })
                     return message.channel.send(`Something went wrong. ${data.participant.name} should be the ${index+1} seed but there was an error.`)

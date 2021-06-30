@@ -90,6 +90,21 @@ const askForRarity = async (message, set, currentPrints) => {
     return collected
 }
 
+const collectNicknames = async (message, card_name) => {
+    const filter = m => m.author.id === message.author.id
+    const msg = await message.channel.send(`Type new nicknames for ${card_name} into the chat one at a time.\n\nThis collection will last 15s.`)
+    const collected = await msg.channel.awaitMessages(filter, {
+        time: 15000
+    }).then(collected => {
+        return collected
+    }).catch(err => {
+        console.log(err)
+        return
+    })
+
+    return collected
+}
+
 const selectPrint = async (message, playerId, card_name) => {
     const prints = await Print.findAll({ 
         where: { card_name: card_name },
@@ -162,6 +177,7 @@ module.exports = {
     askForCardSlot,
     askForRarity,
     askForSetToPrint,
+    collectNicknames,
     getNewMarketPrice,
     selectPrint
 }

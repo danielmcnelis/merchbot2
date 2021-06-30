@@ -1227,7 +1227,7 @@ if (cmd === `!shop`) {
 	} else {
 		const query = args.join(" ")
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-		const card_name = findCard(query, fuzzyPrints, fuzzyPrints2)
+		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
 		if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
@@ -1557,7 +1557,7 @@ if(bindercom.includes(cmd)) {
 		const query = inputs[j]
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-		const card_name = findCard(query, fuzzyPrints, fuzzyPrints2)
+		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
 		if (!print) {
 			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
@@ -1623,7 +1623,7 @@ if(cmd === `!search`) {
 	const query = args.join(' ')
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-	const card_name = findCard(query, fuzzyPrints, fuzzyPrints2)
+	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
 	if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
@@ -1694,7 +1694,7 @@ if(wishlistcom.includes(cmd)) {
 		const query = inputs[j]
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-		const card_name = findCard(query, fuzzyPrints, fuzzyPrints2)
+		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
 		if (!print) {
 			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
@@ -2778,7 +2778,7 @@ if(cmd === `!alc` ||cmd === `!alch` || cmd === `!alchemy`) {
 	if (!args[0]) return message.channel.send(`Please specify the card you wish to transmute into ${starchips}.`)
 	
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-	const card_name = findCard(query, fuzzyPrints, fuzzyPrints2)
+	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
@@ -2850,7 +2850,7 @@ if(cmd === `!award`) {
 	if (!quantity) return message.channel.send(`Please specify the number of items you wish to award.`)
 	if (!item) return message.channel.send(`Please specify the item you wish to award.`)
 
-	const card_name = findCard(item, fuzzyPrints, fuzzyPrints2)
+	const card_name = await findCard(item, fuzzyPrints, fuzzyPrints2)
 	const card_code = `${item.slice(0, 3).toUpperCase()}-${item.slice(-3)}`
 	const print = await Print.findOne({ where: { card_code: card_code }})
 	const prints = await Print.findAll({ 
@@ -3665,7 +3665,7 @@ if(cmd === `!sell`) {
 		if (!query) return message.channel.send(`Please specify the card(s) you wish to sell.`)
 
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-		const card_name = findCard(query, fuzzyPrints, fuzzyPrints2)
+		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
@@ -3773,7 +3773,7 @@ if(cmd === `!buy`) {
 	if (!query) return message.channel.send(`Please specify the card you wish to buy.`)
 
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-	const card_name = findCard(query, fuzzyPrints, fuzzyPrints2)
+	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
@@ -3946,7 +3946,7 @@ if(cmd === `!trade`) {
 		if (!query) return message.channel.send(`Please specify the card(s) you wish to trade.`)
 
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-		const card_name = findCard(query, fuzzyPrints, fuzzyPrints2)
+		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
@@ -3986,7 +3986,7 @@ if(cmd === `!trade`) {
 		if (!query) return message.channel.send(`Please specify the card(s) you wish to trade.`)
 
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-		const card_name = findCard(query, fuzzyPrints, fuzzyPrints2)
+		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, partner, card_name) : null
@@ -4180,7 +4180,7 @@ if(cmd === `!adjust`) {
 	
 	const query = args.join(' ')	
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-	const card_name = findCard(query, fuzzyPrints, fuzzyPrints2)
+	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
 	if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
@@ -4204,7 +4204,7 @@ if(cmd === `!move`) {
 	if (!args.length) return message.channel.send(`Please specify the card you wish to move on the Forbidden & Limited list.`)
 	
 	const query = args.join(' ')
-	const card_name = findCard(query, fuzzyPrints, fuzzyPrints2)
+	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 	const card = card_name ? await Card.findOne({ where: { name: card_name }}) : null
 	if (!card) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 	let konami_code = card.image.slice(0, -4)

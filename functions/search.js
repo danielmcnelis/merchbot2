@@ -79,8 +79,8 @@ const fetchAllUniquePrintNames = async () => {
 //FIND CARD
 const findCard = async (query, fuzzyCards, fuzzyCards2) => {
 	const nickname = await Nickname.findOne({ where: { alius: query } })
-	if (nickname) return nickname.card_name
-	
+	if (nickname && nickname.card_name) return nickname.card_name 
+
     const fuzzy_card = fuzzyCards.get(query, null, 0.36) || []
 	const fuzzy_card_2 = fuzzyCards2.get(query, null, 0.36) || []
 	const fuzzy_results = [...fuzzy_card, ...fuzzy_card_2]

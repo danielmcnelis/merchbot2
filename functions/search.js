@@ -2,7 +2,7 @@
 //SEARCH FUNCTIONS
 const Discord = require('discord.js')
 const { Op } = require('sequelize')
-const { Card, Print } = require('../db/index.js')
+const { Card, Nickname, Print } = require('../db/index.js')
 
 //CARD SEARCH
 const search = async (query, fuzzyCards, fuzzyCards2) => {
@@ -77,7 +77,10 @@ const fetchAllUniquePrintNames = async () => {
 }
 
 //FIND CARD
-const findCard = (query, fuzzyCards, fuzzyCards2) => {
+const findCard = async (query, fuzzyCards, fuzzyCards2) => {
+	const nickname = await Nickname.findOne({ where: { alius: query } })
+	if (nickname) return nickname.card_name
+	
     const fuzzy_card = fuzzyCards.get(query, null, 0.36) || []
 	const fuzzy_card_2 = fuzzyCards2.get(query, null, 0.36) || []
 	const fuzzy_results = [...fuzzy_card, ...fuzzy_card_2]

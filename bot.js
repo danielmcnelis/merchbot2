@@ -372,7 +372,7 @@ if (aliuscom.includes(cmd)) {
 
 	const query = args.join(' ')
 	if (!query) return message.channel.send(`Please specify a card you would like to create aliuses for.`)
-	const card_name = await findCard(query, fuzzyCards, fuzzyCards2)
+	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 	if (!card_name) return message.channel.send(`Could not find card: "${query}".`)
 	const card = await Card.findOne({ where: { name: card_name }})
 	if (!card) return message.channel.send(`I could not find "${card_name}" in the Format Library database.`)

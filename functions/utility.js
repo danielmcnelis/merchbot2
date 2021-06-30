@@ -6,6 +6,7 @@ const { mad, sad, rocks, bronze, silver, gold, platinum, diamond, master, legend
 const Names = require('../static/names.json')
 const { Arena, Binder, Card, Daily, Diary, Draft, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist  } = require('../db/index.js')
 const merchbotId = '584215266586525696'
+const quotes = require('../static/quotes.json')
 
 //CREATE PLAYER
 const createPlayer = async (id, username = null, tag = null) => {
@@ -49,41 +50,6 @@ const createProfile = async (playerId, starter) => {
     const month = `0${date.getMonth() + 1}`
     const day = `0${date.getDate()}`
     const year = `${date.getFullYear()}`
-
-    const quotes = [
-        {
-            quote: `Bruh, this is war. Each and every game 2 men go in and 1 man comes out.`,
-            author: `Gracco`
-        },
-        {
-            quote: `It was pretty cut and dry tbh.`,
-            author: `Di4na`
-        },
-        {
-            quote: `Yu-Gi-Oh! players are the reason liberal democracies fail.`,
-            author: `Noelle`
-        },
-        {
-            quote: `Literally no excuse for me to not be mod.`,
-            author: `iamawesome3000`
-        },
-        {
-            quote: `Sorry dog pissed everywhere I gotta it up before it stains.`,
-            author: `moxies`
-        },
-        {
-            quote: `Hello guys name is Insect_Player24, and today I will activate return and win the game.`,
-            author: `Livd`
-        },
-        {
-            quote: `I'll host. Remember, this time, we're going to have to state the moves in chat, since we're too far away to talk.`,
-            author: `DolphyBlueDrake`
-        },
-        {
-            quote: `Peacekeeper was first mentioned by Cameron iirc.`,
-            author: `Kizaru`
-        }
-    ]
 
     const elem = getRandomElement(quotes)
     const quote = elem.quote

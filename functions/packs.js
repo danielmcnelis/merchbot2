@@ -7,9 +7,10 @@ const { botSpamChannelId } = require('../static/channels.json')
 const { client } = require('../static/clients.js')
 const merchbotId = '584215266586525696'
 const { blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
+const { completeTask } = require('./diary')
 
 const awardPack = async (message, set, num, artwork = false) => {
-    if (!set) return console.log('No set found.')
+    if (!set) return message.channel.send('No set found.')
 
 	const commons = await Print.findAll({ 
 		where: {
@@ -89,7 +90,7 @@ const awardPack = async (message, set, num, artwork = false) => {
                 card_code: yourPack[i]
             }})
     
-            if (!print.id) return console.log(`${card} does not exist in the Print database.`)
+            if (!print.id) return message.channel.send(`${card} does not exist in the Print database.`)
             results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
     
             if (artwork === true) {
@@ -162,6 +163,7 @@ const awardPack = async (message, set, num, artwork = false) => {
         }
     }
 
+    if (set.code === 'CPK') completeTask(message.channel, message.member.id, 'm4')
     return message.channel.send(`<@${message.member.id}> was awarded ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'}. Congratulations!`)
 }
 
@@ -173,7 +175,7 @@ const awardPacksToShop = async (num) => {
         type: 'core'
     }, order: [["createdAt", "DESC"]]})
 
-    if (!coreSets.length) return console.log('No core sets found.')
+    if (!coreSets.length) return botSpamChannel.send('No core sets found.')
     const set = coreSets[0]
 
 	const commons = await Print.findAll({ 
@@ -255,7 +257,7 @@ const awardPacksToShop = async (num) => {
                 card_code: yourPack[i]
             }})
     
-            if (!print.id) return console.log(`${card} does not exist in the Print database.`)
+            if (!print.id) return botSpamChannel.send(`${card} does not exist in the Print database.`)
             results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
     
             const inv = await Inventory.findOne({ where: { 

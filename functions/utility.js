@@ -59,11 +59,6 @@ const createProfile = async (playerId, starter) => {
     const color = getRandomElement(colors)
 
     try {
-        if (playerId !== merchbotId) {
-            const newbies = await Info.findOne({ where: { element: 'newbies' }})
-            newbies.count++
-            await newbies.save()
-        }
         await Binder.create({playerId})
         await Daily.create({playerId})
         await Diary.create({playerId})
@@ -80,52 +75,15 @@ const createProfile = async (playerId, starter) => {
         await Wallet.create({playerId})
         await Wishlist.create({playerId})
     } catch (err) {
-        return console.log(err)
+        console.log(err)
     }
 }
-
-
-//REVIVE
-const revive = async (playerId, z) => {
-	return setTimeout(async function() {
-        const player = await Player.findOne({ where: { id: playerId }})
-
-        if (!player) {
-            const username = Names[playerId] ? Names[playerId] : null
-            await createPlayer(playerId, username)
-        }
-    }, z*100)
-}
-
-//RESTORE
-const restore = async (winner, loser, z) => {
-    return setTimeout(async function() {
-        const winnersRow = await Match.findOne({ where: { playerId: winner }})
-        const losersRow = await Match.findOne({ where: { playerId: loser }})
-
-        const statsLoser = losersRow.stats
-        const statsWinner = winnersRow.stats
-        winnersRow.backup = statsWinner
-        losersRow.backup = statsLoser
-        const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((statsWinner - statsLoser) / 400))))))
-        winnersRow.stats += delta
-        losersRow.stats -= delta
-        winnersRow.wins++
-        losersRow.losses++
-
-        await winnersRow.save()
-        await losersRow.save()
-        await Match.create({ winner: winner, loser: loser, delta })
-        console.log(`Match ${z}: a loss by ${loser} to ${winner} has been added to the database.`)
-    }, z*100)
-}
-
 
 //RECALCULATE
 const recalculate = async (match, winner, loser, z) => {
     return setTimeout(async function() {
-        const winnersRow = await Match.findOne({ where: { playerId: winner }})
-        const losersRow = await Match.findOne({ where: { playerId: loser }})
+        const winnersRow = await Player.findOne({ where: { playerId: winner }})
+        const losersRow = await Player.findOne({ where: { playerId: loser }})
 
         const statsLoser = losersRow.stats
         const statsWinner = winnersRow.stats
@@ -260,7 +218,5 @@ module.exports = {
     isSameDay,
     isVowel,
     recalculate,
-    restore,
-    revive,
     shuffleArray
 }

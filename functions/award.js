@@ -6,7 +6,6 @@ const { blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, merchant,
 const { Message } = require('discord.js')
 
 const awardCard = async (channel, playerId, card_code, quantity = 1) => {
-    console.log('card_code', card_code)
     const print = await Print.findOne({ where: { card_code }})
     if (!print) return channel.send(`Could not find print: "${card_code}".`)
     const card = `${eval(print.rarity)}${card_code} - ${print.card_name}`

@@ -9,6 +9,7 @@ const adminId = '194147938786738176'
 const { client } = require('../static/clients.js')
 const { fpRole } = require('../static/roles.json')
 const { announcementsChannelId, botSpamChannelId, shopChannelId } = require('../static/channels.json')
+const { completeTask } = require('./diary')
 
 // OPEN SHOP
 const openShop = async () => {
@@ -24,7 +25,6 @@ const openShop = async () => {
         updateShop()
         client.channels.cache.get(announcementsChannelId).send(`Good morning, <@&${fpRole}>, The Shop ${merchant} is now open! ${open}`)
         const shopCountdown = getShopCountdown()
-        console.log('setting timeout to closeShop():', shopCountdown)
 		return setTimeout(() => closeShop(), shopCountdown)
 	} 
 }
@@ -54,7 +54,6 @@ const closeShop = async () => {
         await restock()
 		client.channels.cache.get(announcementsChannelId).send(`Good evening, <@&${fpRole}>, The Shop ${merchant} is now closed! ${closed}`)
         const shopCountdown = getShopCountdown()
-        console.log('setting timeout to openShop():', shopCountdown)
 		return setTimeout(() => openShop(), shopCountdown)
 	} 
 }
@@ -129,6 +128,7 @@ const checkShopShouldBe = () => {
 // PROCESS BIDS
 const processBids = async () => {
     const announcementsChannel = client.channels.cache.get(announcementsChannelId)
+    const botSpamChannel = client.channels.cache.get(botSpamChannelId)
     const allBids = await Bid.findAll({ include: Auction , order: [["amount", "DESC"]] })
 
     for (let i = 0; i < allBids.length; i++) {
@@ -182,6 +182,8 @@ const processBids = async () => {
         await print.save()
 
         await bid.destroy()
+
+        if (print.rarity !== 'com' && print.rarity !== 'rar') completeTask(botSpamChannel, wallet.player.id, 'm2')
         announcementsChannel.send(`<@${wallet.player.id}> won a copy of ${eval(print.rarity)}${print.card_code} - ${print.card_name} for ${bid.amount}${stardust}. Congratulations!`) 
     }
 
@@ -195,9 +197,8 @@ const processBids = async () => {
 // RESTOCK
 const restock = async () => {
 	const allSetsForSale = await Set.findAll({ where: { for_sale: true }})
-	const newbies = await Info.findOne({ where: { element: "newbies" }})
 
-	let weightedCount = -10 * newbies.count
+	let weightedCount = 0
 
 	for (let i = 0; i < allSetsForSale.length; i++) {
 		const set = allSetsForSale[i]
@@ -217,8 +218,6 @@ const restock = async () => {
 
         set.unit_sales = 0
         await set.save()
-        newbies.count = 0
-        await newbies.save()
 	}
 
     if (weightedCount < 1) weightedCount = 1

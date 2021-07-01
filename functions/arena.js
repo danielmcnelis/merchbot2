@@ -9,6 +9,7 @@ const { client } = require('../static/clients.js')
 const { shuffleArray, getRandomElement, capitalize } = require('./utility.js')
 const { awardCard } = require('./award.js')
 const { decks, vouchers, prizes, victories, apcs, verbs, encouragements } = require('../static/arenas.json')
+const { completeTask } = require('./diary')
 
 //GET ARENA SAMPLE DECK
 const getArenaSample = async (message) => {
@@ -41,9 +42,7 @@ const startArena = async(guild) => {
     const arenaChannel = client.channels.cache.get(arenaChannelId)
     arenaChannel.send(`Arena players, please check your DMs!`)
     const allArenaEntries = await Arena.findAll({ include: Player })
-
     const contestants = shuffleArray(["P1", "P2", "P3", "P4", "P5", "P6"])
-    console.log('contestants', contestants)
 
     getConfirmation(guild, allArenaEntries[0], contestants[0])
     getConfirmation(guild, allArenaEntries[1], contestants[1])
@@ -136,7 +135,6 @@ const getConfirmation = async (guild, arena_entry, contestant) => {
 const assignArenaRoles = (guild, entries) => {
     entries.forEach((entry) => {
         const member = guild.members.cache.get(entry.playerId)
-        console.log('attempting to assign arena role')
         member.roles.add(arenaRole)
     })
 }
@@ -144,7 +142,6 @@ const assignArenaRoles = (guild, entries) => {
 const startRound = async (info, entries) => {
     const arenaChannel = client.channels.cache.get(arenaChannelId)
     const guild = client.guilds.cache.get("842476300022054913")
-    console.log(`Starting Round ${info.round}`)
 
     if (info.round === 7) {
         const voucher = vouchers[entries[1].tribe]
@@ -166,6 +163,8 @@ const startRound = async (info, entries) => {
             ` ${victories[tribe]}` +
             ` You truly deserve the ${apcs[tribe]}!`
         )
+
+        completeTask(arenaChannel, playerId, 'm3')
         return endArena(info, entries)
     } else if (info.round === 6) {
         if (entries[0].score > entries[1].score) {
@@ -205,13 +204,14 @@ const startRound = async (info, entries) => {
                 arenaChannel.send(`<@${entry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`)
                 const member = guild.members.cache.get(entry.playerId)
                 member.roles.remove(arenaRole)
-                await entry.destroy()
+                entry.score = 0
+                await entry.save()
             }
 
             entries[0].score = 0
             await entries[0].save()
 
-            entries[1].score = 1
+            entries[1].score = 0
             await entries[1].save()
 
             const title = `<!> <!> <!> ARENA FINALS <!> <!> <!>` 
@@ -323,6 +323,7 @@ const endArena = async (info, entries) => {
         const entry = entries[i]
         const member = guild.members.cache.get(entry.playerId)
         member.roles.remove(arenaRole)
+        completeTask(arenaChannel, entry.playerId, 'e12', i * 2000 + 2000)
         await entry.destroy()
     }
 }
@@ -357,8 +358,6 @@ const checkArenaProgress = async (info) => {
     const scores = entries.map((entry) => entry.score)
     const progress_report = entries.map((entry) => entry.is_playing)
     const sum = scores.reduce((a, b) => a + b)
-    console.log("progress_report", progress_report)
-    console.log("!progress_report.includes(true)", !progress_report.includes(true))
 
     if (sum % 3 === 0 && !progress_report.includes(true)) return setTimeout(() => postStandings(info, entries), 3000)
 }

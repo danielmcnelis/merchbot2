@@ -31,6 +31,22 @@ const Daily = db.define('daily', {
     alchemy_4: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
+    },
+    alchemy_5: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+    },
+    alchemy_6: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+    },
+    last_alchemy: {
+        type: Sequelize.DATE,
+        allowNull: true
+    },
+    last_gift: {
+        type: Sequelize.DATE,
+        allowNull: true
     }
 })
 

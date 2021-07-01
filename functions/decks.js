@@ -67,13 +67,10 @@ const awardStarterDeck = async (playerId, starter) => {
 
 //SAVE YDK
 const saveYDK = async (member, url) => {
-    console.log('~~~SAVING YDK~~~')
     const options = new firefox.Options()
     options.addArguments("-headless")
     const username = member.user ? member.user.username : member.username    
-    console.log('username', username)
     const driver = await new Builder().forBrowser('firefox').setFirefoxOptions(options).build()
-    console.log('!!driver', !!driver)
     
     try {
         console.log(`Loading ${username}'s deck at ${url}...`)
@@ -106,9 +103,7 @@ const saveYDK = async (member, url) => {
         const file = deck_arr.join('\n')
         const cards_arr = deck_arr.filter(elem => elem.charAt(0) !== '#' && elem.charAt(0) !== '!' && elem !== '')
         cards_arr.sort()
-        console.log('cards_arr', cards_arr)
         const cards_obj = convertCardsArrayToObject(cards_arr)
-        console.log('cards_obj', cards_obj)
         const allForgedCards = await fetchAllForgedCards()
 
         const allForbiddenCards = await Status.findAll({ 
@@ -134,16 +129,9 @@ const saveYDK = async (member, url) => {
             while (id.length < 8) id = '0' + id
             return id
         })
-
-        console.log('cardIds', cardIds)
-
         const forbiddenCardIds = allForbiddenCards.map(card => card.konamiCode)
         const limitedCardIds = allLimitedCards.map(card => card.konamiCode)
         const semiLimitedCardIds = allSemiLimitedCards.map(card => card.konamiCode)
-
-        console.log('forbiddenCardIds', forbiddenCardIds)
-        console.log('limitedCardIds', limitedCardIds)
-        console.log('semiLimitedCardIds', semiLimitedCardIds)
 
         let illegalCards = []
         let forbiddenCards = []
@@ -154,7 +142,6 @@ const saveYDK = async (member, url) => {
         const keys = Object.keys(cards_obj)
 
         for (let key of keys) {
-            console.log('key', key)
             let id = key
             while (key.length < 8) key = '0' + key
             while (id.charAt(0) === '0') id = id.slice(1)
@@ -257,7 +244,7 @@ const saveAllYDK = async () => {
             try {
                 await saveYDK(member, url)
             } catch (err) {
-                console.log('Fudge. An error:', err)
+                console.log(err)
             }
         }, (( i * 15000 ) + 1000))
     }

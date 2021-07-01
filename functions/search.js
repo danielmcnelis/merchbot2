@@ -6,7 +6,7 @@ const { Card, Nickname, Print } = require('../db/index.js')
 
 //CARD SEARCH
 const search = async (query, fuzzyCards, fuzzyCards2) => {
-	const card_name = findCard(query, fuzzyCards, fuzzyCards2)
+	const card_name = await findCard(query, fuzzyCards, fuzzyCards2)
 	if (!card_name) return false
 
 	const card = await Card.findOne({ 
@@ -54,10 +54,7 @@ const fetchAllCards = async () => {
 const fetchAllForgedCards = async () => {
     const allCards = await fetchAllCards()
 	const allUniquePrintNames = await fetchAllUniquePrintNames()
-	console.log('allUniquePrintNames[0, 10]', allUniquePrintNames[0, 10])
-
 	const allForgedCards = allCards.filter(card => allUniquePrintNames.includes(card.name))
-	console.log('allForgedCards[0]', allForgedCards[0])
     return allForgedCards
 }
 

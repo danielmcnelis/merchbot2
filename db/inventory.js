@@ -11,6 +11,10 @@ const Inventory = db.define('inventory', {
         type: Sequelize.INTEGER,
         defaultValue: 0,
         allowNull: false
+    },
+    draft: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
     }
 })
 

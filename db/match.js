@@ -8,11 +8,19 @@ const Match = db.define('match', {
         defaultValue: "ranked",       
         allowNull: false
     },
-    winner: {
+    winnerId: {
         type: Sequelize.STRING,        
         allowNull: false
     },
-    loser: {
+    winner_name: {
+        type: Sequelize.STRING,        
+        allowNull: false
+    },
+    loserId: {
+        type: Sequelize.STRING,        
+        allowNull: false
+    },
+    loser_name: {
         type: Sequelize.STRING,        
         allowNull: false
     },

@@ -50,7 +50,7 @@ const askForBidPlacement = async (message, player) => {
         const query = collected.first().content
         const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
         const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-        const card_name = findCard(query, fuzzyPrints, fuzzyPrints2)
+        const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
         const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, player.id, card_name) : null
         if (!print) return message.author.send(`Sorry, I do not recognize the card: "${query}".`)
         const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`

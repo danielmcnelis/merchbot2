@@ -1,17 +1,17 @@
 {
     "Easy": {
         "e1": "1) Claim a Starter Deck.",
-        "e2": "2) Purchase a Pack.",
-        "e3": "3) Purchase a Card from The Shop.",
-        "e4": "4) Check your Inventory.",
-        "e5": "5) Win a Ranked Match.",
-        "e6": "6) Check your Stats.",
-        "e7": "7) Grind up a Starchip.",
+        "e2": "2) Check your Inventory.",
+        "e3": "3) Win a Ranked Match.",
+        "e4": "4) Check your Stats.",
+        "e5": "5) Use Alchemy on any Card.",
+        "e6": "6) Purchase a Pack.",
+        "e7": "7) Add a Card to your Binder.",
         "e8": "8) Complete a Trade.",
-        "e9": "9) Use Alchemy on a Super Rare card or higher.",
-        "e10": "10) Fight in the Arena.",
-        "e11": "11) Play Keeper of the Forge.",
-        "e12": "12) Partake in a Round of Trivia.",
+        "e9": "9) Grind up a Starchip.",
+        "e10": "10) Purchase a Card from The Shop.",
+        "e11": "11) Partake in a round of Trivia.",
+        "e12": "12) Fight in the Arena.",
         "bonuses": ["1) +1 Daily use of Alchemy.", "2) +1 Weekly free Pack.", "3) Ranked Bonus: +1 Starchip"]
     },
     "Moderate": {

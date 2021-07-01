@@ -99,10 +99,10 @@ const getFavoriteCard = async (message, fuzzyPrints, fuzzyPrints2) => {
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 30000
-	}).then(collected => {
+	}).then(async collected => {
 		const response = collected.first().content
 		if (response === 'none') return 'none'
-        const favorite_card = findCard(response, fuzzyPrints, fuzzyPrints2) || false
+        const favorite_card = await findCard(response, fuzzyPrints, fuzzyPrints2) || false
 		if (!favorite_card) message.channel.send(`Could not find card: "${response}".`)
 		return favorite_card
 	}).catch(err => {

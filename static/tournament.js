@@ -200,7 +200,6 @@ const removeParticipant = async (message, member, participants, participantId, t
     let keys = Object.keys(participants)
 
     keys.forEach(function(key) {
-        console.log('participants[key]', participants[key])
         if (participants[key].participant.name === member.user.username) {
             participantID = participants[key].participant.id
         }
@@ -374,13 +373,23 @@ const addMatchResult = async (message, matches, participants, loser, winner, for
                         await winningPlayersRecord.save()
                         await losingPlayersRecord.save()
                     } catch (err) {
-                        console.log('error saving player records')
+                        console.log(err)
                     }
                     
                     try {
-                        await Match.create({ format: formatDatabase, winner: winner.user.id, loser: loser.user.id, delta })
+                        await Match.create({  
+                            game_mode: 'tournament',
+                            winner_name: winningPlayer.name,
+                            winnerId: winningPlayer.id, 
+                            loser_name: losingPlayer.name,
+                            loserId: losingPlayer.id, 
+                            delta,
+                            chipsWinner,
+                            chipsLoser
+                        })
+
                     } catch (err) {
-                        console.log('error creating Match')
+                        console.log(err)
                     }
 
                     try {
@@ -392,7 +401,6 @@ const addMatchResult = async (message, matches, participants, loser, winner, for
                             tournamentName: status['tournament'] 
                         })
                     } catch (err) {
-                        console.log('error creating Matchup')
                         console.log(err)
                     }
 
@@ -401,7 +409,7 @@ const addMatchResult = async (message, matches, participants, loser, winner, for
                         entry.losses++
                         await entry.save()
                     } catch (err) {
-                        console.log('error saving entry')
+                        console.log(err)
                     }
                          
                     message.channel.send(`<@${loser.user.id}>, Your ${formatName} tournament loss to ${winner.user.username} has been recorded.`)
@@ -414,7 +422,7 @@ const addMatchResult = async (message, matches, participants, loser, winner, for
                         entry.losses++
                         await entry.save()
                     } catch (err) {
-                        console.log('error saving entry')
+                        console.log(err)
                     }
                          
                     message.channel.send(`<@${loser.user.id}>, Your ${formatName} tournament match against ${winner.user.username} has been recorded as a no-show.`)

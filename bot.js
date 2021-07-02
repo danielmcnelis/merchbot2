@@ -15,6 +15,7 @@ const types = require('./static/types.json')
 const diaries = require('./static/diaries.json')
 const arenas = require('./static/arenas.json')
 const errors = require('./static/errors.json')
+const trivia = require('./trivia.json')
 const ygoprodeck = require('./static/ygoprodeck.json')
 const muted = require('./static/muted.json')
 const prints = require('./static/prints.json')
@@ -2505,6 +2506,33 @@ if (cmd === `!reset`) {
 	return message.channel.send(`${game === 'Trivia' ? 'Trivia' : `The ${game}`} has been reset.`)
 }
 
+//RESUME
+if (cmd === `!resume`) {
+	if (!isMod(message.member)) return message.channel.send('You do not have permission to do that.')
+	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
+	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
+	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
+	: null
+
+	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannelId}> or <#${triviaChannelId}>.`)
+	const role = game === 'Trivia' ? triviaRole : game === 'Arena' ? arenaRole : null
+
+	const info = await Info.findOne({ where: { element: game.toLowerCase() }})
+	if (!info) return message.channel.send(`Could not find game-mode: "${game}".`)
+
+	const entries = await eval(game).findAll()
+	if (!entries) return message.channel.send(`Could not find any entries for: "${game}".`)
+
+	if (game === 'Arena') {
+		message.channel.send(`Arena resumption is not coded yet.`)
+	} else if (game === 'Trivia') {
+		const triviaArr = Object.entries(trivia)
+		const questionsArr = getRandomSubset(triviaArr, 10)
+		setTimeout(() => askQuestion(message.guild, message.channel, info, entries, questionsArr), 30000)
+	}
+
+	return message.channel.send(`${role ? `<@${role}>, ` : ''} ${game === 'Trivia' ? 'Trivia will resume in 30 seconds.' : `The ${game} can now resume.`}`)
+}
 
 //DROP
 if(dropcom.includes(cmd)) {

@@ -323,6 +323,7 @@ const resetTrivia = async (guild, info, entries) => {
 }
 
 module.exports = {
+    askQuestion,
     resetTrivia,
     startTrivia
 }

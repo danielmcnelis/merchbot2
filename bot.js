@@ -1869,8 +1869,8 @@ if (losscom.includes(cmd)) {
 
 	const winner = message.guild.members.cache.get(oppo)
 	const loser = message.guild.members.cache.get(maid)
-	const winningPlayer = await Player.findOne({ where: { id: oppo }, include: Diary, Wallet })
-	const losingPlayer = await Player.findOne({ where: { id: maid }, include: Diary, Wallet })
+	const winningPlayer = await Player.findOne({ where: { id: oppo }, include: [Diary, Wallet] })
+	const losingPlayer = await Player.findOne({ where: { id: maid }, include: [Diary, Wallet] })
 
 	if (winner.roles.cache.some(role => role.id === botRole)) return message.channel.send(`Sorry, Bots do not play Forged in Chaos... *yet*.`)
 	if (oppo.length < 17 || oppo.length > 18) return message.channel.send(`To report a loss, type **!loss @opponent**.`)
@@ -2031,8 +2031,8 @@ if (manualcom.includes(cmd)) {
 
 	const winner = message.guild.members.cache.get(winnerId)
 	const loser = message.guild.members.cache.get(loserId)
-	const winningPlayer = await Player.findOne({ where: { id: winnerId }, include: Diary, Wallet })
-	const losingPlayer = await Player.findOne({ where: { id: loserId }, include: Diary, Wallet })
+	const winningPlayer = await Player.findOne({ where: { id: winnerId }, include: [Diary, Wallet] })
+	const losingPlayer = await Player.findOne({ where: { id: loserId }, include: [Diary, Wallet] })
 
 	if (winner.roles.cache.some(role => role.id === botRole) || loser.roles.cache.some(role => role.id === botRole)) return message.channel.send(`Sorry, Bots do not play Forged in Chaos... *yet*.`)
 	if (!losingPlayer) return message.channel.send(`Sorry, ${loser.user.username} is not in the database.`)

@@ -11,6 +11,11 @@ const Trivia = db.define('trivia', {
         type: Sequelize.INTEGER,
         defaultValue: 0,        
         allowNull: false
+    },
+    answer: {
+        type: Sequelize.TEXT,
+        defaultValue: '',        
+        allowNull: false
     }
 })
 

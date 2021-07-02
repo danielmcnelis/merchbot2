@@ -42,7 +42,7 @@ const Player = db.define('player', {
         defaultValue: 0,           
         allowNull: false
     },
-    vaniquished_foes: {
+    vanquished_foes: {
         type: Sequelize.INTEGER,  
         defaultValue: 0,           
         allowNull: false

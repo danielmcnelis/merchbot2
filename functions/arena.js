@@ -6,10 +6,10 @@ const { fire, tix, credits, blue, red, stoned, stare, wokeaf, koolaid, cavebob, 
 const { arenaRole } = require('../static/roles.json')
 const { arenaChannelId } = require('../static/channels.json')
 const { client } = require('../static/clients.js')
+const { completeTask } = require('./diary')
 const { shuffleArray, getRandomElement, capitalize } = require('./utility.js')
 const { awardCard } = require('./award.js')
 const { decks, vouchers, prizes, victories, apcs, verbs, encouragements } = require('../static/arenas.json')
-const { completeTask } = require('./diary')
 
 //GET ARENA SAMPLE DECK
 const getArenaSample = async (message) => {
@@ -164,7 +164,7 @@ const startRound = async (info, entries) => {
             ` You truly deserve the ${apcs[tribe]}!`
         )
 
-        completeTask(arenaChannel, playerId, 'm3')
+        completeTask(arenaChannel, playerId, 'm10', 12000)
         return endArena(info, entries)
     } else if (info.round === 6) {
         if (entries[0].score > entries[1].score) {
@@ -191,6 +191,8 @@ const startRound = async (info, entries) => {
                 ` ${victories[tribe]}` +
                 ` You truly deserve the ${apcs[tribe]}!`
             )
+
+            completeTask(arenaChannel, playerId, 'm10', 12000)
             return endArena(info, entries)
         } else if ((entries[0].score === entries[1].score) && entries[1].score > entries[2].score) {
         //2 way tie
@@ -290,7 +292,6 @@ const startRound = async (info, entries) => {
 
 const postStandings = async (info, entries) => {
     const arenaChannel = client.channels.cache.get(arenaChannelId)
-    console.log(`Round ${info.round} Standings`)
 
     for (let i = 0; i < entries.length; i++) {
         const entry = entries[i]

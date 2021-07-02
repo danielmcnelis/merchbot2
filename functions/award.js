@@ -27,8 +27,11 @@ const awardCard = async (channel, playerId, card_code, quantity = 1) => {
             quantity,
             printId: print.id
         })
+
+        if (print.rarity === 'scr') completeTask(channel, playerId, 'm4')
     }
 
+    if (print.set_code === 'APC' && ((inv && inv.quantity >= 3) || quantity >=3 )) completeTask(channel, playerId, 'h5')
     return channel.send(`<@${playerId}> was awarded ${quantity} ${card}. Congratulations!`)
 }
 

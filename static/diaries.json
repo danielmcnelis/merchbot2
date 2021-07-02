@@ -12,40 +12,40 @@
         "e10": "10) Purchase a Card from The Shop.",
         "e11": "11) Partake in a round of Trivia.",
         "e12": "12) Fight in the Arena.",
-        "bonuses": ["1) +1 Daily use of Alchemy.", "2) +1 Weekly free Pack.", "3) Ranked Bonus: +1 Starchip"]
+        "bonuses": ["1) +1 Daily use of Alchemy.", "2) +1 Weekly free Pack.", "3) Ranked Bonus: +1 Starchip for wins"]
     },
     "Moderate": {
         "m1": "1) Obtain the Platinum Rank.",
-        "m2": "2) Win a Bid on a Super Rare card or higher.",
-        "m3": "3) Conquer the Arena once with any Tribe.",
-        "m4": "4) Receive a Chaos Pack.",
-        "m5": "5) Purchase 5 or more Packs at once.",
-        "m6": "6) Sell 5 or more copies of any Rare or higher card to the shop at once.",
-        "m7": "7) Collect at least 1 copy of a Secret Rare from a Core Set.",
-        "m8": "8) Win 3 Ranked Matches in a row.",
+        "m2": "2) Win 3 Ranked Matches in a row.",
+        "m3": "3) Purchase 5 or more Packs at once.",
+        "m4": "4) Collect a Secret Rare from a Core Set.",
+        "m5": "5) Win a Bid on a Super Rare or higher.",
+        "m6": "6) Sell 5 or more copies of a Rare or higher to The Shop at once.",
+        "m7": "7) Complete a Trade with 20 unique players.",
+        "m8": "8) Win a Chaos Pack in a Tournament.",
         "m9": "9) Answer 20 different Trivia questions correctly.",
-        "m10": "10) Complete a Trade with 20 unique players.",
-        "bonuses": ["1) +1 Daily use of Alchemy.", "2) +1 Weekly free Pack.", "3) Arena Bonus: +1 Starchip"]
+        "m10": "10) Conquer the Arena once with any Tribe.",
+        "bonuses": ["1) +1 Daily use of Alchemy.", "2) +1 Weekly free Pack.", "3) Arena Bonus: +1 Starchip for wins"]
     },
     "Hard": {
         "h1": "1) Obtain the Diamond Rank.",
-        "h2": "2) Collect 3 copies of any Arena Prize Card.",
-        "h3": "3) Conquer the Arena once each with 6 or more different Tribes.",
-        "h4": "4) Win an 8+ player Tournament.",
-        "h5": "5) Collect 1 copy of each card from a Core Set.",
-        "h6": "6) Purchase a Box of any Core Set.",
+        "h2": "2) Win a Ranked Match against 20 unique players.",
+        "h3": "3) Purchase a Box of any Core Set.",
+        "h4": "4) Collect 1 of each card from a Core Set.",
+        "h5": "5) Collect 3 copies of any Arena Prize Card.",
+        "h6": "6) Win an 8+ player Tournament.",
         "h7": "7) Answer 50 different Trivia questions correctly.",
-        "h8": "8) Win a Ranked Match against 20 unique players.",
+        "h8": "8) Conquer the Arena once each with 6 or more different Tribes.",
         "bonuses": ["1) +1 Daily use of Alchemy.", "2) +1 Weekly free Pack.", "3) Shop Discount: 10% off singles"]
     },
     "Elite": {
         "l1": "1) Obtain the Master Rank.",
-        "l2": "2) Win Keeper of the Forge 25 times.",
-        "l3": "3) Conquer the Arena 3 times each with 6 or more different Tribes.",
+        "l2": "2) Win 10 Ranked Matches in a row.",
+        "l3": "3) Collect 3 copies of each card from a Core Set.",
         "l4": "4) Win a 16+ player Tournament.",
-        "l5": "5) Collect 3 copies of each card from a Core Set.",
-        "l6": "6) Answer 200 different Trivia questions correctly.",
-        "bonuses": ["1) +1 Daily use of Alchemy.", "2) +1 Weekly free Pack.", "3) Tournament Bonus: +1 Chaos Pack"]
+        "l5": "6) Answer 200 different Trivia questions correctly.",
+        "l6": "3) Conquer the Arena 3 times each with 6 or more different Tribes.",
+        "bonuses": ["1) +1 Daily use of Alchemy.", "2) +1 Weekly free Pack.", "3) Tournament Bonus: +1 Chaos Pack for placing"]
     },
     "Master": {
         "s1": "1) Obtain the Legend Rank.",

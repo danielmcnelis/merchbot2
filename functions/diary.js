@@ -1,12 +1,14 @@
 
 
-const { Arena, Diary, Info, Player, Profile, Wallet, Match } = require('../db')
+const { Daily, Diary, Inventory, Set } = require('../db')
+const { Op } = require('sequelize')
+const { awardPack } = require('./packs.js')
 const { cultured, leatherbound, fire, tix, credits, blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
 const diaries = require('../static/diaries.json')
+const merchbotId = '584215266586525696'
 
-const completeTask = async (channel, playerId, task, milliseconds = 2000) => {
-    console.log('completing task')
-    console.log('task', task)
+const checkCoreSetComplete = async (playerId, quantity = 1) => {
+    const task = quantity === 1 ? 'h4' : 'l3'
 
     const count = await Diary.count({
         where: {
@@ -15,7 +17,46 @@ const completeTask = async (channel, playerId, task, milliseconds = 2000) => {
         }
     })
 
-    console.log('count', count)
+    if (count) {
+        console.log(`this player already completed ${task}`)
+        return false
+    }
+
+    const allSets = await Set.findAll({ where: { type: 'core' }})
+    console.log(`checking ${allSets.length} core sets`)
+
+    for (let i = 0; i < allSets.length; i++) {
+        const set = allSets[i]
+        const setInv = await Inventory.findAll({
+            where: {
+                playerId: playerId,
+                card_code: {
+                    [Op.startsWith]: set.code
+                },
+                quantity: {
+                    [Op.gte]: quantity
+                }
+            }
+        })
+    
+        console.log(`player has ${quantity}x of ${setInv.length} out of ${set.size} cards in ${set.code}`)
+        if (setInv.length >= set.size) return true
+    }
+
+    console.log('found 0 complete sets')
+    return false
+}
+
+const completeTask = async (channel, playerId, task, milliseconds = 2000) => {
+    if (playerId === merchbotId) return console.log('abort task completion for @MerchBot')
+
+    const count = await Diary.count({
+        where: {
+            playerId: playerId,
+            [task]: true
+        }
+    })
+
     if (count) return
 
     const diary = await Diary.findOne({ where: { playerId } })
@@ -29,10 +70,7 @@ const completeTask = async (channel, playerId, task, milliseconds = 2000) => {
         task.startsWith('l') ? 'Elite' : 
         'Master'
     
-    console.log('difficulty', difficulty)
-
     return setTimeout(() => {
-        console.log('task', task)
         const task_num = task.slice(1)
         const full_text = diaries[difficulty][task]
         const task_text_only = full_text.slice(full_text.indexOf(") ") + 2)
@@ -44,7 +82,6 @@ const completeTask = async (channel, playerId, task, milliseconds = 2000) => {
 }
 
 const checkDiaryComplete = async (channel, playerId, diary, difficulty) => {
-    console.log('checking diary complete')
     if (
         ( 
             difficulty === 'Easy' &&
@@ -60,13 +97,21 @@ const checkDiaryComplete = async (channel, playerId, diary, difficulty) => {
             diary.l1 && diary.l2 && diary.l3 && diary.l4 && diary.l5 && diary.l6
         )
     ) {
-        return setTimeout(() => {
+        return setTimeout(async () => {
+            const num = difficulty === 'Elite' ? 4 : difficulty === 'Hard' ? 3 : difficulty === 'Moderate' ? 2 : 1 
             channel.send(`<@${playerId}>, Congrats! You completed your ${difficulty} Diary${leatherbound}!`)
-            return channel.send(`\n${blue} ${koolaid} ${legend} ${cavebob} ${cultured}`)
+            channel.send(`\n${blue} ${koolaid} ${legend} ${cavebob} ${cultured}`)
+
+            const daily = await Daily.findOne({ where: { playerId }})
+            daily.cobble_progress = 0
+            await daily.save()
+
+            return awardPack(channel, playerId, null, num)
         }, 2000)
     }
 }
 
 module.exports = {
+    checkCoreSetComplete,
     completeTask
 }

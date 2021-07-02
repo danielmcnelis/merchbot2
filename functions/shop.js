@@ -183,7 +183,9 @@ const processBids = async () => {
 
         await bid.destroy()
 
-        if (print.rarity !== 'com' && print.rarity !== 'rar') completeTask(botSpamChannel, wallet.player.id, 'm2')
+        if (print.rarity !== 'com' && print.rarity !== 'rar') completeTask(botSpamChannel, wallet.player.id, 'm5')
+        if (print.rarity === 'scr') completeTask(botSpamChannel, wallet.player.id, 'm4', 4000)
+        if (print.set_code === 'APC' && winnerInv && winnerInv.quantity >= 3) completeTask(botSpamChannel, wallet.player.id, 'h5', 4000)
         announcementsChannel.send(`<@${wallet.player.id}> won a copy of ${eval(print.rarity)}${print.card_code} - ${print.card_name} for ${bid.amount}${stardust}. Congratulations!`) 
     }
 

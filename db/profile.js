@@ -32,6 +32,11 @@ const Profile = db.define('profile', {
         defaultValue: false,
         allowNull: false
     },
+    trade_partners: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,  
+        allowNull: false
+    },
     beast_wins: {
         type: Sequelize.INTEGER,
         defaultValue: 0,        

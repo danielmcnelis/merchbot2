@@ -8,7 +8,7 @@ const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { fire, tix, credits, blue, red, stoned, stare, leatherbound, wokeaf, koolaid, cavebob, evil, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('./static/emojis.json')
 const { aliuscom, nicknamecom, joincom, bindercom, wishlistcom, invcom, calccom, bracketcom, dropcom, queuecom, checklistcom, startcom, infocom, dbcom, noshowcom, legalcom, listcom, pfpcom, botcom, rolecom, statscom, profcom, losscom, h2hcom, undocom, rankcom, manualcom, yescom, nocom, deckcom } = require('./static/commands.json')
-const { botRole, modRole, adminRole, tourRole, toRole, fpRole, muteRole, arenaRole } = require('./static/roles.json')
+const { triviaRole, botRole, modRole, adminRole, tourRole, toRole, fpRole, muteRole, arenaRole } = require('./static/roles.json')
 const { generalChannelId, rulesChannelId, rulingsChannelId, introChannelId, discussionChannelId, staffChannelId, botSpamChannelId, welcomeChannelId, announcementsChannelId, registrationChannelId, replaysChannelId, duelRequestsChannelId, marketPlaceChannelId, shopChannelId, tournamentChannelId, arenaChannelId, keeperChannelId, triviaChannelId, draftChannelId, gauntletChannelId, bugreportsChannelId, suggestionsChannelId } = require('./static/channels.json')
 const decks = require('./static/decks.json')
 const types = require('./static/types.json')
@@ -22,7 +22,7 @@ const nicknames = require('./static/nicknames.json')
 const statuses = require('./static/statuses.json')
 const { getNewStatus } = require('./functions/status.js')
 const { checkArenaProgress, getArenaSample, resetArena, startArena, startRound } = require('./functions/arena.js')
-const { runTrivia } = require('./functions/trivia.js')
+const { resetTrivia, startTrivia } = require('./functions/trivia.js')
 const { askForGrindAllConfirmation } = require('./functions/mod.js')
 const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Nickname, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
 const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isMod, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
@@ -37,7 +37,7 @@ const { getBarterCard, checkShopShouldBe, getShopCountdown, openShop, closeShop,
 const { awardPack } = require('./functions/packs.js')
 const { getBuyerConfirmation, getFinalConfirmation, getInitiatorConfirmation, getPartnerSide, getPartnerConfirmation, getSellerConfirmation } = require('./functions/trade.js')
 const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard } = require('./functions/profile.js')
-const { completeTask } = require('./functions/diary.js')
+const { checkCoreSetComplete, completeTask } = require('./functions/diary.js')
 const { client, challongeClient } = require('./static/clients.js')
 let fuzzyCards
 let fuzzyCards2
@@ -74,8 +74,8 @@ client.on('ready', async () => {
 	}, 1000 * 60 * 10)
 
 	if (!shopShouldBe) return client.channels.cache.get(staffChannelId).send(`<@&${adminRole}>, The Shop status could not be read from the database.`)
-	if (!shopOpen && shopShouldBe === 'open') client.channels.cache.get(staffChannelId).send(`<@& ${modRole}>, The Shop is unexpectedly closed. Type **!open** to manually open it.`)
-	if (shopOpen && shopShouldBe === 'closed') client.channels.cache.get(staffChannelId).send(`<@& ${modRole}>, The Shop is unexpectedly open. Type **!close** to manually close it.`)
+	if (!shopOpen && shopShouldBe === 'open') client.channels.cache.get(staffChannelId).send(`<@&${modRole}>, The Shop is unexpectedly closed. Type **!open** to manually open it.`)
+	if (shopOpen && shopShouldBe === 'closed') client.channels.cache.get(staffChannelId).send(`<@&${modRole}>, The Shop is unexpectedly open. Type **!close** to manually close it.`)
 
 	if (shopShouldBe === 'closed') {
 		return setTimeout(() => openShop(), shopCountdown)
@@ -124,12 +124,12 @@ client.on('message', async (message) => {
 			mcid === rulingsChannelId
 		) ||
 		//only allow !clear in discussion, replays, rules, shop, intro, bugreports
-		!message.content.startsWith("!clear") && mcid === ( 
-			replaysChannelId || 
-			rulesChannelId ||
-			shopChannelId || 
-			introChannelId || 
-			bugreportsChannelId
+		!message.content.startsWith("!clear") && ( 
+			mcid === replaysChannelId || 
+			mcid === rulesChannelId ||
+			mcid === shopChannelId || 
+			mcid === introChannelId || 
+			mcid === bugreportsChannelId
 		)
 	) return
 
@@ -149,6 +149,7 @@ client.on('message', async (message) => {
 
 //CARD SEARCH 1
 if (!message.content.startsWith("!") && message.content.includes(`{`) && message.content.includes(`}`)) {
+	if (message.member.roles.cache.some(role => role.id === triviaRole)) return message.channel.send(`You cannot search for cards while playing Trivia.`)
 	const query = message.content.slice(message.content.indexOf('{') + 1, message.content.indexOf('}'))
 	const cardEmbed = await search(query, fuzzyCards, fuzzyCards2)
 	if (!cardEmbed) return message.channel.send(`Could not find card: "query".`)
@@ -157,6 +158,7 @@ if (!message.content.startsWith("!") && message.content.includes(`{`) && message
 
 //CARD SEARCH 2
 if (!message.content.startsWith("!") && message.content.includes(`[`) && message.content.includes(`]`)) {
+	if (message.member.roles.cache.some(role => role.id === triviaRole)) return message.channel.send(`You cannot search for cards while playing Trivia.`)
 	const query = message.content.slice(message.content.indexOf('[') + 1, message.content.indexOf(']'))
 	const cardEmbed = await search(query, fuzzyCards, fuzzyCards2)
 	if (!cardEmbed) return message.channel.send(`Could not find card: "query".`)
@@ -169,23 +171,7 @@ if (!message.content.startsWith("!") && message.content.includes(`[`) && message
 
 //TEST
 if(cmd === `!test`) {
-	completeTask(message.channel, maid, 'e11')
-}
-
-//TEST
-if(cmd === `!test2`) {
-	completeTask(message.channel, maid, 'e12')
-}
-
-//TEST
-if(cmd === `!test3`) {
-	const arenaChannel = client.channels.cache.get(arenaChannelId)
-	const info = await Info.findOne({ where: { element: 'arena' } })
-    if (!info) return arenaChannel.send(`Critical error. Missing info in the database.`) 
-    const entries = await Arena.findAll({ include: Player, order: [["score", "DESC"]]})
-    if (!entries) return arenaChannel.send(`Critical error. Missing entries in the database.`) 
-
-	return startRound(info, entries)
+	return
 }
 
 //IMPORT 
@@ -626,7 +612,8 @@ if (pfpcom.includes(cmd)) {
 
 //NAME
 if (cmd === `!name`) {
-	const playerId = messageArray[1].replace(/[\\<>@#&!]/g, "")
+	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : null
+	if (!playerId) return	
 	const member = message.guild.members.cache.get(playerId)
 	const player = await Player.findOne({ where: { id: playerId } })
 	return message.channel.send(`The database name of ${member.user.username} is: ${player.name}.`)
@@ -689,7 +676,7 @@ if(startcom.includes(cmd)) {
 		`\nPlease wait while I open some packs... ${blue}`
 		)
 
-		await awardPack(message, set, 10, artwork = true)
+		await awardPack(message.channel, maid, set, 10)
 		await completeTask(message.channel, maid, 'e1')
 		return message.channel.send(`I wish you luck on your journey, new duelist! ${master}`)
 	}).catch(err => {
@@ -888,7 +875,7 @@ if(infocom.includes(cmd)) {
 		` You can check ratings with the **!stats** command.`+
 		`\n\nDisclaimer: Logs exist and admins can view inventories.`+
 		` Playing with cards you don't own will not be tolerated.`+
-		`\n\nIn addition, you must follow the Forbidden and Limited List.`)
+		`\n\nIn addition, you must follow the Forbidden and Limited List.`, {files: ["https://i.imgur.com/R0TcKar.png"]})
 	}
 
 	if (mcid == marketPlaceChannelId) { 
@@ -1099,7 +1086,7 @@ if(calccom.includes(cmd)) {
 
 //PROFILE
 if(profcom.includes(cmd)) {
-	const playerId = (messageArray.length === 1 ? maid : messageArray[1].replace(/[\\<>@#&!]/g, ""))
+	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const player = await Player.findOne({ 
 		where: { 
 			id: playerId
@@ -1162,7 +1149,7 @@ if(profcom.includes(cmd)) {
 	//\nMaster Diary: ${master_summary}
 
 	let correct_answers = 0
-	const knowledge_keys = Object.keys(player.knowledge)
+	const knowledge_keys = Object.keys(player.knowledge.dataValues)
 	knowledge_keys.forEach(function(key) {
 		if (key.startsWith('question') && player.knowledge[key]) correct_answers++
 	})
@@ -1184,26 +1171,15 @@ if(profcom.includes(cmd)) {
 	//const keeper_win_rate = player.keeper_wins || player.keeper_losses ? `${Math.round(player.keeper_wins / (player.keeper_wins + player.keeper_losses) * 100)}%` : `N/A`
 	//\nKeeper Wins: ${player.keeper_wins}\nKeeper Win Rate: ${keeper_win_rate}
 
-	const allYourTrades = await Trade.findAll({ where: { senderId: playerId } })
-	const allYourPartners = []
-	let trade_partners = 0
-
-	for (let i = 0; i < allYourTrades.length; i++) {
-		if (!allYourPartners.includes(allYourTrades[i].receiver)) {
-			allYourPartners.push(allYourTrades[i].receiver)
-			trade_partners++
-		}
-	}
-
 	const profileEmbed = new Discord.MessageEmbed()
 		.setColor(player.profile.color)
 		.setThumbnail(avatar)
 		.setTitle(`**${player.name}'s Player Profile**`)
 		.setDescription(`Member Since: ${month} ${day}, ${year}${deck_name ? `\nFirst Deck: ${eval(player.profile.starter)} ${deck_name} ${eval(player.profile.starter)}` : ""}`)
 		.addField('Diary Progress', `Easy Diary: ${easy_summary}\nMedium Diary: ${medium_summary}\nHard Diary: ${hard_summary}\nElite Diary: ${elite_summary}`)
-		.addField('Ranked Stats', `Best Medal: ${getMedal(player.best_stats, true)}\nWin Rate: ${win_rate}\nHighest Elo: ${player.best_stats.toFixed(2)}\nVanquished Foes: ${player.vaniquished_foes}\nLongest Streak: ${player.longest_streak}`)
+		.addField('Ranked Stats', `Best Medal: ${getMedal(player.best_stats, true)}\nWin Rate: ${win_rate}\nHighest Elo: ${player.best_stats.toFixed(2)}\nVanquished Foes: ${player.vanquished_foes}\nLongest Streak: ${player.longest_streak}`)
 		.addField('Arena Stats', `Beast Wins: ${player.profile.beast_wins} ${beasts}\nDinosaur Wins: ${player.profile.dinosaur_wins} ${dinosaurs}\nFish Wins: ${player.profile.fish_wins} ${fishes}\nPlant Wins: ${player.profile.plant_wins} ${plants}\nReptile Wins: ${player.profile.reptile_wins} ${reptiles}\nRock Wins: ${player.profile.rock_wins} ${rocks}`)
-		.addField('Other Stats', `Net Worth: ${Math.floor(networth)}${starchips}\nTrade Partners: ${trade_partners}\nTrivia Wins: ${player.profile.trivia_wins}\nTrivia Answers: ${correct_answers} out of 1000`)
+		.addField('Other Stats', `Net Worth: ${Math.floor(networth)}${starchips}\nTrade Partners: ${player.profile.trade_partners}\nTrivia Wins: ${player.profile.trivia_wins}\nTrivia Answers: ${correct_answers} out of 1000`)
 		.setImage(card_image)
 		.setFooter(quote)
 
@@ -1213,7 +1189,7 @@ if(profcom.includes(cmd)) {
 //REFERRAL
 if(cmd === `!ref` || cmd === `!refer` || cmd === `!referral`) {
 	if (!args.length) return message.channel.send(`No player specified.`)
-	const referrer = messageArray[1].replace(/[\\<>@#&!]/g, "")
+	const referrer = message.mentions.users.first() ? message.mentions.users.first().id : null	
 	if (!referrer || referrer.length < 17 || referrer.length > 18) return message.channel.send(`No player specified.`)
 
 	const referringPlayer = await Player.findOne({ where: { id: referrer }, include: Wallet })
@@ -1482,7 +1458,7 @@ if(cmd === `!diary`) {
 	const moderate_complete = diary.m1 && diary.m2 && diary.m3 && diary.m4 && diary.m5 && diary.m6 && diary.m7 && diary.m8 && diary.m9 && diary.m10
 	const hard_complete = diary.h1 && diary.h2 && diary.h3 && diary.h4 && diary.h5 && diary.h6 && diary.h7 && diary.h8
 	const elite_complete = diary.l1 && diary.l2 && diary.l3 && diary.l4 && diary.l5 && diary.l6
-	const master_complete = diary.s1 && diary.s2 && diary.s3 && diary.s4
+	//const master_complete = diary.s1 && diary.s2 && diary.s3 && diary.s4
 	const input = args[0] ? args[0].toLowerCase() : ''
 	const tasks = []
 	let bonuses
@@ -1493,10 +1469,11 @@ if(cmd === `!diary`) {
 		else if(input === 'm' || input.startsWith('me')) { diary_to_display = 'Moderate'; bonuses = diaries.Moderate.bonuses }
 		else if(input === 'h' || input.startsWith('ha')) { diary_to_display = 'Hard'; bonuses = diaries.Hard.bonuses }
 		else if(input === 'l' || input.startsWith('el')) { diary_to_display = 'Elite'; bonuses = diaries.Elite.bonuses }
-		else if(input === 's' || input.startsWith('ma')) { diary_to_display = 'Master'; bonuses = diaries.Master.bonuses }
+		else return message.channel.send(`I do not recognize the "${input}" Diary.`)
+		//else if(input === 's' || input.startsWith('ma')) { diary_to_display = 'Master'; bonuses = diaries.Master.bonuses }
 	} else if (!diary_to_display) {
-		if (master_complete || elite_complete) { diary_to_display = 'Master'; bonuses = diaries.Master.bonuses }
-		else if (hard_complete) { diary_to_display = 'Elite'; bonuses = diaries.Elite.bonuses }
+		//if (master_complete || elite_complete) { diary_to_display = 'Master'; bonuses = diaries.Master.bonuses }
+		if (hard_complete) { diary_to_display = 'Elite'; bonuses = diaries.Elite.bonuses }
 		else if (moderate_complete) { diary_to_display = 'Hard'; bonuses = diaries.Hard.bonuses }
 		else if (easy_complete) { diary_to_display = 'Moderate'; bonuses = diaries.Moderate.bonuses }
 		else { diary_to_display = 'Easy'; bonuses = diaries.Easy.bonuses }
@@ -1556,13 +1533,13 @@ if(cmd === `!diary`) {
 		score = Math.round(score / 6 * 100)
 	}
 
-	if (diary_to_display === 'Master') {
-		if(diary.s1) { score++ ;tasks.push(`~~${diaries.Master.s1}~~`)} else tasks.push(diaries.Master.s1)
-		if(diary.s2) { score++ ;tasks.push(`~~${diaries.Master.s2}~~`)} else tasks.push(diaries.Master.s2)
-		if(diary.s3) { score++ ;tasks.push(`~~${diaries.Master.s3}~~`)} else tasks.push(diaries.Master.s3)
-		if(diary.s4) { score++ ;tasks.push(`~~${diaries.Master.s4}~~`)} else tasks.push(diaries.Master.s4)
-		score = Math.round(score / 4 * 100)
-	}
+	// if (diary_to_display === 'Master') {
+	// 	if(diary.s1) { score++ ;tasks.push(`~~${diaries.Master.s1}~~`)} else tasks.push(diaries.Master.s1)
+	// 	if(diary.s2) { score++ ;tasks.push(`~~${diaries.Master.s2}~~`)} else tasks.push(diaries.Master.s2)
+	// 	if(diary.s3) { score++ ;tasks.push(`~~${diaries.Master.s3}~~`)} else tasks.push(diaries.Master.s3)
+	// 	if(diary.s4) { score++ ;tasks.push(`~~${diaries.Master.s4}~~`)} else tasks.push(diaries.Master.s4)
+	// 	score = Math.round(score / 4 * 100)
+	// }
 
 	const diary_image = diary_to_display === 'Easy' ? 'https://i.imgur.com/bZpSKCG.jpg' :
 		diary_to_display === 'Moderate' ? 'https://i.imgur.com/deUr5ts.jpg' :
@@ -1839,21 +1816,21 @@ if(cmd === `!wallet`) {
 	const results = [`${FiC} --- ${wallet.player.name}'s Wallet --- ${FiC}`]
 	results.push(`Starchips: ${wallet.starchips}${starchips}`)
 	results.push(`Stardust: ${wallet.stardust}${stardust}`)
-	//results.push(`Tickets: ${wallet.tickets} ${tix}`)
-	//results.push(`Credits: ${wallet.credits} ${credits}`)
-	results.push(`Mushrooms: ${wallet.mushroom} ${mushroom}`)
-	results.push(`Moai: ${wallet.moai} ${moai}`)
-	results.push(`Roses: ${wallet.rose} ${rose}`)
-	results.push(`Hooks: ${wallet.hook} ${hook}`)
-	results.push(`Eggs: ${wallet.egg} ${egg}`)
-	results.push(`Cacti: ${wallet.cactus} ${cactus}`)
+	if (wallet.tickets) results.push(`Tickets: ${wallet.tickets} ${tix}`)
+	if (wallet.credits) results.push(`Credits: ${wallet.credits} ${credits}`)
+	if (wallet.mushroom) results.push(`Mushrooms: ${wallet.mushroom} ${mushroom}`)
+	if (wallet.moai) results.push(`Moai: ${wallet.moai} ${moai}`)
+	if (wallet.rose) results.push(`Roses: ${wallet.rose} ${rose}`)
+	if (wallet.hook) results.push(`Hooks: ${wallet.hook} ${hook}`)
+	if (wallet.egg) results.push(`Eggs: ${wallet.egg} ${egg}`)
+	if (wallet.cactus) results.push(`Cacti: ${wallet.cactus} ${cactus}`)
 
 	return message.channel.send(results.join('\n'))
 }
 
 //STATS
 if (statscom.includes(cmd)) {
-	const playerId = (messageArray.length === 1 ? maid : messageArray[1].replace(/[\\<>@#&!]/g, ""))
+	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const player = await Player.findOne({ where: { id: playerId } })
 	const wallet = await Wallet.findOne({ where: { playerId } })
 
@@ -1886,18 +1863,19 @@ if (statscom.includes(cmd)) {
 
 //LOSS
 if (losscom.includes(cmd)) {
-	const oppo = messageArray[1].replace(/[\\<>@#&!]/g, "")
+	const oppo = message.mentions.users.first() ? message.mentions.users.first().id : null	
+	if (!oppo) return message.channel.send(`No player specified.`)
+	if (oppo === maid) return message.channel.send(`You cannot lose a match to yourself.`)
+
 	const winner = message.guild.members.cache.get(oppo)
 	const loser = message.guild.members.cache.get(maid)
 	const winningPlayer = await Player.findOne({ where: { id: oppo }, include: Wallet })
 	const losingPlayer = await Player.findOne({ where: { id: maid }, include: Wallet })
 
-	if (!oppo || oppo == '@') return message.channel.send(`No player specified.`)
-	if (oppo == maid) return message.channel.send(`You cannot lose a match to yourself.`)
 	if (winner.roles.cache.some(role => role.id === botRole)) return message.channel.send(`Sorry, Bots do not play Forged in Chaos... *yet*.`)
 	if (oppo.length < 17 || oppo.length > 18) return message.channel.send(`To report a loss, type **!loss @opponent**.`)
 	if (!losingPlayer) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
-	if (!winningPlayer) return message.channel.send(`That person is not in the database.`)
+	if (!winningPlayer) return message.channel.send(`That user is not in the database.`)
 	
 	// if (status['status'] === 'active' && (loser.roles.cache.some(role => role.id === tourRole) || winner.roles.cache.some(role => role.id === tourRole))) {
 	// 	return challongeClient.matches.index({
@@ -1986,10 +1964,18 @@ if (losscom.includes(cmd)) {
 	const chipsWinner = Math.round((delta)) < 6 ? 6 : Math.round((delta)) > 20 ? 20 : Math.round((delta))
 	const chipsLoser = (origStatsLoser - origStatsWinner) < 72 ? 3 : (origStatsLoser - origStatsWinner) >=150 ? 1 : 2
 
+	const previouslyDefeated = await Match.count({
+		where: {
+			winnerId: winningPlayer.id,
+			loserId: losingPlayer.id
+		}
+	})
+
 	winningPlayer.stats += delta
 	winningPlayer.backup = origStatsWinner
 	winningPlayer.wins++
 	winningPlayer.current_streak++
+	if (!previouslyDefeated) winningPlayer.vanquished_foes++
 	if (winningPlayer.current_streak > winningPlayer.longest_streak) winningPlayer.longest_streak = winningPlayer.current_streak
 	if (winningPlayer.stats > winningPlayer.best_stats) winningPlayer.best_stats = winningPlayer.stats
 	await winningPlayer.save()
@@ -2006,18 +1992,6 @@ if (losscom.includes(cmd)) {
 	losingPlayer.wallet.starchips += chipsLoser
 	await losingPlayer.wallet.save()
 
-	const previouslyDefeated = await Match.count({
-		where: {
-			winnerId: oppo,
-			loserId: maid
-		}
-	})
-
-	if (!previouslyDefeated) {
-		winningPlayer.vanquished_foes++
-		await winningPlayer.save()
-	}
-
 	await Match.create({
 		game_mode: "ranked",
 		winner_name: winningPlayer.name,
@@ -2030,23 +2004,31 @@ if (losscom.includes(cmd)) {
 	})
 
 	completeTask(message.channel, winningPlayer.id, 'e3')
-	if (winningPlayer.stats >= 530) completeTask(message.channel, winningPlayer.id, 'm1')
-	if (winningPlayer.current_streak === 3) completeTask(message.channel, winningPlayer.id, 'm8') 
+	if (winningPlayer.stats >= 530) completeTask(message.channel, winningPlayer.id, 'm1', 3000)
+	if (winningPlayer.stats >= 590) completeTask(message.channel, winningPlayer.id, 'h1', 3000)
+	if (winningPlayer.stats >= 650) completeTask(message.channel, winningPlayer.id, 'l1', 3000)
+	if (winningPlayer.current_streak === 3) completeTask(message.channel, winningPlayer.id, 'm2', 5000) 
+	if (winningPlayer.vanquished_foes === 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
+	if (winningPlayer.current_streak === 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
 	return message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your loss to ${winningPlayer.name} (+${chipsWinner}${starchips}) has been recorded.`)
 }
 
 //MANUAL
 if (manualcom.includes(cmd)) {
-	const winnerId = messageArray[1].replace(/[\\<>@#&!]/g, "")
-	const loserId = messageArray[2].replace(/[\\<>@#&!]/g, "")
+	if (!isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
+
+	const usersMap = message.mentions.users
+	const userIds = [...usersMap.keys()]	
+	const winnerId = message.mentions.users.first() ? message.mentions.users.first().id : null	
+	const loserId = userIds.length > 1 ? userIds[1] : null	
+	if (!winnerId || !loserId) return message.channel.send(`Please specify 2 players.`)
+	if (winnerId === loserId) return message.channel.send(`Please specify 2 different players.`)
+
 	const winner = message.guild.members.cache.get(winnerId)
 	const loser = message.guild.members.cache.get(loserId)
 	const winningPlayer = await Player.findOne({ where: { id: winnerId }, include: Wallet })
 	const losingPlayer = await Player.findOne({ where: { id: loserId }, include: Wallet })
 
-	if (!isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	if (!winner || !loser) return message.channel.send(`Please specify 2 players.`)
-	if (winner === loser) return message.channel.send(`Please specify 2 different players.`)
 	if (winner.roles.cache.some(role => role.id === botRole) || loser.roles.cache.some(role => role.id === botRole)) return message.channel.send(`Sorry, Bots do not play Forged in Chaos... *yet*.`)
 	if (!losingPlayer) return message.channel.send(`Sorry, ${loser.user.username} is not in the database.`)
 	if (!winningPlayer) (`Sorry, ${winner.user.username} was not in the database.`)
@@ -2137,10 +2119,18 @@ if (manualcom.includes(cmd)) {
 		const chipsWinner = Math.round((delta)) < 6 ? 6 : Math.round((delta)) > 20 ? 20 : Math.round((delta))
 		const chipsLoser = (origStatsLoser - origStatsWinner) < 72 ? 3 : (origStatsLoser - origStatsWinner) >=150 ? 1 : 2
 
+		const previouslyDefeated = await Match.count({
+			where: {
+				winnerId: winningPlayer.id,
+				loserId: losingPlayer.id
+			}
+		})
+
 		winningPlayer.stats += delta
 		winningPlayer.backup = origStatsWinner
 		winningPlayer.wins++
 		winningPlayer.current_streak++
+		if (!previouslyDefeated) winningPlayer.vanquished_foes++
 		if (winningPlayer.current_streak > winningPlayer.longest_streak) winningPlayer.longest_streak = winningPlayer.current_streak
 		if (winningPlayer.stats > winningPlayer.best_stats) winningPlayer.best_stats = winningPlayer.stats
 		await winningPlayer.save()
@@ -2157,18 +2147,6 @@ if (manualcom.includes(cmd)) {
 		losingPlayer.wallet.starchips += chipsLoser
 		await losingPlayer.wallet.save()
 	
-		const previouslyDefeated = await Match.count({
-			where: {
-				winnerId: winnerId,
-				loserId: loserId
-			}
-		})
-	
-		if (!previouslyDefeated) {
-			winningPlayer.vanquished_foes++
-			await winningPlayer.save()
-		}
-	
 		await Match.create({ 
 			game: "ranked",
 			winner_name: winningPlayer.name,
@@ -2182,7 +2160,11 @@ if (manualcom.includes(cmd)) {
 
 		completeTask(message.channel, winningPlayer.id, 'e3')
 		if (winningPlayer.stats >= 530) completeTask(message.channel, winningPlayer.id, 'm1', 3000)
-		if (winningPlayer.current_streak === 3) completeTask(message.channel, winningPlayer.id, 'm8', 4000) 
+		if (winningPlayer.stats >= 590) completeTask(message.channel, winningPlayer.id, 'h1', 3000)
+		if (winningPlayer.stats >= 650) completeTask(message.channel, winningPlayer.id, 'l1', 3000)
+		if (winningPlayer.current_streak === 3) completeTask(message.channel, winningPlayer.id, 'm2', 5000) 
+		if (winningPlayer.vanquished_foes === 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
+		if (winningPlayer.current_streak === 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
 		return message.channel.send(`A manual loss by ${losingPlayer.name} (+${chipsLoser}${starchips}) to ${winningPlayer.name} (+${chipsWinner}${starchips}) has been recorded.`)
 	}
 }
@@ -2219,15 +2201,17 @@ if (noshowcom.includes(cmd)) {
 
 //H2H
 if (h2hcom.includes(cmd)) {
-	if (messageArray.length === 1) return message.channel.send("Please specify at least 1 other player.")
-	if (messageArray.length > 3) return message.channel.send("You may only compare 2 players at a time.")
-	const player1Id = messageArray[1].replace(/[\\<>@#&!]/g, "")
-	const player2Id = (messageArray.length === 2 ? maid : messageArray[2].replace(/[\\<>@#&!]/g, ""))
+	const usersMap = message.mentions.users
+	const userIds = [...usersMap.keys()]
+	const player1Id = message.mentions.users.first() ? message.mentions.users.first().id : null	
+	const player2Id = userIds.length > 1 ? userIds[1] : maid	
+
+	if (!player1Id) return message.channel.send("Please specify at least 1 other player.")
+	if (player1Id === player2Id) return message.channel.send(`Please specify 2 different players.`)
 
 	const player1 = await Player.findOne({ where: { id: player1Id } })
 	const player2 = await Player.findOne({ where: { id: player2Id } })
 	
-	if (player1Id === player2Id) return message.channel.send(`Please specify 2 different players.`)
 	if (!player1 && player2Id === maid) return message.channel.send(`That user is not in the database.`)
 	if (!player1 && player2Id !== maid) return message.channel.send(`The first user is not in the database.`)
 	if (!player2 && player2Id === maid) return message.channel.send(`You are not in the database.`)
@@ -2476,10 +2460,9 @@ if(joincom.includes(cmd)) {
 			await info.save()
 			return startArena(message.guild)
 		} else if (game === 'Trivia' && count === 4) {
-			console.log(`RUN THE TRIVIA!!!`)
 			info.status = 'confirming'
 			await info.save()
-			return runTrivia(message.guild)
+			return startTrivia(message.guild)
 		}
 
 	} else {
@@ -2503,17 +2486,10 @@ if (cmd === `!reset`) {
 	const entries = await eval(game).findAll()
 	if (!entries) return message.channel.send(`Could not find any entries for: "${game}".`)
 
-	info.status = 'pending'
-	await info.save()
-
 	if (game === 'Arena') {
 		resetArena(info, entries)
 	} else if (game === 'Trivia') {
-		for (let i = 0; i < entries.length; i++) {
-			const entry = entries[i]
-			entry.active = false
-			await entry.save()
-		}
+		resetTrivia(message.guild, info, entries)
 	}
 
 	return message.channel.send(`${game === 'Trivia' ? 'Trivia' : `The ${game}`} has been reset.`)
@@ -2852,7 +2828,12 @@ if(cmd === `!daily`) {
 			printId: print.id,
 			playerId: maid
 		})
+
+		if (print.rarity === 'scr') completeTask(message.channel, maid, 'm4', 4000)
 	}
+
+	if (await checkCoreSetComplete(maid, 1)) completeTask(message.channel, maid, 'h4', 4000)
+	if (await checkCoreSetComplete(maid, 3)) completeTask(message.channel, maid, 'l3', 5000)
 
 	const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
 	const moderate_complete = diary.m1 && diary.m2 && diary.m3 && diary.m4 && diary.m5 && diary.m6 && diary.m7 && diary.m8 && diary.m9 && diary.m10
@@ -2860,18 +2841,20 @@ if(cmd === `!daily`) {
 	const elite_complete = diary.l1 && diary.l2 && diary.l3 && diary.l4 && diary.l5 && diary.l6
 	const master_complete = diary.s1 && diary.s2 && diary.s3 && diary.s4
 
-	if ((daily.cobble_progress + daysPassed + 1) >= 7) {
+	if (easy_complete && (daily.cobble_progress + daysPassed) >= 6) {
 		daily.cobble_progress = 0
-		let num = master_complete ? 5 : elite_complete ? 4 : hard_complete ? 3 : moderate_complete ? 2 :  easy_complete ? 1 : 1
+		let num = master_complete ? 5 : elite_complete ? 4 : hard_complete ? 3 : moderate_complete ? 2 : 1
 		if (num) setTimeout(() => {
 			message.channel.send(`Oh look, ${daily.player.name}, you cobbled together a pack!`, {files:[`./public/packs/7outof7.png`]})
-			awardPack(message, set, num, artwork = true)
+			awardPack(message.channel, daily.playerId, set, num)
 		}, 4000)
 	} else {
-		daily.cobble_progress += (daysPassed + 1)
-		setTimeout(() => {
-			message.channel.send(`Hey, ${daily.player.name}, keep cobblin', buddy.`, {files:[`./public/packs/${daily.cobble_progress}outof7.png`]})
-		}, 4000)
+		daily.cobble_progress += (daysPassed)
+		if (easy_complete) {
+			setTimeout(() => {
+				message.channel.send(`Hey, ${daily.player.name}, keep cobblin', buddy.`, {files:[`./public/packs/${daily.cobble_progress}outof7.png`]})
+			}, 4000)
+		}
 	}
 
 	daily.last_check_in = date
@@ -2889,8 +2872,6 @@ if(cmd === `!daily`) {
 
 //ALCHEMY
 if(cmd === `!alc` ||cmd === `!alch` || cmd === `!alchemy`) {
-	console.log('mcid', mcid)
-	console.log(mcid !== botSpamChannelId)
 	if (mcid !== botSpamChannelId && mcid !== generalChannelId) return message.channel.send(`Please use this command in <#${botSpamChannelId}> or <#${generalChannelId}>.`)
 	const wallet = await Wallet.findOne({ 
 		where: { playerId: maid },
@@ -2915,19 +2896,26 @@ if(cmd === `!alc` ||cmd === `!alch` || cmd === `!alchemy`) {
 
 	if (!wallet || !daily || !diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	
-	//if (!easy_complete) return message.channel.send(`To gain access to **!alchemy**, complete your Easy Diary.`)
-
 	const date = new Date()
 	const hoursLeftInDay = 23 - date.getHours()
 	const minsLeftInHour = 60 - date.getMinutes()
 
+	if (daily.last_alchemy && !isSameDay(daily.last_alchemy, date)) {
+		daily.alchemy_1 = false
+		daily.alchemy_2 = false
+		daily.alchemy_3 = false
+		daily.alchemy_4 = false
+		daily.alchemy_5 = false
+		await daily.save()
+	}
+
 	if (
-		!(
-			!daily.alchemy_1 ||
-			(!daily.alchemy_2 && easy_complete) ||
-			(!daily.alchemy_3 && moderate_complete) ||
-			(!daily.alchemy_4 && hard_complete) ||
-			(!daily.alchemy_5 && elite_complete)
+		(
+			daily.alchemy_1 &&
+			(daily.alchemy_2 || !easy_complete) &&
+			(daily.alchemy_3 || !moderate_complete) &&
+			(daily.alchemy_4 || !hard_complete) &&
+			(daily.alchemy_5 || !elite_complete)
 		)
 	) return message.channel.send(`You exhausted your alchemic powers for the day. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
 
@@ -2974,10 +2962,13 @@ if(cmd === `!alc` ||cmd === `!alch` || cmd === `!alchemy`) {
 			daily.alchemy_2 = true
 		} else if (!daily.alchemy_3) {
 			daily.alchemy_3 = true
-		} else {
+		} else if (!daily.alchemy_4) {
 			daily.alchemy_4 = true
+		} else {
+			daily.alchemy_5 = true
 		}
 
+		daily.last_alchemy = date
 		await daily.save()
 
 		completeTask(message.channel, maid, 'e5')
@@ -2991,9 +2982,9 @@ if(cmd === `!alc` ||cmd === `!alch` || cmd === `!alchemy`) {
 //AWARD
 if(cmd === `!award`) {
 	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
-	const recipient = args[0].replace(/[\\<>@#&!]/g, "")
+	const recipient = message.mentions.users.first() ? message.mentions.users.first().id : null	
 	if (recipient === maid) return message.channel.send(`You cannot give an award to yourself.`)
-	if (isNaN(recipient) || recipient.length < 17) return message.channel.send(`Please @ mention a user to award.`)
+	if (!recipient || isNaN(recipient) || recipient.length < 17) return message.channel.send(`Please @ mention a user to award.`)
 
 	const player = await Player.findOne({ 
 		where: { id: recipient },
@@ -3009,21 +3000,20 @@ if(cmd === `!award`) {
 	if (!quantity) return message.channel.send(`Please specify the number of items you wish to award.`)
 	if (!item) return message.channel.send(`Please specify the item you wish to award.`)
 
-	const card_name = await findCard(item, fuzzyPrints, fuzzyPrints2)
+	const set_code = item.toUpperCase()
+	const valid_set_code = !!(set_code.length === 3 && await Set.count({where: { code: set_code }}))
 	const card_code = `${item.slice(0, 3).toUpperCase()}-${item.slice(-3)}`
-	const print = await Print.findOne({ where: { card_code: card_code }})
-	const prints = await Print.findAll({ 
-		where: { card_name: { [Op.iLike]: card_name } },
-		order: [['createdAt', 'ASC']]
-	})
+	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
+	const card_name = item && !valid_set_code && !valid_card_code ? await findCard(item, fuzzyPrints, fuzzyPrints2) : null
+	const print = valid_card_code ? await Print.findOne({ where: { card_code } }) : card_name ? await selectPrint(message, maid, card_name) : null
 
-	let walletEmoji, walletField
+	let walletField
 	if (item === 'sc' || item === 'starchip' || item === 'starchips' || item === 'chip' || item === 'chips') walletEmoji = starchips, walletField = 'starchips'
-	if (item === 'sd' ||item === 'stardust' || item === 'dust') walletEmoji = stardust, walletField = 'stardust'
+	if (item === 'sd' ||item === 'stardust' || item === 'dust') walletField = 'stardust'
 
-	if (!print && !prints.length && !walletEmoji) return message.channel.send(`Sorry, I do not recognize the item: "${item}".`)
+	if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the item: "${item}".`)
 
-	const award = print ? ` ${eval(print.rarity)}${print.card_code} - ${print.card_name}` : prints.length ? ` ${eval(prints[0].rarity)}${prints[0].card_code} - ${prints[0].card_name}` : walletEmoji 
+	const award = walletField ? `${eval(walletField)}` : ` ${eval(print.rarity)}${print.card_code} - ${print.card_name}` 
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send(`Are you sure you want to award ${quantity}${award} to ${player.name}?`)
@@ -3033,7 +3023,12 @@ if(cmd === `!award`) {
 	}).then(async collected => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
 		
-		if (print) {
+		if (walletField) {
+			player.wallet[walletField] += quantity
+			await player.wallet.save()
+		} else {
+			const set = await Set.findOne({ where: { code: print.set_code } })
+
 			const inv = await Inventory.findOne({ where: { 
 				card_code: print.card_code,
 				printId: print.id,
@@ -3050,28 +3045,13 @@ if(cmd === `!award`) {
 					printId: print.id,
 					playerId: recipient
 				})
+
+				if (print.rarity === 'scr') completeTask(message.channel, recipient, 'm4')
 			}
-		} else if (prints.length) {
-			const inv = await Inventory.findOne({ where: { 
-				card_code: prints[0].card_code,
-				printId: prints[0].id,
-				playerId: recipient
-			}})
-	
-			if (inv) {
-				inv.quantity += quantity
-				await inv.save()
-			} else {
-				await Inventory.create({ 
-					card_code: prints[0].card_code,
-					quantity: quantity,
-					printId: prints[0].id,
-					playerId: recipient
-				})
-			}
-		} else {
-			player.wallet[walletField] += quantity
-			await player.wallet.save()
+
+			if ( print.set_code === 'APC' && (( inv && inv.quantity >= 3 ) || quantity >= 3 ) ) completeTask(message.channel, recipient, 'h5', 4000)
+			if (await checkCoreSetComplete(recipient, 1)) completeTask(message.channel, recipient, 'h4', 4000)
+			if (await checkCoreSetComplete(recipient, 3)) completeTask(message.channel, recipient, 'l3', 5000)	
 		}
 	
 		return message.channel.send(`${player.name} was awarded ${quantity}${award}. Congratulations!`)
@@ -3084,9 +3064,9 @@ if(cmd === `!award`) {
 //STEAL
 if(cmd === `!steal`) {
 	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
-	const target = args[0].replace(/[\\<>@#&!]/g, "")
+	const target = message.mentions.users.first() ? message.mentions.users.first().id : null	
 	if (target === maid) return message.channel.send(`You cannot steal something from yourself.`)
-	if (isNaN(target) || target.length < 17) return message.channel.send(`Please @ mention a user to steal from.`)
+	if (!target || isNaN(target) || target.length < 17) return message.channel.send(`Please @ mention a user to steal from.`)
 
 	const player = await Player.findOne({ 
 		where: { id: target },
@@ -3111,13 +3091,13 @@ if(cmd === `!steal`) {
 		order: [['createdAt', 'ASC']]
 	})
 
-	let walletEmoji, walletField
-	if (item === 'sc' || item === 'starchip' || item === 'starchips' || item === 'chip' || item === 'chips') walletEmoji = starchips, walletField = 'starchips'
-	if (item === 'sd' ||item === 'stardust' || item === 'dust') walletEmoji = stardust, walletField = 'stardust'
+	let walletField
+	if (item === 'sc' || item === 'starchip' || item === 'starchips' || item === 'chip' || item === 'chips') walletField = 'starchips'
+	if (item === 'sd' ||item === 'stardust' || item === 'dust') walletField = 'stardust'
 
-	if (!print && !prints.length && !walletEmoji) return message.channel.send(`Sorry, I do not recognize the item: "${item}".`)
+	if (!print && !prints.length && !walletField) return message.channel.send(`Sorry, I do not recognize the item: "${item}".`)
 
-	const loot = print ? ` ${eval(print.rarity)}${print.card_code} - ${print.card_name}` : prints.length ? ` ${eval(prints[0].rarity)}${prints[0].card_code} - ${prints[0].card_name}` : walletEmoji 
+	const loot = walletField ? `${eval(walletField)}` : prints.length ? ` ${eval(prints[0].rarity)}${prints[0].card_code} - ${prints[0].card_name}` : ` ${eval(print.rarity)}${print.card_code} - ${print.card_name}`  
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send(`Are you sure you want to steal ${quantity}${loot} from ${player.name}?`)
@@ -3127,20 +3107,14 @@ if(cmd === `!steal`) {
 	}).then(async collected => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
 		
-		if (print) {
-			const inv = await Inventory.findOne({ where: { 
-				card_code: print.card_code,
-				printId: print.id,
-				playerId: target
-			}})
-	
-			if (!inv) {
+		if (walletField) {
+			if (!player.wallet[walletField]) {
 				return message.channel.send(`Sorry, ${player.name} does not have any${loot}.`)
-			} else if (inv.quantity < quantity) {
-				return message.channel.send(`Sorry, ${player.name} only has ${inv.quantity}${loot}.`)
+			} else if (player.wallet[walletField] < quantity) {
+				return message.channel.send(`Sorry, ${player.name} only has ${player.wallet[walletField]}${loot}.`)
 			} else {
-				inv.quantity -= quantity
-				await inv.save()
+				player.wallet[walletField] -= quantity
+				await player.wallet.save()
 			}
 		} else if (prints.length) {
 			const inv = await Inventory.findOne({ where: { 
@@ -3158,13 +3132,19 @@ if(cmd === `!steal`) {
 				await inv.save()
 			}
 		} else {
-			if (!player.wallet[walletField]) {
+			const inv = await Inventory.findOne({ where: { 
+				card_code: print.card_code,
+				printId: print.id,
+				playerId: target
+			}})
+	
+			if (!inv) {
 				return message.channel.send(`Sorry, ${player.name} does not have any${loot}.`)
-			} else if (player.wallet[walletField] < quantity) {
+			} else if (inv.quantity < quantity) {
 				return message.channel.send(`Sorry, ${player.name} only has ${inv.quantity}${loot}.`)
 			} else {
-				player.wallet[walletField] -= quantity
-				await player.wallet.save()
+				inv.quantity -= quantity
+				await inv.save()
 			}
 		}
 	
@@ -3214,7 +3194,7 @@ if(invcom.includes(cmd)) {
 	const valid_set_code = !!(set_code.length === 3 && await Set.count({where: { code: set_code }}))
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-	const card_name = query && !valid_set_code && !valid_card_code ? findCard(query, fuzzyPrints, fuzzyPrints2) : null
+	const card_name = query && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints, fuzzyPrints2) : null
 	const print = valid_card_code ? await Print.findOne({ where: { card_code } }) : card_name ? await selectPrint(message, maid, card_name) : null
 	if (card_name && !print) return
 
@@ -3446,6 +3426,7 @@ if(cmd === `!pack`) {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
 		
 		message.channel.send(`Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}.`)
+		let gotSecret = false
 
 		for (let j = 0; j < num; j++) {
 			const images = []
@@ -3498,6 +3479,8 @@ if(cmd === `!pack`) {
 						printId: print.id,
 						playerId: maid
 					})
+
+					if (print.rarity === 'scr') gotSecret = true
 				}
 			}
 
@@ -3538,7 +3521,10 @@ if(cmd === `!pack`) {
 		await set.save()
 
 		completeTask(message.channel, maid, 'e6')
-		if (num >= 5) completeTask(message.channel, maid, 'm5', 3000)
+		if (num >= 5) completeTask(message.channel, maid, 'm3', 3000)
+		if (gotSecret) completeTask(message.channel, maid, 'm4', 5000)
+		if (await checkCoreSetComplete(maid, 1)) completeTask(message.channel, 'h4', 5000)
+		if (await checkCoreSetComplete(maid, 3)) completeTask(message.channel, 'l3', 6000)
 		return
 	}).catch(err => {
 		console.log(err)
@@ -3619,8 +3605,11 @@ if(cmd === `!box`) {
 	}).then(async collected => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
 		
-		const results = []
-		for (let j = 0; j < set.packs_per_box; j++) {
+		message.channel.send(`Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Box.`)
+		const num = set.packs_per_box
+		for (let j = 0; j < num; j++) {
+			const images = []
+			const results = [`\n${eval(set.emoji)} - ${set.name} Pack${num > 1 ? ` ${j + 1}` : ''} - ${eval(set.alt_emoji)}`]
 			const yourCommons = set.commons_per_pack > 1 ? getRandomSubset(commons, set.commons_per_pack) : set.secrets_per_pack === 1 ? [getRandomElement(commons)] : []
 			const yourRares = set.rares_per_pack > 1 ? getRandomSubset(rares, set.rares_per_pack) : set.rares_per_pack === 1 ? [getRandomElement(rares)] : []
 			const yourSupers = set.supers_per_pack > 1 ? getRandomSubset(supers, set.supers_per_pack) : set.supers_per_pack === 1 ? [getRandomElement(supers)] : []
@@ -3638,9 +3627,7 @@ if(cmd === `!box`) {
 			const yourFoil = getRandomElement(eval(luck))
 	
 			const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil]
-	
-			results.push(`\n${eval(set.emoji)} - ${set.name} Pack ${j + 1} - ${eval(set.alt_emoji)}`)
-	
+		
 			for (let i = 0; i < yourPack.length; i++) {
 				const print = await Print.findOne({ where: {
 					card_code: yourPack[i]
@@ -3649,6 +3636,12 @@ if(cmd === `!box`) {
 				if (!print.id) return console.log(`${card} does not exist in the Print database.`)
 				results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
 	
+				const card = await Card.findOne({ where: {
+					name: print.card_name
+				}})
+		
+				images.push(`${card.image}`)
+				
 				const inv = await Inventory.findOne({ where: { 
 					card_code: print.card_code,
 					printId: print.id,
@@ -3668,6 +3661,31 @@ if(cmd === `!box`) {
 				}
 			}
 	
+			const card_1 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[0]}`)
+			const card_2 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[1]}`)
+			const card_3 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[2]}`)
+			const card_4 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[3]}`)
+			const card_5 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[4]}`)
+			const card_6 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[5]}`)
+			const card_7 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[6]}`)
+			const card_8 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[7]}`)
+			const card_9 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[8]}`)
+	
+			const card_width = 57
+			const canvas = Canvas.createCanvas(card_width * 9, 80)
+			const context = canvas.getContext('2d')
+	
+			context.drawImage(card_1, 0, 0, card_width, 80)
+			context.drawImage(card_2, card_width, 0, card_width, canvas.height)
+			context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
+			context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
+			context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
+			context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
+			context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
+			context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
+			context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
+			const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`)
+			message.author.send(results.join("\n"), attachment)
 		}
 
 		wallet[set.currency] -= set.box_price
@@ -3679,11 +3697,13 @@ if(cmd === `!box`) {
 		set.unit_sales += 24
 		await set.save()
 
-		for (let i = 0; i < results.length; i += ((set.cards_per_pack * 3) + 1) ) {
-			message.author.send(results.slice(i, i + (set.cards_per_pack * 3) + 1))
-		}
-
-		return message.channel.send(`Thank you for your purchase! I messaged you the contents of your ${set.name} ${eval(set.emoji)} Box.`)
+		completeTask(message.channel, maid, 'e6')
+		completeTask(message.channel, maid, 'm3', 3000)
+		completeTask(message.channel, maid, 'm4', 4000)
+		completeTask(message.channel, maid, 'h3', 5000)
+		if (await checkCoreSetComplete(maid, 1)) completeTask(message.channel, 'h4', 5000)
+		if (await checkCoreSetComplete(maid, 3)) completeTask(message.channel, 'l3', 6000)
+		return
 	}).catch(err => {
 		console.log(err)
 		return message.channel.send(`Sorry, time's up.`)
@@ -3740,6 +3760,8 @@ if(cmd === `!dump`) {
 	const dumpConfirmation = await askForDumpConfirmation(message, set, cards, compensation)
 	if (!dumpConfirmation) return
 
+	let m6success = false
+
 	for (let i = 0; i < inv.length; i++) {
 		const merchbotInv = await Inventory.findOne({where: {
 			printId: inv[i].print.id,
@@ -3749,6 +3771,8 @@ if(cmd === `!dump`) {
 		const quantityToSell = inv[i].quantity - quantityToKeep
 		const price = Math.ceil(inv[i].print.market_price * 0.7) * quantityToSell
 		const newPrice = quantityToSell >= 16 ? price / quantityToSell : ( price + ( (16 - quantityToSell) * inv[i].print.market_price ) ) / 16
+
+		if (inv[i].rarity !== 'com' && quantityToSell >= 5) m6success = true
 
 		if (merchbotInv) {
 			merchbotInv.quantity += quantityToSell
@@ -3775,6 +3799,7 @@ if(cmd === `!dump`) {
 	merchbot_wallet.stardust -= compensation
 	await merchbot_wallet.save()
 
+	if (m6success) completeTask(message.channel, maid, 'm6')
 	return message.channel.send(`You sold ${count} ${rarity === 'all' ? '' : eval(rarity)}${set.code} ${set.emoji === set.alt_emoji ? eval(set.emoji) : `${eval(set.emoji)} ${eval(set.alt_emoji)}`} ${count === 1 ? 'card' : 'cards'} to The Shop for ${compensation}${stardust}.`)
 }
 
@@ -3816,60 +3841,84 @@ if(cmd === `!sell`) {
 		const arguments = inputs[i].split(' ')
 		const quantity = isFinite(parseInt(arguments[0])) ? parseInt(arguments[0]) : isFinite(parseInt(arguments[1])) ? parseInt(arguments[1]) : 1
 		const endOfQuery = buyer === merchbotId ? arguments.length : -1
-		const query = isFinite(parseInt(arguments[0])) ? arguments.slice(1, endOfQuery).join(' ') : buyer !== merchbotId ? arguments.slice(1, endOfQuery).join(' ') : arguments.slice(0, endOfQuery).join(' ')
+		const query = isFinite(parseInt(arguments[0])) ? arguments.slice(1, endOfQuery).join(' ') : buyer !== merchbotId ? arguments.slice(2, endOfQuery).join(' ') : arguments.slice(1, endOfQuery).join(' ')
 	
-		if (buyer !== merchbotId && isNaN(price)) return message.channel.send(`Please specify your asking price at the end of the command.`)
+		if (buyer !== merchbotId && isNaN(prices[0])) return message.channel.send(`Please specify your asking price at the end of the command.`)
 		if (!query) return message.channel.send(`Please specify the card(s) you wish to sell.`)
 
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	
-		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-		if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
-		if (buyer === merchbotId) prices.push(Math.ceil(print.market_price * 0.7) * quantity)
-		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+		let walletField
+		console.log('query', query)
+		if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
+		if (query === 'egg' || query === 'eggs') walletField = 'egg'
+		if (query === 'hook' || query === 'hooks') walletField = 'hook'
+		if (query === 'moai' || query === 'moais' ) walletField = 'moai'
+		if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
+		if (query === 'rose' || query === 'roses' ) walletField = 'rose'
 
-		const sellerInv = await Inventory.findOne({ 
+		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
+		if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+		if (buyer === merchbotId && walletField) return message.channel.send(`Sorry, you cannot sell ${eval(walletField)} to The Shop.`)
+		if (buyer === merchbotId) prices.push(Math.ceil(print.market_price * 0.7) * quantity)
+		const card = walletField ? `${eval(walletField)} ${capitalize(walletField)}` : `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+
+		const sellerInv = print ? await Inventory.findOne({ 
 			where: { 
 				printId: print.id,
 				playerId: maid,
 				quantity: { [Op.gt]: 0 }
 			}
-		})
+		}) : await Wallet.findOne({ where: { playerId: maid }})
 
-		if (!sellerInv) return message.channel.send(`You do not have any copies of ${card}.`)
+		if (!sellerInv) return message.channel.send(`You do not have any ${walletField ? '' : 'copies of '}${card}.`)
+		if (walletField && sellerInv[walletField] < quantity) return message.channel.send(`You only have ${sellerInv.quantity} ${card}.`)
 		if (sellerInv.quantity < quantity) return message.channel.send(`You only have ${sellerInv.quantity} ${sellerInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`)
 	
-		if (print.rarity !== 'com' && quantity >= 5) m6success = true
+		if (!walletField && print.rarity !== 'com' && quantity >= 5) m6success = true
 
 		quantities.push(quantity)
-		prints.push(print)
+		if (!walletField) { 
+			prints.push(print)
+		} else {
+			prints.push(walletField)
+		}
 		sellerInvs.push(sellerInv)
 		cards.push(`${quantity} ${card}`)
 	}
 
 	const totalPrice = prices.reduce((a, b) => a + b, 0)
+
+	if (buyer !== merchbotId && prints[0].market_price && Math.ceil(prints[0].market_price * 0.7) * quantities[0] > totalPrice) return message.channel.send(`Sorry, you cannot sell cards to other players for less than what The Shop will pay for them.`)
 	if (buyer !== merchbotId && buyingPlayer.wallet.stardust < totalPrice) return message.channel.send(`Sorry, ${buyingPlayer.name} only has ${buyingPlayer.wallet.stardust}${stardust}.`)
+
 	const sellerConfirmation = seller !== merchbotId ? await getSellerConfirmation(message, mention = false, seller, cards, totalPrice, buyer, buyingPlayer) : true
 	if (!sellerConfirmation) return
 	const buyerConfirmation = buyer !== merchbotId ? await getBuyerConfirmation(message, mention = true, buyer, cards, totalPrice, seller, sellingPlayer) : true
 	if (!buyerConfirmation) return
 
 	for (let i = 0; i < cards.length; i++) {
-		const newPrice = quantities[i] > 16 ? prices[i] / quantities[i] : ( prices[i] + ( (16 - quantities[i]) * prints[i].market_price ) ) / 16
-		prints[i].market_price = newPrice
-		await prints[i].save()
+		const newPrice = prints[i].market_price ? quantities[i] > 16 ? prices[i] / quantities[i] : ( prices[i] + ( (16 - quantities[i]) * prints[i].market_price ) ) / 16 : null
 		
-		const buyerInv = await Inventory.findOne({ 
+		if (prints[i].market_price) {
+			prints[i].market_price = newPrice
+			await prints[i].save()
+		}
+		
+		const buyerInv = prints[i].card_code ? await Inventory.findOne({ 
 			where: { 
 				card_code: prints[i].card_code,
 				printId: prints[i].id,
 				playerId: buyer
 			}
-		})
+		}) : await Wallet.findOne({ where: { playerId: buyer } })
 
-		if (buyerInv) {
+		if (!prints[i].card_code) {
+			buyerInv[prints[i]] += quantities[i]
+			await buyerInv.save()
+		} else if (buyerInv) {
 			buyerInv.quantity += quantities[i]
 			await buyerInv.save()
 		} else {
@@ -3879,10 +3928,19 @@ if(cmd === `!sell`) {
 				printId: prints[i].id,
 				playerId: buyer
 			})
+
+			if (prints[i].rarity === 'scr') completeTask(message.channel, buyer, 'm4')
 		}
 
-		sellerInvs[i].quantity -= quantities[i]
-		await sellerInvs[i].save()
+		if ( prints[i].set_code === 'APC' && ((buyerInv && buyerInv.quantity >= 3) ||  quantities[i] >= 3 ) ) completeTask(message.channel, buyer, 'h5', 4000)
+
+		if (prints[i].set_code) {
+			sellerInvs[i].quantity -= quantities[i]
+			await sellerInvs[i].save()
+		} else {
+			sellerInvs[i][prints[i]] -= quantities[i]
+			await sellerInvs[i].save()
+		}
 	}
 
 	buyingPlayer.wallet.stardust -= parseInt(totalPrice)
@@ -3895,6 +3953,8 @@ if(cmd === `!sell`) {
 		if (m6success === true) completeTask(message.channel, maid, 'm6')
 		return message.channel.send(`You sold ${cards.length > 1 ? `the following to The Shop for ${totalPrice}${stardust}:\n${cards.join('\n')}` : `${cards[0]} to The Shop for ${totalPrice}${stardust}`}.`)
 	} else {
+		if (await checkCoreSetComplete(buyer, 1)) completeTask(message.channel, buyer, 'h4', 4000)
+		if (await checkCoreSetComplete(buyer, 3)) completeTask(message.channel, buyer, 'l3', 5000)
 		return message.channel.send(`${sellingPlayer.name} sold ${cards.length > 1 ? `the following to ${buyingPlayer.name} for ${totalPrice}${stardust}:\n${cards.join('\n')}` : `${cards[0]} to ${buyingPlayer.name} for ${totalPrice}${stardust}.`}`)
 	}
 }
@@ -3934,37 +3994,48 @@ if(cmd === `!buy`) {
 	if (seller === merchbotId && quantity > 3) return message.channel.send(`You cannot buy more than 3 copies of a card from The Shop.`)
 
 	const endOfQuery = seller === merchbotId ? args.length : -1
-	const query = isFinite(parseInt(args[0])) ? args.slice(1, endOfQuery).join(' ') : seller !== merchbotId ? args.slice(1, endOfQuery).join(' ') : args.slice(0, endOfQuery).join(' ')
+	const query = isFinite(parseInt(args[0])) ? args.slice(1, endOfQuery).join(' ') : seller !== merchbotId ? args.slice(2, endOfQuery).join(' ') : args.slice(1, endOfQuery).join(' ')
 	if (!query) return message.channel.send(`Please specify the card you wish to buy.`)
 
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 
-	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-	if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
-	if (seller === merchbotId) price = Math.ceil(print.market_price * 1.1) * quantity
-	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+	let walletField
+	if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
+	if (query === 'egg' || query === 'eggs') walletField = 'egg'
+	if (query === 'hook' || query === 'hooks') walletField = 'hook'
+	if (query === 'moai' || query === 'moais' ) walletField = 'moai'
+	if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
+	if (query === 'rose' || query === 'roses' ) walletField = 'rose'
 
-	const sellerInv = await Inventory.findOne({ 
+	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
+	if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+	if (buyer === merchbotId && walletField) return message.channel.send(`Sorry, you cannot buy ${eval(walletField)} from The Shop.`)
+	if (seller === merchbotId) price = Math.ceil(print.market_price * 1.1) * quantity
+	const card = walletField ? `${eval(walletField)}` : `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+
+	const sellerInv = print ? await Inventory.findOne({ 
 		where: {
 			printId: print.id,
 			playerId: seller,
 			quantity: { [Op.gt]: 0 }
 		}
-	})
+	}) : await Wallet.findOne({ where: { playerId: seller }})
 
-	if (!sellerInv) return message.channel.send(`${seller === merchbotId ? `${card} is out of stock` : `${sellingPlayer.name} does not have any copies of ${card}`}.`)
+	if (!sellerInv) return message.channel.send(`${seller === merchbotId ? `${card} is out of stock` : `${sellingPlayer.name} does not have any ${walletField ? '' : 'copies of '}${card}`}.`)
+	if (walletField && sellerInv[walletField] < quantity) return message.channel.send(`${sellingPlayer.name} only has ${sellerInv.quantity} ${card}.`)
 	if (sellerInv.quantity < quantity) return message.channel.send(`${seller === merchbotId ? `The Shop only has ${sellerInv.quantity} ${sellerInv.quantity > 1 ? 'copies' : 'copy'} of ${card} in stock.` : `${sellingPlayer.name} only has ${sellerInv.quantity} ${sellerInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`}`)
-	if (buyingPlayer.wallet.stardust < price) return message.channel.send(`Sorry, you only have ${buyingPlayer.wallet.stardust}${stardust} and ${card} costs ${price}${stardust}.`)
+	if (buyingPlayer.wallet.stardust < price) return message.channel.send(`${seller === merchbotId ? `Sorry, you only have ${buyingPlayer.wallet.stardust}${stardust} and ${card} costs ${price}${stardust}.` : `Sorry, you only have ${buyingPlayer.wallet.stardust}${stardust}.`}`)
+	if (!walletField && seller !== merchbotId && (price / quantity) < Math.ceil(print.market_price * 0.7)) return message.channel.send(`You cannot buy cards from other players for less than what The Shop will pay for them.`)
 
-	const buyerInv = await Inventory.findOne({ 
+	const buyerInv = print ? await Inventory.findOne({ 
 		where: { 
 			card_code: print.card_code,
 			printId: print.id,
 			playerId: maid
 		}
-	})
+	}) : await Wallet.findOne({ where: { playerId: maid }})
 
 	if (buyerInv && seller === merchbotId && (buyerInv.quantity + quantity > 3)) return message.channel.send(`You already have ${buyerInv.quantity} ${buyerInv.quantity === 1 ? 'copy' : 'copies'} of ${card}.`)
 
@@ -3972,27 +4043,42 @@ if(cmd === `!buy`) {
 	if (!buyerConfirmation) return
 	const sellerConfirmation = seller !== merchbotId ? await getSellerConfirmation(message, mention = true, seller, [card], price, buyer, buyingPlayer) : true
 	if (!sellerConfirmation) return
-
-	if (buyerInv) {
+	
+	if (!print) {
+		buyerInv[walletField] += quantity
+		await buyerInv.save()
+	} else if (buyerInv) {
 		buyerInv.quantity += quantity
 		await buyerInv.save()
 	} else {
 		await Inventory.create({ 
-			card_code: prints[i].card_code,
-			quantity: quantities[i],
-			printId: prints[i].id,
+			card_code: print.card_code,
+			quantity: quantity,
+			printId: print.id,
 			playerId: maid
 		})
+
+		if (print.rarity === 'scr') completeTask(message.channel, maid, 'm4')
 	}
 
-	sellerInv.quantity -= quantity
-	await sellerInv.save()
+	if (print && print.set_code === 'APC' && ( (buyerInv && buyerInv.quantity >= 3) ||  quantity >= 3 ) ) completeTask(message.channel, maid, 'h5', 4000)
+
+	if (print) {
+		sellerInv.quantity -= quantity
+		await sellerInv.save()
+	} else {
+		sellerInv[print] -= quantity
+		await sellerInv.save()
+	}
 
 	buyingPlayer.wallet.stardust -= parseInt(price)
 	await buyingPlayer.wallet.save()
 
 	sellingPlayer.wallet.stardust += parseInt(price)
 	await sellingPlayer.wallet.save()
+
+	if (await checkCoreSetComplete(maid, 1)) completeTask(message.channel, maid, 'h4', 4000)
+	if (await checkCoreSetComplete(maid, 3)) completeTask(message.channel, maid, 'l3', 5000)
 	
 	if (seller === merchbotId) {
 		completeTask(message.channel, maid, 'e10')
@@ -4053,7 +4139,11 @@ if(cmd === `!barter`) {
 
 	wallet[currency] -= 10
 	await wallet.save()
-
+	
+	if (print.set_code === 'APC' && inv && inv.quantity >= 3 ) completeTask(message.channel, maid, 'h5')
+	if (await checkCoreSetComplete(maid, 1)) completeTask(message.channel, maid, 'h4')
+	if (await checkCoreSetComplete(maid, 3)) completeTask(message.channel, maid, 'l3', 3000)
+	
 	return message.channel.send(`Thanks! You exchanged 10 ${eval(currency)} for a copy of ${card}.`)
 }
 
@@ -4120,11 +4210,27 @@ if(cmd === `!trade`) {
 		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	
+		let walletField
+		if (query === 'd' || query === 'sd' || query === 'stardust' || query === 'dust' ) walletField = 'stardust'
+		if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
+		if (query === 'egg' || query === 'eggs') walletField = 'egg'
+		if (query === 'hook' || query === 'hooks') walletField = 'hook'
+		if (query === 'moai' || query === 'moais' ) walletField = 'moai'
+		if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
+		if (query === 'rose' || query === 'roses' ) walletField = 'rose'
+	
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-		if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
-		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+		if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+		const card = walletField ? `${eval(walletField)} ${capitalize(walletField)}` : `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 
-		const initiatorInv = await Inventory.findOne({ 
+		const initiatorInv = walletField ?
+			await Wallet.findOne({ 
+				where: { 
+					playerId: maid,
+					[walletField]: { [Op.gt]: 0 }
+				}
+			})
+		: await Inventory.findOne({ 
 			where: { 
 				printId: print.id,
 				playerId: maid,
@@ -4132,11 +4238,16 @@ if(cmd === `!trade`) {
 			}
 		})
 
-		if (!initiatorInv) return message.channel.send(`You do not have any copies of ${card}.`)
-		if (initiatorInv.quantity < quantity) return message.channel.send(`You only have ${initiatorInv.quantity} ${initiatorInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`)
+		if (!initiatorInv) return message.channel.send(`You do not have any ${walletField ? '' : 'copies of ' }${card}.`)
+		if (walletField && initiatorInv[walletField] < quantity) return message.channel.send(`You only have ${initiatorInv[walletField]} ${card}.`)
+		if (initiatorInv.quantity < quantity) return message.channel.send(`You only have ${initiatorInv.quantity} ${card}.`)
 	
 		quantities.push(quantity)
-		prints.push(print)
+		if (!walletField) {
+			prints.push(print)
+		} else {
+			prints.push(walletField)
+		}
 		initiatorInvs.push(initiatorInv)
 		cards.push(`${quantity} ${card}`)
 	}
@@ -4160,11 +4271,27 @@ if(cmd === `!trade`) {
 		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	
-		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, partner, card_name) : null
-		if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
-		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+		let walletField
+		if (query === 'd' || query === 'sd' || query === 'stardust' || query === 'dust' ) walletField = 'stardust'
+		if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
+		if (query === 'egg' || query === 'eggs') walletField = 'egg'
+		if (query === 'hook' || query === 'hooks') walletField = 'hook'
+		if (query === 'moai' || query === 'moais' ) walletField = 'moai'
+		if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
+		if (query === 'rose' || query === 'roses' ) walletField = 'rose'
 
-		const partnerInv = await Inventory.findOne({ 
+		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, partner, card_name) : null
+		if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+		const card = walletField ? `${eval(walletField)} ${capitalize(walletField)}` : `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+
+		const partnerInv = walletField ?
+			await Wallet.findOne({ 
+				where: { 
+					playerId: partner,
+					[walletField]: { [Op.gt]: 0 }
+				}
+			})
+		: await Inventory.findOne({ 
 			where: { 
 				printId: print.id,
 				playerId: partner,
@@ -4172,11 +4299,16 @@ if(cmd === `!trade`) {
 			}
 		})
 
-		if (!partnerInv) return message.channel.send(`You do not have any copies of ${card}.`)
+		if (!partnerInv) return message.channel.send(`You do not have ${walletField ? '' : 'copies of ' }${card}..`)
+		if (walletField && partnerInv[walletField] < quantity) return message.channel.send(`You only have ${initiatorInv[walletField]} ${card}.`)
 		if (partnerInv.quantity < quantity) return message.channel.send(`You only have ${partnerInv.quantity} ${partnerInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`)
 	
 		partner_quantities.push(quantity)
-		partner_prints.push(print)
+		if (!walletField) {
+			partner_prints.push(print)
+		} else {
+			partner_prints.push(walletField)
+		}
 		partnerInvs.push(partnerInv)
 		partner_cards.push(`${quantity} ${card}`)
 	}
@@ -4187,7 +4319,7 @@ if(cmd === `!trade`) {
 	if (!final_confirmation) return message.channel.send(`Sorry, ${receivingPlayer.name}, this trade has been rejected.`)
 
 	const lastTrade = await Trade.findAll({ order: [['createdAt', 'DESC']]})
-	const transaction_id = lastTrade ? parseInt(lastTrade[0].transaction_id) + 1 : 1
+	const transaction_id = lastTrade.length ? parseInt(lastTrade[0].transaction_id) + 1 : 1
 
 	const tradeHistory = await Trade.count({ 
 		where: {
@@ -4200,37 +4332,46 @@ if(cmd === `!trade`) {
 		const senderProfile = await Profile.findOne({where: { playerId: maid } })
 		senderProfile.trade_partners++
 		await senderProfile.save()
-		if (senderProfile.trade_partners === 20) completeTask(message.channel, maid, 'm10', 5000)
+		if (senderProfile.trade_partners === 20) completeTask(message.channel, maid, 'm7', 5000)
 
 		const receiverProfile = await Profile.findOne({where: { playerId: partner } })
 		receiverProfile.trade_partners++
 		await receiverProfile.save()
-		if (senderProfile.trade_partners === 20) completeTask(message.channel, partner, 'm10', 8000)
+		if (receiverProfile.trade_partners === 20) completeTask(message.channel, partner, 'm7', 8000)
 	}
 
 	for (let i = 0; i < initiatorInvs.length; i++) {
+		const item = prints[i].card_code ? prints[i].card_code : prints[i]
 		await Trade.create({
 			sender_name: initiatingPlayer.name,
 			senderId: initiatingPlayer.id,
 			receiver_name: receivingPlayer.name,
 			receiverId: receivingPlayer.id,
 			transaction_id,
-			item: prints[i].card_code,
+			item,
 			quantity: quantities[i]
 		})
 
-		initiatorInvs[i].quantity -= quantities[i]
-		await initiatorInvs[i].save()
+		if (prints[i].card_code) {
+			initiatorInvs[i].quantity -= quantities[i]
+			await initiatorInvs[i].save()
+		} else {
+			initiatorInvs[i][item] -= quantities[i]
+			await initiatorInvs[i].save()
+		}
 	
-		const partnerInv2 = await Inventory.findOne({ 
+		const partnerInv2 = prints[i].card_code ? await Inventory.findOne({ 
 			where: { 
 				card_code: prints[i].card_code,
 				printId: prints[i].id,
 				playerId: partner
 			}
-		})
+		}) : await Wallet.findOne({ where: { playerId: partner} })
 	
-		if (partnerInv2) {
+		if (!prints[i].card_code) {
+			partnerInv2[prints[i]] += quantities[i]
+			await partnerInv2.save()
+		} else if (partnerInv2) {
 			partnerInv2.quantity += quantities[i]
 			await partnerInv2.save()
 		} else {
@@ -4240,32 +4381,45 @@ if(cmd === `!trade`) {
 				printId: prints[i].id,
 				playerId: partner
 			})
+
+			if (prints[i].rarity === 'scr') completeTask(message.channel, partner, 'm4')
 		}
+
+		if (prints[i].set_code === 'APC' && ( (partnerInv2 && partnerInv2.quantity >= 3) ||  quantities[i] >= 3 ) ) completeTask(message.channel, partner, 'h5', 4000)
 	}
 
 	for (let i = 0; i < partnerInvs.length; i++) {
+		const item = partner_prints[i].card_code ? partner_prints[i].card_code : partner_prints[i]
 		await Trade.create({
 			sender_name: receivingPlayer.name,
 			senderId: receivingPlayer.id,
 			receiver_name: initiatingPlayer.name,
 			receiverId: initiatingPlayer.id,
 			transaction_id,
-			item: partner_prints[i].card_code,
+			item,
 			quantity: partner_quantities[i]
 		})
 
-		partnerInvs[i].quantity -= partner_quantities[i]
-		await partnerInvs[i].save()
+		if (partner_prints[i].card_code) {
+			partnerInvs[i].quantity -= partner_quantities[i]
+			await partnerInvs[i].save()
+		} else {
+			partnerInvs[i][item] -= partner_quantities[i]
+			await partnerInvs[i].save()
+		}
 	
-		const initiatorInv2 = await Inventory.findOne({ 
+		const initiatorInv2 = partner_prints[i].card_code ? await Inventory.findOne({ 
 			where: { 
 				card_code: partner_prints[i].card_code,
 				printId: partner_prints[i].id,
 				playerId: maid
 			}
-		})
-	
-		if (initiatorInv2) {
+		}) : await Wallet.findOne({ where: { playerId: maid} })
+
+		if (!partner_prints[i].card_code) {
+			initiatorInv2[partner_prints[i]] += partner_quantities[i]
+			await initiatorInv2.save()
+		} else if (initiatorInv2) {
 			initiatorInv2.quantity += partner_quantities[i]
 			await initiatorInv2.save()
 		} else {
@@ -4275,11 +4429,21 @@ if(cmd === `!trade`) {
 				printId: partner_prints[i].id,
 				playerId: maid
 			})
+
+			if (partner_prints[i].rarity === 'scr') completeTask(message.channel, maid, 'm4')
 		}
+
+		if (partner_prints[i].set_code === 'APC' && ( (initiatorInv2 && initiatorInv2.quantity >= 3) ||  partner_quantities[i] >= 3 ) ) completeTask(message.channel, maid, 'h5', 4000)
 	}
 
 	completeTask(message.channel, initiatingPlayer.id, 'e8', 5000)
+	if (await checkCoreSetComplete(initiatingPlayer.id, 1)) completeTask(message.channel, initiatingPlayer.id, 'h4', 5000)
+	if (await checkCoreSetComplete(initiatingPlayer.id, 3)) completeTask(message.channel, initiatingPlayer.id, 'l3', 6000)
+
 	completeTask(message.channel, receivingPlayer.id, 'e8', 8000)
+	if (await checkCoreSetComplete(receivingPlayer.id, 1)) completeTask(message.channel, receivingPlayer.id, 'h4', 8000)
+	if (await checkCoreSetComplete(receivingPlayer.id, 3)) completeTask(message.channel, receivingPlayer.id, 'l3', 9000)
+	
 	message.channel.send(`${receivingPlayer.name} received:\n${cards.join("\n")}\n...and...`)
 	return setTimeout(() => message.channel.send(`${initiatingPlayer.name} received:\n${partner_cards.join("\n")}\n...Trade complete!`), 3000)
 }

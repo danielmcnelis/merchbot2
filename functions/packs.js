@@ -6,11 +6,14 @@ const { getRandomElement, getRandomSubset } = require('./utility.js')
 const { botSpamChannelId } = require('../static/channels.json')
 const { client } = require('../static/clients.js')
 const merchbotId = '584215266586525696'
+// const { completeTask } = require('./diary')
 const { blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
-const { completeTask } = require('./diary')
 
-const awardPack = async (message, set, num, artwork = false) => {
-    if (!set) return message.channel.send('No set found.')
+const awardPack = async (channel, playerId, set, num) => {
+	const member = channel.guild.members.cache.get(playerId)
+
+    if (!set) set = await Set.findOne({ where: { code: 'DOC' } })
+    if (!set) return channel.send(`Could not find set.`)
 
 	const commons = await Print.findAll({ 
 		where: {
@@ -63,6 +66,7 @@ const awardPack = async (message, set, num, artwork = false) => {
 	})
 
     const packs = []
+    let gotSecret = false
 
     for (let j = 0; j < num; j++) {
         const images = []
@@ -93,18 +97,17 @@ const awardPack = async (message, set, num, artwork = false) => {
             if (!print.id) return message.channel.send(`${card} does not exist in the Print database.`)
             results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
     
-            if (artwork === true) {
-                const card = await Card.findOne({ where: {
-                    name: print.card_name
-                }})
+            const card = await Card.findOne({ where: {
+                name: print.card_name
+            }})
+    
+            images.push(`${card.image}`)
         
-                images.push(`${card.image}`)
-            }
 
             const inv = await Inventory.findOne({ where: { 
                 card_code: print.card_code,
                 printId: print.id,
-                playerId: message.member.id
+                playerId: playerId
             }})
     
             if (inv) {
@@ -115,56 +118,44 @@ const awardPack = async (message, set, num, artwork = false) => {
                     card_code: print.card_code,
                     quantity: 1,
                     printId: print.id,
-                    playerId: message.member.id
+                    playerId: playerId
                 })
+
+                if (print.rarity === 'scr') gotSecret = true
             }
         }
 
-        if (artwork === true) {
-			const card_1 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[0]}`)
-			const card_2 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[1]}`)
-			const card_3 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[2]}`)
-			const card_4 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[3]}`)
-			const card_5 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[4]}`)
-			const card_6 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[5]}`)
-			const card_7 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[6]}`)
-			const card_8 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[7]}`)
-			const card_9 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[8]}`)
-	
-			const card_width = 57
-			const canvas = Canvas.createCanvas(card_width * 9, 80)
-			const context = canvas.getContext('2d')
-	
-			context.drawImage(card_1, 0, 0, card_width, 80)
-			context.drawImage(card_2, card_width, 0, card_width, canvas.height)
-			context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
-			context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
-			context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
-			context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
-			context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
-			context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
-			context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
-			const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'pack.png')
+        const card_1 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[0]}`)
+        const card_2 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[1]}`)
+        const card_3 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[2]}`)
+        const card_4 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[3]}`)
+        const card_5 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[4]}`)
+        const card_6 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[5]}`)
+        const card_7 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[6]}`)
+        const card_8 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[7]}`)
+        const card_9 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[8]}`)
 
-            message.member.send(results.join('\n'), attachment)
-		} else {
-            packs.push(...results)
-        }
+        const card_width = 57
+        const canvas = Canvas.createCanvas(card_width * 9, 80)
+        const context = canvas.getContext('2d')
+
+        context.drawImage(card_1, 0, 0, card_width, 80)
+        context.drawImage(card_2, card_width, 0, card_width, canvas.height)
+        context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
+        context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
+        context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
+        context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
+        context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
+        context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
+        context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
+        const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'pack.png')
+
+        member.send(results.join('\n'), attachment)
     }
 
-    if (artwork !== true) {
-        for (let i = 0; i < packs.length; i += 30) {
-            if (packs[i+30] && packs[i+30].includes(set.emoji)) {
-                message.author.send(packs.slice(i, i+31))
-                i++
-            } else {
-                message.author.send(packs.slice(i, i+30))
-            }
-        }
-    }
-
-    if (set.code === 'CPK') completeTask(message.channel, message.member.id, 'm4')
-    return message.channel.send(`<@${message.member.id}> was awarded ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'}. Congratulations!`)
+    // if (set.code === 'CPK') completeTask(channel, playerId, 'm8')
+    // if (gotSecret) completeTask(channel, playerId, 'm4', 4000)
+    return channel.send(`<@${playerId}> was awarded ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'}. Congratulations!`)
 }
 
 const awardPacksToShop = async (num) => {

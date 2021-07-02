@@ -23,7 +23,7 @@ const nicknames = require('./static/nicknames.json')
 const statuses = require('./static/statuses.json')
 const { getNewStatus } = require('./functions/status.js')
 const { checkArenaProgress, getArenaSample, resetArena, startArena, startRound } = require('./functions/arena.js')
-const { resetTrivia, startTrivia } = require('./functions/trivia.js')
+const { askQuestion, resetTrivia, startTrivia } = require('./functions/trivia.js')
 const { askForGrindAllConfirmation } = require('./functions/mod.js')
 const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Nickname, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
 const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isMod, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
@@ -2531,7 +2531,7 @@ if (cmd === `!resume`) {
 		setTimeout(() => askQuestion(message.guild, message.channel, info, entries, questionsArr), 30000)
 	}
 
-	return message.channel.send(`${role ? `<@${role}>, ` : ''} ${game === 'Trivia' ? 'Trivia will resume in 30 seconds.' : `The ${game} can now resume.`}`)
+	return message.channel.send(`${role ? `<@&${role}>, ` : ''} ${game === 'Trivia' ? 'Trivia will resume in 30 seconds.' : `The ${game} can now resume.`}`)
 }
 
 //DROP

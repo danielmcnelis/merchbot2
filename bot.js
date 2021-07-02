@@ -3012,7 +3012,7 @@ if(cmd === `!write`) {
 	if (!diary) return message.channel.send(`That user is not in the database.`)
 
 	if (diary[achievement] === true) return message.channel.send(`That user already completed task ${achievement.toUpperCase()}.`)
-	else if (diary[achievement] === false) return completeTask(message.channel, playerId, task)
+	else if (diary[achievement] === false) return completeTask(message.channel, playerId, achievement)
 }
 
 
@@ -3078,12 +3078,12 @@ if(cmd === `!award`) {
 	let walletField
 	if (item === 'sc' || item === 'starchip' || item === 'starchips' || item === 'chip' || item === 'chips') walletEmoji = starchips, walletField = 'starchips'
 	if (item === 'sd' ||item === 'stardust' || item === 'dust') walletField = 'stardust'
-	if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
-	if (query === 'egg' || query === 'eggs') walletField = 'egg'
-	if (query === 'hook' || query === 'hooks') walletField = 'hook'
-	if (query === 'moai' || query === 'moais' ) walletField = 'moai'
-	if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
-	if (query === 'rose' || query === 'roses' ) walletField = 'rose'
+	if (item === 'cactus' || item === 'cactuses' || item === 'cacti' || item === 'cactis' ) walletField = 'cactus'
+	if (item === 'egg' || item === 'eggs') walletField = 'egg'
+	if (item === 'hook' || item === 'hooks') walletField = 'hook'
+	if (item === 'moai' || item === 'moais' ) walletField = 'moai'
+	if (item === 'mushroom' || item === 'mushrooms' || item === 'shroom' || item === 'shrooms') walletField = 'mushroom'
+	if (item === 'rose' || item === 'roses' ) walletField = 'rose'
 
 	if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the item: "${item}".`)
 
@@ -3168,12 +3168,12 @@ if(cmd === `!steal`) {
 	let walletField
 	if (item === 'sc' || item === 'starchip' || item === 'starchips' || item === 'chip' || item === 'chips') walletField = 'starchips'
 	if (item === 'sd' ||item === 'stardust' || item === 'dust') walletField = 'stardust'
-	if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
-	if (query === 'egg' || query === 'eggs') walletField = 'egg'
-	if (query === 'hook' || query === 'hooks') walletField = 'hook'
-	if (query === 'moai' || query === 'moais' ) walletField = 'moai'
-	if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
-	if (query === 'rose' || query === 'roses' ) walletField = 'rose'
+	if (item === 'cactus' || item === 'cactuses' || item === 'cacti' || item === 'cactis' ) walletField = 'cactus'
+	if (item === 'egg' || item === 'eggs') walletField = 'egg'
+	if (item === 'hook' || item === 'hooks') walletField = 'hook'
+	if (item === 'moai' || item === 'moais' ) walletField = 'moai'
+	if (item === 'mushroom' || item === 'mushrooms' || item === 'shroom' || item === 'shrooms') walletField = 'mushroom'
+	if (item === 'rose' || item === 'roses' ) walletField = 'rose'
 
 	if (!print && !prints.length && !walletField) return message.channel.send(`Sorry, I do not recognize the item: "${item}".`)
 

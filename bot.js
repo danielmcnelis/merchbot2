@@ -1907,6 +1907,7 @@ if (losscom.includes(cmd)) {
 
 		const info = await Info.findOne({ where: { element: 'arena' } })
 		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
+		
 
 		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"], ["P5", "P6"]] :
             info.round === 2 ? [["P1", "P3"], ["P2", "P5"], ["P4", "P6"]] :
@@ -1915,12 +1916,14 @@ if (losscom.includes(cmd)) {
             info.round === 5 ? [["P1", "P6"], ["P2", "P3"], ["P4", "P5"]] : 
             null
 	
-		let correct_pairing = false
-		for (let i = 0; i < 3; i++) {
-			if ((pairings[i][0] === losingContestant.contestant && 
-					pairings[i][1] === winningContestant.contestant) ||
-				(pairings[i][0] === winningContestant.contestant &&
-					pairings[i][1] === losingContestant.contestant)) correct_pairing = true
+		let correct_pairing = info.round === 6 ? true : false
+		if (!correct_pairing) {
+			for (let i = 0; i < 3; i++) {
+				if ((pairings[i][0] === losingContestant.contestant && 
+						pairings[i][1] === winningContestant.contestant) ||
+					(pairings[i][0] === winningContestant.contestant &&
+						pairings[i][1] === losingContestant.contestant)) correct_pairing = true
+			}
 		}
 
 		if (!correct_pairing) return message.channel.send(`That player is not your Arena opponent.`)

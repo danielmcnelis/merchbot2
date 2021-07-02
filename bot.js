@@ -22,7 +22,7 @@ const prints = require('./static/prints.json')
 const nicknames = require('./static/nicknames.json')
 const statuses = require('./static/statuses.json')
 const { getNewStatus } = require('./functions/status.js')
-const { checkArenaProgress, getArenaSample, resetArena, startArena, startRound } = require('./functions/arena.js')
+const { checkArenaProgress, getArenaSample, resetArena, startArena, startRound, endArena } = require('./functions/arena.js')
 const { askQuestion, resetTrivia, startTrivia } = require('./functions/trivia.js')
 const { askForGrindAllConfirmation } = require('./functions/mod.js')
 const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Nickname, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
@@ -2532,6 +2532,32 @@ if (cmd === `!resume`) {
 	}
 
 	return message.channel.send(`${role ? `<@&${role}>, ` : ''} ${game === 'Trivia' ? 'Trivia will resume in 30 seconds.' : `The ${game} can now resume.`}`)
+}
+
+//END
+if (cmd === `!end`) {
+	if (!isMod(message.member)) return message.channel.send('You do not have permission to do that.')
+	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
+	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
+	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
+	: null
+
+	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannelId}> or <#${triviaChannelId}>.`)
+	const role = game === 'Trivia' ? triviaRole : game === 'Arena' ? arenaRole : null
+
+	const info = await Info.findOne({ where: { element: game.toLowerCase() }})
+	if (!info) return message.channel.send(`Could not find game-mode: "${game}".`)
+
+	const entries = await eval(game).findAll()
+	if (!entries) return message.channel.send(`Could not find any entries for: "${game}".`)
+
+	if (game === 'Arena') {
+		endArena(message.channel, info, entries)
+	} else if (game === 'Trivia') {
+		return message.channel.send(`This is not programmed for Trivia yet.`)
+	}
+
+	return message.channel.send(`${role ? `<@&${role}>, ` : ''} ${game === 'Trivia' ? 'Trivia has come to an end.' : `The ${game} has come to an end.`}`)
 }
 
 //DROP

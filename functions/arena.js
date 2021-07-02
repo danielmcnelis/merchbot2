@@ -165,7 +165,7 @@ const startRound = async (info, entries) => {
         )
 
         completeTask(arenaChannel, playerId, 'm10', 12000)
-        return endArena(info, entries)
+        return endArena(arenaChannel, info, entries)
     } else if (info.round === 6) {
         if (entries[0].score > entries[1].score) {
         //1st place outright
@@ -193,7 +193,7 @@ const startRound = async (info, entries) => {
             )
 
             completeTask(arenaChannel, playerId, 'm10', 12000)
-            return endArena(info, entries)
+            return endArena( arenaChannel, info, entries)
         } else if ((entries[0].score === entries[1].score) && entries[1].score > entries[2].score) {
         //2 way tie
             for (let i = 2; i < entries.length; i++) {
@@ -234,7 +234,7 @@ const startRound = async (info, entries) => {
             }
 
             arenaChannel.send(`The shadows grew long over the battlefield, and the gladiators had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena.`)
-            return endArena(info, entries)
+            return endArena( arenaChannel, info, entries)
         } else if ((entries[0].score === entries[1].score === entries[2].score === entries[3].score) && entries[3].score > entries[4].score) {
         //4 way tie
             for (let i = 0; i < entries.length; i++) {
@@ -248,7 +248,7 @@ const startRound = async (info, entries) => {
             }
 
             arenaChannel.send(`The shadows grew long over the battlefield, and the gladiators had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena.`)
-            return endArena(info, entries)
+            return endArena( arenaChannel, info, entries)
         } else {
              //5 way tie
              for (let i = 0; i < entries.length; i++) {
@@ -262,7 +262,7 @@ const startRound = async (info, entries) => {
             }
 
             arenaChannel.send(`The shadows grew long over the battlefield, and the gladiators had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena.`)
-            return endArena(info, entries)
+            return endArena( arenaChannel, info, entries)
         }
     } else {
         const P1 = await Arena.findOne({ where: { contestant: "P1" }, include: Player})
@@ -314,7 +314,7 @@ const postStandings = async (info, entries) => {
     }, 10000)
 }
 
-const endArena = async (info, entries) => {
+const endArena = async (channel, info, entries) => {
     info.status = 'pending'
     info.round = null
     await info.save()
@@ -324,7 +324,7 @@ const endArena = async (info, entries) => {
         const entry = entries[i]
         const member = guild.members.cache.get(entry.playerId)
         member.roles.remove(arenaRole)
-        completeTask(arenaChannel, entry.playerId, 'e12', i * 2000 + 2000)
+        completeTask(channel, entry.playerId, 'e12', i * 2000 + 2000)
         await entry.destroy()
     }
 }
@@ -365,6 +365,7 @@ const checkArenaProgress = async (info) => {
 
 module.exports = {
     checkArenaProgress,
+    endArena,
     getArenaSample,
     resetArena,
     startArena,

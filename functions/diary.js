@@ -17,13 +17,9 @@ const checkCoreSetComplete = async (playerId, quantity = 1) => {
         }
     })
 
-    if (count) {
-        console.log(`this player already completed ${task}`)
-        return false
-    }
+    if (count) return false
 
     const allSets = await Set.findAll({ where: { type: 'core' }})
-    console.log(`checking ${allSets.length} core sets`)
 
     for (let i = 0; i < allSets.length; i++) {
         const set = allSets[i]
@@ -39,11 +35,9 @@ const checkCoreSetComplete = async (playerId, quantity = 1) => {
             }
         })
     
-        console.log(`player has ${quantity}x of ${setInv.length} out of ${set.size} cards in ${set.code}`)
         if (setInv.length >= set.size) return true
     }
-
-    console.log('found 0 complete sets')
+    
     return false
 }
 

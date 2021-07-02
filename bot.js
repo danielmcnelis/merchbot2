@@ -1869,8 +1869,8 @@ if (losscom.includes(cmd)) {
 
 	const winner = message.guild.members.cache.get(oppo)
 	const loser = message.guild.members.cache.get(maid)
-	const winningPlayer = await Player.findOne({ where: { id: oppo }, include: Wallet })
-	const losingPlayer = await Player.findOne({ where: { id: maid }, include: Wallet })
+	const winningPlayer = await Player.findOne({ where: { id: oppo }, include: Diary, Wallet })
+	const losingPlayer = await Player.findOne({ where: { id: maid }, include: Diary, Wallet })
 
 	if (winner.roles.cache.some(role => role.id === botRole)) return message.channel.send(`Sorry, Bots do not play Forged in Chaos... *yet*.`)
 	if (oppo.length < 17 || oppo.length > 18) return message.channel.send(`To report a loss, type **!loss @opponent**.`)
@@ -1958,10 +1958,15 @@ if (losscom.includes(cmd)) {
 		return checkArenaProgress(info)
 	}
 
+	const diary = winningPlayer.diary
+	const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
+	console.log('winners easy diary is complete?', easy_complete)
+	const bonus = easy_complete ? 1 : 0
+	console.log('winners bonus:', bonus)
 	const origStatsWinner = winningPlayer.stats
 	const origStatsLoser = losingPlayer.stats
 	const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
-	const chipsWinner = Math.round((delta)) < 6 ? 6 : Math.round((delta)) > 20 ? 20 : Math.round((delta))
+	const chipsWinner = Math.round((delta)) + bonus < 6 ? 6 : Math.round((delta)) > 20 ? 20 : Math.round((delta)) + bonus
 	const chipsLoser = (origStatsLoser - origStatsWinner) < 72 ? 3 : (origStatsLoser - origStatsWinner) >=150 ? 1 : 2
 
 	const previouslyDefeated = await Match.count({
@@ -2026,8 +2031,8 @@ if (manualcom.includes(cmd)) {
 
 	const winner = message.guild.members.cache.get(winnerId)
 	const loser = message.guild.members.cache.get(loserId)
-	const winningPlayer = await Player.findOne({ where: { id: winnerId }, include: Wallet })
-	const losingPlayer = await Player.findOne({ where: { id: loserId }, include: Wallet })
+	const winningPlayer = await Player.findOne({ where: { id: winnerId }, include: Diary, Wallet })
+	const losingPlayer = await Player.findOne({ where: { id: loserId }, include: Diary, Wallet })
 
 	if (winner.roles.cache.some(role => role.id === botRole) || loser.roles.cache.some(role => role.id === botRole)) return message.channel.send(`Sorry, Bots do not play Forged in Chaos... *yet*.`)
 	if (!losingPlayer) return message.channel.send(`Sorry, ${loser.user.username} is not in the database.`)
@@ -2113,10 +2118,15 @@ if (manualcom.includes(cmd)) {
 		message.channel.send(`A manual Arena loss by ${losingPlayer.name} (+1${starchips}) to ${winningPlayer.name} (+2${starchips}) has been recorded.`)
 		return checkArenaProgress(info)
 	} else {
+		const diary = winningPlayer.diary
+		const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
+		console.log('winners easy diary is complete?', easy_complete)
+		const bonus = easy_complete ? 1 : 0
+		console.log('winners bonus:', bonus)
 		const origStatsWinner = winningPlayer.stats
 		const origStatsLoser = losingPlayer.stats
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
-		const chipsWinner = Math.round((delta)) < 6 ? 6 : Math.round((delta)) > 20 ? 20 : Math.round((delta))
+		const chipsWinner = Math.round((delta)) + bonus < 6 ? 6 : Math.round((delta)) > 20 ? 20 : Math.round((delta)) + bonus
 		const chipsLoser = (origStatsLoser - origStatsWinner) < 72 ? 3 : (origStatsLoser - origStatsWinner) >=150 ? 1 : 2
 
 		const previouslyDefeated = await Match.count({
@@ -2979,6 +2989,64 @@ if(cmd === `!alc` ||cmd === `!alch` || cmd === `!alchemy`) {
 	})
 }
 
+
+//WRITE
+if(cmd === `!write`) {
+	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
+	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : null	
+	if (playerId === maid) return message.channel.send(`You cannot cross off your own Diary achievements.`)
+	if (!playerId) return message.channel.send(`Please @ mention a user to write in their Diary.`)
+
+	const achievement = args[1] ? args[1].toLowerCase() : null
+	const valid_tasks = [
+		"e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8", "e9", "e10", "e11", "e12",
+		"m1", "m2", "m3", "m4", "m5", "m6", "m7", "m8", "m9", "m10",
+		"h1", "h2", "h3", "h4", "h5", "h6", "h7", "h8",
+		"l1", "l2", "l3", "l4", "l5", "l6",
+	]
+
+	if (!achievement) return message.channel.send(`Please specify an achievement (E4, M7, H1, L2, etc.)`)
+	if (!valid_tasks.includes(achievement)) return message.channel.send(`Sorry, ${achievement.toUpperCase()} is not a valid task.`)
+
+	const diary = await Diary.findOne({ where: { playerId: playerId } })
+	if (!diary) return message.channel.send(`That user is not in the database.`)
+
+	if (diary[achievement] === true) return message.channel.send(`That user already completed task ${achievement.toUpperCase()}.`)
+	else if (diary[achievement] === false) return completeTask(message.channel, playerId, task)
+}
+
+
+//BURN
+if(cmd === `!burn`) {
+	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
+	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : null	
+	if (playerId === maid) return message.channel.send(`You cannot undo achievements from your own Diary.`)
+	if (!playerId) return message.channel.send(`Please @ mention a user to burn a hole in their Diary.`)
+
+	const achievement = args[1] ? args[1].toLowerCase() : null
+	const valid_tasks = [
+		"e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8", "e9", "e10", "e11", "e12",
+		"m1", "m2", "m3", "m4", "m5", "m6", "m7", "m8", "m9", "m10",
+		"h1", "h2", "h3", "h4", "h5", "h6", "h7", "h8",
+		"l1", "l2", "l3", "l4", "l5", "l6",
+	]
+
+	if (!achievement) return message.channel.send(`Please specify an achievement (E4, M7, H1, L2, etc.)`)
+	if (!valid_tasks.includes(achievement)) return message.channel.send(`Sorry, ${achievement.toUpperCase()} is not a valid task.`)
+	const difficulty = achievement.startsWith('e') ? 'Easy' : achievement.startsWith('m') ? 'Moderate' : achievement.startsWith('h') ? 'Hard' : 'Elite'
+
+	const diary = await Diary.findOne({ where: { playerId: playerId }, include: Player })
+	if (!diary) return message.channel.send(`That user is not in the database.`)
+
+	if (diary[achievement] === false) return message.channel.send(`That user has not completed task ${diares[difficulty][achievement]}.`)
+	else if (diary[achievement] === true) {
+		diary[achievement] = false
+		await diary.save()
+		return message.channel.send(`You undid an achievement in ${diary.player.name}'s Diary:\n**${diares[difficulty][achievement]}**`)
+	}
+}
+
+
 //AWARD
 if(cmd === `!award`) {
 	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
@@ -3010,6 +3078,12 @@ if(cmd === `!award`) {
 	let walletField
 	if (item === 'sc' || item === 'starchip' || item === 'starchips' || item === 'chip' || item === 'chips') walletEmoji = starchips, walletField = 'starchips'
 	if (item === 'sd' ||item === 'stardust' || item === 'dust') walletField = 'stardust'
+	if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
+	if (query === 'egg' || query === 'eggs') walletField = 'egg'
+	if (query === 'hook' || query === 'hooks') walletField = 'hook'
+	if (query === 'moai' || query === 'moais' ) walletField = 'moai'
+	if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
+	if (query === 'rose' || query === 'roses' ) walletField = 'rose'
 
 	if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the item: "${item}".`)
 
@@ -3094,6 +3168,12 @@ if(cmd === `!steal`) {
 	let walletField
 	if (item === 'sc' || item === 'starchip' || item === 'starchips' || item === 'chip' || item === 'chips') walletField = 'starchips'
 	if (item === 'sd' ||item === 'stardust' || item === 'dust') walletField = 'stardust'
+	if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
+	if (query === 'egg' || query === 'eggs') walletField = 'egg'
+	if (query === 'hook' || query === 'hooks') walletField = 'hook'
+	if (query === 'moai' || query === 'moais' ) walletField = 'moai'
+	if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
+	if (query === 'rose' || query === 'roses' ) walletField = 'rose'
 
 	if (!print && !prints.length && !walletField) return message.channel.send(`Sorry, I do not recognize the item: "${item}".`)
 
@@ -3851,7 +3931,6 @@ if(cmd === `!sell`) {
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	
 		let walletField
-		console.log('query', query)
 		if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
 		if (query === 'egg' || query === 'eggs') walletField = 'egg'
 		if (query === 'hook' || query === 'hooks') walletField = 'hook'

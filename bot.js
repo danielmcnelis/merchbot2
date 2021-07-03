@@ -1467,7 +1467,11 @@ if(cmd === `!diary`) {
 	const hard_complete = diary.h1 && diary.h2 && diary.h3 && diary.h4 && diary.h5 && diary.h6 && diary.h7 && diary.h8
 	const elite_complete = diary.l1 && diary.l2 && diary.l3 && diary.l4 && diary.l5 && diary.l6
 	//const master_complete = diary.s1 && diary.s2 && diary.s3 && diary.s4
-	const input = args[0] ? args[0].toLowerCase() : ''
+	const input = message.mentions.users.first() && args[1] ? args[1].toLowerCase() :
+				message.mentions.users.first() && !args[1] ? null :
+				!message.mentions.users.first() && args[0] ? args[0].toLowerCase() :
+				null
+
 	const tasks = []
 	let bonuses
 	let diary_to_display

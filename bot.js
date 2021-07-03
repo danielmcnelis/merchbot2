@@ -1458,6 +1458,8 @@ if(cmd === `!dairy`) return message.channel.send('<:cow:598743989101002762>')
 
 //DIARY
 if(cmd === `!diary`) {
+	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
+	if (playerId !== maid && !isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const diary = await Diary.findOne({ where: { playerId: maid } })
 	if (!diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
@@ -1560,7 +1562,7 @@ if(cmd === `!diary`) {
 		.addField(`${score === 100 ? `${legend} Bonus - Active ${legend}` : `Bonus`}`,`${bonuses.join("\n")}`)
 
 	message.author.send(diaryEmbed);
-	return message.channel.send(`I messaged you the ${diary_to_display} Diary.`)
+	return message.channel.send(`I messaged you ${playerId === maid ? 'the ' : `that player's `} ${diary_to_display} Diary. ${leatherbound}`)
 }
 
 //BINDER

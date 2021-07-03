@@ -1226,6 +1226,26 @@ if(cmd === `!ref` || cmd === `!refer` || cmd === `!referral`) {
 	})
 }
 
+//REFERRAL
+if(cmd === `!reset_ref`) {
+	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : null	
+	if (!playerId) return message.channel.send(`Please specify a player.`)
+	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (maid === playerId) return message.channel.send(`You cannot reset your own referral.`)
+	const playerProfile = await Profile.findOne({ where: { playerId: playerId }})
+	const diary = await Diary.findOne({ where: { playerId: playerId }})
+	if (!playerProfile || !diary) return message.channel.send(`That player is not in the database.`)
+	if (playerProfile.referral === false) return message.channel.send(`That player has not given a referral.`)
+
+	const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
+	if (easy_complete) return message.channel.send(`That player has completed the Easy Diary. Their referral is valid.`)
+
+	playerProfile.referral = false
+	await playerProfile.save()
+
+	return message.channel.send(`${message.mentions.users.username}'s referral was reset.`)
+}
+
 //GIFT //not working
 if(cmd === `!gift`) {
 	return Merch.data.awardStarchips(client, message, rMem, 30)

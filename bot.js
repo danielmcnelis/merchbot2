@@ -1243,7 +1243,7 @@ if(cmd === `!reset_ref`) {
 	playerProfile.referral = false
 	await playerProfile.save()
 
-	return message.channel.send(`${message.mentions.users.username}'s referral was reset.`)
+	return message.channel.send(`${message.mentions.users.first().username}'s referral was reset.`)
 }
 
 //GIFT //not working

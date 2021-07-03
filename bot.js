@@ -2558,7 +2558,7 @@ if (cmd === `!resume`) {
 	if (!entries) return message.channel.send(`Could not find any entries for: "${game}".`)
 
 	if (game === 'Arena') {
-		message.channel.send(`Arena resumption is not coded yet.`)
+		startRound(info, entries)
 	} else if (game === 'Trivia') {
 		const triviaArr = Object.entries(trivia)
 		const questionsArr = getRandomSubset(triviaArr, 10)

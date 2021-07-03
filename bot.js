@@ -3276,14 +3276,8 @@ if(cmd === `!steal`) {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
 		
 		if (walletField) {
-			if (!player.wallet[walletField]) {
-				return message.channel.send(`Sorry, ${player.name} does not have any${loot}.`)
-			} else if (player.wallet[walletField] < quantity) {
-				return message.channel.send(`Sorry, ${player.name} only has ${player.wallet[walletField]}${loot}.`)
-			} else {
-				player.wallet[walletField] -= quantity
-				await player.wallet.save()
-			}
+			player.wallet[walletField] -= quantity
+			await player.wallet.save()
 		} else if (prints.length) {
 			const inv = await Inventory.findOne({ where: { 
 				card_code: prints[0].card_code,
@@ -3292,7 +3286,7 @@ if(cmd === `!steal`) {
 			}})
 	
 			if (!inv) {
-				return message.channel.send(`Sorry, ${player.name} does not have any${loot}.`)
+				return message.channel.send(`Sorry, ${player.name} does not have an inventory slot for${loot}.`)
 			} else if (inv.quantity < quantity) {
 				return message.channel.send(`Sorry, ${player.name} only has ${inv.quantity}${loot}.`)
 			} else {

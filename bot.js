@@ -1460,7 +1460,7 @@ if(cmd === `!dairy`) return message.channel.send('<:cow:598743989101002762>')
 if(cmd === `!diary`) {
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	if (playerId !== maid && !isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	const diary = await Diary.findOne({ where: { playerId: maid } })
+	const diary = await Diary.findOne({ where: { playerId: playerId } })
 	if (!diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
 	const moderate_complete = diary.m1 && diary.m2 && diary.m3 && diary.m4 && diary.m5 && diary.m6 && diary.m7 && diary.m8 && diary.m9 && diary.m10

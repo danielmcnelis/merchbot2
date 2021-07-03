@@ -3,12 +3,12 @@ const { Auction, Bid, Card, Match, Player, Tournament, Print, Set, Wallet, Diary
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { yescom } = require('../static/commands.json')
-const { ygocard, pack, open, closed, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, fish, rock, dinosaur, plant, reptile, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
+const { yellow, ygocard, pack, open, closed, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, fish, rock, dinosaur, plant, reptile, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
 const { awardPacksToShop } = require('./packs')
 const adminId = '194147938786738176'
 const { client } = require('../static/clients.js')
 const { fpRole } = require('../static/roles.json')
-const { announcementsChannelId, botSpamChannelId, shopChannelId } = require('../static/channels.json')
+const { announcementsChannelId, botSpamChannelId, shopChannelId, staffChannelId } = require('../static/channels.json')
 const { completeTask } = require('./diary')
 
 // OPEN SHOP
@@ -25,6 +25,7 @@ const openShop = async () => {
         updateShop()
         client.channels.cache.get(announcementsChannelId).send(`Good morning, <@&${fpRole}>, The Shop ${merchant} is now open! ${open}`)
         const shopCountdown = getShopCountdown()
+        client.channels.cache.get(botSpamChannelId).send(`Dear Moderationers, The Shop will automatically **close** in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes. ${yellow}`)
 		return setTimeout(() => closeShop(), shopCountdown)
 	} 
 }
@@ -54,7 +55,8 @@ const closeShop = async () => {
         await restock()
 		client.channels.cache.get(announcementsChannelId).send(`Good evening, <@&${fpRole}>, The Shop ${merchant} is now closed! ${closed}`)
         const shopCountdown = getShopCountdown()
-		return setTimeout(() => openShop(), shopCountdown)
+        client.channels.cache.get(botSpamChannelId).send(`Dear Moderationers, The Shop will automatically **open** in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes. ${yellow}`)
+        return setTimeout(() => openShop(), shopCountdown)
 	} 
 }
 
@@ -95,7 +97,7 @@ const getShopCountdown = () => {
 			null
     } else if ((day === 5 && hours >= 22) || (day === 6 && hours < 14)) {
         hoursLeftInPeriod = day === 5 ? 23 - hours + 14 :
-            day === 5 ? 13 - hours :
+            day === 6 ? 13 - hours :
             null
     }
 

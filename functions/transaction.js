@@ -254,7 +254,7 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
     const sellerInvs = invoice.invs
     const buyerId = buyingPlayer.id
 
-    if (!price || !cards.length || !quantities.length || !prints.length || !sellerInvs.length || buyerId) {
+    if (!total_price || !cards.length || !quantities.length || !prints.length || !sellerInvs.length || buyerId) {
         message.channel.send(`Error processing MerchBot Sale: missing needed information.`)
         return false
     }

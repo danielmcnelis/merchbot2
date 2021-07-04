@@ -323,6 +323,10 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
         print.market_price = newPrice
         await print.save()
     }
+
+    console.log( 'print.id',  print.id)
+    console.log( 'print.card_code',  print.card_code)
+    console.log( 'buyerId',  buyerId)
     
     const buyerInv = print ? await Inventory.findOrCreate({ 
         where: { 
@@ -330,7 +334,9 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
             printId: print.id,
             playerId: buyerId
         }
-    }) : null
+    }) :  null
+
+    console.log('buyerInv.dataValues', buyerInv.dataValues)
     
     
     const buyerWallet = await Wallet.findOne({ where: { playerId: buyerId } })

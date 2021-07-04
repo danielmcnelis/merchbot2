@@ -91,10 +91,8 @@ const getFinalConfirmation = async (message, cards, player) => {
 }
 
 module.exports = {
-	getBuyerConfirmation,
     getInitiatorConfirmation,
     getPartnerSide,
     getPartnerConfirmation,
-    getFinalConfirmation,
-	getSellerConfirmation
+    getFinalConfirmation
 }

@@ -1131,14 +1131,14 @@ if(profcom.includes(cmd)) {
 	let hard_tasks = 0
 	let elite_tasks = 0
 	let master_tasks = 0
-	const diary_keys = Object.keys(player.diary)
+	const diary_keys = Object.keys(player.diary.dataValues)
 	diary_keys.forEach(function(key) {
-		if (player.diary[key]) {
+		if (player.diary[key] === true) {
 			if (key.startsWith('e')) easy_tasks++
 			else if (key.startsWith('m')) medium_tasks++
 			else if (key.startsWith('h')) hard_tasks++
 			else if (key.startsWith('l')) elite_tasks++
-			else if (key.startsWith('s')) master_tasks++
+			//else if (key.startsWith('s')) master_tasks++
 		}
 	})
 
@@ -1204,7 +1204,6 @@ if(cmd === `!ref` || cmd === `!refer` || cmd === `!referral`) {
 	const referringPlayer = await Player.findOne({ where: { id: referrer }, include: Wallet })
 	if (!referringPlayer) return message.channel.send(`That person is not in the database.`)
 
-	
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send(`Are you sure you want to give a referral to ${referringPlayer.name}?`)
 	const collected = await msg.channel.awaitMessages(filter, {
@@ -1375,12 +1374,12 @@ if(cmd === `!chart`) {
 
 	for (let i = 0; i < allProfiles.length; i++) {
 		const profile = allProfiles[i]
-		beastWins += profile.arena_beast_wins
-		dinosaurWins += profile.arena_dinosaur_wins
-		fishWins += profile.arena_fish_wins
-		plantWins += profile.arena_plant_wins
-		reptileWins += profile.arena_reptile_wins
-		rockWins += profile.arena_rock_wins
+		beastWins += profile.beast_wins
+		dinosaurWins += profile.dinosaur_wins
+		fishWins += profile.fish_wins
+		plantWins += profile.plant_wins
+		reptileWins += profile.reptile_wins
+		rockWins += profile.rock_wins
 	}
 
 	const winsArr = [beastWins, dinosaurWins, fishWins, plantWins, reptileWins, rockWins]
@@ -1586,7 +1585,7 @@ if(cmd === `!diary`) {
 		.addField(`${score === 100 ? `${legend} Bonus - Active ${legend}` : `Bonus`}`,`${bonuses.join("\n")}`)
 
 	message.author.send(diaryEmbed);
-	return message.channel.send(`I messaged you ${playerId === maid ? 'the ' : `that player's `} ${diary_to_display} Diary. ${leatherbound}`)
+	return message.channel.send(`I messaged you ${playerId === maid ? 'the' : `that player's`} ${diary_to_display} Diary. ${leatherbound}`)
 }
 
 //BINDER
@@ -1939,7 +1938,6 @@ if (losscom.includes(cmd)) {
 		const info = await Info.findOne({ where: { element: 'arena' } })
 		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
 		
-
 		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"], ["P5", "P6"]] :
             info.round === 2 ? [["P1", "P3"], ["P2", "P5"], ["P4", "P6"]] :
             info.round === 3 ? [["P1", "P4"], ["P2", "P6"], ["P3", "P5"]] : 
@@ -1962,7 +1960,7 @@ if (losscom.includes(cmd)) {
 		winningPlayer.arena_wins++
 		await winningPlayer.save()
 
-		winningPlayer.wallet.starchips += 2
+		winningPlayer.wallet.starchips += 3
 		await winningPlayer.wallet.save()
 
 		losingPlayer.arena_losses++
@@ -1989,7 +1987,7 @@ if (losscom.includes(cmd)) {
 			chipsLoser: 1
 		})
 
-		message.channel.send(`${losingPlayer.name} (+1${starchips}), your Arena loss to ${winner.user.username} (+2${starchips}) has been recorded.`)
+		message.channel.send(`${losingPlayer.name} (+1${starchips}), your Arena loss to ${winner.user.username} (+3${starchips}) has been recorded.`)
 		return checkArenaProgress(info)
 	}
 
@@ -2346,7 +2344,7 @@ if (rankcom.includes(cmd)) {
 		mcid !== generalChannelId &&
 		mcid !== duelRequestsChannelId &&
 		mcid !== tournamentChannelId
-	) return message.channel.send(`Please use this command in <#${botSpamChannelId}>, <#${duelRequestsChannelId}>, <#${tournamentChannelId}> or <#${generalChannelId}>.`)
+	) return message.channel.send(`Please use this command in <#${botSpamChannelId}>, <#${duelRequestsChannelId}> or <#${generalChannelId}>.`)
 	const x = parseInt(args[0]) || 10
 	const result = []
 	x === 1 ? result[0] = `${FiC} --- The Best Forged Player --- ${FiC}`
@@ -2414,7 +2412,7 @@ if(joincom.includes(cmd)) {
 	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
 	: null
 
-	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${tournamentChannelId}>, <#${arenaChannelId}> or <#${triviaChannelId}>.`)
+	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannelId}> or <#${triviaChannelId}>.`)
 	
 	const player = await Player.findOne({ where: { id: maid }})
 	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
@@ -2602,9 +2600,10 @@ if(dropcom.includes(cmd)) {
 	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
 	: null
 
+	const role = game === 'Arena' ? arenaRole : game === 'Trivia' ? triviaRole : game === 'Draft' ? draftRole : game === 'Tournament' ? tourRole : null
+
 	if (!game) return message.channel.send(
-		`Try using **${cmd}** in channels like: 
-		<#${tournamentChannelId}>, <#${arenaChannelId}> or <#${triviaChannelId}>.`
+		`Try using **${cmd}** in channels like: <#${arenaChannelId}> or <#${triviaChannelId}>.`
 		)
 	
 	if (game === 'Tournament') {
@@ -2630,9 +2629,13 @@ if(dropcom.includes(cmd)) {
 	}
 
 	const entry = await eval(game).findOne({ where: { playerId: maid} })
+	const info = await Info.findOne({ where: { element: game.toLowerCase() } })
+
 	if (entry) {
-		await entry.destroy()
-		return message.channel.send(`You are no longer in the ${game} queue.`)
+		entry.active = false
+		await entry.save()
+		message.member.roles.remove(role)
+		return message.channel.send(`<@${member.user.username}> left ${game === 'Trivia' ? '' : 'the '}${game}${info.status === 'pending' ? ' queue' : ''}.`)
 	} else {
 		return message.channel.send(`You were not in the ${game} queue.`)
 	}
@@ -3126,7 +3129,7 @@ if(cmd === `!burn`) {
 	const diary = await Diary.findOne({ where: { playerId: playerId }, include: Player })
 	if (!diary) return message.channel.send(`That user is not in the database.`)
 
-	if (diary[achievement] === false) return message.channel.send(`That user has not completed task ${diares[difficulty][achievement]}.`)
+	if (diary[achievement] === false) return message.channel.send(`That user has not completed task:\n**${diares[difficulty][achievement]}**.`)
 	else if (diary[achievement] === true) {
 		diary[achievement] = false
 		await diary.save()

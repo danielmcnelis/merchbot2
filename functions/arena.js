@@ -210,10 +210,10 @@ const startRound = async (info, entries) => {
                 await entry.save()
             }
 
-            entries[0].score = 0
+            entries[0].score = 1
             await entries[0].save()
 
-            entries[1].score = 0
+            entries[1].score = 1
             await entries[1].save()
 
             const title = `<!> <!> <!> ARENA FINALS <!> <!> <!>` 
@@ -283,11 +283,62 @@ const startRound = async (info, entries) => {
     
         const title = `------  Arena Round ${info.round}  ------\n${beast}   ${dinosaur}   ${fish}   ${plant}   ${reptile}   ${rock}` 
         const matches = pairings.map((pairing, index) => {
-            return `Match ${index + 1}: <@${pairing[0].playerId}> vs <@${pairing[1].playerId}>`
+            if (pairing[0].active === false && pairing[1].active === false) {
+                setTimout(() => doubleForfeit(pairing[0].playerId, pairing[1].playerId), index * 1000 + 1000)
+                return `Match ${index + 1}: ~~<@${pairing[0].player.name}~~ vs ~~<@${pairing[1].player.name}>~~ (both forfeit)`
+            } else if (pairing[0].active === false && pairing[1].active === true) {
+                setTimout(() => forfeit(winnerId = pairing[1].playerId, loserId = pairing[0].playerId), index * 1000 + 1000)
+                return `Match ${index + 1}: ~~<@${pairing[0].player.name}~~ vs <@${pairing[1].player.name}> (${pairing[0].player.name} forfeits)`
+            } else if (pairing[0].active === true && pairing[1].active === false) {
+                setTimout(() => forfeit(winnerId = pairing[0].playerId, loserId = pairing[1].playerId), index * 1000 + 1000)
+                return `Match ${index + 1}: <@${pairing[0].playerId}> vs ~~<@${pairing[1].playerId}>~~ (${pairing[1].player.name} forfeits)`
+            } else {
+                return `Match ${index + 1}: <@${pairing[0].playerId}> vs <@${pairing[1].playerId}>`
+            }
         })
 
         return arenaChannel.send(`${title}\n${matches.join("\n")}`)
     }
+}
+
+const forfeit = (winnerId, loserId) => {
+		const info = await Info.findOne({ where: { element: 'arena' } })
+		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
+
+		const losingContestant = await Arena.findOne({ where: { playerId: loserId }})
+		const winningContestant = await Arena.findOne({ where: { playerId: winnerId }})
+		if (!winningContestant || !losingContestant) return message.channel.send(`Could not process forfeiture.`)
+		
+		winningContestant.wallet.starchips += 3
+		await winningPlayer.wallet.save()
+
+		losingContestant.is_playing = false
+		await losingContestant.save()
+
+		winningContestant.score++
+		winningContestant.is_playing = false
+		await winningContestant.save()
+
+		message.channel.send(`${losingPlayer.name} (+0${starchips}), your Arena loss to ${winner.user.username} (+3${starchips}) has been recorded.`)
+		return checkArenaProgress(info) 
+}
+
+const doubleForfeit = (player1Id, player2Id) => {
+    const info = await Info.findOne({ where: { element: 'arena' } })
+    if (!info) return message.channel.send(`Error: could not find game: "arena".`)
+
+    const contestant1 = await Arena.findOne({ where: { playerId: player1Id }, include: Player })
+    const contestant2 = await Arena.findOne({ where: { playerId: player2Id }, include: Player })
+    if (!contestant1 || !contestant2) return message.channel.send(`Could not process double forfeiture.`)
+    
+    contestant1.is_playing = false
+    await contestant1.save()
+
+    contestant2.is_playing = false
+    await contestant2.save()
+
+    message.channel.send(`The double Arena forfeiture between ${contestant1.player.name} (+0${starchips}) and ${contestant2.player.name} (+0${starchips}) has been recorded.`)
+    return checkArenaProgress(info) 
 }
 
 const postStandings = async (info, entries) => {

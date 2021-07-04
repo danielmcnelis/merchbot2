@@ -17,7 +17,7 @@ const { completeTask } = require('./diary')
 //GET SELLER CONFIRMATION
 const getSellerConfirmation = async (message, invoice, buyingPlayer, shopSale = true, mention = false) => {
     const sellerId = message.member.id
-    const cards = shopSale ? invoice.cards : invoice.card
+    const cards = shopSale ? invoice.cards : [...invoice.card]
 
 	const filter = m => m.author.id === sellerId
 	const msg = await message.channel.send(

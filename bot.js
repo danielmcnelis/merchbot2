@@ -3129,11 +3129,11 @@ if(cmd === `!burn`) {
 	const diary = await Diary.findOne({ where: { playerId: playerId }, include: Player })
 	if (!diary) return message.channel.send(`That user is not in the database.`)
 
-	if (diary[achievement] === false) return message.channel.send(`That user has not completed task:\n**${diares[difficulty][achievement]}**.`)
+	if (diary[achievement] === false) return message.channel.send(`That user has not completed task:\n**${diaries[difficulty][achievement]}**.`)
 	else if (diary[achievement] === true) {
 		diary[achievement] = false
 		await diary.save()
-		return message.channel.send(`You undid an achievement in ${diary.player.name}'s Diary:\n**${diares[difficulty][achievement]}**`)
+		return message.channel.send(`You undid an achievement in ${diary.player.name}'s Diary:\n**${diaries[difficulty][achievement]}**`)
 	}
 }
 

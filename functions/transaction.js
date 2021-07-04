@@ -115,7 +115,7 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
 
         prints.push(print)
 
-        total_price += Math.ceil(print.market_price * 0.7) * quantity
+        total_price += authorIsSeller ? Math.ceil(print.market_price * 0.7) * quantity : Math.ceil(print.market_price * 1.1) * quantity 
 		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 
 		const sellerInv = await Inventory.findOne({ 
@@ -254,6 +254,7 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
 }
 
 const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer) => {
+    const authorIsSeller = message.author.id === sellingPlayer.id
     const total_price = invoice.total_price
     const cards = invoice.cards
     const quantities = invoice.quantities
@@ -270,7 +271,7 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
         const quantity = quantities[i]
         const print = prints[i]
         const sellerInv = sellerInvs[i]
-        const price = Math.ceil(print.market_price * 0.7)
+        const price = authorIsSeller ? Math.ceil(print.market_price * 0.7) : Math.ceil(print.market_price * 1.1)
 
 		const newPrice = quantity > 16 ? price / quantity :
                         ( price + ( (16 - quantity) * print.market_price ) ) / 16

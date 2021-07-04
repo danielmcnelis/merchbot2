@@ -183,7 +183,7 @@ if(cmd === `!test`) {
 	const context = canvas.getContext('2d')
 	const background = await Canvas.loadImage(`https://ygoprodeck.com/pics/89631139.jpg`)
 	context.drawImage(background, 0, 0, canvas.width, canvas.height)
-	const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `${card.name}.png`)
+	const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `newd.png`)
 	return message.channel.send(`Testing:`, attachment)
 }
 
@@ -194,7 +194,7 @@ if(cmd === `!test2`) {
 	const context = canvas.getContext('2d')
 	const background = await Canvas.loadImage(`https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/1200px-SpongeBob_SquarePants_character.svg.png`)
 	context.drawImage(background, 0, 0, canvas.width, canvas.height)
-	const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `${card.name}.png`)
+	const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `sponge.png`)
 	return message.channel.send(`Testing:`, attachment)
 }
 

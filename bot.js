@@ -1394,12 +1394,12 @@ if(cmd === `!chart`) {
 	const reptileBars = Math.round((reptileWins / longest) * 10)
 	const rockBars = Math.round((rockWins / longest) * 10)
 
-	let beasts
-	let dinosaurs
-	let fishes
-	let plants
-	let reptiles
-	let rocks
+	let beasts = ''
+	let dinosaurs = ''
+	let fishes = ''
+	let plants = ''
+	let reptiles = ''
+	let rocks = ''
 
 	for (let i = 1; i < beastBars; i++) beasts += beast
 	for (let i = 1; i < dinosaurBars; i++) dinosaurs += dinosaur

@@ -315,8 +315,8 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
         return false
     }
 
-    const newPrice = print && quantity > 16 ? price / quantity :
-                    print && quantity <= 16 ? ( price + ( (16 - quantity) * print.market_price ) ) / 16 :
+    const newPrice = print && quantity > 16 ? total_price / quantity :
+                    print && quantity <= 16 ? ( total_price + ( (16 - quantity) * print.market_price ) ) / 16 :
                     null
     
     if (print) {

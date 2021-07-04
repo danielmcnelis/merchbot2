@@ -310,7 +310,7 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
     const sellerWallet = invoice.sellerWallet
     const buyerId = buyingPlayer.playerId
 
-    if (!total_price || !card || !quantity || !((print && sellerInvs.length) || walletField) ) {
+    if (!total_price || !card || !quantity || !((print && sellerInv) || walletField) ) {
         message.channel.send(`Error processing P2P Sale: missing needed information.`)
         return false
     }

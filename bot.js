@@ -4059,9 +4059,9 @@ if(cmd === `!buy`) {
 	if (!sellingPlayer) return message.channel.send(`That user is not in the database.`)
 
 	const line_item = message.mentions.users.first() ? args.slice(1).join(' ').split('; ') : args.join(' ').split('; ')
-	if (line_items.length > 1) return message.channel.send(`You cannot buy different cards in the same transaction.`)
+	if (line_item.length > 1) return message.channel.send(`You cannot buy different cards in the same transaction.`)
 
-	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_item, buyingPlayer, sellingPlayer) : await getInvoiceP2PSale(message, line_item = line_items[0], buyingPlayer, sellingPlayer)
+	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_item, buyingPlayer, sellingPlayer) : await getInvoiceP2PSale(message, line_item[0], buyingPlayer, sellingPlayer)
 	if (!invoice) return
 
 	const sellerConfirmation = await getSellerConfirmation(message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = false)

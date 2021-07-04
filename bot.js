@@ -1394,28 +1394,28 @@ if(cmd === `!chart`) {
 	const reptileBars = Math.round((reptileWins / longest) * 10)
 	const rockBars = Math.round((rockWins / longest) * 10)
 
-	let beasts = beast
-	let dinosaurs = dinosaur
-	let fishs = fish
-	let plants = plant
-	let reptiles = reptile
-	let rocks = rock
+	let beasts
+	let dinosaurs
+	let fishes
+	let plants
+	let reptiles
+	let rocks
 
 	for (let i = 1; i < beastBars; i++) beasts += beast
 	for (let i = 1; i < dinosaurBars; i++) dinosaurs += dinosaur
-	for (let i = 1; i < fishBars; i++) fishs += fish
+	for (let i = 1; i < fishBars; i++) fishes += fish
 	for (let i = 1; i < plantBars; i++) plants += plant
 	for (let i = 1; i < reptileBars; i++) reptiles += reptile
 	for (let i = 1; i < rockBars; i++) rocks += rock
 
 	return message.channel.send(
 		`There have been ${totalWinners} Arena winners. Conquest breakdown:\n` +
-		`${beastWins} - ${beasts}\n` + 
-		`${dinosaurWins} - ${dinosaurs}\n` + 
-		`${fishWins} - ${fishs}\n` + 
-		`${plantWins} - ${plants}\n` + 
-		`${reptileWins} - ${reptiles}\n` +
-		`${rockWins} - ${rocks}`
+		`${beast} - ${beastWins} - ${beasts}\n` + 
+		`${dinosaur} - ${dinosaurWins} - ${dinosaurs}\n` + 
+		`${fish} - ${fishWins} - ${fishes}\n` + 
+		`${plant} - ${plantWins} - ${plants}\n` + 
+		`${reptile} - ${reptileWins} - ${reptiles}\n` +
+		`${rock} - ${rockWins} - ${rocks}`
 	)
 }
 

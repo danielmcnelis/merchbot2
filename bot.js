@@ -4064,7 +4064,7 @@ if(cmd === `!buy`) {
 	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_item, buyingPlayer, sellingPlayer) : await getInvoiceP2PSale(message, line_item[0], buyingPlayer, sellingPlayer)
 	if (!invoice) return
 
-	const buyerConfirmation = !shopSale ? await getBuyerConfirmation(message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = true) : true
+	const buyerConfirmation = await getBuyerConfirmation(message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = true)
 	if (!buyerConfirmation) return
 
 	const sellerConfirmation = shopSale ? true : await getSellerConfirmation(message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = false)

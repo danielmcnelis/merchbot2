@@ -125,19 +125,19 @@ const awardPack = async (channel, playerId, set, num) => {
             }
         }
 
-        const card_1 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[0]}`)
-        const card_2 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[1]}`)
-        const card_3 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[2]}`)
-        const card_4 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[3]}`)
-        const card_5 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[4]}`)
-        const card_6 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[5]}`)
-        const card_7 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[6]}`)
-        const card_8 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[7]}`)
-        const card_9 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[8]}`)
+        // const card_1 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[0]}`)
+        // const card_2 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[1]}`)
+        // const card_3 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[2]}`)
+        // const card_4 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[3]}`)
+        // const card_5 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[4]}`)
+        // const card_6 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[5]}`)
+        // const card_7 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[6]}`)
+        // const card_8 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[7]}`)
+        // const card_9 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[8]}`)
 
-        const card_width = 57
-        // const canvas = Canvas.createCanvas(card_width * 9, 80)
-        // const context = canvas.getContext('2d')
+        // //const card_width = 57
+        // // const canvas = Canvas.createCanvas(card_width * 9, 80)
+        // // const context = canvas.getContext('2d')
 
         // context.drawImage(card_1, 0, 0, card_width, 80)
         // context.drawImage(card_2, card_width, 0, card_width, canvas.height)

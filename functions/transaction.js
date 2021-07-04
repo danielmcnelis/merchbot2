@@ -153,6 +153,8 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer) => {
         m6success
     }
 
+    console.log('invoice', invoice)
+
     return invoice
 }
 
@@ -242,6 +244,8 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer) => {
         sellerInv,
         sellerWallet
     }
+    
+    console.log('invoice', invoice)
 
     return invoice
 }

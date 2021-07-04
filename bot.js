@@ -4013,10 +4013,10 @@ if(cmd === `!sell`) {
 	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_items, buyingPlayer) : await getInvoiceP2PSale(message, line_item = line_items[0], buyingPlayer)
 	if (!invoice) return
 
-	const sellerConfirmation = await getSellerConfirmation(message, invoice, buyingPlayer, shopSale, mention = false)
+	const sellerConfirmation = await getSellerConfirmation(message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = false)
 	if (!sellerConfirmation) return
 
-	const buyerConfirmation = !shopSale ? await getBuyerConfirmation(message, invoice, sellingPlayer, shopSale, mention = true) : true
+	const buyerConfirmation = !shopSale ? await getBuyerConfirmation(message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = true) : true
 	if (!buyerConfirmation) return
 
 	const processSale = shopSale ? await processMerchBotSale(message, invoice, buyingPlayer, sellingPlayer) : await processP2PSale(message, invoice, buyingPlayer, sellingPlayer) 

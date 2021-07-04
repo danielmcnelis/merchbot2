@@ -15,13 +15,11 @@ const { completeTask } = require('./diary')
 
 
 //GET SELLER CONFIRMATION
-const getSellerConfirmation = async (message, invoice, buyingPlayer, shopSale = true, mention = false) => {
-    const sellerId = message.member.id
+const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlayer, shopSale = true, mention = false) => {
     const cards = shopSale ? invoice.cards : [invoice.card]
-
     console.log('cards', cards)
 
-	const filter = m => m.author.id === sellerId
+	const filter = m => m.author.id === sellingPlayer.playerId
 	const msg = await message.channel.send(
         `${mention ? `<@${sellerId}>, Do you agree` : 'Are you sure you want'} ` +
         `to sell${cards.length > 1 ? `:\n${cards.join('\n')}\nT` : ` ${cards[0]} t`}o ` +
@@ -50,9 +48,12 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, shopSale = 
 }
 
 //GET BUYER CONFIRMATION
-const getBuyerConfirmation = async (message, mention = false, buyer, cards, price, seller, sellingPlayer) => {
-	const filter = m => m.author.id === buyer
-	const msg = await message.channel.send(`${mention ? `<@${buyer}>, Do you agree` : 'Are you sure you want'} to buy${cards.length > 1 ? `:\n${cards.join('\n')}\nF` : ` ${cards[0]} f`}rom ${seller === merchbotId ? 'The Shop' : sellingPlayer.name} for ${price}${stardust}?`)
+const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = false) => {
+    const cards = shopSale ? invoice.cards : [invoice.card]
+    console.log('cards', cards)
+
+	const filter = m => m.author.id === buyingPlayer.playerId
+	const msg = await message.channel.send(`${mention ? `<@${buyingPlayer.playerId}>, Do you agree` : 'Are you sure you want'} to buy${cards.length > 1 ? `:\n${cards.join('\n')}\nF` : ` ${cards[0]} f`}rom ${sellingPlayer.playerId === merchbotId ? 'The Shop' : sellingPlayer.name} for ${invoice.total_price}${stardust}?`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000

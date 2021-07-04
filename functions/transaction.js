@@ -9,6 +9,7 @@ const adminId = '194147938786738176'
 const { client } = require('../static/clients.js')
 const { fpRole } = require('../static/roles.json')
 const { findCard } = require('./search.js')
+const { selectPrint } = require('./print.js')
 const { announcementsChannelId, botSpamChannelId, shopChannelId, staffChannelId } = require('../static/channels.json')
 const { completeTask } = require('./diary')
 

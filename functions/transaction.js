@@ -379,7 +379,7 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
         await sellerWallet.save()
     }
 
-    buyerWallet -= total_price
+    buyerWallet.stardust -= total_price
     await buyerWallet.save()
 
     sellerWallet.stardust += total_price

@@ -258,7 +258,7 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
     const sellerInvs = invoice.sellerInvs
     const buyerId = buyingPlayer.id
 
-    if (!total_price || !cards.length || !quantities.length || !prints.length || !sellerInvs.length || buyerId) {
+    if (!total_price || !cards.length || !quantities.length || !prints.length || !sellerInvs.length || !buyerId) {
         message.channel.send(`Error processing MerchBot Sale: missing needed information.`)
         return false
     }
@@ -320,7 +320,7 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
     const sellerWallet = invoice.sellerWallet
     const buyerId = buyingPlayer.id
 
-    if (!total_price || !card || !quantity || !((print && sellerInv) || walletField) ) {
+    if (!total_price || !card || !quantity || !((print && sellerInv) || walletField) || !buyerId) {
         message.channel.send(`Error processing P2P Sale: missing needed information.`)
         return false
     }

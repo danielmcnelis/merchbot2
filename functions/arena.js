@@ -301,7 +301,7 @@ const startRound = async (info, entries) => {
     }
 }
 
-const forfeit = (winnerId, loserId) => {
+const forfeit = async (winnerId, loserId) => {
 		const info = await Info.findOne({ where: { element: 'arena' } })
 		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
 
@@ -323,7 +323,7 @@ const forfeit = (winnerId, loserId) => {
 		return checkArenaProgress(info) 
 }
 
-const doubleForfeit = (player1Id, player2Id) => {
+const doubleForfeit = async (player1Id, player2Id) => {
     const info = await Info.findOne({ where: { element: 'arena' } })
     if (!info) return message.channel.send(`Error: could not find game: "arena".`)
 

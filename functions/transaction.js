@@ -54,9 +54,10 @@ const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlaye
     const cards = shopSale ? invoice.cards : [invoice.card]
     const buyerId = buyingPlayer.id
     console.log('cards', cards)
+    console.log('buyerId', buyerId)
 
-	const filter = m => m.author.id === buyingPlayer.playerId
-	const msg = await message.channel.send(`${mention ? `<@${buyingPlayer.playerId}>, Do you agree` : 'Are you sure you want'} to buy${cards.length > 1 ? `:\n${cards.join('\n')}\nF` : ` ${cards[0]} f`}rom ${sellingPlayer.playerId === merchbotId ? 'The Shop' : sellingPlayer.name} for ${invoice.total_price}${stardust}?`)
+	const filter = m => m.author.id === buyerId
+	const msg = await message.channel.send(`${mention ? `<@${buyerId}>, Do you agree` : 'Are you sure you want'} to buy${cards.length > 1 ? `:\n${cards.join('\n')}\nF` : ` ${cards[0]} f`}rom ${sellingPlayer.playerId === merchbotId ? 'The Shop' : sellingPlayer.name} for ${invoice.total_price}${stardust}?`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000

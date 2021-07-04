@@ -17,7 +17,7 @@ const { completeTask } = require('./diary')
 //GET SELLER CONFIRMATION
 const getSellerConfirmation = async (message, invoice, buyingPlayer, shopSale = true, mention = false) => {
     const sellerId = message.member.id
-    const cards = shopSale ? invoice.cards : [...invoice.card]
+    const cards = shopSale ? invoice.cards : [invoice.card]
 
     console.log('cards', cards)
 
@@ -26,7 +26,7 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, shopSale = 
         `${mention ? `<@${sellerId}>, Do you agree` : 'Are you sure you want'} ` +
         `to sell${cards.length > 1 ? `:\n${cards.join('\n')}\nT` : ` ${cards[0]} t`}o ` +
         `${shopSale ? 'The Shop' : buyingPlayer.name} ` + 
-        `for ${invoice.price}${stardust}?`
+        `for ${invoice.total_price}${stardust}?`
     )
 
 	const collected = await msg.channel.awaitMessages(filter, {

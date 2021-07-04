@@ -2991,14 +2991,14 @@ if(cmd === `!daily`) {
 	daily.last_check_in = date
 	await daily.save()
 
-	const canvas = Canvas.createCanvas(105, 158)
-	const context = canvas.getContext('2d')
-	const background = await Canvas.loadImage(`https://ygoprodeck.com/pics/${card.image}`)
-	context.drawImage(background, 0, 0, canvas.width, canvas.height)
-	const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `${card.name}.png`)
+	// const canvas = Canvas.createCanvas(105, 158)
+	// const context = canvas.getContext('2d')
+	// const background = await Canvas.loadImage(`https://ygoprodeck.com/pics/${card.image}`)
+	// context.drawImage(background, 0, 0, canvas.width, canvas.height)
+	// const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `${card.name}.png`)
 
 	message.channel.send(`1... 2...`)
-	return setTimeout(() => message.channel.send(`${enthusiasm} ${daily.player.name} pulled ${eval(print.rarity)}${print.card_code} - ${print.card_name} from the grab bag! ${emoji}`, attachment), 2000)
+	return setTimeout(() => message.channel.send(`${enthusiasm} ${daily.player.name} pulled ${eval(print.rarity)}${print.card_code} - ${print.card_name} from the grab bag! ${emoji}`, attachment = false), 2000)
 }
 
 //ALCHEMY
@@ -3690,20 +3690,20 @@ if(cmd === `!pack`) {
 			const card_9 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[8]}`)
 	
 			const card_width = 57
-			const canvas = Canvas.createCanvas(card_width * 9, 80)
-			const context = canvas.getContext('2d')
+			// const canvas = Canvas.createCanvas(card_width * 9, 80)
+			// const context = canvas.getContext('2d')
 	
-			context.drawImage(card_1, 0, 0, card_width, 80)
-			context.drawImage(card_2, card_width, 0, card_width, canvas.height)
-			context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
-			context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
-			context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
-			context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
-			context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
-			context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
-			context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
-			const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`)
-			message.author.send(results.join("\n"), attachment)
+			// context.drawImage(card_1, 0, 0, card_width, 80)
+			// context.drawImage(card_2, card_width, 0, card_width, canvas.height)
+			// context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
+			// context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
+			// context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
+			// context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
+			// context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
+			// context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
+			// context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
+			// const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`)
+			message.author.send(results.join("\n"), attachment = false)
 		}
 
 		wallet[set.currency] -= (set.unit_price * num)
@@ -3867,20 +3867,20 @@ if(cmd === `!box`) {
 			const card_9 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[8]}`)
 	
 			const card_width = 57
-			const canvas = Canvas.createCanvas(card_width * 9, 80)
-			const context = canvas.getContext('2d')
+			// const canvas = Canvas.createCanvas(card_width * 9, 80)
+			// const context = canvas.getContext('2d')
 	
-			context.drawImage(card_1, 0, 0, card_width, 80)
-			context.drawImage(card_2, card_width, 0, card_width, canvas.height)
-			context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
-			context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
-			context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
-			context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
-			context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
-			context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
-			context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
-			const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`)
-			message.author.send(results.join("\n"), attachment)
+			// context.drawImage(card_1, 0, 0, card_width, 80)
+			// context.drawImage(card_2, card_width, 0, card_width, canvas.height)
+			// context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
+			// context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
+			// context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
+			// context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
+			// context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
+			// context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
+			// context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
+			// const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`)
+			message.author.send(results.join("\n"), attachment = false)
 		}
 
 		wallet[set.currency] -= set.box_price

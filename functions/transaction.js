@@ -244,7 +244,7 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer) => {
         sellerInv,
         sellerWallet
     }
-    
+
     console.log('invoice', invoice)
 
     return invoice
@@ -255,7 +255,7 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
     const cards = invoice.cards
     const quantities = invoice.quantities
     const prints = invoice.prints
-    const sellerInvs = invoice.invs
+    const sellerInvs = invoice.sellerInvs
     const buyerId = buyingPlayer.id
 
     if (!total_price || !cards.length || !quantities.length || !prints.length || !sellerInvs.length || buyerId) {

@@ -146,7 +146,7 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer) => {
         cards,
         prints,
         sellerInvs,
-        m6sucsess
+        m6success
     }
 
     return invoice

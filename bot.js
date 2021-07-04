@@ -2631,11 +2631,16 @@ if(dropcom.includes(cmd)) {
 	const entry = await eval(game).findOne({ where: { playerId: maid} })
 	const info = await Info.findOne({ where: { element: game.toLowerCase() } })
 
-	if (entry) {
+	if (info.status === 'pending' && entry) {
+		await entry.destroy()
+		return message.channel.send(`You are no longer in the ${game} queue.`)
+	} else if (info.status === 'active' && entry) {
 		entry.active = false
 		await entry.save()
 		message.member.roles.remove(role)
-		return message.channel.send(`<@${message.member.user.username}> left ${game === 'Trivia' ? '' : 'the '}${game}${info.status === 'pending' ? ' queue' : ''}.`)
+		return message.channel.send(`<@${maid}> dropped out of ${game === 'Trivia' ? '' : 'the '}${game}.`)
+	} else if (info.status === 'confirming' && entry) {
+		return message.channel.send(`You cannot drop during the confirmation process.`)
 	} else {
 		return message.channel.send(`You were not in the ${game} queue.`)
 	}

@@ -17,9 +17,11 @@ const { completeTask } = require('./diary')
 //GET SELLER CONFIRMATION
 const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlayer, shopSale = true, mention = false) => {
     const cards = shopSale ? invoice.cards : [invoice.card]
+    const sellerId = sellingPlayer.id
     console.log('cards', cards)
+    console.log('sellerId', sellerId)
 
-	const filter = m => m.author.id === sellingPlayer.playerId
+	const filter = m => m.author.id === sellerId
 	const msg = await message.channel.send(
         `${mention ? `<@${sellerId}>, Do you agree` : 'Are you sure you want'} ` +
         `to sell${cards.length > 1 ? `:\n${cards.join('\n')}\nT` : ` ${cards[0]} t`}o ` +
@@ -50,6 +52,7 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlay
 //GET BUYER CONFIRMATION
 const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = false) => {
     const cards = shopSale ? invoice.cards : [invoice.card]
+    const buyerId = buyingPlayer.id
     console.log('cards', cards)
 
 	const filter = m => m.author.id === buyingPlayer.playerId

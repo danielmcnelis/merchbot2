@@ -127,12 +127,12 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
 		})
 
 		if (!sellerInv) {
-            message.channel.send(`${authorIsSeller ? 'You do' : shopSale ? `Sorry, ${card} is out of stock.` : `${buyingPlayer.name} does`} not have any copies of ${card}.`)
+            message.channel.send(`${authorIsSeller ? `You do not have any copies of ${card}` : `Sorry, ${card} is out of stock.`}.`)
             return false
         } 
 
 		if (sellerInv.quantity < quantity) {
-            message.channel.send(`${authorIsSeller ? 'You only have' : shopSale ? `Sorry, I only have` : `${buyingPlayer.name} only has`} ${sellerInv.quantity} ${sellerInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`)
+            message.channel.send(`${authorIsSeller ? 'You only have' : `Sorry, I only have`} ${sellerInv.quantity} ${sellerInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`)
             return
         } 
 	

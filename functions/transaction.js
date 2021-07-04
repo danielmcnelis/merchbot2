@@ -57,7 +57,7 @@ const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlaye
     console.log('buyerId', buyerId)
 
 	const filter = m => m.author.id === buyerId
-	const msg = await message.channel.send(`${mention ? `<@${buyerId}>, Do you agree` : 'Are you sure you want'} to buy${cards.length > 1 ? `:\n${cards.join('\n')}\nF` : ` ${cards[0]} f`}rom ${sellingPlayer.playerId === merchbotId ? 'The Shop' : sellingPlayer.name} for ${invoice.total_price}${stardust}?`)
+	const msg = await message.channel.send(`${mention ? `<@${buyerId}>, Do you agree` : 'Are you sure you want'} to buy${cards.length > 1 ? `:\n${cards.join('\n')}\nF` : ` ${cards[0]} f`}rom ${sellingPlayer.id === merchbotId ? 'The Shop' : sellingPlayer.name} for ${invoice.total_price}${stardust}?`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
@@ -252,7 +252,7 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
     const quantities = invoice.quantities
     const prints = invoice.prints
     const sellerInvs = invoice.invs
-    const buyerId = buyingPlayer.playerId
+    const buyerId = buyingPlayer.id
 
     if (!price || !cards.length || !quantities.length || !prints.length || !sellerInvs.length || buyerId) {
         message.channel.send(`Error processing MerchBot Sale: missing needed information.`)
@@ -308,7 +308,7 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
     const walletField = invoice.walletField
     const sellerInv = invoice.sellerInv
     const sellerWallet = invoice.sellerWallet
-    const buyerId = buyingPlayer.playerId
+    const buyerId = buyingPlayer.id
 
     if (!total_price || !card || !quantity || !((print && sellerInv) || walletField) ) {
         message.channel.send(`Error processing P2P Sale: missing needed information.`)

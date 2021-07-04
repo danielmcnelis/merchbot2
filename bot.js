@@ -2635,7 +2635,7 @@ if(dropcom.includes(cmd)) {
 		entry.active = false
 		await entry.save()
 		message.member.roles.remove(role)
-		return message.channel.send(`<@${member.user.username}> left ${game === 'Trivia' ? '' : 'the '}${game}${info.status === 'pending' ? ' queue' : ''}.`)
+		return message.channel.send(`<@${message.member.user.username}> left ${game === 'Trivia' ? '' : 'the '}${game}${info.status === 'pending' ? ' queue' : ''}.`)
 	} else {
 		return message.channel.send(`You were not in the ${game} queue.`)
 	}

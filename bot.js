@@ -21,6 +21,13 @@ const muted = require('./static/muted.json')
 const prints = require('./static/prints.json')
 const nicknames = require('./static/nicknames.json')
 const statuses = require('./static/statuses.json')
+const { 
+    getBuyerConfirmation,
+    getSellerConfirmation,
+    getInvoiceMerchBotSale,
+    getInvoiceP2PSale,
+    processMerchBotSale,
+    processP2PSale } = require('./functions/transaction.js')
 const { getNewStatus } = require('./functions/status.js')
 const { checkArenaProgress, getArenaSample, resetArena, startArena, startRound, endArena } = require('./functions/arena.js')
 const { askQuestion, resetTrivia, startTrivia } = require('./functions/trivia.js')
@@ -36,7 +43,7 @@ const { uploadDeckFolder } = require('./functions/drive.js')
 const { fetchAllCardNames, fetchAllCards, fetchAllUniquePrintNames, findCard, search } = require('./functions/search.js')
 const { getBarterCard, checkShopShouldBe, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
 const { awardPack } = require('./functions/packs.js')
-const { getBuyerConfirmation, getFinalConfirmation, getInitiatorConfirmation, getPartnerSide, getPartnerConfirmation, getSellerConfirmation } = require('./functions/trade.js')
+const { getFinalConfirmation, getInitiatorConfirmation, getPartnerSide, getPartnerConfirmation } = require('./functions/trade.js')
 const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard } = require('./functions/profile.js')
 const { checkCoreSetComplete, completeTask } = require('./functions/diary.js')
 const { client, challongeClient } = require('./static/clients.js')
@@ -2130,7 +2137,7 @@ if (manualcom.includes(cmd)) {
 		winningPlayer.arena_wins++
 		await winningPlayer.save()
 
-		winningPlayer.wallet.starchips += 2
+		winningPlayer.wallet.starchips += 3
 		await winningPlayer.wallet.save()
 
 		winningContestant.score++
@@ -2148,7 +2155,7 @@ if (manualcom.includes(cmd)) {
 			chipsLoser: 1
 		})
 
-		message.channel.send(`A manual Arena loss by ${losingPlayer.name} (+1${starchips}) to ${winningPlayer.name} (+2${starchips}) has been recorded.`)
+		message.channel.send(`A manual Arena loss by ${losingPlayer.name} (+1${starchips}) to ${winningPlayer.name} (+3${starchips}) has been recorded.`)
 		return checkArenaProgress(info)
 	} else {
 		const diary = winningPlayer.diary
@@ -3982,142 +3989,39 @@ if(cmd === `!sell`) {
 	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
 
 	if (!args.length) return message.channel.send(`Please specify the card(s) you wish to sell.`)
-	const seller = maid
-	const buyer = message.mentions.users.first() ? message.mentions.users.first().id : merchbotId	
-	if (buyer === maid) return message.channel.send(`You cannot sell cards to yourself.`)
+	const sellerId = maid
+	const buyerId = message.mentions.users.first() ? message.mentions.users.first().id : merchbotId	
+	if (buyerId === sellerId) return message.channel.send(`You cannot sell cards to yourself.`)
+	const shopSale = !!(buyerId === merchbotId)
 
 	const sellingPlayer = await Player.findOne({ 
-		where: { id: maid },
+		where: { id: sellerId },
 		include: Wallet
 	})
 
 	const buyingPlayer = await Player.findOne({ 
-		where: { id: buyer },
+		where: { id: buyerId },
 		include: Wallet
 	})
 
 	if (!sellingPlayer) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	if (!buyingPlayer) return message.channel.send(`That user is not in the database.`)
 
-	const inputs = args.join(' ').split('; ')
-	if (buyer !== merchbotId && inputs.length > 1) return message.channel.send(`You cannot sell different cards to a player in the same transaction.`)
-	const quantities = []
-	const cards = []
-	const prints = []
-	sellerInvs = []		
-	const prices = buyer === merchbotId ? [] : [parseInt(args[args.length - 1])]
-	
-	let m6success = false
-	for (let i = 0; i < inputs.length; i++) {
-		const arguments = inputs[i].split(' ')
-		const quantity = isFinite(parseInt(arguments[0])) ? parseInt(arguments[0]) : isFinite(parseInt(arguments[1])) ? parseInt(arguments[1]) : 1
-		const endOfQuery = buyer === merchbotId ? arguments.length : -1
-		const query = isFinite(parseInt(arguments[0])) ? arguments.slice(1, endOfQuery).join(' ') : buyer !== merchbotId ? arguments.slice(2, endOfQuery).join(' ') : arguments.slice(1, endOfQuery).join(' ')
-	
-		if (buyer !== merchbotId && isNaN(prices[0])) return message.channel.send(`Please specify your asking price at the end of the command.`)
-		if (!query) return message.channel.send(`Please specify the card(s) you wish to sell.`)
+	const line_items = message.mentions.users.first() ? args.slice(1).join(' ').split('; ') : args.join(' ').split('; ')
+	if (!shopSale && line_items.length > 1) return message.channel.send(`You cannot sell different cards to a player in the same transaction.`)
 
-		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
-		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-	
-		let walletField
-		if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
-		if (query === 'egg' || query === 'eggs') walletField = 'egg'
-		if (query === 'hook' || query === 'hooks') walletField = 'hook'
-		if (query === 'moai' || query === 'moais' ) walletField = 'moai'
-		if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
-		if (query === 'rose' || query === 'roses' ) walletField = 'rose'
+	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_items, buyingPlayer) : await getInvoiceP2PSale(message, line_item = line_items[0], buyingPlayer)
+	if (!invoice) return
 
-		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-		if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
-		if (buyer === merchbotId && walletField) return message.channel.send(`Sorry, you cannot sell ${eval(walletField)} to The Shop.`)
-		if (buyer === merchbotId) prices.push(Math.ceil(print.market_price * 0.7) * quantity)
-		const card = walletField ? `${eval(walletField)} ${capitalize(walletField)}` : `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
-
-		const sellerInv = print ? await Inventory.findOne({ 
-			where: { 
-				printId: print.id,
-				playerId: maid,
-				quantity: { [Op.gt]: 0 }
-			}
-		}) : await Wallet.findOne({ where: { playerId: maid }})
-
-		if (!sellerInv) return message.channel.send(`You do not have any ${walletField ? '' : 'copies of '}${card}.`)
-		if (walletField && sellerInv[walletField] < quantity) return message.channel.send(`You only have ${sellerInv.quantity} ${card}.`)
-		if (sellerInv.quantity < quantity) return message.channel.send(`You only have ${sellerInv.quantity} ${sellerInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`)
-	
-		if (!walletField && print.rarity !== 'com' && quantity >= 5) m6success = true
-
-		quantities.push(quantity)
-		if (!walletField) { 
-			prints.push(print)
-		} else {
-			prints.push(walletField)
-		}
-		sellerInvs.push(sellerInv)
-		cards.push(`${quantity} ${card}`)
-	}
-
-	const totalPrice = prices.reduce((a, b) => a + b, 0)
-
-	if (buyer !== merchbotId && prints[0].market_price && Math.ceil(prints[0].market_price * 0.7) * quantities[0] > totalPrice) return message.channel.send(`Sorry, you cannot sell cards to other players for less than what The Shop will pay for them.`)
-	if (buyer !== merchbotId && buyingPlayer.wallet.stardust < totalPrice) return message.channel.send(`Sorry, ${buyingPlayer.name} only has ${buyingPlayer.wallet.stardust}${stardust}.`)
-
-	const sellerConfirmation = seller !== merchbotId ? await getSellerConfirmation(message, mention = false, seller, cards, totalPrice, buyer, buyingPlayer) : true
+	const sellerConfirmation = await getSellerConfirmation(message, invoice, buyingPlayer, shopSale, mention = false)
 	if (!sellerConfirmation) return
-	const buyerConfirmation = buyer !== merchbotId ? await getBuyerConfirmation(message, mention = true, buyer, cards, totalPrice, seller, sellingPlayer) : true
+
+	const buyerConfirmation = !shopSale ? await getBuyerConfirmation(message, invoice, sellingPlayer, shopSale, mention = true) : true
 	if (!buyerConfirmation) return
 
-	for (let i = 0; i < cards.length; i++) {
-		const newPrice = prints[i].market_price ? quantities[i] > 16 ? prices[i] / quantities[i] : ( prices[i] + ( (16 - quantities[i]) * prints[i].market_price ) ) / 16 : null
-		
-		if (prints[i].market_price) {
-			prints[i].market_price = newPrice
-			await prints[i].save()
-		}
-		
-		const buyerInv = prints[i].card_code ? await Inventory.findOne({ 
-			where: { 
-				card_code: prints[i].card_code,
-				printId: prints[i].id,
-				playerId: buyer
-			}
-		}) : await Wallet.findOne({ where: { playerId: buyer } })
+	const processSale = shopSale ? await processMerchBotSale(message, invoice, buyingPlayer, sellingPlayer) : await processP2PSale(message, invoice, buyingPlayer, sellingPlayer) 
 
-		if (!prints[i].card_code) {
-			buyerInv[prints[i]] += quantities[i]
-			await buyerInv.save()
-		} else if (buyerInv) {
-			buyerInv.quantity += quantities[i]
-			await buyerInv.save()
-		} else {
-			await Inventory.create({ 
-				card_code: prints[i].card_code,
-				quantity: quantities[i],
-				printId: prints[i].id,
-				playerId: buyer
-			})
 
-			if (prints[i].rarity === 'scr') completeTask(message.channel, buyer, 'm4')
-		}
-
-		if ( prints[i].set_code === 'APC' && ((buyerInv && buyerInv.quantity >= 3) ||  quantities[i] >= 3 ) ) completeTask(message.channel, buyer, 'h5', 4000)
-
-		if (prints[i].set_code) {
-			sellerInvs[i].quantity -= quantities[i]
-			await sellerInvs[i].save()
-		} else {
-			sellerInvs[i][prints[i]] -= quantities[i]
-			await sellerInvs[i].save()
-		}
-	}
-
-	buyingPlayer.wallet.stardust -= parseInt(totalPrice)
-	await buyingPlayer.wallet.save()
-
-	sellingPlayer.wallet.stardust += parseInt(totalPrice)
-	await sellingPlayer.wallet.save()
 
 	if (buyer === merchbotId) {
 		if (m6success === true) completeTask(message.channel, maid, 'm6')
@@ -4172,11 +4076,11 @@ if(cmd === `!buy`) {
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 
 	let walletField
-	if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
+	if (query === 'cactus' || query === 'cactuses' || query === 'cacti') walletField = 'cactus'
 	if (query === 'egg' || query === 'eggs') walletField = 'egg'
 	if (query === 'hook' || query === 'hooks') walletField = 'hook'
 	if (query === 'moai' || query === 'moais' ) walletField = 'moai'
-	if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
+	if (query === 'mushroom' || query === 'mushrooms') walletField = 'mushroom'
 	if (query === 'rose' || query === 'roses' ) walletField = 'rose'
 
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
@@ -4382,11 +4286,11 @@ if(cmd === `!trade`) {
 	
 		let walletField
 		if (query === 'd' || query === 'sd' || query === 'stardust' || query === 'dust' ) walletField = 'stardust'
-		if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
+		if (query === 'cactus' || query === 'cactuses' || query === 'cacti') walletField = 'cactus'
 		if (query === 'egg' || query === 'eggs') walletField = 'egg'
 		if (query === 'hook' || query === 'hooks') walletField = 'hook'
 		if (query === 'moai' || query === 'moais' ) walletField = 'moai'
-		if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
+		if (query === 'mushroom' || query === 'mushrooms') walletField = 'mushroom'
 		if (query === 'rose' || query === 'roses' ) walletField = 'rose'
 	
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
@@ -4444,11 +4348,11 @@ if(cmd === `!trade`) {
 	
 		let walletField
 		if (query === 'd' || query === 'sd' || query === 'stardust' || query === 'dust' ) walletField = 'stardust'
-		if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
+		if (query === 'cactus' || query === 'cactuses' || query === 'cacti') walletField = 'cactus'
 		if (query === 'egg' || query === 'eggs') walletField = 'egg'
 		if (query === 'hook' || query === 'hooks') walletField = 'hook'
 		if (query === 'moai' || query === 'moais' ) walletField = 'moai'
-		if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
+		if (query === 'mushroom' || query === 'mushrooms') walletField = 'mushroom'
 		if (query === 'rose' || query === 'roses' ) walletField = 'rose'
 
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, partner, card_name) : null

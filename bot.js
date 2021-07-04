@@ -4039,125 +4039,47 @@ if(cmd === `!buy`) {
 		mcid !== marketPlaceChannelId
 	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
 
-	if (!args.length) return message.channel.send(`Please specify the card you wish to buy.`)
-	if (args.join("").includes(";")) return message.channel.send(`You cannot buy different cards in the same transaction.`)
-	const buyer = maid
-	const seller = message.mentions.users.first() ? message.mentions.users.first().id : merchbotId	
-	if (seller === maid) return message.channel.send(`You cannot buy cards from yourself.`)
-	const shopOpen = (seller === merchbotId) ? await checkShopOpen() : false
-	if (seller === merchbotId && !shopOpen) return message.channel.send(`Sorry, The Shop is closed.`)
+	if (!args.length) return message.channel.send(`Please specify the card(s) you wish to sell.`)
+	const buyerId = maid
+	const sellerId = message.mentions.users.first() ? message.mentions.users.first().id : merchbotId	
+	if (buyerId === sellerId) return message.channel.send(`You cannot buy cards from yourself.`)
+	const shopSale = !!(sellerId === merchbotId)
 
-	const buyingPlayer = await Player.findOne({ 
-		where: { id: maid },
+	const sellingPlayer = await Player.findOne({ 
+		where: { id: sellerId },
 		include: Wallet
 	})
 
-	const sellingPlayer = await Player.findOne({ 
-		where: { id: seller },
+	const buyingPlayer = await Player.findOne({ 
+		where: { id: buyerId },
 		include: Wallet
 	})
 
 	if (!buyingPlayer) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	if (!sellingPlayer) return message.channel.send(`That user is not in the database.`)
 
-	let price = seller === merchbotId ? null : parseInt(args[args.length - 1])
-	if (seller !== merchbotId && isNaN(price)) return message.channel.send(`Please specify your offer price at the end of the command.`)
-	
-	const quantity = isFinite(parseInt(args[0])) ? parseInt(args[0]) : isFinite(parseInt(args[1])) ? parseInt(args[1]) : 1
-	if (seller === merchbotId && quantity > 3) return message.channel.send(`You cannot buy more than 3 copies of a card from The Shop.`)
+	const line_items = message.mentions.users.first() ? args.slice(1).join(' ').split('; ') : args.join(' ').split('; ')
+	if (line_items.length > 1) return message.channel.send(`You cannot buy different cards in the same transaction.`)
 
-	const endOfQuery = seller === merchbotId ? args.length : -1
-	const query = isFinite(parseInt(args[0])) ? args.slice(1, endOfQuery).join(' ') : seller !== merchbotId ? args.slice(2, endOfQuery).join(' ') : args.slice(1, endOfQuery).join(' ')
-	if (!query) return message.channel.send(`Please specify the card you wish to buy.`)
+	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_items, buyingPlayer) : await getInvoiceP2PSale(message, line_item = line_items[0], buyingPlayer)
+	if (!invoice) return
 
-	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
-	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-
-	let walletField
-	if (query === 'cactus' || query === 'cactuses' || query === 'cacti') walletField = 'cactus'
-	if (query === 'egg' || query === 'eggs') walletField = 'egg'
-	if (query === 'hook' || query === 'hooks') walletField = 'hook'
-	if (query === 'moai' || query === 'moais' ) walletField = 'moai'
-	if (query === 'mushroom' || query === 'mushrooms') walletField = 'mushroom'
-	if (query === 'rose' || query === 'roses' ) walletField = 'rose'
-
-	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-	if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
-	if (buyer === merchbotId && walletField) return message.channel.send(`Sorry, you cannot buy ${eval(walletField)} from The Shop.`)
-	if (seller === merchbotId) price = Math.ceil(print.market_price * 1.1) * quantity
-	const card = walletField ? `${eval(walletField)}` : `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
-
-	const sellerInv = print ? await Inventory.findOne({ 
-		where: {
-			printId: print.id,
-			playerId: seller,
-			quantity: { [Op.gt]: 0 }
-		}
-	}) : await Wallet.findOne({ where: { playerId: seller }})
-
-	if (!sellerInv) return message.channel.send(`${seller === merchbotId ? `${card} is out of stock` : `${sellingPlayer.name} does not have any ${walletField ? '' : 'copies of '}${card}`}.`)
-	if (walletField && sellerInv[walletField] < quantity) return message.channel.send(`${sellingPlayer.name} only has ${sellerInv.quantity} ${card}.`)
-	if (sellerInv.quantity < quantity) return message.channel.send(`${seller === merchbotId ? `The Shop only has ${sellerInv.quantity} ${sellerInv.quantity > 1 ? 'copies' : 'copy'} of ${card} in stock.` : `${sellingPlayer.name} only has ${sellerInv.quantity} ${sellerInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`}`)
-	if (buyingPlayer.wallet.stardust < price) return message.channel.send(`${seller === merchbotId ? `Sorry, you only have ${buyingPlayer.wallet.stardust}${stardust} and ${card} costs ${price}${stardust}.` : `Sorry, you only have ${buyingPlayer.wallet.stardust}${stardust}.`}`)
-	if (!walletField && seller !== merchbotId && (price / quantity) < Math.ceil(print.market_price * 0.7)) return message.channel.send(`You cannot buy cards from other players for less than what The Shop will pay for them.`)
-
-	const buyerInv = print ? await Inventory.findOne({ 
-		where: { 
-			card_code: print.card_code,
-			printId: print.id,
-			playerId: maid
-		}
-	}) : await Wallet.findOne({ where: { playerId: maid }})
-
-	if (buyerInv && seller === merchbotId && (buyerInv.quantity + quantity > 3)) return message.channel.send(`You already have ${buyerInv.quantity} ${buyerInv.quantity === 1 ? 'copy' : 'copies'} of ${card}.`)
-
-	const buyerConfirmation = buyer !== merchbotId ? await getBuyerConfirmation(message, mention = false, buyer, [card], price, seller, sellingPlayer) : true
-	if (!buyerConfirmation) return
-	const sellerConfirmation = seller !== merchbotId ? await getSellerConfirmation(message, mention = true, seller, [card], price, buyer, buyingPlayer) : true
+	const sellerConfirmation = await getSellerConfirmation(message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = false)
 	if (!sellerConfirmation) return
-	
-	if (!print) {
-		buyerInv[walletField] += quantity
-		await buyerInv.save()
-	} else if (buyerInv) {
-		buyerInv.quantity += quantity
-		await buyerInv.save()
+
+	const buyerConfirmation = !shopSale ? await getBuyerConfirmation(message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = true) : true
+	if (!buyerConfirmation) return
+
+	const processSale = shopSale ? await processMerchBotSale(message, invoice, buyingPlayer, sellingPlayer) : await processP2PSale(message, invoice, buyingPlayer, sellingPlayer) 
+	if (!processSale) return
+
+	if (shopSale) {
+		if (invoice.m6success === true) completeTask(message.channel, maid, 'm6')
+		return message.channel.send(`You sold ${invoice.cards.length > 1 ? `the following to The Shop for ${invoice.total_price}${stardust}:\n${invoice.cards.join('\n')}` : `${invoice.cards[0]} to The Shop for ${invoice.total_price}${stardust}`}.`)
 	} else {
-		await Inventory.create({ 
-			card_code: print.card_code,
-			quantity: quantity,
-			printId: print.id,
-			playerId: maid
-		})
-
-		if (print.rarity === 'scr') completeTask(message.channel, maid, 'm4')
-	}
-
-	if (print && print.set_code === 'APC' && ( (buyerInv && buyerInv.quantity >= 3) ||  quantity >= 3 ) ) completeTask(message.channel, maid, 'h5', 4000)
-
-	if (print) {
-		sellerInv.quantity -= quantity
-		await sellerInv.save()
-	} else {
-		sellerInv[print] -= quantity
-		await sellerInv.save()
-	}
-
-	buyingPlayer.wallet.stardust -= parseInt(price)
-	await buyingPlayer.wallet.save()
-
-	sellingPlayer.wallet.stardust += parseInt(price)
-	await sellingPlayer.wallet.save()
-
-	if (await checkCoreSetComplete(maid, 1)) completeTask(message.channel, maid, 'h4', 4000)
-	if (await checkCoreSetComplete(maid, 3)) completeTask(message.channel, maid, 'l3', 5000)
-	
-	if (seller === merchbotId) {
-		completeTask(message.channel, maid, 'e10')
-		return message.channel.send(`You bought ${quantity} ${card} from The Shop for ${price}${stardust}.`)
-	} else {
-		return message.channel.send(`${buyingPlayer.name} bought ${quantity} ${card} from ${sellingPlayer.name} for ${price}${stardust}.`)
+		if (await checkCoreSetComplete(buyerId, 1)) completeTask(message.channel, buyerId, 'h4', 4000)
+		if (await checkCoreSetComplete(buyerId, 3)) completeTask(message.channel, buyerId, 'l3', 5000)
+		return message.channel.send(`${sellingPlayer.name} sold ${invoice.quantity} ${invoice.card} to ${buyingPlayer.name} for ${invoice.total_price}${stardust}.`)
 	}
 }
 

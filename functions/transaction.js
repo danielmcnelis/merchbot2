@@ -79,8 +79,9 @@ const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlaye
 }
 
 
-const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer) => {
-    const sellerId = message.author.id
+const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, sellingPlayer) => {
+    const sellerId = sellingPlayer.id
+    const authorIsSeller = message.author.id === sellerId
     let total_price = 0
     const cards = []
     const sellerInvs = []
@@ -95,7 +96,7 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer) => {
         const query = isFinite(args[0]) ? args.slice(1).join(' ') : args.slice(0).join(' ')	
 
 		if (!query) {
-            message.channel.send(`Please specify the card(s) you wish to sell.`)
+            message.channel.send(`Please specify the ${authorIsSeller ? 'card(s)' : 'card'} you wish to ${authorIsSeller ? 'sell' : 'buy'}.`)
             return false
         } 
 
@@ -126,12 +127,12 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer) => {
 		})
 
 		if (!sellerInv) {
-            message.channel.send(`You do not have any copies of ${card}.`)
+            message.channel.send(`${authorIsSeller ? 'You do' : shopSale ? `Sorry, ${card} is out of stock.` : `${buyingPlayer.name} does`} not have any copies of ${card}.`)
             return false
         } 
 
 		if (sellerInv.quantity < quantity) {
-            message.channel.send(`You only have ${sellerInv.quantity} ${sellerInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`)
+            message.channel.send(`${authorIsSeller ? 'You only have' : shopSale ? `Sorry, I only have` : `${buyingPlayer.name} only has`} ${sellerInv.quantity} ${sellerInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`)
             return
         } 
 	
@@ -158,26 +159,28 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer) => {
     return invoice
 }
 
-const getInvoiceP2PSale = async (message, line_item, buyingPlayer) => {
-    const sellerId = message.author.id
+const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer) => {
+    const sellerId = sellingPlayer.id
+    const buyerId = buyingPlayer.id
+    const authorIsSeller = message.author.id === sellerId
     const args = line_item.split(' ')
     const quantity = isFinite(args[0]) ? parseInt(args[0]) : 1
     const total_price = parseInt(args[args.length - 1])
 
     if (!total_price) {
-        message.channel.send(`Please specify your asking price at the end of the command.`)
+        message.channel.send(`Please specify your ${authorIsSeller ? 'asking price' : 'offer price'} at the end of the command.`)
         return false
     }
 
-	if (buyingPlayer.wallet.stardust < total_price) {
-        message.channel.send(`Sorry, ${buyingPlayer.name} only has ${buyingPlayer.wallet.stardust}${stardust}.`)
+	if (buyingPlayer.wallet.stardust < total_price && buyerId !== merchbotId) {
+        message.channel.send(`Sorry, ${authorIsSeller ? `${buyingPlayer.name} only has` : 'You only have'} ${buyingPlayer.wallet.stardust}${stardust}.`)
         return false
     } 
 
     const query = isFinite(args[0]) ? args.slice(1, -1).join(' ') : args.slice(0, -1).join(' ')
 
     if (!query) {
-        message.channel.send(`Please specify the card(s) you wish to sell.`)
+        message.channel.send(`Please specify the card(s) you wish to ${authorIsSeller ? 'sell' : 'buy'}.`)
         return false
     } 
 
@@ -203,7 +206,7 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer) => {
     }
 
 	if (print && Math.ceil(print.market_price * 0.7) * quantity > total_price) {
-        message.channel.send(`Sorry, you cannot sell cards to other players for less than what The Shop will pay for them.`)
+        message.channel.send(`Sorry, you cannot ${authorIsSeller ? 'sell cards to' : 'buy cards from'} other players for less than what The Shop will pay for them.`)
         return false
     }
 
@@ -226,12 +229,12 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer) => {
     }})
 
     if (!sellerInv && !sellerWallet) {
-        message.channel.send(`You do not have any ${walletField ? '' : 'copies of '}${card}.`)
+        message.channel.send(`${authorIsSeller ? `You do not have any ${walletField ? '' : 'copies of '}` : shopSale ? 'Sorry, ' : `${buyingPlayer.name} does not have any${walletField ? '' : 'copies of '}`}${card}${shopSale ? ' is Out of Stock.' : ''}.`)
         return false
     } 
 
     if (sellerInv && sellerInv.quantity < quantity || sellerWallet && sellerWallet[walletField] < quantity) {
-        message.channel.send(`You only have ${sellerInv ? sellerInv.quantity : sellerWallet[walletField]} ${card}.`)
+        message.channel.send(`${authorIsSeller ? 'You' : shopSale ? 'I' : `${buyingPlayer}` } only have ${sellerInv ? sellerInv.quantity : sellerWallet[walletField]} ${card}${shopSale ? ' in stock.' : ''}.`)
         return false
     }
 

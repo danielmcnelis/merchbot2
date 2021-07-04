@@ -4020,16 +4020,15 @@ if(cmd === `!sell`) {
 	if (!buyerConfirmation) return
 
 	const processSale = shopSale ? await processMerchBotSale(message, invoice, buyingPlayer, sellingPlayer) : await processP2PSale(message, invoice, buyingPlayer, sellingPlayer) 
+	if (!processSale) return
 
-
-
-	if (buyer === merchbotId) {
-		if (m6success === true) completeTask(message.channel, maid, 'm6')
-		return message.channel.send(`You sold ${cards.length > 1 ? `the following to The Shop for ${totalPrice}${stardust}:\n${cards.join('\n')}` : `${cards[0]} to The Shop for ${totalPrice}${stardust}`}.`)
+	if (shopSale) {
+		if (invoice.m6success === true) completeTask(message.channel, maid, 'm6')
+		return message.channel.send(`You sold ${invoice.cards.length > 1 ? `the following to The Shop for ${invoice.total_price}${stardust}:\n${invoice.cards.join('\n')}` : `${invoice.cards[0]} to The Shop for ${invoice.total_price}${stardust}`}.`)
 	} else {
-		if (await checkCoreSetComplete(buyer, 1)) completeTask(message.channel, buyer, 'h4', 4000)
-		if (await checkCoreSetComplete(buyer, 3)) completeTask(message.channel, buyer, 'l3', 5000)
-		return message.channel.send(`${sellingPlayer.name} sold ${cards.length > 1 ? `the following to ${buyingPlayer.name} for ${totalPrice}${stardust}:\n${cards.join('\n')}` : `${cards[0]} to ${buyingPlayer.name} for ${totalPrice}${stardust}.`}`)
+		if (await checkCoreSetComplete(buyerId, 1)) completeTask(message.channel, buyerId, 'h4', 4000)
+		if (await checkCoreSetComplete(buyerId, 3)) completeTask(message.channel, buyerId, 'l3', 5000)
+		return message.channel.send(`${sellingPlayer.name} sold ${invoice.quantity} ${invoice.card} to ${buyingPlayer.name} for ${invoice.total_price}${stardust}.`)
 	}
 }
 

@@ -19,6 +19,8 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, shopSale = 
     const sellerId = message.member.id
     const cards = shopSale ? invoice.cards : [...invoice.card]
 
+    console.log('cards', cards)
+
 	const filter = m => m.author.id === sellerId
 	const msg = await message.channel.send(
         `${mention ? `<@${sellerId}>, Do you agree` : 'Are you sure you want'} ` +

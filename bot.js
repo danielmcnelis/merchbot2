@@ -1410,12 +1410,12 @@ if(cmd === `!chart`) {
 
 	return message.channel.send(
 		`There have been ${totalWinners} Arena winners. Conquest breakdown:\n` +
-		`${beasts}\n` + 
-		`${dinosaurs}\n` + 
-		`${fishs}\n` + 
-		`${plants}\n` + 
-		`${reptiles}\n` +
-		`${rocks}`
+		`${beastWins} - ${beasts}\n` + 
+		`${dinosaurWins} - ${dinosaurs}\n` + 
+		`${fishWins} - ${fishs}\n` + 
+		`${plantWins} - ${plants}\n` + 
+		`${reptileWins} - ${reptiles}\n` +
+		`${rockWins} - ${rocks}`
 	)
 }
 
@@ -2601,6 +2601,7 @@ if(dropcom.includes(cmd)) {
 	: null
 
 	const role = game === 'Arena' ? arenaRole : game === 'Trivia' ? triviaRole : game === 'Draft' ? draftRole : game === 'Tournament' ? tourRole : null
+	if (game === 'Trivia' && message.member.roles.cache.some(role => role.id === arenaRole)) return message.channel.send(`You cannot join Trivia while playing in the Arena.`)
 
 	if (!game) return message.channel.send(
 		`Try using **${cmd}** in channels like: <#${arenaChannelId}> or <#${triviaChannelId}>.`

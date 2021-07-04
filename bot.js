@@ -4058,10 +4058,10 @@ if(cmd === `!buy`) {
 	if (!buyingPlayer) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	if (!sellingPlayer) return message.channel.send(`That user is not in the database.`)
 
-	const line_items = message.mentions.users.first() ? args.slice(1).join(' ').split('; ') : args.join(' ').split('; ')
+	const line_item = message.mentions.users.first() ? args.slice(1).join(' ').split('; ') : args.join(' ').split('; ')
 	if (line_items.length > 1) return message.channel.send(`You cannot buy different cards in the same transaction.`)
 
-	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_items, buyingPlayer) : await getInvoiceP2PSale(message, line_item = line_items[0], buyingPlayer)
+	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_item, buyingPlayer, sellingPlayer) : await getInvoiceP2PSale(message, line_item = line_items[0], buyingPlayer, sellingPlayer)
 	if (!invoice) return
 
 	const sellerConfirmation = await getSellerConfirmation(message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = false)
@@ -4075,11 +4075,11 @@ if(cmd === `!buy`) {
 
 	if (shopSale) {
 		if (invoice.m6success === true) completeTask(message.channel, maid, 'm6')
-		return message.channel.send(`You sold ${invoice.cards.length > 1 ? `the following to The Shop for ${invoice.total_price}${stardust}:\n${invoice.cards.join('\n')}` : `${invoice.cards[0]} to The Shop for ${invoice.total_price}${stardust}`}.`)
+		return message.channel.send(`You bought ${invoice.cards.length > 1 ? `the following from The Shop for ${invoice.total_price}${stardust}:\n${invoice.cards.join('\n')}` : `${invoice.cards[0]} from The Shop for ${invoice.total_price}${stardust}`}.`)
 	} else {
 		if (await checkCoreSetComplete(buyerId, 1)) completeTask(message.channel, buyerId, 'h4', 4000)
 		if (await checkCoreSetComplete(buyerId, 3)) completeTask(message.channel, buyerId, 'l3', 5000)
-		return message.channel.send(`${sellingPlayer.name} sold ${invoice.quantity} ${invoice.card} to ${buyingPlayer.name} for ${invoice.total_price}${stardust}.`)
+		return message.channel.send(`${sellingPlayer.name} bought ${invoice.quantity} ${invoice.card} from ${buyingPlayer.name} for ${invoice.total_price}${stardust}.`)
 	}
 }
 

@@ -4010,7 +4010,7 @@ if(cmd === `!sell`) {
 	const line_items = message.mentions.users.first() ? args.slice(1).join(' ').split('; ') : args.join(' ').split('; ')
 	if (!shopSale && line_items.length > 1) return message.channel.send(`You cannot sell different cards to a player in the same transaction.`)
 
-	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_items, buyingPlayer) : await getInvoiceP2PSale(message, line_item = line_items[0], buyingPlayer)
+	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_items, buyingPlayer, sellingPlayer) : await getInvoiceP2PSale(message, line_item = line_items[0], buyingPlayer)
 	if (!invoice) return
 
 	const sellerConfirmation = await getSellerConfirmation(message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = false)

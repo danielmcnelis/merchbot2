@@ -88,7 +88,7 @@ const getPartnerSide = async (message, cards, player) => {
         return false
 	})
 
-    return collected.split(" ")
+    return collected
 }
 
 

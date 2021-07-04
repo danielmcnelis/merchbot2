@@ -4426,7 +4426,7 @@ if(cmd === `!trade`) {
 	if (!initiator_confirmation) return message.channel.send(`No problem. Have a nice day.`)
 	const partner_side = await getPartnerSide(message, cards, receivingPlayer)
 	if (partner_side.startsWith('!')) return message.channel.send(`Please do not respond with bot commands. Simply type what you would like to trade.`)
-	const partner_inputs = partner_side.join(' ').split('; ')
+	const partner_inputs = partner_side.split('; ')
 	const partner_quantities = []
 	const partner_cards = []
 	const partner_prints = []

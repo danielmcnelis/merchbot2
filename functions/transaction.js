@@ -271,12 +271,18 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
 		print.market_price = newPrice
 		await print.save()
 		
-		const buyerInv = await Inventory.findOrCreate({ 
+		let buyerInv = await Inventory.findOne({ 
 			where: { 
 				card_code: print.card_code,
 				printId: print.id,
 				playerId: buyerId
 			}
+		})
+
+        if (!buyerInv) buyerInv = await Inventory.create({ 
+            card_code: print.card_code,
+            printId: print.id,
+            playerId: buyerId
 		})
 
 		buyerInv.quantity += quantity
@@ -328,13 +334,21 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
     console.log( 'print.card_code',  print.card_code)
     console.log( 'buyerId',  buyerId)
     
-    const buyerInv = print ? await Inventory.findOrCreate({ 
+    let buyerInv = print ? await Inventory.findOne({ 
         where: { 
             card_code: print.card_code,
             printId: print.id,
             playerId: buyerId
         }
-    }) :  null
+    }) : null
+
+    if (!buyerInv && print) {
+        buyerInv = await Inventory.create({ 
+            card_code: print.card_code,
+            printId: print.id,
+            playerId: buyerId
+        })
+    }
 
     console.log('buyerInv.dataValues', buyerInv.dataValues)
     

@@ -179,8 +179,25 @@ if (!message.content.startsWith("!") && message.content.includes(`[`) && message
 
 //TEST
 if(cmd === `!test`) {
-	return
+	const canvas = Canvas.createCanvas(105, 158)
+	const context = canvas.getContext('2d')
+	const background = await Canvas.loadImage(`https://ygoprodeck.com/pics/89631139.jpg`)
+	context.drawImage(background, 0, 0, canvas.width, canvas.height)
+	const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `${card.name}.png`)
+	return message.channel.send(`Testing:`, attachment)
 }
+
+
+//TEST2
+if(cmd === `!test2`) {
+	const canvas = Canvas.createCanvas(200, 200)
+	const context = canvas.getContext('2d')
+	const background = await Canvas.loadImage(`https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/1200px-SpongeBob_SquarePants_character.svg.png`)
+	context.drawImage(background, 0, 0, canvas.width, canvas.height)
+	const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `${card.name}.png`)
+	return message.channel.send(`Testing:`, attachment)
+}
+
 
 //IMPORT 
 if (cmd === `!import`) {

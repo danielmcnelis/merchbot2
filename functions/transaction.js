@@ -229,7 +229,7 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
     }})
 
     if (!sellerInv && !sellerWallet) {
-        message.channel.send(`${authorIsSeller ? `You do not have any ${walletField ? '' : 'copies of '}` : shopSale ? 'Sorry, ' : `${buyingPlayer.name} does not have any${walletField ? '' : 'copies of '}`}${card}${shopSale ? ' is Out of Stock.' : ''}.`)
+        message.channel.send(`${authorIsSeller ? `You do not have any ${walletField ? '' : 'copies of '}` : shopSale ? 'Sorry, ' : `${buyingPlayer.name} does not have any${walletField ? '' : 'copies of '}`}${card}${shopSale ? ' is Out of Stock' : ''}.`)
         return false
     } 
 

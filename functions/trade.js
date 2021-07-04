@@ -100,11 +100,15 @@ const getPartnerConfirmation = async (message, cards, player) => {
 		max: 1,
 		time: 15000
 	}).then(async collected => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return false		
-		else return true
+		if (!yescom.includes(collected.first().content.toLowerCase())) {
+			message.channel.send(`No problem. Have a nice day.`)
+			return false
+		} else {
+			return true
+		}
 	}).catch(err => {
 		console.log(err)
-		message.channel.send(`Sorry, time's up.`)
+		message.channel.send(`Time's up.`)
         return false
 	})
 
@@ -119,11 +123,15 @@ const getFinalConfirmation = async (message, cards, player) => {
 		max: 1,
 		time: 15000
 	}).then(async collected => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)		
-		else return true
+		if (!yescom.includes(collected.first().content.toLowerCase())) {
+			message.channel.send(`No problem. Have a nice day.`)
+			return false
+		} else {
+			return true
+		}
 	}).catch(err => {
 		console.log(err)
-		message.channel.send(`Sorry, time's up.`)
+		message.channel.send(`Time's up.`)
         return false
 	})
 

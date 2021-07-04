@@ -1497,7 +1497,7 @@ if(cmd === `!diary`) {
 
 	if (input) {
 		if(input === 'e' || input === 'ez' || input === 'easy' || input.startsWith('ea')) { diary_to_display = 'Easy'; bonuses = diaries.Easy.bonuses }
-		else if(input === 'm' || input.startsWith('me')) { diary_to_display = 'Moderate'; bonuses = diaries.Moderate.bonuses }
+		else if(input === 'm' || input.startsWith('me') || input.startsWith('mo')) { diary_to_display = 'Moderate'; bonuses = diaries.Moderate.bonuses }
 		else if(input === 'h' || input.startsWith('ha')) { diary_to_display = 'Hard'; bonuses = diaries.Hard.bonuses }
 		else if(input === 'l' || input.startsWith('el')) { diary_to_display = 'Elite'; bonuses = diaries.Elite.bonuses }
 		else return message.channel.send(`I do not recognize the "${input}" Diary.`)
@@ -1759,7 +1759,7 @@ if(wishlistcom.includes(cmd)) {
 	if (!args.length || playerId !== maid) {
 		const prints = []
 		
-		for (let i = 0; i < 18; i++) {
+		for (let i = 0; i < 10; i++) {
 			const card_code = wishlist[`slot_${i + 1}`]
 			if (!card_code) continue
 			const print = await Print.findOne({ where: { card_code }})
@@ -1820,7 +1820,7 @@ if(wishlistcom.includes(cmd)) {
 
 		let success = false
 		let i = 0
-		while (!success && i < 18) {
+		while (!success && i < 10) {
 			if (!wishlist[`slot_${i + 1}`]) {
 				success = true
 				wishlist[`slot_${i + 1}`] = print.card_code
@@ -3589,7 +3589,7 @@ if(cmd === `!pack`) {
 	if (money < (set.unit_price * num)) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${money}${eval(set.currency)} and ${num > 1 ? `${num} ` : ''}${set.name} ${eval(set.emoji)} Packs cost ${num * set.unit_price}${eval(set.currency)}.`)
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`${wallet.player.name}, have ${money}${eval(set.currency)}. Do you want to spend ${num * set.unit_price}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`)
+	const msg = await message.channel.send(`${wallet.player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${num * set.unit_price}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
@@ -3769,7 +3769,7 @@ if(cmd === `!box`) {
 	})
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`${wallet.player.name}, have ${money}${eval(set.currency)}. Do you want to spend ${set.box_price}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`)
+	const msg = await message.channel.send(`${wallet.player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.box_price}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
@@ -4425,6 +4425,7 @@ if(cmd === `!trade`) {
 	const initiator_confirmation = await getInitiatorConfirmation(message, cards, receivingPlayer)
 	if (!initiator_confirmation) return message.channel.send(`No problem. Have a nice day.`)
 	const partner_side = await getPartnerSide(message, cards, receivingPlayer)
+	if (partner_side.startsWith('!')) return message.channel.send(`Please do not respond with bot commands. Simply type what you would like to trade.`)
 	const partner_inputs = partner_side.join(' ').split('; ')
 	const partner_quantities = []
 	const partner_cards = []
@@ -4484,9 +4485,9 @@ if(cmd === `!trade`) {
 	}
 
 	const partner_confirmation = await getPartnerConfirmation(message, partner_cards, receivingPlayer)
-	if (!partner_confirmation) return message.channel.send(`No problem. Have a nice day.`)
+	if (!partner_confirmation) return setTimeout(() => message.channel.send(`Sorry, ${initiatingPlayer.name}, this trade has been rejected.`), 2000)
 	const final_confirmation = await getFinalConfirmation(message, partner_cards, initiatingPlayer)
-	if (!final_confirmation) return message.channel.send(`Sorry, ${receivingPlayer.name}, this trade has been rejected.`)
+	if (!final_confirmation) return setTimeout(() => message.channel.send(`Sorry, ${receivingPlayer.name}, this trade has been rejected.`), 2000)
 
 	const lastTrade = await Trade.findAll({ order: [['createdAt', 'DESC']]})
 	const transaction_id = lastTrade.length ? parseInt(lastTrade[0].transaction_id) + 1 : 1

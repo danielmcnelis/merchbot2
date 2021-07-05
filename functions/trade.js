@@ -75,7 +75,8 @@ const getFinalConfirmation = async (message, cards, player) => {
 		max: 1,
 		time: 15000
 	}).then(async collected => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) {
+		const response = collected.first().content.toLowerCase()
+		if (!yescom.includes(response)) {
 			message.channel.send(`No problem. Have a nice day.`)
 			return false
 		} else {

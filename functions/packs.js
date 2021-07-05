@@ -125,32 +125,32 @@ const awardPack = async (channel, playerId, set, num) => {
             }
         }
 
-        // const card_1 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[0]}`)
-        // const card_2 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[1]}`)
-        // const card_3 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[2]}`)
-        // const card_4 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[3]}`)
-        // const card_5 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[4]}`)
-        // const card_6 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[5]}`)
-        // const card_7 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[6]}`)
-        // const card_8 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[7]}`)
-        // const card_9 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[8]}`)
+        const card_1 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[0]}`)
+        const card_2 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[1]}`)
+        const card_3 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[2]}`)
+        const card_4 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[3]}`)
+        const card_5 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[4]}`)
+        const card_6 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[5]}`)
+        const card_7 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[6]}`)
+        const card_8 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[7]}`)
+        const card_9 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[8]}`)
 
-        // //const card_width = 57
-        // // const canvas = Canvas.createCanvas(card_width * 9, 80)
-        // // const context = canvas.getContext('2d')
+        const card_width = 57
+        const canvas = Canvas.createCanvas(card_width * 9, 80)
+        const context = canvas.getContext('2d')
 
-        // context.drawImage(card_1, 0, 0, card_width, 80)
-        // context.drawImage(card_2, card_width, 0, card_width, canvas.height)
-        // context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
-        // context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
-        // context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
-        // context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
-        // context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
-        // context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
-        // context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
-        // const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'pack.png')
+        context.drawImage(card_1, 0, 0, card_width, 80)
+        context.drawImage(card_2, card_width, 0, card_width, canvas.height)
+        context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
+        context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
+        context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
+        context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
+        context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
+        context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
+        context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
+        const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'pack.png')
 
-        member.send(results.join('\n'), attachment = false)
+        member.send(results.join('\n'), attachment)
     }
 
     if (set.code === 'CPK') completeTask(channel, playerId, 'm8')

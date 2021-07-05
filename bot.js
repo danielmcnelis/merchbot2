@@ -3924,8 +3924,10 @@ if(cmd === `!dump`) {
 	if (rarity === 'unrecognized') return message.channel.send(`Please specify a valid rarity.`)
 	if (!rarity) return
 
-	const quantityToKeep = await getDumpQuantity(message, rarity)
+	const quantityToKeep = await getDumpQuantity(message, rarity, set_code)
 	if (!quantityToKeep && quantityToKeep !== 0) return message.channel.send(`Please specify a valid quanity.`)
+
+	//const exceptions = await getExceptions(message, rarity, set_code)
 
 	const unfilteredInv = await Inventory.findAll({
 		where: {
@@ -4061,6 +4063,8 @@ if(cmd === `!buy`) {
 	const sellerId = message.mentions.users.first() ? message.mentions.users.first().id : merchbotId	
 	if (buyerId === sellerId) return message.channel.send(`You cannot buy cards from yourself.`)
 	const shopSale = !!(sellerId === merchbotId)
+	const info = await Info.findOne({ where: { element: 'shop'} })
+	if (shopSale && info.status === 'closed') return message.channel.send(`Sorry, The Shop is closed.`)
 
 	const sellingPlayer = await Player.findOne({ 
 		where: { id: sellerId },

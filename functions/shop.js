@@ -440,6 +440,32 @@ const getDumpQuantity = async (message, rarity) => {
     return collected
 }
 
+// GET EXCEPTIONS
+const getExceptions = async (message, rarity, set_code) => {
+    const filter = m => m.author.id === message.member.user.id
+	const msg = await message.channel.send(`Please provide a list of ${eval(rarity)} ${set_code} ${eval(set_code)} cards you do not want to bulk sell.`)
+    const collected = await msg.channel.awaitMessages(filter, {
+		max: 1,
+        time: 60000
+    }).then(async collected => {
+		const response = Math.round(parseInt(collected.first().content.toLowerCase()))
+        if (!Number.isInteger(response) && response >= 0) {
+            message.channel.send(`Please provide a positive number.`)
+            return false
+        } else {
+            return response
+        }
+
+    }).catch(err => {
+		console.log(err)
+        message.channel.send(`Sorry, time's up.`)
+        return false
+	})
+
+    return collected
+}
+
+
 // GET BARTER CARD
 const getBarterCard = async (message) => {
     const options = [

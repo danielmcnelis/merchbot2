@@ -3703,7 +3703,7 @@ if(cmd === `!pack`) {
 			context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
 			context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
 			const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`)
-			message.author.send(results.join("\n"), attachment = false)
+			message.author.send(results.join("\n"), attachment)
 		}
 
 		wallet[set.currency] -= (set.unit_price * num)

@@ -81,6 +81,7 @@ const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlaye
 
 const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, sellingPlayer) => {
     const sellerId = sellingPlayer.id
+    const buyerId = buyingPlayer.id
     const authorIsSeller = message.author.id === sellerId
     let total_price = 0
     const cards = []

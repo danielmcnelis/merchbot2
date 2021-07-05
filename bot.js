@@ -8,7 +8,7 @@ const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { fire, tix, credits, blue, red, stoned, stare, leatherbound, wokeaf, koolaid, cavebob, evil, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('./static/emojis.json')
 const { aliuscom, nicknamecom, joincom, bindercom, wishlistcom, invcom, calccom, bracketcom, dropcom, queuecom, checklistcom, startcom, infocom, dbcom, noshowcom, legalcom, listcom, pfpcom, botcom, rolecom, statscom, profcom, losscom, h2hcom, undocom, rankcom, manualcom, yescom, nocom, deckcom } = require('./static/commands.json')
-const { triviaRole, botRole, modRole, adminRole, tourRole, toRole, fpRole, muteRole, arenaRole } = require('./static/roles.json')
+const { triviaRole, botRole, modRole, adminRole, tourRole, toRole, fpRole, muteRole, arenaRole, ambassadorRole } = require('./static/roles.json')
 const { generalChannelId, rulesChannelId, rulingsChannelId, introChannelId, discussionChannelId, staffChannelId, botSpamChannelId, welcomeChannelId, announcementsChannelId, registrationChannelId, replaysChannelId, duelRequestsChannelId, marketPlaceChannelId, shopChannelId, tournamentChannelId, arenaChannelId, keeperChannelId, triviaChannelId, draftChannelId, gauntletChannelId, bugreportsChannelId, suggestionsChannelId } = require('./static/channels.json')
 const decks = require('./static/decks.json')
 const types = require('./static/types.json')
@@ -33,7 +33,7 @@ const { checkArenaProgress, getArenaSample, resetArena, startArena, startRound, 
 const { askQuestion, resetTrivia, startTrivia } = require('./functions/trivia.js')
 const { askForGrindAllConfirmation } = require('./functions/mod.js')
 const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Nickname, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
-const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isMod, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
+const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isMod, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
 const { checkDeckList, saveYDK, saveAllYDK, awardStarterDeck, getShopDeck } = require('./functions/decks.js')
 const { askForBidCancellation, askForBidPlacement, manageBidding } = require('./functions/bids.js')
 const { selectTournament, getTournamentType, seed, askForDBUsername, getDeckListTournament, getDeckNameTournament, sendTotournamentChannelId, directSignUp, removeParticipant, getParticipants, findOpponent } = require('./functions/tournament.js')
@@ -416,7 +416,7 @@ if (cmd === `!init`) {
 
 //ALIUS 
 if (aliuscom.includes(cmd)) {
-	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isAmbassador(message.member)) return message.channel.send(`You do not have permission to do that.`)
 
 	const query = args.join(' ')
 	if (!query) return message.channel.send(`Please specify a card you would like to create aliuses for.`)
@@ -1502,7 +1502,7 @@ if(cmd === `!dairy`) return message.channel.send('<:cow:598743989101002762>')
 //DIARY
 if(cmd === `!diary`) {
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
-	if (playerId !== maid && !isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (playerId !== maid && !isAmbassador(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const diary = await Diary.findOne({ where: { playerId: playerId } })
 	if (!diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12

@@ -4023,6 +4023,8 @@ if(cmd === `!sell`) {
 	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_items, buyingPlayer, sellingPlayer) : await getInvoiceP2PSale(message, line_item = line_items[0], buyingPlayer, sellingPlayer)
 	if (!invoice) return
 
+	if (invoice.total_price > buyingPlayer.wallet.stardust) return message.channel.send(`Sorry, ${buyingPlayer.name} only has ${buyingPlayer.wallet.stardust} and ${invoice.quantities[0] > 1 ? `${invoice.quantities[0]} copies of ` : ''}${invoice.cards[0]} costs ${invoice.total_price}${stardust}.`)
+
 	const sellerConfirmation = await getSellerConfirmation(message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = false)
 	if (!sellerConfirmation) return
 
@@ -4075,6 +4077,8 @@ if(cmd === `!buy`) {
 
 	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_item, buyingPlayer, sellingPlayer) : await getInvoiceP2PSale(message, line_item[0], buyingPlayer, sellingPlayer)
 	if (!invoice) return
+
+	if (invoice.total_price > buyingPlayer.wallet.stardust) return message.channel.send(`Sorry, you only have ${buyingPlayer.wallet.stardust} and ${invoice.quantities[0] > 1 ? `${invoice.quantities[0]} copies of ` : ''}${invoice.cards[0]} costs ${invoice.total_price}${stardust}.`)
 
 	const buyerConfirmation = await getBuyerConfirmation(message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = false)
 	if (!buyerConfirmation) return

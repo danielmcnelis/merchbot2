@@ -111,10 +111,10 @@ const isNewUser = async (playerId) => {
 }
 
 //IS ADMIN?
-const isAdmin = (member) => member.roles.cache.some(role => role.id === adminRole)
+const isAdmin = (member) => member.roles.cache.some(role => role.id === (adminRole || modRole || ambassadorRole))
 
 //IS MOD?
-const isMod = (member) => member.roles.cache.some(role => role.id === modRole)
+const isMod = (member) => member.roles.cache.some(role => role.id === (modRole || ambassadorRole))
 
 //IS AMBASSADOR?
 const isAmbassador = (member) => member.roles.cache.some(role => role.id === ambassadorRole)

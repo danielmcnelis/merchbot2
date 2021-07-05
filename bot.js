@@ -3184,13 +3184,13 @@ if(cmd === `!award`) {
 
 	const quantity = parseInt(args[1]) ? parseInt(args[1]) : 1
 	const query = parseInt(args[1]) ? args.slice(2).join(" ") : args.slice(1).join(" ")
-	if (!quantity || !query) return message.channel.send(`Please specify the item you wish to award.`)
+	if (!quantity || !query) return message.channel.send(`Please specify the query you wish to award.`)
 
-	const set_code = item.toUpperCase()
+	const set_code = query.toUpperCase()
 	const valid_set_code = !!(set_code.length === 3 && await Set.count({where: { code: set_code }}))
-	const card_code = `${item.slice(0, 3).toUpperCase()}-${item.slice(-3)}`
+	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-	const card_name = item && !valid_set_code && !valid_card_code ? await findCard(item, fuzzyPrints, fuzzyPrints2) : null
+	const card_name = query && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints, fuzzyPrints2) : null
 	const print = valid_card_code ? await Print.findOne({ where: { card_code } }) : card_name ? await selectPrint(message, maid, card_name) : null
 
 	let walletField
@@ -3203,7 +3203,7 @@ if(cmd === `!award`) {
 	if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
 	if (query === 'rose' || query === 'roses' ) walletField = 'rose'
 
-	if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the item: "${item}".`)
+	if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the item: "${query}".`)
 	const award = walletField ? `${eval(walletField)}` : ` ${eval(print.rarity)}${print.card_code} - ${print.card_name}` 
 
 	const filter = m => m.author.id === message.author.id

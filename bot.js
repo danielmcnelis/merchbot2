@@ -3172,8 +3172,8 @@ if(cmd === `!burn`) {
 if(cmd === `!award`) {
 	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
 	const recipient = message.mentions.users.first() ? message.mentions.users.first().id : null	
+	if (!recipient) return message.channel.send(`Please @ mention a user to award.`)
 	if (recipient === maid) return message.channel.send(`You cannot give an award to yourself.`)
-	if (!recipient || isNaN(recipient) || recipient.length < 17) return message.channel.send(`Please @ mention a user to award.`)
 
 	const player = await Player.findOne({ 
 		where: { id: recipient },
@@ -3182,12 +3182,9 @@ if(cmd === `!award`) {
 
 	if (!player) return message.channel.send(`That user is not in the database.`)
 
-	const quantity = parseInt(args[1])
-	const item = args.slice(2).join(" ")
-	
-	if (!args[1] && !item) return message.channel.send(`Please specify the item you wish to award.`)
-	if (!quantity) return message.channel.send(`Please specify the number of items you wish to award.`)
-	if (!item) return message.channel.send(`Please specify the item you wish to award.`)
+	const quantity = parseInt(args[1]) ? parseInt(args[1]) : 1
+	const query = parseInt(args[1]) ? args.slice(2).join(" ") : args.slice(1).join(" ")
+	if (!quantity || !query) return message.channel.send(`Please specify the item you wish to award.`)
 
 	const set_code = item.toUpperCase()
 	const valid_set_code = !!(set_code.length === 3 && await Set.count({where: { code: set_code }}))
@@ -3197,17 +3194,16 @@ if(cmd === `!award`) {
 	const print = valid_card_code ? await Print.findOne({ where: { card_code } }) : card_name ? await selectPrint(message, maid, card_name) : null
 
 	let walletField
-	if (item === 'sc' || item === 'starchip' || item === 'starchips' || item === 'chip' || item === 'chips') walletEmoji = starchips, walletField = 'starchips'
-	if (item === 'sd' ||item === 'stardust' || item === 'dust') walletField = 'stardust'
-	if (item === 'cactus' || item === 'cactuses' || item === 'cacti' || item === 'cactis' ) walletField = 'cactus'
-	if (item === 'egg' || item === 'eggs') walletField = 'egg'
-	if (item === 'hook' || item === 'hooks') walletField = 'hook'
-	if (item === 'moai' || item === 'moais' ) walletField = 'moai'
-	if (item === 'mushroom' || item === 'mushrooms' || item === 'shroom' || item === 'shrooms') walletField = 'mushroom'
-	if (item === 'rose' || item === 'roses' ) walletField = 'rose'
+	if (query === 'sc' || query === 'starchip' || query === 'starchips' || query === 'chip' || query === 'chips') walletEmoji = starchips, walletField = 'starchips'
+	if (query === 'sd' ||query === 'stardust' || query === 'dust') walletField = 'stardust'
+	if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
+	if (query === 'egg' || query === 'eggs') walletField = 'egg'
+	if (query === 'hook' || query === 'hooks') walletField = 'hook'
+	if (query === 'moai' || query === 'moais' ) walletField = 'moai'
+	if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
+	if (query === 'rose' || query === 'roses' ) walletField = 'rose'
 
 	if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the item: "${item}".`)
-
 	const award = walletField ? `${eval(walletField)}` : ` ${eval(print.rarity)}${print.card_code} - ${print.card_name}` 
 
 	const filter = m => m.author.id === message.author.id
@@ -3270,35 +3266,30 @@ if(cmd === `!steal`) {
 
 	if (!player) return message.channel.send(`That user is not in the database.`)
 
-	const quantity = parseInt(args[1])
-	const item = args.slice(2).join(" ")
-	
-	if (!args[1] && !item) return message.channel.send(`Please specify the item you wish to steal.`)
-	if (!quantity) return message.channel.send(`Please specify the number of items you wish to steal.`)
-	if (!item) return message.channel.send(`Please specify the item you wish to steal.`)
+	const quantity = parseInt(args[1]) ? parseInt(args[1]) : 1
+	const query = parseInt(args[1]) ? args.slice(2).join(" ") : args.slice(1).join(" ")	
+	if (!quantity || !query) return message.channel.send(`Please specify the item you wish to steal.`)
 
-	const card_code = `${item.slice(0, 3).toUpperCase()}-${item.slice(-3)}`
-
-	const print = await Print.findOne({ where: { card_code: card_code }})
-
-	const prints = await Print.findAll({ 
-		where: { card_name: { [Op.iLike]: item } },
-		order: [['createdAt', 'ASC']]
-	})
+	const set_code = query.toUpperCase()
+	const valid_set_code = !!(set_code.length === 3 && await Set.count({where: { code: set_code }}))
+	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
+	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
+	const card_name = query && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints, fuzzyPrints2) : null
+	const print = valid_card_code ? await Print.findOne({ where: { card_code } }) : card_name ? await selectPrint(message, maid, card_name) : null
+	if (card_name && !print) return
 
 	let walletField
-	if (item === 'sc' || item === 'starchip' || item === 'starchips' || item === 'chip' || item === 'chips') walletField = 'starchips'
-	if (item === 'sd' ||item === 'stardust' || item === 'dust') walletField = 'stardust'
-	if (item === 'cactus' || item === 'cactuses' || item === 'cacti' || item === 'cactis' ) walletField = 'cactus'
-	if (item === 'egg' || item === 'eggs') walletField = 'egg'
-	if (item === 'hook' || item === 'hooks') walletField = 'hook'
-	if (item === 'moai' || item === 'moais' ) walletField = 'moai'
-	if (item === 'mushroom' || item === 'mushrooms' || item === 'shroom' || item === 'shrooms') walletField = 'mushroom'
-	if (item === 'rose' || item === 'roses' ) walletField = 'rose'
+	if (query === 'sc' || query === 'starchip' || query === 'starchips' || query === 'chip' || query === 'chips') walletField = 'starchips'
+	if (query === 'sd' ||query === 'stardust' || query === 'dust') walletField = 'stardust'
+	if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
+	if (query === 'egg' || query === 'eggs') walletField = 'egg'
+	if (query === 'hook' || query === 'hooks') walletField = 'hook'
+	if (query === 'moai' || query === 'moais' ) walletField = 'moai'
+	if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
+	if (query === 'rose' || query === 'roses' ) walletField = 'rose'
 
-	if (!print && !prints.length && !walletField) return message.channel.send(`Sorry, I do not recognize the item: "${item}".`)
-
-	const loot = walletField ? `${eval(walletField)}` : prints.length ? ` ${eval(prints[0].rarity)}${prints[0].card_code} - ${prints[0].card_name}` : ` ${eval(print.rarity)}${print.card_code} - ${print.card_name}`  
+	if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the item: "${query}".`)
+	const loot = walletField ? `${eval(walletField)}` : ` ${eval(print.rarity)}${print.card_code} - ${print.card_name}` 
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send(`Are you sure you want to steal ${quantity}${loot} from ${player.name}?`)
@@ -3311,10 +3302,10 @@ if(cmd === `!steal`) {
 		if (walletField) {
 			player.wallet[walletField] -= quantity
 			await player.wallet.save()
-		} else if (prints.length) {
+		} else if (print) {
 			const inv = await Inventory.findOne({ where: { 
-				card_code: prints[0].card_code,
-				printId: prints[0].id,
+				card_code: print.card_code,
+				printId: print.id,
 				playerId: target
 			}})
 	

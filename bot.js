@@ -416,7 +416,7 @@ if (cmd === `!init`) {
 
 //ALIUS 
 if (aliuscom.includes(cmd)) {
-	if (!isAmbassador(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isAdmin(message.member) && !isMod(message.member) && !isAmbassador(message.member)) return message.channel.send(`You do not have permission to do that.`)
 
 	const query = args.join(' ')
 	if (!query) return message.channel.send(`Please specify a card you would like to create aliuses for.`)
@@ -712,7 +712,7 @@ if(startcom.includes(cmd)) {
 
 //MUTE 
 if(cmd === `!mute`) {
-	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isAdmin(message.member) && !isMod(message.member)) return message.channel.send("You do not have permission to do that.")
 	const member = message.mentions.members.first()
 	if (!member) return message.channel.send(`Please tag the user you wish to mute.`)
 	const mutedPeople = JSON.parse(fs.readFileSync('./static/muted.json'))['mutedPeople']
@@ -735,7 +735,7 @@ if(cmd === `!mute`) {
 
 //UNMUTE 
 if(cmd === `!unmute`) {
-	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isAdmin(message.member)) return message.channel.send("You do not have permission to do that.")
 	const member = message.mentions.members.first()
 	if (!member) return message.channel.send(`Please tag the user you wish to unmute.`)
 	const mutedPeople = JSON.parse(fs.readFileSync('./static/muted.json'))['mutedPeople']
@@ -838,7 +838,7 @@ if (botcom.includes(cmd)) {
 		)
 		.addField('Misc. Commands',
 			`!bot - View the MerchBot User Manual.`
-			+ (isMod(message.member) ? `\n!mod - View the Moderator User Manual.` : '')
+			+ (isAdmin(message.member) || isMod(message.member) ? `\n!mod - View the Moderator User Manual.` : '')
 			+ `\n!info - Post information about a channel.`
 			+ `\n!ref (@user) - Send a referral bonus to another player.`
 		)
@@ -849,7 +849,7 @@ if (botcom.includes(cmd)) {
 
 //MOD USER GUIDE 
 if (cmd === `!mod`) {
-	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isMod(message.member) && !isAdmin(message.member)) return message.channel.send("You do not have permission to do that.")
 	const botEmbed = new Discord.MessageEmbed()
 		.setColor('#8062cc')
 		.setTitle('MerchBot - Moderator User Manual')
@@ -1502,7 +1502,7 @@ if(cmd === `!dairy`) return message.channel.send('<:cow:598743989101002762>')
 //DIARY
 if(cmd === `!diary`) {
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
-	if (playerId !== maid && !isAmbassador(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (playerId !== maid && !isAdmin(message.member) && !isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const diary = await Diary.findOne({ where: { playerId: playerId } })
 	if (!diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
@@ -2077,7 +2077,7 @@ if (losscom.includes(cmd)) {
 
 //MANUAL
 if (manualcom.includes(cmd)) {
-	if (!isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isAdmin(message.member) && !isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
 
 	const usersMap = message.mentions.users
 	const userIds = [...usersMap.keys()]	

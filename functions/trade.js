@@ -187,7 +187,7 @@ const getTradeSummary = async (message, inputs, player) => {
 			walletQuantities.push(quantity)
 			walletFields.push(walletField)
 		}
-		
+
 		cards.push(`${quantity} ${card}`)
 	}
 
@@ -207,14 +207,14 @@ const getTradeSummary = async (message, inputs, player) => {
 
 //PROCESS TRADE
 const processTrade = async (message, transaction_id, initiatorSummary, receiverSummary, initiatingPlayer, receivingPlayer) => {
-	const initiator_wallet = initiatorSummary.wallet
+	const initiator_wallet = initiatingPlayer.wallet
 	const initiator_print_quants = initiatorSummary.printQuantities
 	const initiator_prints = initiatorSummary.prints
 	const initiator_invs = initiatorSummary.invs
 	const initiator_wallet_quants = initiatorSummary.walletQuantities
 	const initiator_wallet_fields = initiatorSummary.walletFields
 
-	const receiver_wallet = receiverSummary.wallet
+	const receiver_wallet = receivingPlayer.wallet
 	const receiver_print_quants = receiverSummary.printQuantities
 	const receiver_prints = receiverSummary.prints
 	const receiver_invs = receiverSummary.invs

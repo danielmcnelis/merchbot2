@@ -7,6 +7,7 @@ const { yescom, nocom } = require('../static/commands.json')
 const { starchips, stardust, com, rar, sup, ult, scr, egg, cactus, hook, moai, mushroom, rose } = require('../static/emojis.json')
 const { findCard } = require('./search.js')
 const { selectPrint } = require('./print.js')
+const { capitalize } = require('./utility.js')
 const { completeTask } = require('./diary')
 const merchbotId = '584215266586525696'
 

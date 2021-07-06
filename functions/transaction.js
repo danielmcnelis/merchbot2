@@ -10,6 +10,7 @@ const { client } = require('../static/clients.js')
 const { fpRole } = require('../static/roles.json')
 const { findCard } = require('./search.js')
 const { selectPrint } = require('./print.js')
+const { capitalize } = require('./utility.js')
 const { announcementsChannelId, botSpamChannelId, shopChannelId, staffChannelId } = require('../static/channels.json')
 const { completeTask } = require('./diary')
 
@@ -18,8 +19,6 @@ const { completeTask } = require('./diary')
 const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlayer, shopSale = true, mention = false) => {
     const cards = shopSale ? invoice.cards : [invoice.card]
     const sellerId = sellingPlayer.id
-    console.log('cards', cards)
-    console.log('sellerId', sellerId)
 
 	const filter = m => m.author.id === sellerId
 	const msg = await message.channel.send(
@@ -53,8 +52,6 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlay
 const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = false) => {
     const cards = shopSale ? invoice.cards : [invoice.card]
     const buyerId = buyingPlayer.id
-    console.log('cards', cards)
-    console.log('buyerId', buyerId)
 
 	const filter = m => m.author.id === buyerId
 	const msg = await message.channel.send(`${mention ? `<@${buyerId}>, Do you agree` : 'Are you sure you want'} to buy${cards.length > 1 ? `:\n${cards.join('\n')}\nF` : ` ${cards[0]} f`}rom ${sellingPlayer.id === merchbotId ? 'The Shop' : sellingPlayer.name} for ${invoice.total_price}${stardust}?`)
@@ -168,8 +165,6 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
         m6success
     }
 
-    console.log('invoice', invoice)
-
     return invoice
 }
 
@@ -266,8 +261,6 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
         m4success
     }
 
-    console.log('invoice', invoice)
-
     return invoice
 }
 
@@ -355,10 +348,6 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
         print.market_price = newPrice
         await print.save()
     }
-
-    console.log( 'print.id',  print.id)
-    console.log( 'print.card_code',  print.card_code)
-    console.log( 'buyerId',  buyerId)
     
     let buyerInv = print ? await Inventory.findOne({ 
         where: { 
@@ -374,10 +363,7 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
             printId: print.id,
             playerId: buyerId
         })
-    }
-
-    console.log('buyerInv.dataValues', buyerInv.dataValues)
-    
+    }    
     
     const buyerWallet = await Wallet.findOne({ where: { playerId: buyerId } })
 

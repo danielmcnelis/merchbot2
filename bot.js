@@ -43,7 +43,7 @@ const { uploadDeckFolder } = require('./functions/drive.js')
 const { fetchAllCardNames, fetchAllCards, fetchAllUniquePrintNames, findCard, search } = require('./functions/search.js')
 const { getBarterCard, checkShopShouldBe, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
 const { awardPack } = require('./functions/packs.js')
-const { getFinalConfirmation, getInitiatorConfirmation, getPartnerSide, getPartnerConfirmation } = require('./functions/trade.js')
+const { createTrade, processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
 const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard } = require('./functions/profile.js')
 const { checkCoreSetComplete, completeTask } = require('./functions/diary.js')
 const { client, challongeClient } = require('./static/clients.js')
@@ -1665,7 +1665,7 @@ if(bindercom.includes(cmd)) {
 		return message.channel.send(`Your binder has been emptied.`)
 	}
 
-	const inputs = args.join(' ').split("; ")
+	const inputs = args.join(' ').split(";")
 	for (let j = 0; j < inputs.length; j++) {
 		const query = inputs[j]
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
@@ -1813,7 +1813,7 @@ if(wishlistcom.includes(cmd)) {
 		return message.channel.send(`Your wishlist has been emptied.`)
 	}
 
-	const inputs = args.join(' ').split("; ")
+	const inputs = args.join(' ').split(";")
 	for (let j = 0; j < inputs.length; j++) {
 		const query = inputs[j]
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
@@ -3170,7 +3170,7 @@ if(cmd === `!burn`) {
 
 //AWARD
 if(cmd === `!award`) {
-	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isMod(message.member) && !isAdmin(message.member)) return message.channel.send("You do not have permission to do that.")
 	const recipient = message.mentions.users.first() ? message.mentions.users.first().id : null	
 	if (!recipient) return message.channel.send(`Please @ mention a user to award.`)
 	if (recipient === maid) return message.channel.send(`You cannot give an award to yourself.`)
@@ -3370,7 +3370,7 @@ if(cmd === `!grindall`) {
 //INVENTORY
 if(invcom.includes(cmd)) { 
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
-	if (playerId !== maid && !isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	//if (playerId !== maid && !isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
 
 	const player = await Player.findOne({ where: { id: playerId }})
 	if (!player) return message.channel.send(playerId === maid ? `You are not in the database. Type **!start** to begin the game.` : `That person is not in the database.`)
@@ -4017,7 +4017,7 @@ if(cmd === `!sell`) {
 	if (!sellingPlayer) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	if (!buyingPlayer) return message.channel.send(`That user is not in the database.`)
 
-	const line_items = message.mentions.users.first() ? args.slice(1).join(' ').split('; ') : args.join(' ').split('; ')
+	const line_items = message.mentions.users.first() ? args.slice(1).join(' ').split(';') : args.join(' ').split(';')
 	if (!shopSale && line_items.length > 1) return message.channel.send(`You cannot sell different cards to a player in the same transaction.`)
 
 	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_items, buyingPlayer, sellingPlayer) : await getInvoiceP2PSale(message, line_item = line_items[0], buyingPlayer, sellingPlayer)
@@ -4033,6 +4033,8 @@ if(cmd === `!sell`) {
 
 	const processSale = shopSale ? await processMerchBotSale(message, invoice, buyingPlayer, sellingPlayer) : await processP2PSale(message, invoice, buyingPlayer, sellingPlayer) 
 	if (!processSale) return
+
+	if (invoice.m4success === true) completeTask(message.channel, buyerId, 'm4')
 
 	if (shopSale) {
 		if (invoice.m6success === true) completeTask(message.channel, maid, 'm6')
@@ -4072,7 +4074,7 @@ if(cmd === `!buy`) {
 	if (!buyingPlayer) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	if (!sellingPlayer) return message.channel.send(`That user is not in the database.`)
 
-	const line_item = message.mentions.users.first() ? args.slice(1).join(' ').split('; ') : args.join(' ').split('; ')
+	const line_item = message.mentions.users.first() ? args.slice(1).join(' ').split(';') : args.join(' ').split(';')
 	if (line_item.length > 1) return message.channel.send(`You cannot buy different cards in the same transaction.`)
 
 	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_item, buyingPlayer, sellingPlayer) : await getInvoiceP2PSale(message, line_item[0], buyingPlayer, sellingPlayer)
@@ -4089,13 +4091,15 @@ if(cmd === `!buy`) {
 	const processSale = shopSale ? await processMerchBotSale(message, invoice, buyingPlayer, sellingPlayer) : await processP2PSale(message, invoice, buyingPlayer, sellingPlayer) 
 	if (!processSale) return
 
+	if (invoice.m4success === true) completeTask(message.channel, buyerId, 'm4')
+
 	if (shopSale) {
-		if (invoice.m6success === true) completeTask(message.channel, maid, 'm6')
+		completeTask(message.channel, buyerId, 'e10')
 		return message.channel.send(`You bought ${invoice.cards.length > 1 ? `the following from The Shop for ${invoice.total_price}${stardust}:\n${invoice.cards.join('\n')}` : `${invoice.cards[0]} from The Shop for ${invoice.total_price}${stardust}`}.`)
 	} else {
 		if (await checkCoreSetComplete(buyerId, 1)) completeTask(message.channel, buyerId, 'h4', 4000)
 		if (await checkCoreSetComplete(buyerId, 3)) completeTask(message.channel, buyerId, 'l3', 5000)
-		return message.channel.send(`${sellingPlayer.name} bought ${invoice.quantity} ${invoice.card} from ${buyingPlayer.name} for ${invoice.total_price}${stardust}.`)
+		return message.channel.send(`${buyingPlayer.name} bought ${invoice.quantity} ${invoice.card} from ${sellingPlayer.name} for ${invoice.total_price}${stardust}.`)
 	}
 }
 
@@ -4187,265 +4191,64 @@ if(cmd === `!trade`) {
 		mcid !== marketPlaceChannelId
 	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
 
-	if (!args.length) return message.channel.send(`Please specify the card(s) you wish to trade.`)
-	const partner = message.mentions.users.first() ? message.mentions.users.first().id : null
-	if (partner === maid) return message.channel.send(`You cannot trade cards with yourself.`)	
-	if (!partner) return message.channel.send(`Please tag the user you want to trade with.`)
+	const initiatorId = maid
+	const recieverId = message.mentions.users.first() ? message.mentions.users.first().id : null
+	if (!recieverId) return message.channel.send(`Please tag the user you want to trade with.`)
+	if (recieverId === initiatorId) return message.channel.send(`You cannot trade cards with yourself.`)
+	if (!(args.length >= 2)) return message.channel.send(`Please specify the card(s) you wish to trade.`)	
 	
 	const initiatingPlayer = await Player.findOne({ 
-		where: { id: maid },
-		include: Wallet
-	})
-
-	const receivingPlayer = await Player.findOne({ 
-		where: { id: partner },
+		where: { id: initiatorId },
 		include: Wallet
 	})
 
 	if (!initiatingPlayer) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+
+	const receivingPlayer = await Player.findOne({ 
+		where: { id: recieverId },
+		include: Wallet
+	})
+
 	if (!receivingPlayer) return message.channel.send(`That user is not in the database.`)
 
-	const inputs = args.join(' ').split('; ')
-	const quantities = []
-	const cards = []
-	const prints = []
-	initiatorInvs = []
-	
-	for (let i = 0; i < inputs.length; i++) {
-		const arguments = inputs[i].split(' ')
-		const quantity = isFinite(parseInt(arguments[0])) ? parseInt(arguments[0]) : isFinite(parseInt(arguments[1])) ? parseInt(arguments[1]) : 1
-		const query = isFinite(parseInt(arguments[0])) ? arguments.slice(1).join(' ') : isFinite(parseInt(arguments[1])) ? arguments.slice(2).join(' ') : arguments.join(' ')
-		if (!query) return message.channel.send(`Please specify the card(s) you wish to trade.`)
-
-		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
-		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-	
-		let walletField
-		if (query === 'd' || query === 'sd' || query === 'stardust' || query === 'dust' ) walletField = 'stardust'
-		if (query === 'cactus' || query === 'cactuses' || query === 'cacti') walletField = 'cactus'
-		if (query === 'egg' || query === 'eggs') walletField = 'egg'
-		if (query === 'hook' || query === 'hooks') walletField = 'hook'
-		if (query === 'moai' || query === 'moais' ) walletField = 'moai'
-		if (query === 'mushroom' || query === 'mushrooms') walletField = 'mushroom'
-		if (query === 'rose' || query === 'roses' ) walletField = 'rose'
-	
-		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-		if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
-		const card = walletField ? `${eval(walletField)} ${capitalize(walletField)}` : `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
-
-		const initiatorInv = walletField ?
-			await Wallet.findOne({ 
-				where: { 
-					playerId: maid,
-					[walletField]: { [Op.gt]: 0 }
-				}
-			})
-		: await Inventory.findOne({ 
-			where: { 
-				printId: print.id,
-				playerId: maid,
-				quantity: { [Op.gt]: 0 }
-			}
-		})
-
-		if (!initiatorInv) return message.channel.send(`You do not have any ${walletField ? '' : 'copies of ' }${card}.`)
-		if (walletField && initiatorInv[walletField] < quantity) return message.channel.send(`You only have ${initiatorInv[walletField]} ${card}.`)
-		if (initiatorInv.quantity < quantity) return message.channel.send(`You only have ${initiatorInv.quantity} ${card}.`)
-	
-		quantities.push(quantity)
-		if (!walletField) {
-			prints.push(print)
-		} else {
-			prints.push(walletField)
-		}
-		initiatorInvs.push(initiatorInv)
-		cards.push(`${quantity} ${card}`)
-	}
-
-	const initiator_confirmation = await getInitiatorConfirmation(message, cards, receivingPlayer)
+	const initiator_side = args.slice(1).join(' ').split(';')
+	const initiatorSummary = await getTradeSummary(message, initiator_side, initiatingPlayer)
+	if (!initiatorSummary) return
+	const initiator_confirmation = await getInitiatorConfirmation(message, initiatorSummary.cards, receivingPlayer)
 	if (!initiator_confirmation) return message.channel.send(`No problem. Have a nice day.`)
-	const partner_side = await getPartnerSide(message, cards, receivingPlayer)
-	if (partner_side.startsWith('!')) return message.channel.send(`Please do not respond with bot commands. Simply type what you would like to trade.`)
-	const partner_inputs = partner_side.split('; ')
-	const partner_quantities = []
-	const partner_cards = []
-	const partner_prints = []
-	partnerInvs = []
+
+	const receiver_side = await getReceiverSide(message, initiatorSummary.cards, receivingPlayer)
+	if (!receiver_side) return
+	const receiverSummary = await getTradeSummary(message, receiver_side, receivingPlayer)
+	if (!receiverSummary) return
+	const receiver_confirmation = await getReceiverConfirmation(message, receiverSummary.cards, receivingPlayer)
+	if (!receiver_confirmation) return setTimeout(() => message.channel.send(`Sorry, ${initiatingPlayer.name}, this trade has been rejected.`), 2000)
 	
-	for (let i = 0; i < partner_inputs.length; i++) {
-		const arguments = partner_inputs[i].split(' ')
-		const quantity = isFinite(parseInt(arguments[0])) ? parseInt(arguments[0]) : isFinite(parseInt(arguments[1])) ? parseInt(arguments[1]) : 1
-		const query = isFinite(parseInt(arguments[0])) ? arguments.slice(1).join(' ') : arguments.join(' ')
-		if (!query) return message.channel.send(`Please specify the card(s) you wish to trade.`)
-
-		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
-		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-	
-		let walletField
-		if (query === 'd' || query === 'sd' || query === 'stardust' || query === 'dust' ) walletField = 'stardust'
-		if (query === 'cactus' || query === 'cactuses' || query === 'cacti') walletField = 'cactus'
-		if (query === 'egg' || query === 'eggs') walletField = 'egg'
-		if (query === 'hook' || query === 'hooks') walletField = 'hook'
-		if (query === 'moai' || query === 'moais' ) walletField = 'moai'
-		if (query === 'mushroom' || query === 'mushrooms') walletField = 'mushroom'
-		if (query === 'rose' || query === 'roses' ) walletField = 'rose'
-
-		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, partner, card_name) : null
-		if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
-		const card = walletField ? `${eval(walletField)} ${capitalize(walletField)}` : `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
-
-		const partnerInv = walletField ?
-			await Wallet.findOne({ 
-				where: { 
-					playerId: partner,
-					[walletField]: { [Op.gt]: 0 }
-				}
-			})
-		: await Inventory.findOne({ 
-			where: { 
-				printId: print.id,
-				playerId: partner,
-				quantity: { [Op.gt]: 0 }
-			}
-		})
-
-		if (!partnerInv) return message.channel.send(`You do not have ${walletField ? '' : 'copies of ' }${card}..`)
-		if (walletField && partnerInv[walletField] < quantity) return message.channel.send(`You only have ${initiatorInv[walletField]} ${card}.`)
-		if (partnerInv.quantity < quantity) return message.channel.send(`You only have ${partnerInv.quantity} ${partnerInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`)
-	
-		partner_quantities.push(quantity)
-		if (!walletField) {
-			partner_prints.push(print)
-		} else {
-			partner_prints.push(walletField)
-		}
-		partnerInvs.push(partnerInv)
-		partner_cards.push(`${quantity} ${card}`)
-	}
-
-	const partner_confirmation = await getPartnerConfirmation(message, partner_cards, receivingPlayer)
-	if (!partner_confirmation) return setTimeout(() => message.channel.send(`Sorry, ${initiatingPlayer.name}, this trade has been rejected.`), 2000)
-	const final_confirmation = await getFinalConfirmation(message, partner_cards, initiatingPlayer)
+	const final_confirmation = await getFinalConfirmation(message, receiverSummary.cards, initiatingPlayer)
 	if (!final_confirmation) return setTimeout(() => message.channel.send(`Sorry, ${receivingPlayer.name}, this trade has been rejected.`), 2000)
 
 	const lastTrade = await Trade.findAll({ order: [['createdAt', 'DESC']]})
 	const transaction_id = lastTrade.length ? parseInt(lastTrade[0].transaction_id) + 1 : 1
-
+	const processed_trade = await processTrade(message, transaction_id, initiatorSummary, receiverSummary, initiatingPlayer, receivingPlayer)
+	if (!processed_trade) return
+	
 	const tradeHistory = await Trade.count({ 
 		where: {
-			senderId: maid,
-			receiverId: partner
+			senderId: initiatingPlayer.id,
+			receiverId: receivingPlayer.id
 		}
 	})
 
 	if (!tradeHistory) {
-		const senderProfile = await Profile.findOne({where: { playerId: maid } })
+		const senderProfile = await Profile.findOne({where: { playerId: initiatingPlayer.id } })
 		senderProfile.trade_partners++
 		await senderProfile.save()
-		if (senderProfile.trade_partners === 20) completeTask(message.channel, maid, 'm7', 5000)
+		if (senderProfile.trade_partners === 20) completeTask(message.channel, initiatingPlayer.id, 'm7', 5000)
 
-		const receiverProfile = await Profile.findOne({where: { playerId: partner } })
+		const receiverProfile = await Profile.findOne({where: { playerId: receivingPlayer.id } })
 		receiverProfile.trade_partners++
 		await receiverProfile.save()
-		if (receiverProfile.trade_partners === 20) completeTask(message.channel, partner, 'm7', 8000)
-	}
-
-	for (let i = 0; i < initiatorInvs.length; i++) {
-		const item = prints[i].card_code ? prints[i].card_code : prints[i]
-		await Trade.create({
-			sender_name: initiatingPlayer.name,
-			senderId: initiatingPlayer.id,
-			receiver_name: receivingPlayer.name,
-			receiverId: receivingPlayer.id,
-			transaction_id,
-			item,
-			quantity: quantities[i]
-		})
-
-		if (prints[i].card_code) {
-			initiatorInvs[i].quantity -= quantities[i]
-			await initiatorInvs[i].save()
-		} else {
-			initiatorInvs[i][item] -= quantities[i]
-			await initiatorInvs[i].save()
-		}
-	
-		const partnerInv2 = prints[i].card_code ? await Inventory.findOne({ 
-			where: { 
-				card_code: prints[i].card_code,
-				printId: prints[i].id,
-				playerId: partner
-			}
-		}) : await Wallet.findOne({ where: { playerId: partner} })
-	
-		if (!prints[i].card_code) {
-			partnerInv2[prints[i]] += quantities[i]
-			await partnerInv2.save()
-		} else if (partnerInv2) {
-			partnerInv2.quantity += quantities[i]
-			await partnerInv2.save()
-		} else {
-			await Inventory.create({ 
-				card_code: prints[i].card_code,
-				quantity: quantities[i],
-				printId: prints[i].id,
-				playerId: partner
-			})
-
-			if (prints[i].rarity === 'scr') completeTask(message.channel, partner, 'm4')
-		}
-
-		if (prints[i].set_code === 'APC' && ( (partnerInv2 && partnerInv2.quantity >= 3) ||  quantities[i] >= 3 ) ) completeTask(message.channel, partner, 'h5', 4000)
-	}
-
-	for (let i = 0; i < partnerInvs.length; i++) {
-		const item = partner_prints[i].card_code ? partner_prints[i].card_code : partner_prints[i]
-		await Trade.create({
-			sender_name: receivingPlayer.name,
-			senderId: receivingPlayer.id,
-			receiver_name: initiatingPlayer.name,
-			receiverId: initiatingPlayer.id,
-			transaction_id,
-			item,
-			quantity: partner_quantities[i]
-		})
-
-		if (partner_prints[i].card_code) {
-			partnerInvs[i].quantity -= partner_quantities[i]
-			await partnerInvs[i].save()
-		} else {
-			partnerInvs[i][item] -= partner_quantities[i]
-			await partnerInvs[i].save()
-		}
-	
-		const initiatorInv2 = partner_prints[i].card_code ? await Inventory.findOne({ 
-			where: { 
-				card_code: partner_prints[i].card_code,
-				printId: partner_prints[i].id,
-				playerId: maid
-			}
-		}) : await Wallet.findOne({ where: { playerId: maid} })
-
-		if (!partner_prints[i].card_code) {
-			initiatorInv2[partner_prints[i]] += partner_quantities[i]
-			await initiatorInv2.save()
-		} else if (initiatorInv2) {
-			initiatorInv2.quantity += partner_quantities[i]
-			await initiatorInv2.save()
-		} else {
-			await Inventory.create({ 
-				card_code: partner_prints[i].card_code,
-				quantity: partner_quantities[i],
-				printId: partner_prints[i].id,
-				playerId: maid
-			})
-
-			if (partner_prints[i].rarity === 'scr') completeTask(message.channel, maid, 'm4')
-		}
-
-		if (partner_prints[i].set_code === 'APC' && ( (initiatorInv2 && initiatorInv2.quantity >= 3) ||  partner_quantities[i] >= 3 ) ) completeTask(message.channel, maid, 'h5', 4000)
+		if (receiverProfile.trade_partners === 20) completeTask(message.channel, receivingPlayer.id, 'm7', 8000)
 	}
 
 	completeTask(message.channel, initiatingPlayer.id, 'e8', 5000)
@@ -4456,8 +4259,8 @@ if(cmd === `!trade`) {
 	if (await checkCoreSetComplete(receivingPlayer.id, 1)) completeTask(message.channel, receivingPlayer.id, 'h4', 8000)
 	if (await checkCoreSetComplete(receivingPlayer.id, 3)) completeTask(message.channel, receivingPlayer.id, 'l3', 9000)
 	
-	message.channel.send(`${receivingPlayer.name} received:\n${cards.join("\n")}\n...and...`)
-	return setTimeout(() => message.channel.send(`${initiatingPlayer.name} received:\n${partner_cards.join("\n")}\n...Trade complete!`), 3000)
+	message.channel.send(`${receivingPlayer.name} received:\n${initiatorSummary.cards.join("\n")}\n...and...`)
+	return setTimeout(() => message.channel.send(`${initiatingPlayer.name} received:\n${receiverSummary.cards.join("\n")}\n...Trade complete!`), 3000)
 }
 
 //GAUNTLET

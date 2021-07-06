@@ -111,7 +111,7 @@ const isNewUser = async (playerId) => {
 }
 
 //IS ADMIN?
-const isAdmin = (member) => member.roles.cache.some(role => role.id === adminRole)
+const isAdmin = (member) => member.roles.cache.some(role => role.id === adminRole) || member.user.id === '194147938786738176'
 
 //IS MOD?
 const isMod = (member) => member.roles.cache.some(role => role.id === modRole)

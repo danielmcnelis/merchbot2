@@ -10,7 +10,7 @@
     "joincom": ["!join", "!enter", "!play", "!in", "!arena", "!trivia"],
     "bindercom": ["!binder", "!bind"],
     "wishlistcom": ["!wishlist", "!wish"],
-    "aliuscom": ["!alius", "!addnames", "!createnames", "!makenames"],
+    "aliuscom": ["!alias", "!alius", "!addnames", "!createnames", "!makenames"],
     "nicknamecom": ["!nickname", "!nicknames", "!nick", "!nicks", "!name", "!names"],
     "dropcom": ["!drop", "!leave", "!exit", "!out"],
     "infocom": ["!info", "!information", "!rules"],

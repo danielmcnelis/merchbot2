@@ -88,6 +88,7 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
     const sellerInvs = []
     const quantities = []
     const prints = []
+    let m4success
     let m6success
 
     for (let i = 0; i < line_items.length; i++) {
@@ -147,7 +148,8 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
             return
         } 
 	
-		if (!!(print.rarity !== 'com' && quantity >= 5)) m6sucsess = !!(print.rarity !== 'com' && quantity >= 5)
+		if (!!(print.rarity === 'scr')) m4success = true
+		if (!!(print.rarity !== 'com' && quantity >= 5)) m6success = true
 
 		quantities.push(quantity)
 		prints.push(print)
@@ -162,6 +164,7 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
         cards,
         prints,
         sellerInvs,
+        m4success,
         m6success
     }
 
@@ -177,6 +180,7 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
     const args = line_item.split(' ')
     const quantity = isFinite(args[0]) ? parseInt(args[0]) : 1
     const total_price = parseInt(args[args.length - 1])
+    let m4success
 
     if (!total_price) {
         message.channel.send(`Please specify your ${authorIsSeller ? 'asking price' : 'offer price'} at the end of the command.`)
@@ -221,6 +225,8 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
         return false
     }
 
+    if (print && print.rarity === 'scr') m4success = true
+
     const card = walletField ? `${eval(walletField)} ${capitalize(walletField)}` :
                 `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 
@@ -256,7 +262,8 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
         print,
         walletField,
         sellerInv,
-        sellerWallet
+        sellerWallet,
+        m4success
     }
 
     console.log('invoice', invoice)

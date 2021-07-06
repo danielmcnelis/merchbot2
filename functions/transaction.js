@@ -290,7 +290,7 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
 		print.market_price = newPrice
 		await print.save()
 		
-		let buyerInv = await Inventory.findOne({ 
+        const buyerCount = await Inventory.count({ 
 			where: { 
 				card_code: print.card_code,
 				printId: print.id,
@@ -298,19 +298,29 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
 			}
 		})
 
-        if (!buyerInv) buyerInv = await Inventory.create({ 
-            card_code: print.card_code,
-            printId: print.id,
-            playerId: buyerId
+        if (!buyerCount) {
+            await Inventory.create({ 
+                card_code: print.card_code,
+                printId: print.id,
+                playerId: buyerId
+            })
+        }
+
+		const buyerInv = await Inventory.findOne({ 
+			where: { 
+				card_code: print.card_code,
+				printId: print.id,
+				playerId: buyerId
+			}
 		})
+
+        if (!buyerInv) {
+            message.channel.send(`Database error: Could not find or create Buyer Inventory for: ${print.card_name}.`)
+        }
 
 		buyerInv.quantity += quantity
 		await buyerInv.save()
 
-        if (!buyerInv) {
-            message.channel.send(`Database error: Could not find or create Buyer Inventory.`)
-            return false
-        }
  
         sellerInv.quantity -= quantity
 		await sellerInv.save()
@@ -332,71 +342,78 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
     const print = invoice.print
     const walletField = invoice.walletField
     const sellerInv = invoice.sellerInv
-    const sellerWallet = invoice.sellerWallet
-    const buyerId = buyingPlayer.id
 
-    if (!total_price || !card || !quantity || !((print && sellerInv) || walletField) || !buyerId) {
+    const buyerId = buyingPlayer.id
+    const sellerId = sellingPlayer.id
+    const sellerWallet = sellingPlayer.wallet
+    const buyerWallet = buyingPlayer.wallet
+
+    if (!total_price || !card || !quantity || !((print && sellerInv) || walletField) || !buyerId || !sellerId || !buyerWallet || !sellerWallet) {
         message.channel.send(`Error processing P2P Sale: missing needed information.`)
         return false
     }
 
-    const newPrice = print && quantity >= 16 ? total_price / quantity :
-                    print && quantity < 16 ? ( total_price + ( (16 - quantity) * print.market_price ) ) / 16 :
-                    null
-    
     if (print) {
+        const newPrice = quantity >= 16 ? total_price / quantity :
+                        ( total_price + ( (16 - quantity) * print.market_price ) ) / 16
+
         print.market_price = newPrice
         await print.save()
-    }
-    
-    let buyerInv = print ? await Inventory.findOne({ 
-        where: { 
-            card_code: print.card_code,
-            printId: print.id,
-            playerId: buyerId
-        }
-    }) : null
 
-    if (!buyerInv && print) {
-        buyerInv = await Inventory.create({ 
-            card_code: print.card_code,
-            printId: print.id,
-            playerId: buyerId
+        const buyerCount = await Inventory.count({ 
+            where: { 
+                card_code: print.card_code,
+                printId: print.id,
+                playerId: buyerId
+            }
         })
-    }    
     
-    const buyerWallet = await Wallet.findOne({ where: { playerId: buyerId } })
+        if (!buyerCount) {
+            await Inventory.create({ 
+                card_code: print.card_code,
+                printId: print.id,
+                playerId: buyerId
+            })
+        }
+    
+        const buyerInv = await Inventory.findOne({ 
+            where: { 
+                card_code: print.card_code,
+                printId: print.id,
+                playerId: buyerId
+            }
+        })
 
-    if (!buyerInv && !buyerWallet) {
-        message.channel.send(`Database error: Could not find or create Buyer Inventory/Wallet.`)
-        return false
-    }
+        if (!buyerInv) {
+            message.channel.send(`Database error: Could not find Buyer Inventory for: ${print.card_name}.`)
+        }
 
-    if (buyerInv) {
         buyerInv.quantity += quantity
-        await buyerInv.save()
+        await buyerInv.save()   
+
+        sellerInv.quantity -= quantity
+        await sellerInv.save()
+
+        if (print.rarity === 'scr') completeTask(message.channel, buyerId, 'm4')
+        if (print.set_code === 'APC' && buyerInv && buyerInv.quantity >= 3) completeTask(message.channel, buyerId, 'h5')
+
+        buyerWallet.stardust -= total_price
+        await buyerWallet.save()
+    
+        sellerWallet.stardust += total_price
+        await sellerWallet.save()
+
     } else if (walletField) {
         buyerWallet[walletField] += quantity
         await buyerWallet.save()
-    }
 
-    if (print && print.rarity === 'scr') completeTask(message.channel, buyerId, 'm4')
-    if (print && print.set_code === 'APC' && buyerInv && buyerInv.quantity >= 3) completeTask(message.channel, buyerId, 'h5')
-
-    if (print) {
-        sellerInv.quantity -= quantity
-        await sellerInv.save()
-    } else if (walletField) {
         sellerWallet[walletField] -= quantity
         await sellerWallet.save()
+    } else {
+        message.channel.send(`Error processing P2P Sale: missing needed information.`)
+        return false
     }
-
-    buyerWallet.stardust -= total_price
-    await buyerWallet.save()
-
-    sellerWallet.stardust += total_price
-    await sellerWallet.save()
-
+ 
     return true
 }
  

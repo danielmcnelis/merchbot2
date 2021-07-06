@@ -280,10 +280,10 @@ const processTrade = async (message, transaction_id, initiatorSummary, receiverS
 			quantity: quantity
 		})
 
-		initiator_wallet[field].quantity -= quantity
+		initiator_wallet[field] -= quantity
 		await initiator_wallet.save()
 		
-		receiver_wallet[field].quantity += quantity
+		receiver_wallet[field] += quantity
 		await receiver_wallet.save()
 	}
 
@@ -346,10 +346,10 @@ const processTrade = async (message, transaction_id, initiatorSummary, receiverS
 			quantity: quantity
 		})
 		
-		receiver_wallet[field].quantity -= quantity
+		receiver_wallet[field] -= quantity
 		await receiver_wallet.save()
 
-		initiator_wallet[field].quantity += quantity
+		initiator_wallet[field] += quantity
 		await initiator_wallet.save()
 	}
 	

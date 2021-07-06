@@ -159,7 +159,7 @@ const getTradeSummary = async (message, inputs, player) => {
 		const card = walletField ? `${eval(walletField)} ${capitalize(walletField)}` :
 		`${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 
-		const inv = print ? await Inventory.findOne({ 
+		const inv = print && !walletField ? await Inventory.findOne({ 
 			where: { 
 				printId: print.id,
 				playerId: player.id,

@@ -475,7 +475,7 @@ const askForExclusions = async (message, rarity, set_code) => {
 // GET EXCLUSIONS
 const getExclusions = async (message, rarity, set) => {
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send(`Please provide a list of ${rarity === 'all' ? '' : eval(rarity)}${set.code} ${set.emoji === set.alt_emoji ? eval(set.emoji) : eval(set.emoji), eval(set.alt_emoji)} cards you do not want to bulk sell.`)
+	const msg = await message.channel.send(`Please provide a list of ${rarity === 'all' ? '' : eval(rarity)}${set.code} ${set.emoji === set.alt_emoji ? eval(set.emoji) : `${eval(set.emoji)} ${eval(set.alt_emoji)}`} cards you do not want to bulk sell.`)
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
         time: 60000

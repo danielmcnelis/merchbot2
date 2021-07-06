@@ -74,7 +74,9 @@ client.on('ready', async () => {
 	const shopShouldBe = checkShopShouldBe()
 	const shopCountdown = getShopCountdown()
 	const shopOpen = await checkShopOpen()
-	
+	const hoursLeftInPeriod = Math.floor(shopCountdown / (3600000))
+	const minsLeftInPeriod = Math.ceil((shopCountdown % 3600000)/ 60000)
+
 	if (shopOpen) updateShop()
 	setInterval(async () =>  {
 		const shopOpen = await checkShopOpen()

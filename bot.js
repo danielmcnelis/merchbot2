@@ -1336,8 +1336,8 @@ if (cmd === `!shop`) {
 			quantity: { [Op.gt]: 0 }
 		}})
 		const market_price = print.market_price
-		const selling_price = Math.ceil(market_price * 1.2)
-		const buying_price = Math.ceil(market_price * 0.8)
+		const selling_price = Math.ceil(market_price * 1.1)
+		const buying_price = Math.ceil(market_price * 0.7)
 		if (!inv) return message.channel.send(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - Out of Stock.`)
 		return message.channel.send(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - ${inv.quantity}`)
 	}
@@ -3941,7 +3941,7 @@ if(cmd === `!dump`) {
 		const quantityToSell = inv[i].quantity - quantityToKeep
 		count += quantityToSell
 		cards.push(`${quantityToSell} ${eval(inv[i].print.rarity)}${inv[i].print.card_name}`)
-		const price = Math.ceil(inv[i].print.market_price * 0.8) * quantityToSell
+		const price = Math.ceil(inv[i].print.market_price * 0.7) * quantityToSell
 		compensation += price
 	}
 
@@ -3957,7 +3957,7 @@ if(cmd === `!dump`) {
 		}})
 
 		const quantityToSell = inv[i].quantity - quantityToKeep
-		const price = Math.ceil(inv[i].print.market_price * 0.8) * quantityToSell
+		const price = Math.ceil(inv[i].print.market_price * 0.7) * quantityToSell
 
 		const newPrice = quantityToSell >= 16 ? price / quantityToSell :
 						( price + ( (16 - quantityToSell) * inv[i].print.market_price ) ) / 16

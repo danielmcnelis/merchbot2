@@ -290,8 +290,8 @@ const updateShop = async () => {
         for (let i = 0; i < shopInv.length; i++) {
             const row = shopInv[i]
             const market_price = row.print.market_price
-            const selling_price = Math.ceil(market_price * 1.2)
-            const buying_price = Math.ceil(market_price * 0.8)
+            const selling_price = Math.ceil(market_price * 1.1)
+            const buying_price = Math.ceil(market_price * 0.7)
             results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(row.print.rarity)}${row.card_code} - ${row.print.card_name} - ${row.quantity}`) 
         }
     
@@ -354,8 +354,8 @@ const postBids = async (newlyInStock) => {
                 }, include: Print
             })
             const market_price = row.print.market_price
-            const selling_price = Math.ceil(market_price * 1.2)
-            const buying_price = Math.ceil(market_price * 0.8)
+            const selling_price = Math.ceil(market_price * 1.1)
+            const buying_price = Math.ceil(market_price * 0.7)
             results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(row.print.rarity)}${row.card_code} - ${row.print.card_name} - ${row.quantity}`) 
         }
     

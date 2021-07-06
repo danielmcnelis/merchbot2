@@ -97,7 +97,7 @@ const askForBidPlacement = async (message, player) => {
 
 const askForBidAmount = async (message, player, print, card) => {
     const filter = m => m.author.id === message.author.id
-    const price = Math.ceil(print.market_price * 1.2)
+    const price = Math.ceil(print.market_price * 1.1)
     const msg = await message.author.send(`The Shop sells ${card} for ${price}${stardust}. How much would you like to bid?`)
     const collected = await msg.channel.awaitMessages(filter, {
         max: 1,

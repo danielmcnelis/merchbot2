@@ -2,14 +2,16 @@
 const { Auction, Bid, Card, Match, Player, Tournament, Print, Set, Wallet, Diary, Inventory, Arena, Trivia, Keeper, Gauntlet, Draft, Daily, Binder, Wishlist, Profile, Info } = require('../db')
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
-const { yescom } = require('../static/commands.json')
+const { nocom, yescom } = require('../static/commands.json')
 const { yellow, ygocard, pack, open, closed, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, fish, rock, dinosaur, plant, reptile, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
 const { awardPacksToShop } = require('./packs')
 const adminId = '194147938786738176'
 const { client } = require('../static/clients.js')
 const { fpRole } = require('../static/roles.json')
 const { announcementsChannelId, botSpamChannelId, shopChannelId, staffChannelId } = require('../static/channels.json')
-const { completeTask } = require('./diary')
+const { completeTask } = require('./diary.js')
+const { findCard } = require('./search.js')
+const { selectPrint } = require('./print.js')
 
 // OPEN SHOP
 const openShop = async () => {
@@ -25,7 +27,8 @@ const openShop = async () => {
         updateShop()
         client.channels.cache.get(announcementsChannelId).send(`Good morning, <@&${fpRole}>, The Shop ${merchant} is now open! ${open}`)
         const shopCountdown = getShopCountdown()
-        client.channels.cache.get(botSpamChannelId).send(`Dear Moderationers, The Shop will automatically **close** in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes. ${yellow}`)
+        client.channels.cache.get(staffChannelId).send(`Dear Moderationers, The Shop will automatically **close** in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes.`)
+        client.channels.cache.get(staffChannelId).send(`${yellow}`)
 		return setTimeout(() => closeShop(), shopCountdown)
 	} 
 }
@@ -55,7 +58,8 @@ const closeShop = async () => {
         await restock()
 		client.channels.cache.get(announcementsChannelId).send(`Good evening, <@&${fpRole}>, The Shop ${merchant} is now closed! ${closed}`)
         const shopCountdown = getShopCountdown()
-        client.channels.cache.get(botSpamChannelId).send(`Dear Moderationers, The Shop will automatically **open** in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes. ${yellow}`)
+        client.channels.cache.get(staffChannelId).send(`Dear Moderationers, The Shop will automatically **open** in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes.`)
+        client.channels.cache.get(staffChannelId).send(`${yellow}`)
         return setTimeout(() => openShop(), shopCountdown)
 	} 
 }
@@ -440,22 +444,49 @@ const getDumpQuantity = async (message, rarity) => {
     return collected
 }
 
-// GET EXCEPTIONS
-const getExceptions = async (message, rarity, set_code) => {
+
+
+// ASK FOR EXCLUSIONS
+const askForExclusions = async (message, rarity, set_code) => {
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send(`Please provide a list of ${eval(rarity)} ${set_code} ${eval(set_code)} cards you do not want to bulk sell.`)
+	const msg = await message.channel.send(`Do you want to exclude any cards?`)
+    const collected = await msg.channel.awaitMessages(filter, {
+		max: 1,
+        time: 15000
+    }).then(async collected => {
+        const response = collected.first().content.toLowerCase()
+        if (yescom.includes(response)) {
+            return true
+        } else if (nocom.includes(response)) {
+            return false
+        } else {
+            message.channel.send(`I'll take that as a yes.`)
+            return true
+        }
+    }).catch(err => {
+		console.log(err)
+        return false
+	})
+
+    return collected
+}
+
+
+// GET EXCLUSIONS
+const getExclusions = async (message, rarity, set) => {
+    const filter = m => m.author.id === message.member.user.id
+	const msg = await message.channel.send(`Please provide a list of ${rarity === 'all' ? '' : eval(rarity)}${set.code} ${set.emoji === set.alt_emoji ? eval(set.emoji) : eval(set.emoji), eval(set.alt_emoji)} cards you do not want to bulk sell.`)
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
         time: 60000
     }).then(async collected => {
-		const response = Math.round(parseInt(collected.first().content.toLowerCase()))
-        if (!Number.isInteger(response) && response >= 0) {
-            message.channel.send(`Please provide a positive number.`)
+		const response = collected.first().content.toLowerCase()
+        if (response.startsWith('!')) {
+            message.channel.send(`Please do not respond with bot commands. Simply type what you would like to exclude.`)
             return false
         } else {
-            return response
+            return collected.first().content.split(';')
         }
-
     }).catch(err => {
 		console.log(err)
         message.channel.send(`Sorry, time's up.`)
@@ -463,6 +494,37 @@ const getExceptions = async (message, rarity, set_code) => {
 	})
 
     return collected
+}
+
+// GET EXCLUDED PRINTS
+const getExcludedPrintIds = async (message, rarity, set, exclusions) => {
+    const playerId = message.author.id
+    const printIds = []
+
+    for (let i = 0; i < exclusions.length; i++) {
+        const query = exclusions[i].split(' ').filter((el) => el !== '').join(' ')
+		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
+		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
+	
+		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) :
+                    card_name ? await selectPrint(message, playerId, card_name) :
+                    null
+		
+        if (!print) {
+            message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+            return false
+        }
+
+        if (print.setId !== set.id || (rarity !== 'all' && print.rarity !== rarity)) {
+            message.channel.send(`Sorry, "${query}" A.K.A. ${print.card_name} is not a ${rarity === 'all' ? '' : eval(rarity)}${set.code} ${set.emoji === set.alt_emoji ? eval(set.emoji) : eval(set.emoji), eval(set.alt_emoji)} card.`)
+            return false
+        }
+
+        else printIds.push(print.id)
+    }
+
+    return printIds
 }
 
 
@@ -515,12 +577,15 @@ const getBarterCard = async (message) => {
 
 module.exports = {
     askForDumpConfirmation,
+    askForExclusions,
     checkShopOpen,
     checkShopShouldBe,
     closeShop,
     getBarterCard,
     getDumpRarity,
     getDumpQuantity,
+    getExclusions,
+    getExcludedPrintIds,
     getShopCountdown,
     openShop,
     postBids,

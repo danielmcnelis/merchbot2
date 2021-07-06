@@ -158,7 +158,7 @@ const startRound = async (info, entries) => {
         await profile.save()
         await awardCard(arenaChannel, playerId, prizes[tribe])
 
-        arenaChannel.send(`Congratulations to <@${playerId}> on a brilliant victory` +
+        arenaChannel.send(`Congratulations to <@${playerId}> on a brilliant victory` +!
             ` with the ${capitalize(tribe)} ${eval(tribe)} deck.` +
             ` ${victories[tribe]}` +
             ` You truly deserve the ${apcs[tribe]}!`

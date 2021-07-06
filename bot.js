@@ -41,7 +41,7 @@ const { makeSheet, addSheet, writeToSheet } = require('./functions/sheets.js')
 const { askForAdjustConfirmation, askForCardSlot, collectNicknames, getNewMarketPrice, askForSetToPrint, selectPrint, askForRarity } = require('./functions/print.js')
 const { uploadDeckFolder } = require('./functions/drive.js')
 const { fetchAllCardNames, fetchAllCards, fetchAllUniquePrintNames, findCard, search } = require('./functions/search.js')
-const { getBarterCard, checkShopShouldBe, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
+const { getBarterCard, checkShopShouldBe, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
 const { awardPack } = require('./functions/packs.js')
 const { createTrade, processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
 const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard } = require('./functions/profile.js')
@@ -86,8 +86,12 @@ client.on('ready', async () => {
 	if (shopOpen && shopShouldBe === 'closed') client.channels.cache.get(staffChannelId).send(`<@&${modRole}>, The Shop is unexpectedly open. Type **!close** to manually close it.`)
 
 	if (shopShouldBe === 'closed') {
+        client.channels.cache.get(staffChannelId).send(`Dear Moderationers, The Shop will automatically **open** in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes.`)
+        client.channels.cache.get(staffChannelId).send(`${yellow}`)
 		return setTimeout(() => openShop(), shopCountdown)
 	} else if (shopShouldBe === 'open') {
+        client.channels.cache.get(staffChannelId).send(`Dear Moderationers, The Shop will automatically **close** in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes.`)
+        client.channels.cache.get(staffChannelId).send(`${yellow}`)
 		return setTimeout(() => closeShop(), shopCountdown)
 	}
 })
@@ -179,12 +183,18 @@ if (!message.content.startsWith("!") && message.content.includes(`[`) && message
 
 //TEST
 if(cmd === `!test`) {
-	const canvas = Canvas.createCanvas(105, 158)
-	const context = canvas.getContext('2d')
-	const background = await Canvas.loadImage(`https://ygoprodeck.com/pics/89631139.jpg`)
-	context.drawImage(background, 0, 0, canvas.width, canvas.height)
-	const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `newd.png`)
-	return message.channel.send(`Testing:`, attachment)
+	const shopCountdown = getShopCountdown()
+	const hoursLeftInPeriod = Math.floor(shopCountdown / (3600000))
+	const minutesLeftInPeriod = Math.ceil((shopCountdown % 3600000)/ 60000)
+	console.log('hoursLeftInPeriod', hoursLeftInPeriod)
+	console.log('minutesLeftInPeriod', minutesLeftInPeriod)
+
+	// const canvas = Canvas.createCanvas(105, 158)
+	// const context = canvas.getContext('2d')
+	// const background = await Canvas.loadImage(`https://ygoprodeck.com/pics/89631139.jpg`)
+	// context.drawImage(background, 0, 0, canvas.width, canvas.height)
+	// const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `newd.png`)
+	// return message.channel.send(`Testing:`, attachment)
 }
 
 
@@ -1665,7 +1675,7 @@ if(bindercom.includes(cmd)) {
 		return message.channel.send(`Your binder has been emptied.`)
 	}
 
-	const inputs = args.join(' ').split(";")
+	const inputs = args.join(' ').split(";").filter((el) => el !== '')
 	for (let j = 0; j < inputs.length; j++) {
 		const query = inputs[j]
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
@@ -2853,8 +2863,8 @@ if(cmd === `!daily`) {
 	if (!daily || !diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 
 	const date = new Date()
-	const hoursLeftInDay = 23 - date.getHours()
-	const minsLeftInHour = 60 - date.getMinutes()
+	const hoursLeftInDay = date.getMinutes() === 0 ? 24 - date.getHours() : 23 - date.getHours()
+	const minsLeftInHour = date.getMinutes() === 0 ? 0 : 60 - date.getMinutes()
 
 	if (daily.last_check_in && isSameDay(daily.last_check_in, date)) return message.channel.send(`You already used **!daily** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
 
@@ -3028,8 +3038,8 @@ if(cmd === `!alc` ||cmd === `!alch` || cmd === `!alchemy`) {
 	if (!wallet || !daily || !diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	
 	const date = new Date()
-	const hoursLeftInDay = 23 - date.getHours()
-	const minsLeftInHour = 60 - date.getMinutes()
+	const hoursLeftInDay = date.getMinutes() === 0 ? 24 - date.getHours() : 23 - date.getHours()
+	const minsLeftInHour = date.getMinutes() === 0 ? 0 : 60 - date.getMinutes()
 
 	if (daily.last_alchemy && !isSameDay(daily.last_alchemy, date)) {
 		daily.alchemy_1 = false
@@ -3918,8 +3928,11 @@ if(cmd === `!dump`) {
 	const quantityToKeep = await getDumpQuantity(message, rarity, set_code)
 	if (!quantityToKeep && quantityToKeep !== 0) return message.channel.send(`Please specify a valid quanity.`)
 
-	//const exceptions = await getExceptions(message, rarity, set_code)
-
+	const wish_to_exclude = await askForExclusions(message)
+	const exclusions = wish_to_exclude ? await getExclusions(message, rarity, set) : null
+	const excluded_prints = exclusions ? await getExcludedPrintIds(message, rarity, set, exclusions) : null
+	if (excluded_prints === false) return
+	
 	const unfilteredInv = await Inventory.findAll({
 		where: {
 			card_code: { [Op.startsWith]: set_code },
@@ -3929,7 +3942,11 @@ if(cmd === `!dump`) {
 		order: [["card_code", "ASC"]]
 	})
 
-	const inv = rarity === 'all' ? unfilteredInv : unfilteredInv.filter((row) => row.print.rarity === rarity)
+	const inv = rarity === 'all' && !excluded_prints ? unfilteredInv :
+				rarity === 'all' && excluded_prints.length ? unfilteredInv.filter((el) => !excluded_prints.includes(el.printId) ) :
+				rarity !== 'all' && !excluded_prints ? unfilteredInv.filter((el) => el.print.rarity === rarity) :
+				rarity !== 'all' && excluded_prints.length ? unfilteredInv.filter((el) => !excluded_prints.includes(el.printId) && el.print.rarity === rarity) :
+				[]
 
 	if (!inv.length) return message.channel.send(`You do not have more than ${quantityToKeep} ${quantityToKeep === 1 ? 'copy' : 'copies'} of any ${rarity === 'all' ? '' : `${eval(rarity)} `}${set_code} ${eval(set_code)} cards.`)
 

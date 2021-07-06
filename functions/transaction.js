@@ -235,10 +235,10 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
     
     const sellerWallet = print ? await Wallet.findOne({ where: { 
         playerId: sellerId 
-    }}) : await Wallet.findOne({ where: { 
+    }}) : walletField ? await Wallet.findOne({ where: { 
         [walletField]: { [Op.gt]: 0 },
         playerId: sellerId 
-    }})
+    }}) : null
 
     if (!sellerInv && !sellerWallet) {
         message.channel.send(`${authorIsSeller ? `You do not have any ${walletField ? '' : 'copies of '}` : shopSale ? 'Sorry, ' : `${buyingPlayer.name} does not have any${walletField ? '' : 'copies of '}`}${card}${shopSale ? ' is Out of Stock' : ''}.`)
@@ -246,7 +246,7 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
     } 
 
     if (sellerInv && sellerInv.quantity < quantity || sellerWallet && sellerWallet[walletField] < quantity) {
-        message.channel.send(`${authorIsSeller ? 'You' : shopSale ? 'I' : `${buyingPlayer}` } only have ${sellerInv ? sellerInv.quantity : sellerWallet[walletField]} ${card}${shopSale ? ' in stock.' : ''}.`)
+        message.channel.send(`${authorIsSeller ? 'You only have' : shopSale ? 'I only have' : `${buyingPlayer} only has` } ${sellerInv ? sellerInv.quantity : sellerWallet[walletField]} ${card}${shopSale ? ' in stock.' : ''}.`)
         return false
     }
 

@@ -90,7 +90,7 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
 
     for (let i = 0; i < line_items.length; i++) {
         const line_item = line_items[i]
-		const args = line_item.split(' ')
+		const args = line_item.split(' ').filter((el) => el !== '')
         const quantity = isFinite(args[0]) ? parseInt(args[0]) : 1    
         const query = isFinite(args[0]) ? args.slice(1).join(' ') : args.slice(0).join(' ')	
 
@@ -172,7 +172,7 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
     const sellerId = sellingPlayer.id
     const buyerId = buyingPlayer.id
     const authorIsSeller = message.author.id === sellerId
-    const args = line_item.split(' ')
+    const args = line_item.split(' ').filter((el) => el !== '')
     const quantity = isFinite(args[0]) ? parseInt(args[0]) : 1
     const total_price = parseInt(args[args.length - 1])
     let m4success

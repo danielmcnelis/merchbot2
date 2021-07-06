@@ -182,12 +182,12 @@ const getTradeSummary = async (message, inputs, player) => {
 		if (!walletField) {
 			printQuantities.push(quantity)
 			prints.push(print)
+			invs.push(inv)
 		} else {
 			walletQuantities.push(quantity)
 			walletFields.push(walletField)
 		}
-
-		invs.push(inv)
+		
 		cards.push(`${quantity} ${card}`)
 	}
 

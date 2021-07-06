@@ -235,12 +235,15 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
     
     const sellerWallet = print ? await Wallet.findOne({ where: { 
         playerId: sellerId 
-    }}) : walletField ? await Wallet.findOne({ where: { 
+    }}) : await Wallet.findOne({ where: { 
         [walletField]: { [Op.gt]: 0 },
         playerId: sellerId 
-    }}) : null
+    }})
 
-    if (!sellerInv && !sellerWallet) {
+    console.log('sellerInv', sellerInv)
+    console.log('sellerWallet', sellerWallet)
+
+    if ((!sellerInv && print) && (!sellerWallet && walletField)) {
         message.channel.send(`${authorIsSeller ? `You do not have any ${walletField ? '' : 'copies of '}` : shopSale ? 'Sorry, ' : `${buyingPlayer.name} does not have any${walletField ? '' : 'copies of '}`}${card}${shopSale ? ' is Out of Stock' : ''}.`)
         return false
     } 

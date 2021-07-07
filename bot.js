@@ -1444,14 +1444,18 @@ if(cmd === `!chart`) {
 	for (let i = 1; i < reptileBars; i++) reptiles += reptile
 	for (let i = 1; i < rockBars; i++) rocks += rock
 
+	const arr = [
+		[beastWins, `${beast} - ${beastWins} - ${beasts}`], 
+		[dinosaurWins, `${dinosaur} - ${dinosaurWins} - ${dinosaurs}`], 
+		[fishWins, `${fish} - ${fishWins} - ${fishes}`], 
+		[plantWins, `${plant} - ${plantWins} - ${plants}`], 
+		[reptileWins, `${reptile} - ${reptileWins} - ${reptiles}`], 
+		[rockWins, `${rock} - ${rockWins} - ${rocks}`]
+	]
+
 	return message.channel.send(
 		`There have been ${totalWinners} Arena winners. Conquest breakdown:\n` +
-		`${beast} - ${beastWins} - ${beasts}\n` + 
-		`${dinosaur} - ${dinosaurWins} - ${dinosaurs}\n` + 
-		`${fish} - ${fishWins} - ${fishes}\n` + 
-		`${plant} - ${plantWins} - ${plants}\n` + 
-		`${reptile} - ${reptileWins} - ${reptiles}\n` +
-		`${rock} - ${rockWins} - ${rocks}`
+		arr.sort((a, b) => b[1] - a[1]).map((el) => el[1]).join("\n")
 	)
 }
 

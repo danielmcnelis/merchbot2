@@ -1505,19 +1505,40 @@ if(cmd === `!update_trades`) {
 		obj[playerId] = []
 	})
 
+	console.log('allProfiles.length', allProfiles.length)
+
 	console.log('obj', obj)
 
 	const allTrades = await Trade.findAll()
+
+	console.log('allTrades.length', allTrades.length)
 
 	allTrades.forEach((trade) => {
 		const senderId = trade.senderId
 		const receiverId = trade.receiverId
 
+		console.log('senderId', senderId)
+		console.log('receiverId', receiverId)
+
+		console.log()
+
 		if (!obj[senderId].includes(receiverId)) obj[senderId].push(receiverId)
 		if (!obj[receiverId].includes(senderId)) obj[receiverId].push(senderId)
 	})
 
-	return console.log('obj', obj)
+	for (let i = 0; i < allProfiles.length; i++) {
+		const profile = allProfiles[i]
+		const playerId = profile.playerId
+		console.log('playerId', playerId)
+		const trade_partners = obj[playerId].length
+		console.log('trade_partners', trade_partners)
+
+		profile.trade_partners = trade_partners
+		await profile.save()
+	}
+
+	console.log('obj', obj)
+	return message.channel.send(`Player profiles have been updated to reflect the number of trade partners.`)
 }
 
 
@@ -4283,9 +4304,7 @@ if(cmd === `!trade`) {
 
 	const lastTrade = await Trade.findAll({ order: [['createdAt', 'DESC']]})
 	const transaction_id = lastTrade.length ? parseInt(lastTrade[0].transaction_id) + 1 : 1
-	const processed_trade = await processTrade(message, transaction_id, initiatorSummary, receiverSummary, initiatingPlayer, receivingPlayer)
-	if (!processed_trade) return
-	
+
 	const tradeHistory1 = await Trade.count({ 
 		where: {
 			senderId: initiatingPlayer.id,
@@ -4300,17 +4319,23 @@ if(cmd === `!trade`) {
 		}
 	})
 
+	console.log('tradeHistory1', tradeHistory1)
+	console.log('tradeHistory2', tradeHistory2)
+
 	if (tradeHistory1 + tradeHistory2 === 0) {
 		const senderProfile = await Profile.findOne({where: { playerId: initiatingPlayer.id } })
 		senderProfile.trade_partners++
 		await senderProfile.save()
-		if (senderProfile.trade_partners === 20) completeTask(message.channel, initiatingPlayer.id, 'm7', 5000)
+		if (senderProfile.trade_partners >= 20) completeTask(message.channel, initiatingPlayer.id, 'm7', 5000)
 
 		const receiverProfile = await Profile.findOne({where: { playerId: receivingPlayer.id } })
 		receiverProfile.trade_partners++
 		await receiverProfile.save()
-		if (receiverProfile.trade_partners === 20) completeTask(message.channel, receivingPlayer.id, 'm7', 8000)
+		if (receiverProfile.trade_partners >= 20) completeTask(message.channel, receivingPlayer.id, 'm7', 8000)
 	}
+
+	const processed_trade = await processTrade(message, transaction_id, initiatorSummary, receiverSummary, initiatingPlayer, receivingPlayer)
+	if (!processed_trade) return
 
 	completeTask(message.channel, initiatingPlayer.id, 'e8', 5000)
 	if (await checkCoreSetComplete(initiatingPlayer.id, 1)) completeTask(message.channel, initiatingPlayer.id, 'h4', 5000)

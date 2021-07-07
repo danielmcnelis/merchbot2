@@ -412,6 +412,12 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
 
         sellerWallet[walletField] -= quantity
         await sellerWallet.save()
+        
+        buyerWallet.stardust -= total_price
+        await buyerWallet.save()
+    
+        sellerWallet.stardust += total_price
+        await sellerWallet.save()
     } else {
         message.channel.send(`Error processing P2P Sale: missing needed information.`)
         return false

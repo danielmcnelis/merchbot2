@@ -1455,7 +1455,7 @@ if(cmd === `!chart`) {
 
 	return message.channel.send(
 		`There have been ${totalWinners} Arena winners. Conquest breakdown:\n` +
-		arr.sort((a, b) => b[1] - a[1]).map((el) => el[1]).join("\n")
+		arr.sort((a, b) => b[0] - a[0]).map((el) => el[1]).join("\n")
 	)
 }
 

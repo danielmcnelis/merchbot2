@@ -133,7 +133,7 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
 			}
 		})
 
-        if (!authorIsSeller && buyerInv && (buyerInv.quantity + quantity > 3)) return message.channel.send(`You cannot buy more than 3 copies of a card from The Shop.`)
+        if (!authorIsSeller && ( (buyerInv && (buyerInv.quantity + quantity > 3)) || quantity > 3 ) ) return message.channel.send(`You cannot buy more than 3 copies of a card from The Shop.`)
 
 		if (!sellerInv) {
             message.channel.send(`${authorIsSeller ? `You do not have any copies of ${card}` : `Sorry, ${card} is out of stock.`}.`)

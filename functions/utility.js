@@ -110,6 +110,9 @@ const isNewUser = async (playerId) => {
     return !count
 }
 
+//IS JAZZ?
+const isJazz = (member) => member.user.id === '194147938786738176'
+
 //IS ADMIN?
 const isAdmin = (member) => member.roles.cache.some(role => role.id === adminRole) || member.user.id === '194147938786738176'
 
@@ -217,6 +220,7 @@ module.exports = {
     hasProfile,
     isAdmin,
     isAmbassador,
+    isJazz,
     isMod,
     isNewUser,
     isSameDay,

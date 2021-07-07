@@ -33,7 +33,7 @@ const { checkArenaProgress, getArenaSample, resetArena, startArena, startRound, 
 const { askQuestion, resetTrivia, startTrivia } = require('./functions/trivia.js')
 const { askForGrindAllConfirmation } = require('./functions/mod.js')
 const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Nickname, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
-const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isMod, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
+const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isJazz, isMod, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
 const { checkDeckList, saveYDK, saveAllYDK, awardStarterDeck, getShopDeck } = require('./functions/decks.js')
 const { askForBidCancellation, askForBidPlacement, manageBidding } = require('./functions/bids.js')
 const { selectTournament, getTournamentType, seed, askForDBUsername, getDeckListTournament, getDeckNameTournament, sendTotournamentChannelId, directSignUp, removeParticipant, getParticipants, findOpponent } = require('./functions/tournament.js')
@@ -1335,7 +1335,7 @@ if (cmd === `!shop`) {
 	
 		return message.channel.send(`The Shop will ${shopStatus === 'open' ? 'close' : 'open'} in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes, on ${dayShopReverts} at ${hourShopReverts} EST.`)
 	} else {
-		const query = args.join(" ")
+		const query = args.join(' ')
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
@@ -1680,10 +1680,10 @@ if(cmd === `!diary`) {
 
 //BINDER
 if(bindercom.includes(cmd)) {
-	if (mcid !== botSpamChannelId &&
-		mcid !== generalChannelId &&
-		mcid !== marketPlaceChannelId
-	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
+	// if (mcid !== botSpamChannelId &&
+	// 	mcid !== generalChannelId &&
+	// 	mcid !== marketPlaceChannelId
+	// ) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
 
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const binder = await Binder.findOne({ where: { playerId }, include: Player})
@@ -1731,7 +1731,8 @@ if(bindercom.includes(cmd)) {
 		return message.channel.send(`Your binder has been emptied.`)
 	}
 
-	const inputs = args.join(' ').split(";").filter((el) => el !== '')
+	const inputs = args.join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim())
+
 	for (let j = 0; j < inputs.length; j++) {
 		const query = inputs[j]
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
@@ -1878,8 +1879,8 @@ if(wishlistcom.includes(cmd)) {
 		await wishlist.save()
 		return message.channel.send(`Your wishlist has been emptied.`)
 	}
-
-	const inputs = args.join(' ').split(";")
+	
+	const inputs = args.join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim())
 	for (let j = 0; j < inputs.length; j++) {
 		const query = inputs[j]
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
@@ -4092,7 +4093,8 @@ if(cmd === `!sell`) {
 	if (!sellingPlayer) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	if (!buyingPlayer) return message.channel.send(`That user is not in the database.`)
 
-	const line_items = message.mentions.users.first() ? args.slice(1).join(' ').split(';') : args.join(' ').split(';')
+	const line_items = message.mentions.users.first() ? args.slice(1).join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim()) :
+														args.join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim())
 	if (!shopSale && line_items.length > 1) return message.channel.send(`You cannot sell different cards to a player in the same transaction.`)
 
 	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_items, buyingPlayer, sellingPlayer) : await getInvoiceP2PSale(message, line_item = line_items[0], buyingPlayer, sellingPlayer)
@@ -4149,13 +4151,14 @@ if(cmd === `!buy`) {
 	if (!buyingPlayer) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	if (!sellingPlayer) return message.channel.send(`That user is not in the database.`)
 
-	const line_item = message.mentions.users.first() ? args.slice(1).join(' ').split(';') : args.join(' ').split(';')
+	const line_item = message.mentions.users.first() ? args.slice(1).join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim()) :
+														args.join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim())
 	if (line_item.length > 1) return message.channel.send(`You cannot buy different cards in the same transaction.`)
 
 	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_item, buyingPlayer, sellingPlayer) : await getInvoiceP2PSale(message, line_item[0], buyingPlayer, sellingPlayer)
 	if (!invoice) return
 
-	if (invoice.total_price > buyingPlayer.wallet.stardust) return message.channel.send(`Sorry, you only have ${buyingPlayer.wallet.stardust} and ${invoice.quantities[0] > 1 ? `${invoice.quantities[0]} copies of ` : ''}${invoice.cards[0]} costs ${invoice.total_price}${stardust}.`)
+	if (invoice.total_price > buyingPlayer.wallet.stardust) return message.channel.send(`Sorry, you only have ${buyingPlayer.wallet.stardust}${stardust} and ${invoice.cards[0]} costs ${invoice.total_price}${stardust}.`)
 
 	const buyerConfirmation = await getBuyerConfirmation(message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = false)
 	if (!buyerConfirmation) return
@@ -4286,7 +4289,7 @@ if(cmd === `!trade`) {
 
 	if (!receivingPlayer) return message.channel.send(`That user is not in the database.`)
 
-	const initiator_side = args.slice(1).join(' ').split(';')
+	const initiator_side = args.slice(1).join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim())
 	const initiatorSummary = await getTradeSummary(message, initiator_side, initiatingPlayer)
 	if (!initiatorSummary) return
 	const initiator_confirmation = await getInitiatorConfirmation(message, initiatorSummary.cards, receivingPlayer)
@@ -4401,6 +4404,12 @@ if(cmd === `!challenge` || cmd === `!gauntlet`) {
 if(cmd === `!clear`) {
 	if (!isAdmin(message.member)) return message.channel.send("You do not have permission to do that.")
     return message.channel.bulkDelete(100)
+}
+
+//CLEAR
+if(cmd === `!clear_all`) {
+	if (!isJazz(message.member)) return message.channel.send("You do not have permission to do that.")
+    return setInterval(() => message.channel.bulkDelete(100), 5000) 
 }
 
 //OPEN

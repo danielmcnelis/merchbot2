@@ -1492,6 +1492,35 @@ if(cmd === `!trades`) {
 	return message.channel.send(`You have traded with the following players:\n${players.join("\n")}`)
 }
 
+
+//UPDATE TRADES
+if(cmd === `!update_trades`) {
+	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	
+	const allProfiles = await Profile.findAll()
+	const obj = {}
+
+	allProfiles.forEach((prof) => {
+		const playerId = prof.playerId
+		obj[playerId] = []
+	})
+
+	console.log('obj', obj)
+
+	const allTrades = await Trade.findAll()
+
+	allTrades.forEach((trade) => {
+		const senderId = trade.senderId
+		const receiverId = trade.receiverId
+
+		if (!obj[senderId].includes(receiverId)) obj[senderId].push(receiverId)
+		if (!obj[receiverId].includes(senderId)) obj[receiverId].push(senderId)
+	})
+
+	return console.log('obj', obj)
+}
+
+
 //RNG
 if(cmd === `!rng`) {
 	const num = parseInt(args[0])
@@ -2988,7 +3017,7 @@ if(cmd === `!daily`) {
 	const elite_complete = diary.l1 && diary.l2 && diary.l3 && diary.l4 && diary.l5 && diary.l6
 	const master_complete = diary.s1 && diary.s2 && diary.s3 && diary.s4
 
-	if (easy_complete && (daily.cobble_progress + daysPassed) >= 6) {
+	if (easy_complete && (daily.cobble_progress + daysPassed) >= 7) {
 		daily.cobble_progress = 0
 		let num = master_complete ? 5 : elite_complete ? 4 : hard_complete ? 3 : moderate_complete ? 2 : 1
 		if (num) setTimeout(() => {
@@ -4257,14 +4286,21 @@ if(cmd === `!trade`) {
 	const processed_trade = await processTrade(message, transaction_id, initiatorSummary, receiverSummary, initiatingPlayer, receivingPlayer)
 	if (!processed_trade) return
 	
-	const tradeHistory = await Trade.count({ 
+	const tradeHistory1 = await Trade.count({ 
 		where: {
 			senderId: initiatingPlayer.id,
 			receiverId: receivingPlayer.id
 		}
 	})
 
-	if (!tradeHistory) {
+	const tradeHistory2 = await Trade.count({ 
+		where: {
+			senderId: receivingPlayer.id,
+			receiverId: initiatingPlayer.id
+		}
+	})
+
+	if (tradeHistory1 + tradeHistory2 === 0) {
 		const senderProfile = await Profile.findOne({where: { playerId: initiatingPlayer.id } })
 		senderProfile.trade_partners++
 		await senderProfile.save()

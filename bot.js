@@ -73,17 +73,6 @@ client.on('ready', async () => {
 
 	const arenaChannel = client.channels.cache.get(arenaChannelId)
 
-	arenaChannel.send(`\nWho tf is <@172149847397367809>` +
-	`\n\nHe's never ben involved in fkn anything untill now.` +
-	`\n\nThis really isn't fair.` +
-	`\n\nFolks just hoppin on for no reason`)
-
-	arenaChannel.send(`\nAnd that other guy <@228357555355648001>` +
-	`\n\nHe really needs to chill.` +
-	`\n\nLike that time I invented macro gadget.`+
-	`\n\nU no how that hapens?` +
-	`\n\nJust smoke a blunt and relax lls`)
-
 	const shopShouldBe = checkShopShouldBe()
 	const shopCountdown = getShopCountdown()
 	const shopOpen = await checkShopOpen()
@@ -3619,6 +3608,7 @@ if(checklistcom.includes(cmd)) {
 
 //PACK
 if(cmd === `!pack`) {
+	return
 	const num = args.length === 1 && isFinite(args[0]) ? parseInt(args[0]) : args.length > 1 && isFinite(args[1]) ? parseInt(args[1]) : 1
 	const code = args.length === 1 && !isFinite(args[0]) ? args[0] : args.length > 1 && !isFinite(args[1]) ? args[1] : 'DOC'
 	if (code && code.startsWith('SS')) return message.channel.send(`Sorry, Starter Series cards are not sold by the pack.`)

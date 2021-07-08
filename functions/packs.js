@@ -166,16 +166,16 @@ const awardPack = async (channel, playerId, set, num) => {
         const canvas = Canvas.createCanvas(card_width * 9, 80)
         const context = canvas.getContext('2d')
 
-        if (background && canvas && context && card_1) context.drawImage(card_1, 0, 0, card_width, 80)
-        if (background && canvas && context && card_2) context.drawImage(card_2, card_width, 0, card_width, canvas.height)
-        if (background && canvas && context && card_3) context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
-        if (background && canvas && context && card_4) context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
-        if (background && canvas && context && card_5) context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
-        if (background && canvas && context && card_6) context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
-        if (background && canvas && context && card_7) context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
-        if (background && canvas && context && card_8) context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
-        if (background && canvas && context && card_9) context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
-        const attachment =  background && canvas && context ?
+        if (canvas && context && card_1) context.drawImage(card_1, 0, 0, card_width, 80)
+        if (canvas && context && card_2) context.drawImage(card_2, card_width, 0, card_width, canvas.height)
+        if (canvas && context && card_3) context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
+        if (canvas && context && card_4) context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
+        if (canvas && context && card_5) context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
+        if (canvas && context && card_6) context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
+        if (canvas && context && card_7) context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
+        if (canvas && context && card_8) context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
+        if (canvas && context && card_9) context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
+        const attachment =  canvas && context ?
             new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`) :
             false
 

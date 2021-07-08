@@ -30,14 +30,25 @@ const search = async (query, fuzzyCards, fuzzyCards2) => {
 	const labels = card.card === "Monster" ? `**Attribute:** ${card.attribute}\n**Level:** ${card.level}\n**Release Date:** ${card.date}\n**[** ${classes.join(" / ")} **]**` : `**Category:** ${card.category}\n**Release Date:** ${card.date}` 
 	const stats = card.card === "Monster" ? `**ATK:** ${card.atk} **DEF:** ${card.def}` : ''
 
+	
+	const attachment = fs.existsSync(`./public/card_images/${card.image}`) ?
+		new Discord.MessageAttachment(`./public/card_images/${card.image}`, card.image) :
+		null
+
+	const thumbnail = attachment ?
+		`attachment://${card.image}` :
+		`https://ygoprodeck.com/pics/${card.image}`
+
+	console.log('card.image', card.image)
+	console.log('fs.existsSync(`./public/card_images/${card.image}`', fs.existsSync(`./public/card_images/${card.image}`))
+	console.log('!!attachment', !!attachment)	
+	console.log('thumbnail', thumbnail)
+
 	const cardEmbed = new Discord.MessageEmbed()
 		.setColor(color)
 		.setTitle(card.name)
-		.setThumbnail(
-			fs.existsSync(`../public/card_images/${card.image}`) ?
-			`../public/card_images/${card.image}` :
-			`https://ygoprodeck.com/pics/${card.image}`
-		)
+		.attachFiles(attachment)
+		.setThumbnail(thumbnail)
 		.setDescription(`${labels}\n\n${card.description}\n\n${stats}`)
 
 	return cardEmbed

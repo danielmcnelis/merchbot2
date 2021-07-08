@@ -187,19 +187,18 @@ if (!message.content.startsWith("!") && message.content.includes(`[`) && message
 
 //TEST
 if(cmd === `!test`) {
-	return
-	// const canvas = Canvas.createCanvas(105, 158)
-	// const context = canvas.getContext('2d')
-	// const background = await Canvas.loadImage(`https://ygoprodeck.com/pics/89631139.jpg`)
-	// context.drawImage(background, 0, 0, canvas.width, canvas.height)
-	// const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `bewd.png`)
-	// return message.channel.send(`Testing:`, attachment)
+	const canvas = Canvas.createCanvas(105, 158)
+	const context = canvas.getContext('2d')
+	const background = await Canvas.loadImage(`https://ygoprodeck.com/pics/89631139.jpg`)
+	context.drawImage(background, 0, 0, canvas.width, canvas.height)
+	const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `bewd.png`)
+	return message.channel.send(`Behold!`, attachment)
 }
 
 
-//IMPORT 
-if (cmd === `!import`) {
-	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
+//IMPORT_DATA
+if (cmd === `!import_data`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 
 	const { data } = await axios.get('https://db.ygoprodeck.com/api/v7/cardinfo.php?misc=Yes')
 	fs.writeFile("./static/ygoprodeck.json", JSON.stringify(data), (err) => { 
@@ -207,6 +206,42 @@ if (cmd === `!import`) {
 	})
 
 	return message.channel.send(`Successfully imported the latest data from ygoprodeck.com.`)
+}
+
+//IMPORT_IMAGES
+if (cmd === `!import_images`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	const allPrints = await Print.findAll({ order: [["card_name", "ASC"]] })
+	console.log('allPrints.length', allPrints.length)
+
+	for (let i = 0; i <= allPrints.length; i++) {
+		const print = allPrints[i]
+		console.log(`trying ${print.card_name}`)
+		const card = await Card.findOne({ where: {
+			name: print.card_name
+		}})
+
+		if (!card) {
+			console.log(`failure for ${print.card_name}`)
+			continue
+		} 
+
+		console.log(`found card ${card.name}, ${card.image}`)
+
+		const url = `https://ygoprodeck.com/pics/${card.image}`
+		const writer = fs.createWriteStream(`./public/card_images/${card.image}`)
+
+		const response = await axios({
+			url,
+			method: 'GET',
+			responseType: 'stream'
+		})
+
+		const success = await response.data.pipe(writer)
+		console.log(`success = ${!!success} for ${card.image}`)
+	}
+
+	return message.channel.send(`Successfully imported high quality images for Forged in Chaos cards from YGOPRODeck.`)
 }
 
 //UPDATE 

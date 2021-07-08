@@ -187,29 +187,13 @@ if (!message.content.startsWith("!") && message.content.includes(`[`) && message
 
 //TEST
 if(cmd === `!test`) {
-	const shopCountdown = getShopCountdown()
-	const hoursLeftInPeriod = Math.floor(shopCountdown / (3600000))
-	const minutesLeftInPeriod = Math.ceil((shopCountdown % 3600000)/ 60000)
-	console.log('hoursLeftInPeriod', hoursLeftInPeriod)
-	console.log('minutesLeftInPeriod', minutesLeftInPeriod)
-
+	return
 	// const canvas = Canvas.createCanvas(105, 158)
 	// const context = canvas.getContext('2d')
 	// const background = await Canvas.loadImage(`https://ygoprodeck.com/pics/89631139.jpg`)
 	// context.drawImage(background, 0, 0, canvas.width, canvas.height)
-	// const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `newd.png`)
+	// const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `bewd.png`)
 	// return message.channel.send(`Testing:`, attachment)
-}
-
-
-//TEST2
-if(cmd === `!test2`) {
-	const canvas = Canvas.createCanvas(200, 200)
-	const context = canvas.getContext('2d')
-	const background = await Canvas.loadImage(`https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/1200px-SpongeBob_SquarePants_character.svg.png`)
-	context.drawImage(background, 0, 0, canvas.width, canvas.height)
-	const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `sponge.png`)
-	return message.channel.send(`Testing:`, attachment)
 }
 
 
@@ -3062,9 +3046,11 @@ if(cmd === `!daily`) {
 
 	const canvas = Canvas.createCanvas(105, 158)
 	const context = canvas.getContext('2d')
-	const background = await Canvas.loadImage(`https://ygoprodeck.com/pics/${card.image}`)
-	context.drawImage(background, 0, 0, canvas.width, canvas.height)
-	const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `${card.name}.png`)
+	const background = fs.existsSync(`./public/card_images/${card.image}`) ? 
+						await Canvas.loadImage(`./public/card_images/${card.image}`) :
+						await Canvas.loadImage(`https://ygoprodeck.com/pics/${card.image}`)
+	if (background && canvas && context) context.drawImage(background, 0, 0, canvas.width, canvas.height)
+	const attachment = background && canvas && context ? new Discord.MessageAttachment(canvas.toBuffer(), `${card.name}.png`) : false
 
 	message.channel.send(`1... 2...`)
 	return setTimeout(() => message.channel.send(`${enthusiasm} ${daily.player.name} pulled ${eval(print.rarity)}${print.card_code} - ${print.card_name} from the grab bag! ${emoji}`, attachment), 2000)
@@ -3739,30 +3725,58 @@ if(cmd === `!pack`) {
 				}
 			}
 
-			const card_1 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[0]}`)
-			const card_2 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[1]}`)
-			const card_3 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[2]}`)
-			const card_4 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[3]}`)
-			const card_5 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[4]}`)
-			const card_6 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[5]}`)
-			const card_7 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[6]}`)
-			const card_8 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[7]}`)
-			const card_9 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[8]}`)
-	
+			const card_1 = fs.existsSync(`./public/card_images/${images[0]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[0]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[0]}`)
+
+			const card_2 = fs.existsSync(`./public/card_images/${images[1]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[1]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[1]}`)
+
+			const card_3 = fs.existsSync(`./public/card_images/${images[2]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[2]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[2]}`)
+
+			const card_4 = fs.existsSync(`./public/card_images/${images[3]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[3]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[3]}`)
+
+			const card_5 = fs.existsSync(`./public/card_images/${images[4]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[4]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[4]}`)
+
+			const card_6 = fs.existsSync(`./public/card_images/${images[5]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[5]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[5]}`)
+
+			const card_7 = fs.existsSync(`./public/card_images/${images[6]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[6]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[6]}`)
+
+			const card_8 = fs.existsSync(`./public/card_images/${images[7]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[7]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[7]}`)
+
+			const card_9 = fs.existsSync(`./public/card_images/${images[8]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[8]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[8]}`)
+			
 			const card_width = 57
 			const canvas = Canvas.createCanvas(card_width * 9, 80)
 			const context = canvas.getContext('2d')
 	
-			context.drawImage(card_1, 0, 0, card_width, 80)
-			context.drawImage(card_2, card_width, 0, card_width, canvas.height)
-			context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
-			context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
-			context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
-			context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
-			context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
-			context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
-			context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
-			const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`)
+			if (background && canvas && context && card_1) context.drawImage(card_1, 0, 0, card_width, 80)
+			if (background && canvas && context && card_2) context.drawImage(card_2, card_width, 0, card_width, canvas.height)
+			if (background && canvas && context && card_3) context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
+			if (background && canvas && context && card_4) context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
+			if (background && canvas && context && card_5) context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
+			if (background && canvas && context && card_6) context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
+			if (background && canvas && context && card_7) context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
+			if (background && canvas && context && card_8) context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
+			if (background && canvas && context && card_9) context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
+			const attachment =  background && canvas && context ?
+				new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`) :
+				false
 			message.author.send(results.join("\n"), attachment)
 		}
 
@@ -3916,30 +3930,59 @@ if(cmd === `!box`) {
 				}
 			}
 	
-			const card_1 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[0]}`)
-			const card_2 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[1]}`)
-			const card_3 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[2]}`)
-			const card_4 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[3]}`)
-			const card_5 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[4]}`)
-			const card_6 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[5]}`)
-			const card_7 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[6]}`)
-			const card_8 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[7]}`)
-			const card_9 = await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[8]}`)
-	
+			const card_1 = fs.existsSync(`./public/card_images/${images[0]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[0]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[0]}`)
+
+			const card_2 = fs.existsSync(`./public/card_images/${images[1]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[1]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[1]}`)
+
+			const card_3 = fs.existsSync(`./public/card_images/${images[2]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[2]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[2]}`)
+
+			const card_4 = fs.existsSync(`./public/card_images/${images[3]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[3]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[3]}`)
+
+			const card_5 = fs.existsSync(`./public/card_images/${images[4]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[4]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[4]}`)
+
+			const card_6 = fs.existsSync(`./public/card_images/${images[5]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[5]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[5]}`)
+
+			const card_7 = fs.existsSync(`./public/card_images/${images[6]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[6]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[6]}`)
+
+			const card_8 = fs.existsSync(`./public/card_images/${images[7]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[7]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[7]}`)
+
+			const card_9 = fs.existsSync(`./public/card_images/${images[8]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[8]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[8]}`)
+			
 			const card_width = 57
 			const canvas = Canvas.createCanvas(card_width * 9, 80)
 			const context = canvas.getContext('2d')
 	
-			context.drawImage(card_1, 0, 0, card_width, 80)
-			context.drawImage(card_2, card_width, 0, card_width, canvas.height)
-			context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
-			context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
-			context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
-			context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
-			context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
-			context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
-			context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
-			const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`)
+			if (background && canvas && context && card_1) context.drawImage(card_1, 0, 0, card_width, 80)
+			if (background && canvas && context && card_2) context.drawImage(card_2, card_width, 0, card_width, canvas.height)
+			if (background && canvas && context && card_3) context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
+			if (background && canvas && context && card_4) context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
+			if (background && canvas && context && card_5) context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
+			if (background && canvas && context && card_6) context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
+			if (background && canvas && context && card_7) context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
+			if (background && canvas && context && card_8) context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
+			if (background && canvas && context && card_9) context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
+			const attachment =  background && canvas && context ?
+				new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`) :
+				false
+		
 			message.author.send(results.join("\n"), attachment)
 		}
 

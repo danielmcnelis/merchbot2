@@ -1,6 +1,7 @@
 
 //SEARCH FUNCTIONS
 const Discord = require('discord.js')
+const fs = require('fs')
 const { Op } = require('sequelize')
 const { Card, Nickname, Print } = require('../db/index.js')
 
@@ -32,7 +33,11 @@ const search = async (query, fuzzyCards, fuzzyCards2) => {
 	const cardEmbed = new Discord.MessageEmbed()
 		.setColor(color)
 		.setTitle(card.name)
-		.setThumbnail(`https://ygoprodeck.com/pics/${card.image}`)
+		.setThumbnail(
+			fs.existsSync(`../public/card_images/${card.image}`) ?
+			`../public/card_images/${card.image}` :
+			`https://ygoprodeck.com/pics/${card.image}`
+		)
 		.setDescription(`${labels}\n\n${card.description}\n\n${stats}`)
 
 	return cardEmbed

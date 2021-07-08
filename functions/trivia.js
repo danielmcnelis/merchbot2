@@ -153,7 +153,7 @@ const askQuestion = async (guild, channel, info, entries, questionsArr) => {
 	let fuzzyAnswers = FuzzySet([], false)
     answers.forEach((a) =>  fuzzyAnswers.add(a))
 
-    channel.send(`${megaphone} ${megaphone} ${megaphone}  **------ Question #${info.round} ------**  ${dummy} ${dummy} ${dummy}\n${question}\n\n`)
+    channel.send(`${megaphone} --- Question #${info.round} --- ${dummy}\n${question}\n\n`)
     
     getAnswer(guild, entries[0], question)
     getAnswer(guild, entries[1], question)

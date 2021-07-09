@@ -967,7 +967,7 @@ if(infocom.includes(cmd)) {
 		` It requires 6 players to launch.`+
 		` When it starts, you are loaned a 60-card deck, and you get 5 minutes to cut it down to no fewer than 40 cards.`+
 		`\n\nThe Arena is a Round Robin, singles-games tournament.`+
-		` Winners receive 2${starchips}, losers receive 1${starchips}.`+
+		` Winners receive 4${starchips}, losers receive 2${starchips}.`+
 		` To report a loss, type **!loss @opponent**, then wait for the next round.`+
 		`\n\nThe Champion of the Arena walks away with an ${ult}Arena Prize Card according to their Tribe!`+
 		` Everyone else receives Vouchers for their wins.`+
@@ -2072,13 +2072,13 @@ if (losscom.includes(cmd)) {
 		winningPlayer.arena_wins++
 		await winningPlayer.save()
 
-		winningPlayer.wallet.starchips += 3
+		winningPlayer.wallet.starchips += 4
 		await winningPlayer.wallet.save()
 
 		losingPlayer.arena_losses++
 		await losingPlayer.save()
 	
-		losingPlayer.wallet.starchips++
+		losingPlayer.wallet.starchips += 2
 		await losingPlayer.wallet.save()
 
 		losingContestant.is_playing = false
@@ -2095,11 +2095,11 @@ if (losscom.includes(cmd)) {
 			loser_name: losingPlayer.name,
 			loserId: losingPlayer.id,
 			delta: 0,
-			chipsWinner: 2,
-			chipsLoser: 1
+			chipsWinner: 4,
+			chipsLoser: 2
 		})
 
-		message.channel.send(`${losingPlayer.name} (+1${starchips}), your Arena loss to ${winner.user.username} (+3${starchips}) has been recorded.`)
+		message.channel.send(`${losingPlayer.name} (+2${starchips}), your Arena loss to ${winner.user.username} (+4${starchips}) has been recorded.`)
 		return checkArenaProgress(info)
 	}
 
@@ -2233,7 +2233,7 @@ if (manualcom.includes(cmd)) {
 		losingPlayer.arena_losses++
 		await losingPlayer.save()
 
-		losingPlayer.wallet.starchips++
+		losingPlayer.wallet.starchips += 2
 		await losingPlayer.wallet.save()
 	
 		losingContestant.is_playing = false
@@ -2242,7 +2242,7 @@ if (manualcom.includes(cmd)) {
 		winningPlayer.arena_wins++
 		await winningPlayer.save()
 
-		winningPlayer.wallet.starchips += 3
+		winningPlayer.wallet.starchips += 4
 		await winningPlayer.wallet.save()
 
 		winningContestant.score++
@@ -2256,11 +2256,11 @@ if (manualcom.includes(cmd)) {
 			loser_name: losingPlayer.name,
 			loserId: losingPlayer.id,
 			delta: 0,
-			chipsWinner: 2,
-			chipsLoser: 1
+			chipsWinner: 4,
+			chipsLoser: 2
 		})
 
-		message.channel.send(`A manual Arena loss by ${losingPlayer.name} (+1${starchips}) to ${winningPlayer.name} (+3${starchips}) has been recorded.`)
+		message.channel.send(`A manual Arena loss by ${losingPlayer.name} (+2${starchips}) to ${winningPlayer.name} (+4${starchips}) has been recorded.`)
 		return checkArenaProgress(info)
 	} else {
 		const diary = winningPlayer.diary

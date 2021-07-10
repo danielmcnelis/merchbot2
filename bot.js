@@ -9,7 +9,7 @@ const { Op } = require('sequelize')
 const { fire, tix, credits, blue, red, yellow, stoned, stare, leatherbound, wokeaf, koolaid, cavebob, evil, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('./static/emojis.json')
 const { aliuscom, nicknamecom, joincom, bindercom, wishlistcom, invcom, calccom, bracketcom, dropcom, queuecom, checklistcom, startcom, infocom, dbcom, noshowcom, legalcom, listcom, pfpcom, botcom, rolecom, statscom, profcom, losscom, h2hcom, undocom, rankcom, manualcom, yescom, nocom, deckcom } = require('./static/commands.json')
 const { triviaRole, botRole, modRole, adminRole, tourRole, toRole, fpRole, muteRole, arenaRole, ambassadorRole } = require('./static/roles.json')
-const { generalChannelId, rulesChannelId, rulingsChannelId, introChannelId, discussionChannelId, staffChannelId, botSpamChannelId, welcomeChannelId, announcementsChannelId, registrationChannelId, replaysChannelId, duelRequestsChannelId, marketPlaceChannelId, shopChannelId, tournamentChannelId, arenaChannelId, keeperChannelId, triviaChannelId, draftChannelId, gauntletChannelId, bugreportsChannelId, suggestionsChannelId } = require('./static/channels.json')
+const { gutterChannelId, generalChannelId, rulesChannelId, rulingsChannelId, introChannelId, discussionChannelId, staffChannelId, botSpamChannelId, welcomeChannelId, announcementsChannelId, registrationChannelId, replaysChannelId, duelRequestsChannelId, marketPlaceChannelId, shopChannelId, tournamentChannelId, arenaChannelId, keeperChannelId, triviaChannelId, draftChannelId, gauntletChannelId, bugreportsChannelId, suggestionsChannelId } = require('./static/channels.json')
 const decks = require('./static/decks.json')
 const types = require('./static/types.json')
 const diaries = require('./static/diaries.json')
@@ -1380,7 +1380,8 @@ if (cmd === `!shop`) {
 if(cmd === `!count`) {
 	if (mcid !== botSpamChannelId &&
 		mcid !== generalChannelId &&
-		mcid !== marketPlaceChannelId
+		mcid !== marketPlaceChannelId &&
+		mcid !== gutterChannelId
 	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
 
 	const allSetsForSale = await Set.findAll({ where: { for_sale: true }})
@@ -3460,7 +3461,7 @@ if(cmd === `!grindall`) {
 //INVENTORY
 if(invcom.includes(cmd)) { 
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
-	//if (playerId !== maid && !isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (playerId !== maid && !isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
 
 	const player = await Player.findOne({ where: { id: playerId }})
 	if (!player) return message.channel.send(playerId === maid ? `You are not in the database. Type **!start** to begin the game.` : `That person is not in the database.`)
@@ -4328,8 +4329,11 @@ if(cmd === `!bid`) {
 		order: [[Bid, 'amount', 'DESC']]})
 	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 
+	const info = await Info.findOne({ where: { element: 'shop' }})
+	if (info.status !== 'closed') return message.channel.send(`Bidding is only available when The Shop is closed..`)
+
     const count = await Auction.count()
-    if (!count) message.channel.send(`Sorry, there are no singles up for auction tonight.`)
+    if (!count) return message.channel.send(`Sorry, there are no singles up for auction tonight.`)
     
 	message.channel.send(`Please check your DMs.`)
 

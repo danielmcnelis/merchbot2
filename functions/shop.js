@@ -187,7 +187,7 @@ const processBids = async () => {
         inv.quantity--
         await inv.save()
 
-        const newPrice = ( bid.amount + 15 * print.market_price ) / 16
+        const newPrice = ( bid.amount + print.market_price ) / 2
         print.market_price = newPrice
         await print.save()
 

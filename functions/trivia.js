@@ -273,12 +273,12 @@ const endTrivia = async (guild, channel, info, entries) => {
 
     const prizes = entries[0].score > entries[1].score && entries[1].score > entries[2].score ? [4, 2] :
         entries[0].score > entries[1].score && entries[1].score === entries[2].score && entries[2].score > entries[3].score ? [4, 1, 1] :
-        entries[0].score > entries[1].score && entries[1].score === entries[2].score === entries[3].score && entries[3].score > entries[4].score ? [4, 1, 1, 1] :
-        entries[0].score > entries[1].score && entries[1].score === entries[2].score === entries[3].score === entries[4].score ? [4, 1, 1, 1, 1] :
+        entries[0].score > entries[1].score && entries[1].score === entries[2].score && entries[2].score === entries[3].score && entries[3].score > entries[4].score ? [4, 1, 1, 1] :
+        entries[0].score > entries[1].score && entries[1].score === entries[2].score && entries[2].score === entries[3].score && entries[3].score === entries[4].score ? [4, 1, 1, 1, 1] :
         entries[0].score === entries[1].score && entries[1].score > entries[2].score ? [3, 3] :
-        entries[0].score === entries[1].score === entries[2].score && entries[2].score > entries[3].score ? [2, 2, 2] :
-        entries[0].score === entries[1].score === entries[2].score === entries[3].score && entries[3] > entries[4].score ? [2, 2, 2, 2] :
-        entries[0].score === entries[1].score === entries[2].score === entries[3].score === entries[4].score ? [2, 2, 2, 2, 2] :
+        entries[0].score === entries[1].score && entries[1].score === entries[2].score && entries[2].score > entries[3].score ? [2, 2, 2] :
+        entries[0].score === entries[1].score && entries[1].score === entries[2].score && entries[2].score === entries[3].score && entries[3] > entries[4].score ? [2, 2, 2, 2] :
+        entries[0].score === entries[1].score && entries[1].score === entries[2].score && entries[2].score === entries[3].score && entries[3].score === entries[4].score ? [2, 2, 2, 2, 2] :
         []
 
     for (let i = 0; i < entries.length; i++) {

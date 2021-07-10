@@ -126,7 +126,7 @@ const getAnswer = async (guild, entry, question) => {
 	const msg = await member.send(question)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
-		time: 15000
+		time: 16000
 	}).then(async collected => {
 		const response = collected.first().content
         entry.answer = response

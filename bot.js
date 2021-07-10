@@ -463,7 +463,7 @@ if (aliuscom.includes(cmd)) {
 	if (!values.length) return message.channel.send(`Sorry, time's up.`)
 
 	for (let i = 0; i < values.length; i++) {
-		const alius = values[i].content.toLowerCase().split(" ")[0]
+		const alius = values[i].content.toLowerCase()
 		const old_nick = await Nickname.findOne({ where: { alius } })
 		if (old_nick) {
 			message.channel.send(`Error: "${alius}" is already being used for ${old_nick.card_name}.`)

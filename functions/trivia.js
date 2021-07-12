@@ -134,7 +134,7 @@ const getAnswer = async (guild, entry, question) => {
         return member.send(`Thanks!`)
 	}).catch(async err => {
 		console.log(err)
-        entry.answer = 'N/A'
+        entry.answer = 'no answer'
         await entry.save()
         return member.send(`Time's up!`)
 	})
@@ -184,14 +184,14 @@ const askQuestion = async (guild, channel, info, entries, questionsArr) => {
     
     
         let name = updatedEntries[0].player.name
-        let timedOut = updatedEntries[0].answer === 'N/A' ? true : false
+        let timedOut = updatedEntries[0].answer === 'no answer' ? true : false
         let answer = updatedEntries[0].answer
         let score = score_0
         channel.send(`${name}${timedOut ? ` did not answer in time. That's a shame. ${orange}` : ` said: ${answer}. ${score ? `Correct! ${cultured}` : `That ain't it! ${amongmfao}`}`}`)
 
         setTimeout(() => {
             let name = updatedEntries[1].player.name
-            let timedOut = updatedEntries[1].answer === 'N/A' ? true : false
+            let timedOut = updatedEntries[1].answer === 'no answer' ? true : false
             let answer = updatedEntries[1].answer
             let score = score_1
             channel.send(`${name}${timedOut ? ` did not answer in time. That's a shame. ${orange}` : ` said: ${answer}. ${score ? `Correct! ${cultured}` : `That ain't it! ${amongmfao}`}`}`)
@@ -199,7 +199,7 @@ const askQuestion = async (guild, channel, info, entries, questionsArr) => {
 
         setTimeout(() => {
             let name = updatedEntries[2].player.name
-            let timedOut = updatedEntries[2].answer === 'N/A' ? true : false
+            let timedOut = updatedEntries[2].answer === 'no answer' ? true : false
             let answer = updatedEntries[2].answer
             let score = score_2
             channel.send(`${name}${timedOut ? ` did not answer in time. That's a shame. ${orange}` : ` said: ${answer}. ${score ? `Correct! ${cultured}` : `That ain't it! ${amongmfao}`}`}`)
@@ -207,7 +207,7 @@ const askQuestion = async (guild, channel, info, entries, questionsArr) => {
 
         setTimeout(() => {
             let name = updatedEntries[3].player.name
-            let timedOut = updatedEntries[3].answer === 'N/A' ? true : false
+            let timedOut = updatedEntries[3].answer === 'no answer' ? true : false
             let answer = updatedEntries[3].answer
             let score = score_3
             channel.send(`${name}${timedOut ? ` did not answer in time. That's a shame. ${orange}` : ` said: ${answer}. ${score ? `Correct! ${cultured}` : `That ain't it! ${amongmfao}`}`}`)
@@ -215,7 +215,7 @@ const askQuestion = async (guild, channel, info, entries, questionsArr) => {
 
         setTimeout(() => {
             let name = updatedEntries[4].player.name
-            let timedOut = updatedEntries[4].answer === 'N/A' ? true : false
+            let timedOut = updatedEntries[4].answer === 'no answer' ? true : false
             let answer = updatedEntries[4].answer
             let score = score_4
             channel.send(`${name}${timedOut ? ` did not answer in time. That's a shame. ${orange}` : ` said: ${answer}. ${score ? `Correct! ${cultured}` : `That ain't it! ${amongmfao}`}`}`)

@@ -1,5 +1,5 @@
 
-const { Card, Player, Print, Set, Wallet, Diary, Inventory } = require('../db')
+const { Card, Player, Print, Set, Wallet, Diary, Inventory, Auction } = require('../db')
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { yescom } = require('../static/commands.json')
@@ -113,8 +113,13 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
             return false
         }
 
-        total_price += authorIsSeller ? Math.ceil(print.market_price * 0.7) * quantity : Math.ceil(print.market_price * 1.1) * quantity 
 		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+        const auction = await Auction.findOne({ where: { printId: print.id }})
+
+        if (auction) {
+            message.channel.send(`Sorry, ${card} will not be available until the next auction.`)
+            return false
+        }
 
         if (card_codes.includes(card_code)) {
             message.channel.send(`You cannot list ${card} more than once.`)
@@ -152,6 +157,7 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
 		if (!!(print.rarity === 'scr')) m4success = true
 		if (!!(print.rarity !== 'com' && quantity >= 5)) m6success = true
 
+        total_price += authorIsSeller ? Math.ceil(print.market_price * 0.7) * quantity : Math.ceil(print.market_price * 1.1) * quantity 
 		card_codes.push(card_code)
 		quantities.push(quantity)
 		prints.push(print)
@@ -330,10 +336,22 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
             message.channel.send(`Database error: Could not find or create Buyer Inventory for: ${print.card_name}.`)
         }
 
+        const auction = await Auction.findOne({ where: { printId: print.id }})
+
+        if (auction) {
+            auction.quantity += quantity
+            await auction.save()
+        } else if (buyerInv.quantity < 1) {
+            await Auction.create({
+                card_code: print.card_code,
+                quantity: quantity,
+                printId: print.id
+            })
+        } 
+
 		buyerInv.quantity += quantity
 		await buyerInv.save()
 
- 
         sellerInv.quantity -= quantity
 		await sellerInv.save()
 	}

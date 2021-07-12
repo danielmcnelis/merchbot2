@@ -45,12 +45,6 @@ const closeShop = async () => {
 		shop.status = 'closed'
 		await shop.save()
 
-        const allAuctions = await Auction.findAll()
-        for (let i = 0; i < allAuctions.length; i++) {
-            const auction = allAuctions[i]
-            await auction.destroy()
-        }
-
         const allBids = await Bid.findAll()
         for (let i = 0; i < allBids.length; i++) {
             const bid = allBids[i]

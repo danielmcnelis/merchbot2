@@ -2399,15 +2399,9 @@ if (noshowcom.includes(cmd)) {
 			
 		const winningPlayer = await Player.findOne({ where: { id: winningContestant.playerId }, include: Wallet })
 		if (!winningPlayer) return message.channel.send(`Could not find Arena opponent in the database.`)
-
-		noShowPlayer.arena_losses++
-		await noShowPlayer.save()
 	
 		noShowContestant.is_playing = false
 		await noShowContestant.save()
-
-		winningPlayer.arena_wins++
-		await winningPlayer.save()
 
 		winningPlayer.wallet.starchips += 4
 		await winningPlayer.wallet.save()
@@ -2420,9 +2414,6 @@ if (noshowcom.includes(cmd)) {
 		return checkArenaProgress(info)
 	}
 	
-
-
-
 }
 
 //H2H
@@ -4163,10 +4154,12 @@ if(cmd === `!dump`) {
 	let count = 0
 
 	for (let i = 0; i < inv.length; i++) {
-		const quantityToSell = inv[i].quantity - quantityToKeep
+		const sellerInv = inv[i]
+		const print = sellerInv.print
+		const quantityToSell = sellerInv.quantity - quantityToKeep
 		count += quantityToSell
-		cards.push(`${quantityToSell} ${eval(inv[i].print.rarity)}${inv[i].print.card_name}`)
-		const price = Math.ceil(inv[i].print.market_price * 0.7) * quantityToSell
+		cards.push(`${quantityToSell} ${eval(print.rarity)}${print.card_name}`)
+		const price = Math.ceil(print.market_price * 0.7) * quantityToSell
 		compensation += price
 	}
 
@@ -4176,36 +4169,56 @@ if(cmd === `!dump`) {
 	let m6success = false
 
 	for (let i = 0; i < inv.length; i++) {
-		const merchbotInv = await Inventory.findOne({where: {
-			printId: inv[i].print.id,
+		const sellerInv = inv[i]
+		const print = sellerInv.print
+		const quantityToSell = sellerInv.quantity - quantityToKeep
+		const price = Math.ceil(print.market_price * 0.7) * quantityToSell
+
+		const newPrice = quantityToSell >= 16 ? price / quantityToSell :
+						( price + ( (16 - quantityToSell) * sellerInv.print.market_price ) ) / 16
+
+		if (print.rarity !== 'com' && quantityToSell >= 5) m6success = true
+
+		const merchCount = await Inventory.count({where: {
+			printId: print.id,
 			playerId: merchbotId
 		}})
 
-		const quantityToSell = inv[i].quantity - quantityToKeep
-		const price = Math.ceil(inv[i].print.market_price * 0.7) * quantityToSell
+        if (!merchCount) {
+            await Inventory.create({ 
+                card_code: print.card_code,
+                printId: print.id,
+                playerId: merchbotId
+            })
+        }
 
-		const newPrice = quantityToSell >= 16 ? price / quantityToSell :
-						( price + ( (16 - quantityToSell) * inv[i].print.market_price ) ) / 16
+		const merchbotInv = await Inventory.findOne({ where: {
+			card_code: print.card_code,
+			printId: print.id,
+			playerId: merchbotId
+		}})
 
-		if (inv[i].print.rarity !== 'com' && quantityToSell >= 5) m6success = true
+        const auction = await Auction.findOne({ where: { printId: print.id }})
+		
+        if (auction) {
+            auction.quantity += quantityToSell
+            await auction.save()
+        } else if (merchbotInv.quantity < 1) {
+            await Auction.create({
+                card_code: print.card_code,
+                quantity: quantityToSell,
+                printId: print.id
+            })
+        } 
 
-		if (merchbotInv) {
-			merchbotInv.quantity += quantityToSell
-			await merchbotInv.save()
-		} else {
-			await Inventory.create({ 
-				card_code: inv[i].print.card_code,
-				quantity: quantityToSell,
-				printId: inv[i].print.id,
-				playerId: merchbotId
-			})
-		}
+		merchbotInv.quantity += quantityToSell
+		await merchbotInv.save()
 
-		inv[i].print.market_price = newPrice
-		await inv[i].print.save()
+		print.market_price = newPrice
+		await print.save()
 
-		inv[i].quantity -= quantityToSell
-		await inv[i].save()
+		sellerInv.quantity -= quantityToSell
+		await sellerInv.save()
 	}
 
 	player.wallet.stardust += compensation
@@ -4568,14 +4581,14 @@ if(cmd === `!clear_all`) {
 
 //OPEN
 if(cmd === `!open`) {
-	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isMod(message.member) && !isJazz(message.member)) return message.channel.send("You do not have permission to do that.")
 	message.channel.send(`Opening the shop now.`)
 	return openShop()
 }
 
 //CLOSE
 if(cmd === `!close`) {
-	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isMod(message.member) && !isJazz(message.member)) return message.channel.send("You do not have permission to do that.")
 	message.channel.send(`Closing the shop now.`)
 	return closeShop()
 }

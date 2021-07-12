@@ -2397,7 +2397,7 @@ if (noshowcom.includes(cmd)) {
 		const winningContestant = await Arena.findOne({ where: { contestant: PX }})
 		if (!winningContestant) return message.channel.send(`Could not find Arena opponent. Please try **!manual**.`)
 			
-		const winningPlayer = await Player.findOne({ where: { id: winningContestant.playerId } })
+		const winningPlayer = await Player.findOne({ where: { id: winningContestant.playerId }, include: Wallet })
 		if (!winningPlayer) return message.channel.send(`Could not find Arena opponent in the database.`)
 
 		noShowPlayer.arena_losses++

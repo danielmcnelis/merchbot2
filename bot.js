@@ -2328,31 +2328,101 @@ if (manualcom.includes(cmd)) {
 //NO SHOW
 if (noshowcom.includes(cmd)) {
 	if (!isMod(message.member)) return message.channel.send('You do not have permission to do that.')
-	const noShow = message.mentions.members.first()
-	const noShowId = member && member.user ? member.user.id : null
-	const noShowEntry = await Entry.findOne({ where: { playerId: noShowId }, include: Player })
+	const noShowId = message.mentions.users.first() ? message.mentions.users.first().id : null	
+	const member = message.mentions.members.first() || null	
+	if (!noShowId) return message.channel.send("Please specify a player.")
+	if (!member) return message.channel.send("Could not find member in the server.")
+	const noShowPlayer = await Player.findOne({ where: { id: noShowId } })
+	if (!noShowPlayer) return message.channel.send(`That user is not in the database.`)
 
-	if (!noShow) return message.channel.send("Please specify a player. Be sure they are not invisible.")
-	if (!noShowEntry || !noShow.roles.cache.some(role => role.id === tourRole)) return message.channel.send(
-		`Sorry, ${noShow.user.username} was is not in the tournament.`
-		)
+	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
+	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
+	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
+	: null
 
-	const tournaments = await Tournament.findAll()
-	if (!tournaments.length) return message.channel.send(`There is no active tournament.`)
-
-	const tournament = await selectTournament(message, tournaments)
-	if (!tournament) return message.channel.send(`Please select a valid tournament.`)
+	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannelId}>.`)
 	
-	return challongeClient.matches.index({
-		id: tournament.id,
-		callback: (err, data) => {
-			if (err) {
-				return message.channel.send(`Could not find tournament: "${tournament.name}".`)
-			} else {
-				return findOpponent(message, data, noShow, noShowEntry)
+	if (game === 'Tournament') {
+		const noShowEntry = await Entry.findOne({ where: { playerId: noShowId }, include: Player })
+	
+		if (!noShowEntry || !noShow.roles.cache.some(role => role.id === tourRole)) return message.channel.send(
+			`Sorry, ${noShow.user.username} is not in the tournament.`
+			)
+	
+		const tournaments = await Tournament.findAll()
+		if (!tournaments.length) return message.channel.send(`There is no active tournament.`)
+	
+		const tournament = await selectTournament(message, tournaments)
+		if (!tournament) return message.channel.send(`Please select a valid tournament.`)
+		
+		return challongeClient.matches.index({
+			id: tournament.id,
+			callback: (err, data) => {
+				if (err) {
+					return message.channel.send(`Could not find tournament: "${tournament.name}".`)
+				} else {
+					return findOpponent(message, data, noShow, noShowEntry)
+				}
 			}
+		}) 
+	} else if (game === 'Arena') {
+		if (!member.roles.cache.some(role => role.id === arenaRole)) return message.channel.send(`${player.name} does not appear to have the Arena Players role.`)
+			
+		const noShowContestant = await Arena.findOne({ where: { playerId: noShowId }})
+		if (!noShowContestant) return message.channel.send(`That player is not in the current Arena.`)
+
+		const info = await Info.findOne({ where: { element: 'arena' } })
+		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
+
+		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"], ["P5", "P6"]] :
+			info.round === 2 ? [["P1", "P3"], ["P2", "P5"], ["P4", "P6"]] :
+			info.round === 3 ? [["P1", "P4"], ["P2", "P6"], ["P3", "P5"]] : 
+			info.round === 4 ? [["P1", "P5"], ["P2", "P4"], ["P3", "P6"]] : 
+			info.round === 5 ? [["P1", "P6"], ["P2", "P3"], ["P4", "P5"]] : 
+			null
+	
+		let PX = false
+
+		if (pairings) {
+			for (let i = 0; i < 3; i++) {
+				if (pairings[i][0] === noShowContestant.contestant) PX = pairings[i][1]
+				if (PX) break
+				if (pairings[i][1] === noShowContestant.contestant) PX = pairings[i][0]
+				if (PX) break
+			}
+
+			if (!PX) return message.channel.send(`Could not find Arena opponent. Please try **!manual**.`)
 		}
-	}) 
+		
+		const winningContestant = await Arena.findOne({ where: { contestant: PX }})
+		if (!winningContestant) return message.channel.send(`Could not find Arena opponent. Please try **!manual**.`)
+			
+		const winningPlayer = await Player.findOne({ where: { id: winningContestant.playerId } })
+		if (!winningPlayer) return message.channel.send(`Could not find Arena opponent in the database.`)
+
+		noShowPlayer.arena_losses++
+		await noShowPlayer.save()
+	
+		noShowContestant.is_playing = false
+		await noShowContestant.save()
+
+		winningPlayer.arena_wins++
+		await winningPlayer.save()
+
+		winningPlayer.wallet.starchips += 4
+		await winningPlayer.wallet.save()
+
+		winningContestant.score++
+		winningContestant.is_playing = false
+		await winningContestant.save()
+
+		message.channel.send(`A no-show by ${losingPlayer.name} (+0${starchips}) to ${winningPlayer.name} (+4${starchips}) has been recorded.`)
+		return checkArenaProgress(info)
+	}
+	
+
+
+
 }
 
 //H2H
@@ -4117,7 +4187,7 @@ if(cmd === `!dump`) {
 		const newPrice = quantityToSell >= 16 ? price / quantityToSell :
 						( price + ( (16 - quantityToSell) * inv[i].print.market_price ) ) / 16
 
-		if (inv[i].rarity !== 'com' && quantityToSell >= 5) m6success = true
+		if (inv[i].print.rarity !== 'com' && quantityToSell >= 5) m6success = true
 
 		if (merchbotInv) {
 			merchbotInv.quantity += quantityToSell
@@ -4211,7 +4281,7 @@ if(cmd === `!buy`) {
 		mcid !== marketPlaceChannelId
 	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
 
-	if (!args.length) return message.channel.send(`Please specify the card(s) you wish to sell.`)
+	if (!args.length) return message.channel.send(`Please specify the card(s) you wish to buy.`)
 	const buyerId = maid
 	const sellerId = message.mentions.users.first() ? message.mentions.users.first().id : merchbotId	
 	if (buyerId === sellerId) return message.channel.send(`You cannot buy cards from yourself.`)

@@ -82,6 +82,7 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
     const authorIsSeller = message.author.id === sellerId
     let total_price = 0
     const cards = []
+    const card_codes = []
     const sellerInvs = []
     const quantities = []
     const prints = []
@@ -112,10 +113,13 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
             return false
         }
 
-        prints.push(print)
-
         total_price += authorIsSeller ? Math.ceil(print.market_price * 0.7) * quantity : Math.ceil(print.market_price * 1.1) * quantity 
 		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+
+        if (card_codes.includes(card_code)) {
+            message.channel.send(`You cannot list ${card} more than once.`)
+            return false
+        }
 
 		const sellerInv = await Inventory.findOne({ 
 			where: { 
@@ -136,7 +140,7 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
         if (!authorIsSeller && ( (buyerInv && (buyerInv.quantity + quantity > 3)) || quantity > 3 ) ) return message.channel.send(`You cannot buy more than 3 copies of a card from The Shop.`)
 
 		if (!sellerInv) {
-            message.channel.send(`${authorIsSeller ? `You do not have any copies of ${card}` : `Sorry, ${card} is out of stock.`}.`)
+            message.channel.send(`${authorIsSeller ? `You do not have any copies of ${card}` : `Sorry, ${card} is out of stock`}.`)
             return false
         } 
 
@@ -148,6 +152,7 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
 		if (!!(print.rarity === 'scr')) m4success = true
 		if (!!(print.rarity !== 'com' && quantity >= 5)) m6success = true
 
+		card_codes.push(card_code)
 		quantities.push(quantity)
 		prints.push(print)
 		sellerInvs.push(sellerInv)
@@ -222,8 +227,8 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
 
     if (print && print.rarity === 'scr') m4success = true
 
-    const card = walletField ? `${eval(walletField)} ${capitalize(walletField)}` :
-                `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+    const card = walletField ? `${quantity} ${eval(walletField)} ${capitalize(walletField)}` :
+                `${quantity} ${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 
     const sellerInv = print ? await Inventory.findOne({ 
         where: { 
@@ -239,9 +244,6 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
         [walletField]: { [Op.gt]: 0 },
         playerId: sellerId 
     }})
-
-    console.log('sellerInv', sellerInv)
-    console.log('sellerWallet', sellerWallet)
 
     if ((!sellerInv && print) && (!sellerWallet && walletField)) {
         message.channel.send(`${authorIsSeller ? `You do not have any ${walletField ? '' : 'copies of '}` : shopSale ? 'Sorry, ' : `${buyingPlayer.name} does not have any${walletField ? '' : 'copies of '}`}${card}${shopSale ? ' is Out of Stock' : ''}.`)
@@ -276,6 +278,10 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
     const sellerInvs = invoice.sellerInvs
     const buyerId = buyingPlayer.id
 
+    console.log('quantities')
+    console.log('cards')
+    console.log('prints', prints.map((p) => p.card_name))
+
     if (!total_price || !cards.length || !quantities.length || !prints.length || !sellerInvs.length || !buyerId) {
         message.channel.send(`Error processing MerchBot Sale: missing needed information.`)
         return false
@@ -286,6 +292,9 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
         const print = prints[i]
         const sellerInv = sellerInvs[i]
         const price = authorIsSeller ? Math.ceil(print.market_price * 0.7) : Math.ceil(print.market_price * 1.1)
+
+        console.log('print', print.card_name)
+        console.log('quantity', quantity)
 
 		const newPrice = quantity > 16 ? price / quantity :
                         ( price * quantity + ( (16 - quantity) * print.market_price ) ) / 16

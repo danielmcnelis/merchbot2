@@ -2329,9 +2329,9 @@ if (manualcom.includes(cmd)) {
 if (noshowcom.includes(cmd)) {
 	if (!isMod(message.member)) return message.channel.send('You do not have permission to do that.')
 	const noShowId = message.mentions.users.first() ? message.mentions.users.first().id : null	
-	const member = message.mentions.members.first() || null	
+	const noShowMember = message.mentions.members.first() || null	
 	if (!noShowId) return message.channel.send("Please specify a player.")
-	if (!member) return message.channel.send("Could not find member in the server.")
+	if (!noShowMember) return message.channel.send("Could not find member in the server.")
 	const noShowPlayer = await Player.findOne({ where: { id: noShowId } })
 	if (!noShowPlayer) return message.channel.send(`That user is not in the database.`)
 
@@ -2366,7 +2366,7 @@ if (noshowcom.includes(cmd)) {
 			}
 		}) 
 	} else if (game === 'Arena') {
-		if (!member.roles.cache.some(role => role.id === arenaRole)) return message.channel.send(`${player.name} does not appear to have the Arena Players role.`)
+		if (!noShowMember.roles.cache.some(role => role.id === arenaRole)) return message.channel.send(`${noShowPlayer.name} does not appear to have the Arena Players role.`)
 			
 		const noShowContestant = await Arena.findOne({ where: { playerId: noShowId }})
 		if (!noShowContestant) return message.channel.send(`That player is not in the current Arena.`)

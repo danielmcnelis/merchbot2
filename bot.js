@@ -2416,7 +2416,7 @@ if (noshowcom.includes(cmd)) {
 		winningContestant.is_playing = false
 		await winningContestant.save()
 
-		message.channel.send(`A no-show by ${losingPlayer.name} (+0${starchips}) to ${winningPlayer.name} (+4${starchips}) has been recorded.`)
+		message.channel.send(`A no-show by ${noShowPlayer.name} (+0${starchips}) to ${winningPlayer.name} (+4${starchips}) has been recorded.`)
 		return checkArenaProgress(info)
 	}
 	

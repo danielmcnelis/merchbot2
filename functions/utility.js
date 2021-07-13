@@ -1,7 +1,7 @@
 
 //UTILITY FUNCTIONS
 
-const { adminRole, modRole, ambassadorRole } = require('../static/roles.json')
+const { adminRole, ambassadorRole, arenaRole, modRole, tourRole } = require('../static/roles.json')
 const { mad, sad, rocks, bronze, silver, gold, platinum, diamond, master, legend, god, approve } = require('../static/emojis.json')
 const Names = require('../static/names.json')
 const { Arena, Binder, Card, Daily, Diary, Draft, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist  } = require('../db/index.js')
@@ -122,6 +122,12 @@ const isMod = (member) => member.roles.cache.some(role => role.id === modRole)
 //IS AMBASSADOR?
 const isAmbassador = (member) => member.roles.cache.some(role => role.id === ambassadorRole)
 
+//IS ARENA PLAYER?
+const isArenaPlayer = (member) => member.roles.cache.some(role => role.id === arenaRole)
+
+//IS TOUR PLAYER?
+const isTourPlayer = (member) => member.roles.cache.some(role => role.id === tourRole)
+
 //HAS PROFILE?
 const hasProfile = async (playerId) => {
     const profile = await Profile.findOne({ where: { playerId }})
@@ -220,8 +226,10 @@ module.exports = {
     hasProfile,
     isAdmin,
     isAmbassador,
+    isArenaPlayer,
     isJazz,
     isMod,
+    isTourPlayer,
     isNewUser,
     isSameDay,
     isVowel,

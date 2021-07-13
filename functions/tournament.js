@@ -5,6 +5,7 @@ const { approve, FiC } = require('../static/emojis.json')
 const { Arena, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist } = require('../db')
 const { client, challongeClient } = require('../static/clients.js')
 const { saveYDK, saveAllYDK } = require('./decks.js')
+const { capitalize } = require('./utility.js')
 const types = require('../static/types.json')
 
 
@@ -252,21 +253,6 @@ const findOpponent = async (message, matches, noShow, noShowPlayer, formatName, 
     }
 
     return getParticipants(message, matches, noShow, winner, formatName, formatDatabase, true)
-}
-
-
-//GET PARTICIPANTS
-const getParticipants = async (message, matches, loser, winner, formatName, formatDatabase, noshow = false) => {
-    challongeClient.participants.index({
-        id: status['tournament'],
-        callback: (err, data) => {
-            if (err) {
-                return message.channel.send(`Error: the current tournament, "${status['tournament']}", could not be accessed.`)
-            } else {
-                return addMatchResult(message, matches, data, loser, winner, formatName, formatDatabase, noshow)
-            }
-        }
-    })
 }
 
 
@@ -602,6 +588,47 @@ const getTournamentType = async (message) => {
     return tournamentType
 }
 
+const generateSheetData = async () => {
+    const allDecks = await Entry.findAll()
+    const typeData = {}
+    const catData = {}
+    const sheet1Data = [['Player', 'Deck', 'Type', 'Link']]
+    const sheet2DataA = [['Deck', 'Entries', 'Percent']]
+    const sheet2DataB = [[], ['Category', 'Entries', 'Percent']]
+
+    allDecks.forEach(function (deck) {
+        console.log(deck.type)
+        console.log(deck.category)
+        console.log(deck.pilot)
+        console.log(deck.name)
+        console.log(deck.url)
+        typeData[deck.type] ? typeData[deck.type]++ : typeData[deck.type] = 1
+        catData[deck.category] ? catData[deck.category]++ : catData[deck.category] = 1
+        const row = [deck.pilot, deck.name, deck.type, deck.url]
+        sheet1Data.push(row)
+    })
+
+    let typeDataArr = Object.entries(typeData).sort((b, a) => b[0].localeCompare(a[0]))
+    let catDataArr = Object.entries(catData).sort((b, a) => b[0].localeCompare(a[0]))
+
+    let typeDataArr2 = typeDataArr.map(function(elem) {
+        return [elem[0], elem[1], `${(elem[1], elem[1] / allDecks.length * 100).toFixed(2)}%`]
+    })
+
+    let catDataArr2 = catDataArr.map(function(elem) {
+        return [capitalize(elem[0]), elem[1], `${(elem[1], elem[1] / allDecks.length * 100).toFixed(2)}%`]
+    })
+
+    const sheet2Data = [...sheet2DataA, ...typeDataArr2, ...sheet2DataB, ...catDataArr2]
+
+    const data = {
+        sheet1Data,
+        sheet2Data
+    }
+
+    return data
+}
+
 module.exports = {
     askForDBUsername,
     getDeckListTournament,
@@ -610,7 +637,7 @@ module.exports = {
     removeParticipant,
     directSignUp,
     seed,
-    getParticipants,
+    generateSheetData,
     findOpponent,
     getUpdatedMatchesObject,
     addMatchResult,

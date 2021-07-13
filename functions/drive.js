@@ -4,6 +4,7 @@ const {google} = require('googleapis')
 const {drive_token} = require('../secrets.json')
 const {drive_credentials} = require('../credentials.json')
 const fs = require('fs')
+const { Entry } = require('../db')
 
 // const {client_secret, client_id, redirect_uris} = drive_credentials.installed
 // const {access_token, refresh_token} = drive_token
@@ -15,43 +16,47 @@ const fs = require('fs')
 
 // const drive = google.drive({ version: 'v3', auth: oAuth2Client})
 
-const uploadDeckFolder = async (name, allDecks) => {
+const uploadDeckFolder = async (tournament) => {
+  const { name, id } = tournament
   let folderId
   const fileMetadata = {
     'name': `${name} Decks`,
     'mimeType': 'application/vnd.google-apps.folder'
   }
 
-  // try {
-  //   await drive.files.create({
-  //     resource: fileMetadata,
-  //     fields: 'id'
-  //   }, function (err, file) {
-  //     if (err) {
-  //       console.error(err)
-  //     } else {
-  //       folderId = file.data.id
-  //       console.log(`Created folder with id: ${folderId}.`)
-  //       for (let i = 0; i < allDecks.length; i++) {
-  //           const player = allDecks[i].player.name
+  const allDecks = await Entry.findAll({ where: { tournamentId: id }})
 
-  //           const fileMetadata = {
-  //           'name': `${name} - ${player}.ydk`,
-  //           parents: [folderId]
-  //           }
-        
-  //           const media = {
-  //           mimeType: 'application/json',
-  //           body: fs.createReadStream(`./decks/${player}.ydk`)
-  //           }
+  try {
+    await drive.files.create({
+      resource: fileMetadata,
+      fields: 'id'
+    }, function (err, file) {
+      if (err) {
+        console.error(err)
+      } else {
+        folderId = file.data.id
+        console.log(`Created folder with id: ${folderId}.`)
+        for (let i = 0; i < allDecks.length; i++) {
+            const player = allDecks[i].player.name
 
-  //           saveFile(fileMetadata, media, i) 
-  //       }
-  //     }
-  //   })
-  // } catch (err) {
-  //   console.log(err)
-  // }
+            const fileMetadata = {
+            'name': `${name} - ${player}.ydk`,
+            parents: [folderId]
+            }
+      
+            const media = {
+            mimeType: 'application/json',
+            body: fs.createReadStream(`./decks/${player}.ydk`)
+            }
+
+            saveFile(fileMetadata, media, i) 
+        }
+      }
+    })
+  } catch (err) {
+    console.log(err)
+  }
+
 }
 
 // const saveFile = async (fileMetadata, media, i) => {

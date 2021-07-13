@@ -198,6 +198,11 @@ const processBids = async () => {
         const auction = allAuctions[i]
         await auction.destroy()
     }
+
+    for (let i = 0; i < allBids.length; i++) {
+        const bid = allBids[i]
+        await bid.destroy()
+    }
 }
 
 // RESTOCK
@@ -228,9 +233,9 @@ const restock = async () => {
 
     if (weightedCount < 1) weightedCount = 1
 	const count = Math.ceil(weightedCount / 8)
-    const newlyInStock = await awardPacksToShop(count)
-    if (!newlyInStock) return client.channels.cache.get(shopChannelId).send(`Error awarding ${count} packs to shop.`)
-    else return postBids(newlyInStock)
+    const packsAwarded = await awardPacksToShop(count)
+    if (!packsAwarded) return client.channels.cache.get(shopChannelId).send(`Error awarding ${count} packs to shop.`)
+    else return postBids()
 }
 
 // UPDATE SHOP
@@ -345,6 +350,8 @@ const postBids = async (newlyInStock) => {
         }
 
         results.push(`\n${ygocard} --- Singles Auction --- ${ygocard}`)
+
+        const newlyInStock = await Auction.findAll()
     
         if (!newlyInStock.length) results.push('N/A')
         for (let i = 0; i < newlyInStock.length; i++) {

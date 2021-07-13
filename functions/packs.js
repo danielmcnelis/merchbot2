@@ -249,7 +249,10 @@ const awardPacksToShop = async (num) => {
 	})
 
     const results = []
-    const newlyInStock = []
+    const boxes = Math.floor(num / set.packs_per_box)
+    console.log('boxes', boxes)
+    const packs_from_boxes = boxes * set.packs_per_box
+    console.log('packs_from_boxes', packs_from_boxes)
 
     for (let j = 0; j < num; j++) {
         const yourCommons = set.commons_per_pack > 1 ? getRandomSubset(commons, set.commons_per_pack) : set.secrets_per_pack === 1 ? [getRandomElement(commons)] : []
@@ -265,7 +268,7 @@ const awardPacksToShop = async (num) => {
         if (!yourUltras.length) for (let i = 0; i < set.ultras_per_box; i++) odds.push("ultras")
         if (!yourSecrets.length) for (let i = 0; i < set.secrets_per_box; i++) odds.push("secrets")
     
-        const luck = getRandomElement(odds)
+        const luck = (j + 1) < packs_from_boxes ? odds[j % 24] : getRandomElement(odds)
         const yourFoil = getRandomElement(eval(luck))
     
         const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil]
@@ -296,7 +299,6 @@ const awardPacksToShop = async (num) => {
             }
 
             if (!inv || inv.quantity === 0) {
-                newlyInStock.push(print)
                 await Auction.create({
                     card_code: print.card_code,
                     printId: print.id
@@ -317,7 +319,7 @@ const awardPacksToShop = async (num) => {
         }
     }
 
-    newlyInStock.sort((a, b) => b.market_price - a.market_price)
+
     botSpamChannel.send(`<@${merchbotId}> opened ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'} of ${set.name} ${eval(set.emoji)}!`)
 
     for (let i = 0; i < results.length; i += 30) {
@@ -329,7 +331,7 @@ const awardPacksToShop = async (num) => {
         }
     }
     
-    return newlyInStock
+    return true
 }
 
 module.exports = {

@@ -33,10 +33,10 @@ const { checkArenaProgress, getArenaSample, resetArena, startArena, startRound, 
 const { askQuestion, resetTrivia, startTrivia } = require('./functions/trivia.js')
 const { askForGrindAllConfirmation } = require('./functions/mod.js')
 const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Nickname, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
-const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isJazz, isMod, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
+const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isJazz, isMod, isTourPlayer, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
 const { checkDeckList, saveYDK, saveAllYDK, awardStarterDeck, getShopDeck } = require('./functions/decks.js')
 const { askForBidCancellation, askForBidPlacement, manageBidding } = require('./functions/bids.js')
-const { selectTournament, getTournamentType, seed, askForDBUsername, getDeckListTournament, getDeckNameTournament, sendTotournamentChannelId, directSignUp, removeParticipant, getParticipants, findOpponent } = require('./functions/tournament.js')
+const { selectTournament, getTournamentType, seed, askForDBUsername, getDeckListTournament, getDeckNameTournament, directSignUp, removeParticipant, getParticipants, findOpponent, generateSheetData } = require('./functions/tournament.js')
 const { makeSheet, addSheet, writeToSheet } = require('./functions/sheets.js')
 const { askForAdjustConfirmation, askForCardSlot, collectNicknames, getNewMarketPrice, askForSetToPrint, selectPrint, askForRarity } = require('./functions/print.js')
 const { uploadDeckFolder } = require('./functions/drive.js')
@@ -697,50 +697,75 @@ if (dbcom.includes(cmd)) {
 	}
 }
 
-//STARTER
+//STARTER OR START
 if(startcom.includes(cmd)) {
-	if(await isNewUser(maid)) await createPlayer(maid, message.author.username, message.author.tag)
-	if(await hasProfile(maid)) return message.channel.send("You already received your first Starter Deck.")
-
-	const set = await Set.findOne({ where: {
-		code: 'DOC'
-	}})
-
-	if (!set) return message.channel.send(`Could not find set: "DOC".`)
-
-	const filter = m => m.author.id === maid
-	await message.channel.send(`Greetings, champ! Which deck would you like to start?\n- (1) Fish\'s Ire  ${fish}\n- (2) Rock\'s Foundation ${rock}`)
+	if (( message.channel === client.channels.cache.get(tournamentChannelId) && isMod(message.member) ) || isJazz(message.member) ) {
+        const unregistered = await Entry.findAll({ where: { participantId: null } })
+        if (unregistered.length) return message.channel.send('One of more players has not been signed up. Please check the Database.')
+		const { sheet1Data, sheet2Data } = await generateSheetData()
+		const tournament = await Tournament.findOne({ where: { state: 'pending' } })
+		if (!tournament) return message.channel.send(`Error: Could not find a pending tournament.`)
+        const { name, url } = tournament
+        await challongeClient.tournaments.start({
+            id: name,
+            callback: async (err) => {
+                if (err) {
+                    return message.channel.send(`Error: ${name} could not be initialized.`)
+                } else {
+                    tournament.state = 'underway'
+					await tournament.save()
+                    const spreadsheetId = await makeSheet(`${name} Deck Lists`, sheet1Data)
+                    await addSheet(spreadsheetId, 'Summary')
+                    await writeToSheet(spreadsheetId, 'Summary', 'RAW', sheet2Data)
+                    //await uploadDeckFolder(name)
+                    return message.channel.send(`Let's go! Your tournament is starting now: https://challonge.com/${url}. ${FiC}`)
+                }
+            }
+        })
+	} else {
+		if(await isNewUser(maid)) await createPlayer(maid, message.author.username, message.author.tag)
+		if(await hasProfile(maid)) return message.channel.send("You already received your first Starter Deck.")
 	
-	message.channel.awaitMessages(filter, {
-		max: 1,
-		time: 30000
-	}).then(async collected => {
-		const response = collected.first().content.toLowerCase()
-		let starter
-
-		if(response.includes('fish') || response.includes(fish) || response.includes("(1)") || response === "1") {
-			starter = 'fish'
-		} else if(response.includes('rock') || response.includes(rock) || response.includes === "(2)" || response === "2") {
-			starter = 'rock'
-		}
-
-		if (!starter) return message.channel.send('You did not select a valid Starter Deck. Please type **!start** to try again.')
-
-		await awardStarterDeck(maid, starter)
-		await createProfile(maid, starter)
-		message.member.roles.add(fpRole)
-		message.channel.send(`Excellent choice, ${message.author.username}! ${legend}` +
-		`\nYou received a copy of ${starter === "fish" ? `Fish's Ire ${fish}` : `Rock's Foundation ${rock}`} and the **Forged Players** role! ${wokeaf}` +
-		`\nPlease wait while I open some packs... ${blue}`
-		)
-
-		await awardPack(message.channel, maid, set, 10)
-		await completeTask(message.channel, maid, 'e1')
-		return message.channel.send(`I wish you luck on your journey, new duelist! ${master}`)
-	}).catch(err => {
-		console.log(err)
-		return message.channel.send(`Sorry, time's up.`)
-	})
+		const set = await Set.findOne({ where: {
+			code: 'DOC'
+		}})
+	
+		if (!set) return message.channel.send(`Could not find set: "DOC".`)
+	
+		const filter = m => m.author.id === maid
+		await message.channel.send(`Greetings, champ! Which deck would you like to start?\n- (1) Fish\'s Ire  ${fish}\n- (2) Rock\'s Foundation ${rock}`)
+		
+		message.channel.awaitMessages(filter, {
+			max: 1,
+			time: 30000
+		}).then(async collected => {
+			const response = collected.first().content.toLowerCase()
+			let starter
+	
+			if(response.includes('fish') || response.includes(fish) || response.includes("(1)") || response === "1") {
+				starter = 'fish'
+			} else if(response.includes('rock') || response.includes(rock) || response.includes === "(2)" || response === "2") {
+				starter = 'rock'
+			}
+	
+			if (!starter) return message.channel.send('You did not select a valid Starter Deck. Please type **!start** to try again.')
+	
+			await awardStarterDeck(maid, starter)
+			await createProfile(maid, starter)
+			message.member.roles.add(fpRole)
+			message.channel.send(`Excellent choice, ${message.author.username}! ${legend}` +
+			`\nYou received a copy of ${starter === "fish" ? `Fish's Ire ${fish}` : `Rock's Foundation ${rock}`} and the **Forged Players** role! ${wokeaf}` +
+			`\nPlease wait while I open some packs... ${blue}`
+			)
+	
+			await awardPack(message.channel, maid, set, 10)
+			await completeTask(message.channel, maid, 'e1')
+			return message.channel.send(`I wish you luck on your journey, new duelist! ${master}`)
+		}).catch(err => {
+			console.log(err)
+			return message.channel.send(`Sorry, time's up.`)
+		})
+	}
 }
 
 //MUTE 
@@ -2021,27 +2046,21 @@ if (losscom.includes(cmd)) {
 	if (!losingPlayer) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	if (!winningPlayer) return message.channel.send(`That user is not in the database.`)
 	
-	// if (status['status'] === 'active' && (loser.roles.cache.some(role => role.id === tourRole) || winner.roles.cache.some(role => role.id === tourRole))) {
-	// 	return challongeClient.matches.index({
-	// 		id: status['tournament'],
-	// 		callback: (err, data) => {
-	// 			if (err) {
-	// 				return message.channel.send(`Error: the current tournament, "${name}", could not be accessed.`)
-	// 			} else {
-	// 				const tournamentChannelId = formats[status['format']] ? formats[status['format']].channel : null
-	// 				if (formatChannel !== tournamentChannelId) {
-	// 					return message.channel.send(`Please report this match in the appropriate channel: <#${tournamentChannelId}>.`)
-	// 				} else {
-	// 					return getParticipants(message, data, loser, winner, formatName, formatDatabase)
-	// 				}
-	// 			}
-	// 		}
-	// 	}) 
-	// }
+	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
+	//: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
+	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
+	: "Ranked"
 
-	if (message.member.roles.cache.some(role => role.id === arenaRole)) {
-		if (message.channel !== client.channels.cache.get(arenaChannelId)) return message.channel.send(`Please report your loss in: <#${arenaChannelId}>`)
-		
+	const hasArenaRole = isArenaPlayer(message.member)
+	const hasTourRole = isTourPlayer(message.member)
+
+	if (hasTourRole && game === 'Tournament') {
+		const tournament = await Tournament.findAll({ where: { state: 'underway' } })
+		if (!tournament) return message.channel.send(`There is no active tournament.`)
+		return
+	} else if (!hasTourRole && game === 'Tournament') {
+		return message.channel.send(`You do not have the Tournament Players role. Please report your loss in the appropriate channel.`)
+	} else if (hasArenaRole && game === 'Arena') {
 		const losingContestant = await Arena.findOne({ where: { playerId: maid }})
 		if (!losingContestant) return message.channel.send(`You are not in the current Arena.`)
 		const winningContestant = await Arena.findOne({ where: { playerId: oppo }})
@@ -2052,11 +2071,11 @@ if (losscom.includes(cmd)) {
 		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
 		
 		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"], ["P5", "P6"]] :
-            info.round === 2 ? [["P1", "P3"], ["P2", "P5"], ["P4", "P6"]] :
-            info.round === 3 ? [["P1", "P4"], ["P2", "P6"], ["P3", "P5"]] : 
-            info.round === 4 ? [["P1", "P5"], ["P2", "P4"], ["P3", "P6"]] : 
-            info.round === 5 ? [["P1", "P6"], ["P2", "P3"], ["P4", "P5"]] : 
-            null
+			info.round === 2 ? [["P1", "P3"], ["P2", "P5"], ["P4", "P6"]] :
+			info.round === 3 ? [["P1", "P4"], ["P2", "P6"], ["P3", "P5"]] : 
+			info.round === 4 ? [["P1", "P5"], ["P2", "P4"], ["P3", "P6"]] : 
+			info.round === 5 ? [["P1", "P6"], ["P2", "P3"], ["P4", "P5"]] : 
+			null
 	
 		let correct_pairing = info.round === 6 ? true : false
 		if (!correct_pairing) {
@@ -2102,66 +2121,68 @@ if (losscom.includes(cmd)) {
 
 		message.channel.send(`${losingPlayer.name} (+2${starchips}), your Arena loss to ${winner.user.username} (+4${starchips}) has been recorded.`)
 		return checkArenaProgress(info)
-	}
+	} else if (!hasArenaRole && game === 'Arena') {
+		return message.channel.send(`You do not have the Arena Players role. Please report your loss in the appropriate channel.`)
+	} else if (hasArenaRole && game !== 'Arena') {
+		return message.channel.send(`You have the Arena Players role. Please report your Arena loss in <#${arenaChannelId}>, or get a Moderator to help you.`)
+	} else if (!hasArenaRole && game === 'Ranked') {
+		const diary = winningPlayer.diary
+		const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
+		const bonus = easy_complete ? 1 : 0
+		const origStatsWinner = winningPlayer.stats
+		const origStatsLoser = losingPlayer.stats
+		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
+		const chipsWinner = Math.round((delta)) + bonus < 6 ? 6 : Math.round((delta)) > 20 ? 20 : Math.round((delta)) + bonus
+		const chipsLoser = (origStatsLoser - origStatsWinner) < 72 ? 3 : (origStatsLoser - origStatsWinner) >=150 ? 1 : 2
 
-	const diary = winningPlayer.diary
-	const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
-	console.log('winners easy diary is complete?', easy_complete)
-	const bonus = easy_complete ? 1 : 0
-	console.log('winners bonus:', bonus)
-	const origStatsWinner = winningPlayer.stats
-	const origStatsLoser = losingPlayer.stats
-	const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
-	const chipsWinner = Math.round((delta)) + bonus < 6 ? 6 : Math.round((delta)) > 20 ? 20 : Math.round((delta)) + bonus
-	const chipsLoser = (origStatsLoser - origStatsWinner) < 72 ? 3 : (origStatsLoser - origStatsWinner) >=150 ? 1 : 2
+		const previouslyDefeated = await Match.count({
+			where: {
+				winnerId: winningPlayer.id,
+				loserId: losingPlayer.id
+			}
+		})
 
-	const previouslyDefeated = await Match.count({
-		where: {
+		winningPlayer.stats += delta
+		winningPlayer.backup = origStatsWinner
+		winningPlayer.wins++
+		winningPlayer.current_streak++
+		if (!previouslyDefeated) winningPlayer.vanquished_foes++
+		if (winningPlayer.current_streak > winningPlayer.longest_streak) winningPlayer.longest_streak = winningPlayer.current_streak
+		if (winningPlayer.stats > winningPlayer.best_stats) winningPlayer.best_stats = winningPlayer.stats
+		await winningPlayer.save()
+
+		winningPlayer.wallet.starchips += chipsWinner
+		await winningPlayer.wallet.save()
+
+		losingPlayer.stats -= delta
+		losingPlayer.backup = origStatsLoser
+		losingPlayer.losses++
+		losingPlayer.current_streak = 0
+		await losingPlayer.save()
+
+		losingPlayer.wallet.starchips += chipsLoser
+		await losingPlayer.wallet.save()
+
+		await Match.create({
+			game_mode: "ranked",
+			winner_name: winningPlayer.name,
 			winnerId: winningPlayer.id,
-			loserId: losingPlayer.id
-		}
-	})
+			loser_name: losingPlayer.name,
+			loserId: losingPlayer.id,
+			delta: delta,
+			chipsWinner: chipsWinner,
+			chipsLoser: chipsLoser
+		})
 
-	winningPlayer.stats += delta
-	winningPlayer.backup = origStatsWinner
-	winningPlayer.wins++
-	winningPlayer.current_streak++
-	if (!previouslyDefeated) winningPlayer.vanquished_foes++
-	if (winningPlayer.current_streak > winningPlayer.longest_streak) winningPlayer.longest_streak = winningPlayer.current_streak
-	if (winningPlayer.stats > winningPlayer.best_stats) winningPlayer.best_stats = winningPlayer.stats
-	await winningPlayer.save()
-
-	winningPlayer.wallet.starchips += chipsWinner
-	await winningPlayer.wallet.save()
-	
-	losingPlayer.stats -= delta
-	losingPlayer.backup = origStatsLoser
-	losingPlayer.losses++
-	losingPlayer.current_streak = 0
-	await losingPlayer.save()
-
-	losingPlayer.wallet.starchips += chipsLoser
-	await losingPlayer.wallet.save()
-
-	await Match.create({
-		game_mode: "ranked",
-		winner_name: winningPlayer.name,
-		winnerId: winningPlayer.id,
-		loser_name: losingPlayer.name,
-		loserId: losingPlayer.id,
-		delta: delta,
-		chipsWinner: chipsWinner,
-		chipsLoser: chipsLoser
-	})
-
-	completeTask(message.channel, winningPlayer.id, 'e3')
-	if (winningPlayer.stats >= 530) completeTask(message.channel, winningPlayer.id, 'm1', 3000)
-	if (winningPlayer.stats >= 590) completeTask(message.channel, winningPlayer.id, 'h1', 3000)
-	if (winningPlayer.stats >= 650) completeTask(message.channel, winningPlayer.id, 'l1', 3000)
-	if (winningPlayer.current_streak === 3) completeTask(message.channel, winningPlayer.id, 'm2', 5000) 
-	if (winningPlayer.vanquished_foes === 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
-	if (winningPlayer.current_streak === 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
-	return message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your loss to ${winningPlayer.name} (+${chipsWinner}${starchips}) has been recorded.`)
+		completeTask(message.channel, winningPlayer.id, 'e3')
+		if (winningPlayer.stats >= 530) completeTask(message.channel, winningPlayer.id, 'm1', 3000)
+		if (winningPlayer.stats >= 590) completeTask(message.channel, winningPlayer.id, 'h1', 3000)
+		if (winningPlayer.stats >= 650) completeTask(message.channel, winningPlayer.id, 'l1', 3000)
+		if (winningPlayer.current_streak === 3) completeTask(message.channel, winningPlayer.id, 'm2', 5000) 
+		if (winningPlayer.vanquished_foes === 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
+		if (winningPlayer.current_streak === 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
+		return message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your loss to ${winningPlayer.name} (+${chipsWinner}${starchips}) has been recorded.`)
+	}
 }
 
 //MANUAL
@@ -2584,7 +2605,7 @@ if(joincom.includes(cmd)) {
 	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
 	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
 	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
-	: null
+	: "Tournament"
 
 	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannelId}> or <#${triviaChannelId}>.`)
 	
@@ -2613,7 +2634,6 @@ if(joincom.includes(cmd)) {
 					if (!deckListUrl) return
 					const deckName = await getDeckNameTournament(member, player)
 					if (!deckName) return
-					sendTotournamentChannelId(player, deckListUrl, deckName)
 
 					if (resubmission) {
 						const entry = await Entry.findOne({ where: { playerId: player.id } })
@@ -2869,7 +2889,7 @@ if (cmd.toLowerCase() === `!remove`) {
 
 //CREATE 
 if (cmd === `!create`) {
-	if (!isMod(message.member)) return message.channel.send('You do not have permission to do that.')
+	if (!isMod(message.member) && !isJazz(message.member)) return message.channel.send('You do not have permission to do that.')
 	if (!args.length) return message.channel.send(`Please provide a name for the new tournament.`)
 
 	const tournamentType = await getTournamentType(message)

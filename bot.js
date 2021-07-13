@@ -4263,7 +4263,7 @@ if(cmd === `!sell`) {
 	const buyerId = message.mentions.users.first() ? message.mentions.users.first().id : merchbotId	
 	if (buyerId === sellerId) return message.channel.send(`You cannot sell cards to yourself.`)
 	const shopSale = !!(buyerId === merchbotId)
-
+	
 	const sellingPlayer = await Player.findOne({ 
 		where: { id: sellerId },
 		include: Wallet

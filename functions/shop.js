@@ -307,7 +307,7 @@ const updateShop = async () => {
 }
 
 // POST BIDS
-const postBids = async (newlyInStock) => {
+const postBids = async () => {
     const shopChannel = client.channels.cache.get(shopChannelId)
     shopChannel.bulkDelete(100)
     
@@ -351,7 +351,10 @@ const postBids = async (newlyInStock) => {
 
         results.push(`\n${ygocard} --- Singles Auction --- ${ygocard}`)
 
-        const newlyInStock = await Auction.findAll()
+        const newlyInStock = await Auction.findAll({ 
+            include: Print,
+            order: [[Print, 'market_price', 'DESC']]
+        })
     
         if (!newlyInStock.length) results.push('N/A')
         for (let i = 0; i < newlyInStock.length; i++) {

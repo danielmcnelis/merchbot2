@@ -1,5 +1,5 @@
 
-const { Card, Player, Print, Set, Wallet, Diary, Inventory, Auction } = require('../db')
+const { Card, Player, Print, Set, Wallet, Diary, Info, Inventory, Auction } = require('../db')
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { yescom } = require('../static/commands.json')
@@ -77,6 +77,8 @@ const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlaye
 
 
 const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, sellingPlayer) => {
+	const info = await Info.findOne({ where: { element: 'shop'} })
+
     const sellerId = sellingPlayer.id
     const buyerId = buyingPlayer.id
     const authorIsSeller = message.author.id === sellerId
@@ -116,7 +118,7 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
 		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
         const auction = await Auction.findOne({ where: { printId: print.id }})
 
-        if (auction) {
+        if (!authorIsSeller && auction) {
             message.channel.send(`Sorry, ${card} will not be available until the next auction.`)
             return false
         }

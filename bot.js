@@ -79,7 +79,12 @@ client.on('ready', async () => {
 	const hoursLeftInPeriod = Math.floor(shopCountdown / (3600000))
 	const minsLeftInPeriod = Math.ceil((shopCountdown % 3600000)/ 60000)
 
-	if (shopOpen) updateShop()
+	if (shopOpen) {
+		updateShop()
+	} else {
+		postBids()
+	}
+	
 	setInterval(async () =>  {
 		const shopOpen = await checkShopOpen()
 		if (shopOpen) updateShop()
@@ -4263,7 +4268,7 @@ if(cmd === `!sell`) {
 	const buyerId = message.mentions.users.first() ? message.mentions.users.first().id : merchbotId	
 	if (buyerId === sellerId) return message.channel.send(`You cannot sell cards to yourself.`)
 	const shopSale = !!(buyerId === merchbotId)
-	
+
 	const sellingPlayer = await Player.findOne({ 
 		where: { id: sellerId },
 		include: Wallet

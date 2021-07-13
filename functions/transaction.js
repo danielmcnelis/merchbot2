@@ -341,7 +341,7 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
         if (auction) {
             auction.quantity += quantity
             await auction.save()
-        } else if (buyerInv.quantity < 1) {
+        } else if (authorIsSeller && buyerInv.quantity < 1) {
             await Auction.create({
                 card_code: print.card_code,
                 quantity: quantity,

@@ -24,6 +24,7 @@ const statuses = require('./static/statuses.json')
 const { 
     getBuyerConfirmation,
     getSellerConfirmation,
+    getInvoiceMerchBotPurchase,
     getInvoiceMerchBotSale,
     getInvoiceP2PSale,
     processMerchBotSale,
@@ -71,8 +72,6 @@ client.on('ready', async () => {
         fuzzyPrints2.add(card)
     })
 
-	const arenaChannel = client.channels.cache.get(arenaChannelId)
-
 	const shopShouldBe = checkShopShouldBe()
 	const shopCountdown = getShopCountdown()
 	const shopOpen = await checkShopOpen()
@@ -84,7 +83,7 @@ client.on('ready', async () => {
 	} else {
 		postBids()
 	}
-	
+
 	setInterval(async () =>  {
 		const shopOpen = await checkShopOpen()
 		if (shopOpen) updateShop()
@@ -4258,10 +4257,10 @@ if(cmd === `!dump`) {
 
 //SELL
 if(cmd === `!sell`) {
-	if (mcid !== botSpamChannelId &&
-		mcid !== generalChannelId &&
-		mcid !== marketPlaceChannelId
-	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
+	// if (mcid !== botSpamChannelId &&
+	// 	mcid !== generalChannelId &&
+	// 	mcid !== marketPlaceChannelId
+	// ) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
 
 	if (!args.length) return message.channel.send(`Please specify the card(s) you wish to sell.`)
 	const sellerId = maid
@@ -4286,7 +4285,7 @@ if(cmd === `!sell`) {
 														args.join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim())
 	if (!shopSale && line_items.length > 1) return message.channel.send(`You cannot sell different cards to a player in the same transaction.`)
 
-	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_items, buyingPlayer, sellingPlayer) : await getInvoiceP2PSale(message, line_item = line_items[0], buyingPlayer, sellingPlayer)
+	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_items, sellingPlayer) : await getInvoiceP2PSale(message, line_item = line_items[0], buyingPlayer, sellingPlayer)
 	if (!invoice) return
 
 	if (invoice.total_price > buyingPlayer.wallet.stardust) return message.channel.send(`Sorry, ${buyingPlayer.name} only has ${buyingPlayer.wallet.stardust} and ${invoice.quantities[0] > 1 ? `${invoice.quantities[0]} copies of ` : ''}${invoice.cards[0]} costs ${invoice.total_price}${stardust}.`)
@@ -4314,10 +4313,10 @@ if(cmd === `!sell`) {
 
 //BUY
 if(cmd === `!buy`) {
-	if (mcid !== botSpamChannelId &&
-		mcid !== generalChannelId &&
-		mcid !== marketPlaceChannelId
-	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
+	// if (mcid !== botSpamChannelId &&
+	// 	mcid !== generalChannelId &&
+	// 	mcid !== marketPlaceChannelId
+	// ) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
 
 	if (!args.length) return message.channel.send(`Please specify the card(s) you wish to buy.`)
 	const buyerId = maid
@@ -4344,7 +4343,7 @@ if(cmd === `!buy`) {
 														args.join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim())
 	if (line_item.length > 1) return message.channel.send(`You cannot buy different cards in the same transaction.`)
 
-	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_item, buyingPlayer, sellingPlayer) : await getInvoiceP2PSale(message, line_item[0], buyingPlayer, sellingPlayer)
+	const invoice = shopSale ? await getInvoiceMerchBotPurchase(message, line_item, buyingPlayer) : await getInvoiceP2PSale(message, line_item[0], buyingPlayer, sellingPlayer)
 	if (!invoice) return
 
 	if (invoice.total_price > buyingPlayer.wallet.stardust) return message.channel.send(`Sorry, you only have ${buyingPlayer.wallet.stardust}${stardust} and ${invoice.cards[0]} costs ${invoice.total_price}${stardust}.`)

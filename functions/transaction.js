@@ -75,20 +75,17 @@ const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlaye
 	return collected
 }
 
-
-const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, sellingPlayer) => {
+// GET INVOICE MERCHBOT SALE
+const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer) => {
 	const info = await Info.findOne({ where: { element: 'shop'} })
-
+    const shopIsClosed = info.status === 'closed'
     const sellerId = sellingPlayer.id
-    const buyerId = buyingPlayer.id
-    const authorIsSeller = message.author.id === sellerId
     let total_price = 0
     const cards = []
     const card_codes = []
     const sellerInvs = []
     const quantities = []
     const prints = []
-    let m4success
     let m6success
 
     for (let i = 0; i < line_items.length; i++) {
@@ -98,9 +95,9 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
         const query = isFinite(args[0]) ? args.slice(1).join(' ') : args.slice(0).join(' ')	
 
 		if (!query) {
-            message.channel.send(`Please specify the ${authorIsSeller ? 'card(s)' : 'card'} you wish to ${authorIsSeller ? 'sell' : 'buy'}.`)
+            message.channel.send(`Please specify the cards you wish to sell.`)
             return false
-        } 
+        }
 
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
@@ -116,12 +113,6 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
         }
 
 		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
-        const auction = await Auction.findOne({ where: { printId: print.id }})
-
-        if (!authorIsSeller && auction) {
-            message.channel.send(`Sorry, ${card} will not be available until the next auction.`)
-            return false
-        }
 
         if (card_codes.includes(card_code)) {
             message.channel.send(`You cannot list ${card} more than once.`)
@@ -136,36 +127,39 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
 			}
 		})
 
-		const buyerInv = await Inventory.findOne({ 
+		const merchbotInv = await Inventory.count({ 
 			where: { 
 				printId: print.id,
-				playerId: buyerId,
+				playerId: merchbotId,
 				quantity: { [Op.gt]: 0 }
 			}
 		})
 
-        if (!authorIsSeller && ( (buyerInv && (buyerInv.quantity + quantity > 3)) || quantity > 3 ) ) return message.channel.send(`You cannot buy more than 3 copies of a card from The Shop.`)
+        const auction = await Auction.findOne({ where: { printId: print.id }})
+
+        if ((auction || !merchbotInv) && shopIsClosed) {
+            message.channel.send(`Sorry, you cannot sell ${card} until the current auction is over.`)
+            return false
+        }
 
 		if (!sellerInv) {
-            message.channel.send(`${authorIsSeller ? `You do not have any copies of ${card}` : `Sorry, ${card} is out of stock`}.`)
+            message.channel.send(`You do not have any copies of ${card}.`)
             return false
-        } 
+        }
 
 		if (sellerInv.quantity < quantity) {
-            message.channel.send(`${authorIsSeller ? 'You only have' : `Sorry, I only have`} ${sellerInv.quantity} ${sellerInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`)
+            message.channel.send(`You only have ${sellerInv.quantity} ${sellerInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`)
             return
         } 
 	
-		if (!!(print.rarity === 'scr')) m4success = true
 		if (!!(print.rarity !== 'com' && quantity >= 5)) m6success = true
 
-        total_price += authorIsSeller ? Math.ceil(print.market_price * 0.7) * quantity : Math.ceil(print.market_price * 1.1) * quantity 
+        total_price += Math.ceil(print.market_price * 0.7) * quantity
 		card_codes.push(card_code)
 		quantities.push(quantity)
 		prints.push(print)
 		sellerInvs.push(sellerInv)
 		cards.push(`${quantity} ${card}`)
-    
     }
 
     const invoice = {
@@ -174,13 +168,105 @@ const getInvoiceMerchBotSale = async (message, line_items, buyingPlayer, selling
         cards,
         prints,
         sellerInvs,
-        m4success,
         m6success
     }
 
     return invoice
 }
 
+// GET INVOICE MERCHBOT PURCHASE
+const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer) => {
+    const buyerId = buyingPlayer.id
+    let total_price = 0
+    const cards = []
+    const sellerInvs = []
+    const quantities = []
+    const prints = []
+    let m4success
+
+    const line_item = line_items[0]
+    const args = line_item.split(' ').filter((el) => el !== '')
+    const quantity = isFinite(args[0]) ? parseInt(args[0]) : 1    
+    const query = isFinite(args[0]) ? args.slice(1).join(' ') : args.slice(0).join(' ')	
+
+    if (!query) {
+        message.channel.send(`Please specify the card you wish to buy.`)
+        return false
+    } 
+
+    const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
+    const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+    const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
+
+    const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) :
+                card_name ? await selectPrint(message, buyerId, card_name) :
+                null
+    
+    if (!print) {
+        message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+        return false
+    }
+
+    const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+    const auction = await Auction.findOne({ where: { printId: print.id }})
+
+    if (auction) {
+        message.channel.send(`Sorry, ${card} will not be available until the next auction.`)
+        return false
+    }
+
+    const merchbotInv = await Inventory.findOne({ 
+        where: { 
+            printId: print.id,
+            playerId: merchbotId,
+            quantity: { [Op.gt]: 0 }
+        }
+    })
+
+    const buyerInv = await Inventory.findOne({ 
+        where: { 
+            printId: print.id,
+            playerId: buyerId,
+            quantity: { [Op.gt]: 0 }
+        }
+    })
+
+    if (buyerInv && (buyerInv.quantity + quantity > 3) || quantity > 3 ) {
+        message.channel.send(`You cannot buy more than 3 copies of a card from The Shop.`)
+        return false
+    } 
+
+    if (!merchbotInv) {
+        message.channel.send(`Sorry, ${card} is out of stock.`)
+        return false
+    } 
+
+    if (merchbotInv.quantity < quantity) {
+        message.channel.send(`Sorry, I only have ${merchbotInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`)
+        return
+    } 
+
+    if (!!(print.rarity === 'scr')) m4success = true
+
+    total_price += Math.ceil(print.market_price * 1.1) * quantity 
+    quantities.push(quantity)
+    prints.push(print)
+    sellerInvs.push(merchbotInv)
+    cards.push(`${quantity} ${card}`)
+
+    const invoice = {
+        total_price,
+        quantities,
+        cards,
+        prints,
+        sellerInvs,
+        m4success
+    }
+
+    return invoice
+}
+
+// GET INVOICE P2P SALE
 const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer) => {
     const sellerId = sellingPlayer.id
     const buyerId = buyingPlayer.id
@@ -277,6 +363,7 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
     return invoice
 }
 
+// PROCESS MERCHBOT SALE
 const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer) => {
     const authorIsSeller = message.author.id === sellingPlayer.id
     const total_price = invoice.total_price
@@ -285,10 +372,6 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
     const prints = invoice.prints
     const sellerInvs = invoice.sellerInvs
     const buyerId = buyingPlayer.id
-
-    console.log('quantities')
-    console.log('cards')
-    console.log('prints', prints.map((p) => p.card_name))
 
     if (!total_price || !cards.length || !quantities.length || !prints.length || !sellerInvs.length || !buyerId) {
         message.channel.send(`Error processing MerchBot Sale: missing needed information.`)
@@ -300,9 +383,6 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
         const print = prints[i]
         const sellerInv = sellerInvs[i]
         const price = authorIsSeller ? Math.ceil(print.market_price * 0.7) : Math.ceil(print.market_price * 1.1)
-
-        console.log('print', print.card_name)
-        console.log('quantity', quantity)
 
 		const newPrice = quantity > 16 ? price / quantity :
                         ( price * quantity + ( (16 - quantity) * print.market_price ) ) / 16
@@ -367,6 +447,7 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
     return true
 }
 
+// PROCESS P2P SALE
 const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => {
     const total_price = invoice.total_price
     const card = invoice.card
@@ -455,10 +536,10 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
     return true
 }
  
-
 module.exports = {
     getBuyerConfirmation,
     getSellerConfirmation,
+    getInvoiceMerchBotPurchase,
     getInvoiceMerchBotSale,
     getInvoiceP2PSale,
     processMerchBotSale,

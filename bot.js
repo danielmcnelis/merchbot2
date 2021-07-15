@@ -1781,10 +1781,10 @@ if(cmd === `!diary`) {
 
 //BINDER
 if(bindercom.includes(cmd)) {
-	// if (mcid !== botSpamChannelId &&
-	// 	mcid !== generalChannelId &&
-	// 	mcid !== marketPlaceChannelId
-	// ) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
+	if (mcid !== botSpamChannelId &&
+		mcid !== generalChannelId &&
+		mcid !== marketPlaceChannelId
+	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
 
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const binder = await Binder.findOne({ where: { playerId }, include: Player})
@@ -1908,6 +1908,11 @@ if(cmd === `!search`) {
 	const allBinders = await Binder.findAll({ include: Player })
 	const allWishlists = await Wishlist.findAll({ include: Player })
 	
+	const membersMap = await message.guild.members.fetch()
+	const memberIds = [...membersMap.keys()]
+	const filtered_binders = allBinders.filter((binder) => memberIds.includes(binder.playerId))
+	const filtered_wishlists = allWishlists.filter((wishlist) => memberIds.includes(wishlist.playerId))
+
 	const query = args.join(' ')
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
@@ -1920,13 +1925,13 @@ if(cmd === `!search`) {
 	const binderResults = []
 	const wishlistResults = []
 
-	allBinders.forEach(function(binder) {
+	filtered_binders.forEach(function(binder) {
 		for (let i = 0; i < 18; i++) {
 			if (binder[`slot_${(i + 1)}`] === print.card_code) binderResults.push(binder.player.name)
 		}
 	})
 	
-	allWishlists.forEach(function(wishlist) {
+	filtered_wishlists.forEach(function(wishlist) {
 		for (let i = 0; i < 10; i++) {
 			if (wishlist[`slot_${(i + 1)}`] === print.card_code) wishlistResults.push(wishlist.player.name)
 		}
@@ -2070,9 +2075,14 @@ if (statscom.includes(cmd)) {
 		order: [['stats', 'DESC']]
 	})
 
-	const index = allRecords.length ? allRecords.findIndex(record => record.dataValues.id === playerId) : -1
 
-	const rank = (index === -1 ? `N/A` : `#${index + 1} out of ${allRecords.length}`)
+	const membersMap = await message.guild.members.fetch()
+	const memberIds = [...membersMap.keys()]
+	const filtered_records = allRecords.filter((record) => memberIds.includes(record.id))
+			
+	const index = filtered_records.length ? filtered_records.findIndex(record => record.dataValues.id === playerId) : -1
+
+	const rank = (index === -1 ? `N/A` : `#${index + 1} out of ${filtered_records.length}`)
 	const medal = getMedal(player.stats, true)
 
 	if (playerId === maid) completeTask(message.channel, maid, 'e4')
@@ -2740,10 +2750,14 @@ if (rankcom.includes(cmd)) {
 		},
 		order: [['stats', 'DESC']]
 	})
-			
-	if (x > allPlayers.length) return message.channel.send(`I need a smaller number. We only have ${allPlayers.length} Forged players.`)
 
-	const topPlayers = allPlayers.slice(0, x)
+	const membersMap = await message.guild.members.fetch()
+	const memberIds = [...membersMap.keys()]
+	const filtered_players = allPlayers.filter((player) => memberIds.includes(player.id))
+			
+	if (x > filtered_players.length) return message.channel.send(`I need a smaller number. We only have ${filtered_players.length} Forged players.`)
+
+	const topPlayers = filtered_players.slice(0, x)
 
 	for (let i = 0; i < x; i++) result[i+1] = `${(i+1)}. ${getMedal(topPlayers[i].stats)} ${topPlayers[i].name}`
 

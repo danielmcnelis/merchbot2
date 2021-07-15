@@ -8,7 +8,7 @@ const { botSpamChannelId } = require('../static/channels.json')
 const { client } = require('../static/clients.js')
 const merchbotId = '584215266586525696'
 const { completeTask } = require('./diary')
-const { blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
+const { blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, CPK, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
 
 const awardPack = async (channel, playerId, set, num) => {
 	const member = channel.guild.members.cache.get(playerId)

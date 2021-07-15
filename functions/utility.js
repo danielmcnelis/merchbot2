@@ -126,7 +126,7 @@ const isAmbassador = (member) => member.roles.cache.some(role => role.id === amb
 const isArenaPlayer = (member) => member.roles.cache.some(role => role.id === arenaRole)
 
 //IS TOUR PLAYER?
-const isTourPlayer = (member) => member.roles.cache.some(role => role.id === tourRole)
+const isTourPlayer = (member) => member.roles.cache.some(role => role.id === tourRole || role.id === '864960157758914570')
 
 //HAS PROFILE?
 const hasProfile = async (playerId) => {

@@ -3,7 +3,7 @@
 const { Daily, Diary, Inventory, Set } = require('../db')
 const { Op } = require('sequelize')
 const { awardPack } = require('./packs.js')
-const { cultured, leatherbound, fire, tix, credits, blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
+const { cultured, leatherbound, fire, tix, credits, blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, CPK, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
 const diaries = require('../static/diaries.json')
 const merchbotId = '584215266586525696'
 

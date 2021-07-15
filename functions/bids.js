@@ -3,7 +3,7 @@ const { Auction, Bid, Print, Set, Inventory, Player, Wallet } = require('../db')
 const { yescom, nocom } = require('../static/commands.json')
 const { findCard } = require('./search.js')
 const { selectPrint } = require('./print.js')
-const { blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
+const { blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, CPK, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
 
 const manageBidding = async (message, player) => {
     const filter = m => m.author.id === message.author.id
@@ -52,7 +52,8 @@ const askForBidPlacement = async (message, player) => {
         const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
         const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
         const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, player.id, card_name) : null
-        if (!print) return message.author.send(`Sorry, I do not recognize the card: "${query}".`)
+        const count = print && print.set_code === 'CPK' ? await Inventory.findOne({ where: { printId: print.id } }) : true
+        if (!print || !count) return message.author.send(`Sorry, I do not recognize the card: "${query}".`)
         const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
         
         const auction = await Auction.findOne({ where: { printId: print.id } })

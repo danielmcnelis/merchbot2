@@ -55,6 +55,31 @@ const startArena = async(guild) => {
         element: 'arena'
     }})
 
+    for (let i = 1; i < 12; i ++) {
+        setTimeout(async () => {
+            const count = await Arena.count({ where: {
+                active: true
+            } })
+    
+            const active = await Info.count({ where: {
+                element: 'arena',
+                status: 'active'
+            } })
+
+            if (count === 6 && !active) {
+                info.round = 1
+                info.status = 'active'
+                await info.save()
+                assignArenaRoles(guild, allArenaEntries)
+                setTimeout(() => {
+                    channel.send(`<@&${arenaRole}>, square-up gamers! The Arena starts in 10 seconds. ${cavebob}\n\nP.S. If you aren't playing within 5 minutes of this message, **it's a game loss**!`)
+                }, 1000)
+                return setTimeout(() => {
+                    return startRound(info)
+                }, 11000)
+            }
+        }, i * 5000)
+
     return setTimeout(async () => {
         const count = await Arena.count({ where: {
             active: true
@@ -83,7 +108,12 @@ const startArena = async(guild) => {
             info.status = 'active'
             await info.save()
             assignArenaRoles(guild, allArenaEntries)
-            return startRound(info)
+            setTimeout(() => {
+                channel.send(`<@&${arenaRole}>, square-up gamers! The Arena starts in 10 seconds. ${cavebob}\n\nP.S. If you aren't playing within 5 minutes of this message, **it's a game loss**!`)
+            }, 1000)
+            return setTimeout(() => {
+                return startRound(info)
+            }, 11000)
         }
     }, 61000)
 }

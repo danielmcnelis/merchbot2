@@ -10,7 +10,7 @@ const merchbotId = '584215266586525696'
 const { completeTask } = require('./diary')
 const { blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
 
-const awardPack = async (channel, playerId, set, num) => {
+const awardPack = async (channel, playerId, set, num, prize = false) => {
 	const member = channel.guild.members.cache.get(playerId)
 
     if (!set) set = await Set.findOne({ where: { code: 'DOC' } })
@@ -126,63 +126,25 @@ const awardPack = async (channel, playerId, set, num) => {
             }
         }
 
-        const card_1 = fs.existsSync(`./public/card_images/${images[0]}`) ? 
-            await Canvas.loadImage(`./public/card_images/${images[0]}`) :
-            await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[0]}`)
-
-        const card_2 = fs.existsSync(`./public/card_images/${images[1]}`) ? 
-            await Canvas.loadImage(`./public/card_images/${images[1]}`) :
-            await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[1]}`)
-
-        const card_3 = fs.existsSync(`./public/card_images/${images[2]}`) ? 
-            await Canvas.loadImage(`./public/card_images/${images[2]}`) :
-            await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[2]}`)
-
-        const card_4 = fs.existsSync(`./public/card_images/${images[3]}`) ? 
-            await Canvas.loadImage(`./public/card_images/${images[3]}`) :
-            await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[3]}`)
-
-        const card_5 = fs.existsSync(`./public/card_images/${images[4]}`) ? 
-            await Canvas.loadImage(`./public/card_images/${images[4]}`) :
-            await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[4]}`)
-
-        const card_6 = fs.existsSync(`./public/card_images/${images[5]}`) ? 
-            await Canvas.loadImage(`./public/card_images/${images[5]}`) :
-            await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[5]}`)
-
-        const card_7 = fs.existsSync(`./public/card_images/${images[6]}`) ? 
-            await Canvas.loadImage(`./public/card_images/${images[6]}`) :
-            await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[6]}`)
-
-        const card_8 = fs.existsSync(`./public/card_images/${images[7]}`) ? 
-            await Canvas.loadImage(`./public/card_images/${images[7]}`) :
-            await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[7]}`)
-
-        const card_9 = fs.existsSync(`./public/card_images/${images[8]}`) ? 
-            await Canvas.loadImage(`./public/card_images/${images[8]}`) :
-            await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[8]}`)
-
         const card_width = 57
-        const canvas = Canvas.createCanvas(card_width * 9, 80)
+        const canvas = Canvas.createCanvas(card_width * set.cards_per_pack, 80)
         const context = canvas.getContext('2d')
 
-        if (canvas && context && card_1) context.drawImage(card_1, 0, 0, card_width, 80)
-        if (canvas && context && card_2) context.drawImage(card_2, card_width, 0, card_width, canvas.height)
-        if (canvas && context && card_3) context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
-        if (canvas && context && card_4) context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
-        if (canvas && context && card_5) context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
-        if (canvas && context && card_6) context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
-        if (canvas && context && card_7) context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
-        if (canvas && context && card_8) context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
-        if (canvas && context && card_9) context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
-        const attachment =  canvas && context ?
+        for (let i = 0; i < set.cards_per_pack; i++) {
+            const card = fs.existsSync(`./public/card_images/${images[i]}`) ? 
+            await Canvas.loadImage(`./public/card_images/${images[i]}`) :
+            await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[i]}`)
+            if (canvas && context && card) context.drawImage(card, card_width * i, 0, card_width, canvas.height)
+        }
+
+        const attachment = canvas && context ?
             new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`) :
             false
 
         member.send(results.join('\n'), attachment)
     }
 
-    if (set.code === 'CH1') completeTask(channel, playerId, 'm8')
+    if (set.code === 'CH1' && prize) completeTask(channel, playerId, 'm8')
     if (gotSecret) completeTask(channel, playerId, 'm4', 4000)
     return channel.send(`<@${playerId}> was awarded ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'}. Congratulations!`)
 }

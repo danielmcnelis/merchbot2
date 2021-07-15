@@ -335,38 +335,38 @@ if (cmd === `!fix_atk/def`) {
 	return message.channel.send(`You fixed the ATK/DEF stats of ${updated} cards in the Format Library database.`)
 }
 
-// //CPK
-// if (cmd === `!cpk`) {
-// 	const CH! = {
-// 		code: "CH1",
-// 		name: "Chaos Pack",
-// 		type: "tour",
-// 		emoji: "CPK",
-// 		alt_emoji: "CPK",
-// 		size: 20,
-// 		commons: 9,
-// 		rares: 6,
-// 		supers: 4,
-// 		ultras: 1,
-// 		secrets: 0,
-// 		specials: 0,
-// 		spec_for_sale: false,
-// 		unit_price: 15,
-// 		unit_sales: 0,
-// 		cards_per_pack: 3,
-// 		box_price: 315,
-// 		packs_per_box: 20,
-// 		commons_per_pack: 2,
-// 		commons_per_box: 40,
-// 		rares_per_box: 14,
-// 		supers_per_box: 5,
-// 		ultras_per_box: 1,
-// 		secrets_per_box: 0
-// 	}
+//CPK
+if (cmd === `!cpk`) {
+	const CH1 = {
+		code: "CH1",
+		name: "Chaos Pack",
+		type: "tour",
+		emoji: "CPK",
+		alt_emoji: "CPK",
+		size: 20,
+		commons: 9,
+		rares: 6,
+		supers: 4,
+		ultras: 1,
+		secrets: 0,
+		specials: 0,
+		spec_for_sale: false,
+		unit_price: 15,
+		unit_sales: 0,
+		cards_per_pack: 3,
+		box_price: 315,
+		packs_per_box: 20,
+		commons_per_pack: 2,
+		commons_per_box: 40,
+		rares_per_box: 14,
+		supers_per_box: 5,
+		ultras_per_box: 1,
+		secrets_per_box: 0
+	}
 
-// 	await Set.create(CH1)
-// 	message.channel.send(`I created a set: CH1. Please reset the bot for these changes to take full effect.`)
-// }
+	await Set.create(CH1)
+	message.channel.send(`I created a set: CH1. Please reset the bot for these changes to take full effect.`)
+}
 
 //INIT
 if (cmd === `!init`) {
@@ -743,6 +743,9 @@ if(startcom.includes(cmd)) {
         const { name, id, url } = tournament
 		const unregistered = await Entry.findAll({ where: { participantId: null, tournamentId: id } })
         if (unregistered.length) return message.channel.send('One of more players has not been signed up. Please check the Database.')
+		const entries = await Entry.findAll({ where: { tournamentId: id } })
+		const set = await Set.findOne({ where: { code: 'CH1' } })
+		if (!entries.length || !set) return message.channel.send(`Error: missing needed information.`)
 		const { sheet1Data, sheet2Data } = await generateSheetData()
 		const success = await seed(message, id)
 		if (!success) return message.channel.send(`Error seeding tournament. Please try again or start it manually.`)
@@ -759,7 +762,14 @@ if(startcom.includes(cmd)) {
                     await addSheet(spreadsheetId, 'Summary')
                     await writeToSheet(spreadsheetId, 'Summary', 'RAW', sheet2Data)
                     //await uploadDeckFolder(name)
-                    return message.channel.send(`Let's go! Your tournament is starting now: https://challonge.com/${url} ${FiC}`)
+					message.channel.send(`Please wait while I open some pack(s)... ${blue}`)
+					
+					for (let i = 0; i < entries.length; i++) {
+						const playerId = entries[i].playerId
+						await awardPack(message.channel, playerId, set, 1, false)
+					}
+
+					return message.channel.send(`Let's go! Your tournament is starting now: https://challonge.com/${url} ${FiC}`)
                 }
             }
         })
@@ -1427,9 +1437,9 @@ if (cmd === `!shop`) {
 		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-		if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 		const count = print && print.set_code === 'CH1' ? await Inventory.count({ where: { printId: print.id }}) : true
-		const card = `${eval(print.rarity)}${print.card_code} - ${count ? print.card_name : '???'}`
+		if (!print || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 		const inv = await Inventory.findOne({ where: {
 			printId: print.id,
 			playerId: merchbotId,
@@ -3576,7 +3586,7 @@ if(cmd === `!burn`) {
 
 //AWARD
 if(cmd === `!award`) {
-	if (!isMod(message.member) && !isAdmin(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isMod(message.member) && !isAdmin(message.member) &&!isJazz(message.member)) return message.channel.send("You do not have permission to do that.")
 	const recipient = message.mentions.users.first() ? message.mentions.users.first().id : null	
 	if (!recipient) return message.channel.send(`Please @ mention a user to award.`)
 	if (recipient === maid) return message.channel.send(`You cannot give an award to yourself.`)
@@ -3603,7 +3613,7 @@ if(cmd === `!award`) {
 		}).then(async collected => {
 			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
 			message.channel.send(`Please wait while I open your pack(s)... ${blue}`)			
-			return awardPack(message.channel, recipient, set, quantity)
+			return awardPack(message.channel, recipient, set, quantity, prize = true)
 		}).catch(err => {
 			console.log(err)
 			return message.channel.send(`Sorry, time's up.`)

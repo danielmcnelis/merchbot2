@@ -1,5 +1,6 @@
 
 //PROFILE FUNCTIONS
+const { Inventory } = require('../db')
 const { yescom, nocom } = require('../static/commands.json')
 const { findCard } = require('./search.js')
 
@@ -103,7 +104,9 @@ const getFavoriteCard = async (message, fuzzyPrints, fuzzyPrints2) => {
 		const response = collected.first().content
 		if (response === 'none') return 'none'
         const favorite_card = await findCard(response, fuzzyPrints, fuzzyPrints2) || false
-		if (!favorite_card) message.channel.send(`Could not find card: "${response}".`)
+		const print = await Print.findOne({ where: { card_name: favorite_card }})
+		const count = await Inventory.count({ where: { printId: print.id }})
+		if (!favorite_card || !count) message.channel.send(`Could not find card: "${response}".`)
 		return favorite_card
 	}).catch(err => {
 		console.log(err)

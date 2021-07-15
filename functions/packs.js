@@ -7,7 +7,6 @@ const { getRandomElement, getRandomSubset } = require('./utility.js')
 const { botSpamChannelId } = require('../static/channels.json')
 const { client } = require('../static/clients.js')
 const merchbotId = '584215266586525696'
-const { completeTask } = require('./diary')
 const { blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
 
 const awardPack = async (channel, playerId, set, num, prize = false) => {
@@ -144,9 +143,8 @@ const awardPack = async (channel, playerId, set, num, prize = false) => {
         member.send(results.join('\n'), attachment)
     }
 
-    if (set.code === 'CH1' && prize) completeTask(channel, playerId, 'm8')
-    if (gotSecret) completeTask(channel, playerId, 'm4', 4000)
-    return channel.send(`<@${playerId}> was awarded ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'}. Congratulations!`)
+    channel.send(`<@${playerId}> was awarded ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'}. Congratulations!`)
+    return gotSecret
 }
 
 const awardPacksToShop = async (num) => {

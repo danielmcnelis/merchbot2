@@ -811,8 +811,9 @@ if(startcom.includes(cmd)) {
 			`\nPlease wait while I open some packs... ${blue}`
 			)
 	
-			await awardPack(message.channel, maid, set, 10)
+			const gotSecret = await awardPack(message.channel, maid, set, 10)
 			await completeTask(message.channel, maid, 'e1')
+			if (gotSecret) await completeTask(message.channel, maid, 'm4', 4000)
 			return message.channel.send(`I wish you luck on your journey, new duelist! ${master}`)
 		}).catch(err => {
 			console.log(err)
@@ -3457,7 +3458,8 @@ if(cmd === `!daily`) {
 		let num = master_complete ? 5 : elite_complete ? 4 : hard_complete ? 3 : moderate_complete ? 2 : 1
 		if (num) setTimeout(() => {
 			message.channel.send(`Oh look, ${daily.player.name}, you cobbled together a pack!`, {files:[`./public/packs/7outof7.png`]})
-			awardPack(message.channel, daily.playerId, set, num)
+			const gotSecret = awardPack(message.channel, daily.playerId, set, num)
+			if (gotSecret) completeTask(message.channel, daily.playerId, 'm4')
 		}, 4000)
 	} else {
 		daily.cobble_progress += (daysPassed)
@@ -3684,6 +3686,10 @@ if(cmd === `!award`) {
 			console.log(err)
 			return message.channel.send(`Sorry, time's up.`)
 		})
+
+		return setTimeout(() => {
+			return completeTask(message.channel, recipient, 'm8')
+		}, 5000)
 	}
 
 	const set_code = query.toUpperCase()

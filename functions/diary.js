@@ -128,7 +128,9 @@ const checkDiaryComplete = async (channel, playerId, diary, difficulty) => {
             daily.cobble_progress = 0
             await daily.save()
 
-            return awardPack(channel, playerId, null, num)
+            const gotSecret = await awardPack(channel, playerId, null, num)
+			if (gotSecret) await completeTask(channel, playerId, 'm4')
+            return
         }, 2000)
     }
 }

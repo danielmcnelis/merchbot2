@@ -3179,7 +3179,7 @@ if (cmd === `!create`) {
 
 //BRACKET
 if (bracketcom.includes(cmd)) {
-	const tournaments = await Tournament.findAll({ where: { state: 'pending' } })
+	const tournaments = await Tournament.findAll()
 	const tournament = await selectTournament(message, tournaments, maid)
 	if (!tournament) return message.channel.send('There is no active tournament.')
 

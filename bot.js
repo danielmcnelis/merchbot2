@@ -737,7 +737,7 @@ if (dbcom.includes(cmd)) {
 //STARTER OR START
 if(startcom.includes(cmd)) {
 	if (( message.channel === client.channels.cache.get(tournamentChannelId) && isMod(message.member) ) || isJazz(message.member) ) {
-		const tournaments = await Tournament.findAll({ where: { state: 'pending' } })
+		const tournaments = await Tournament.findAll({ where: { state: 'pending' }, order: [['createdAt', 'ASC']] })
 		const tournament = await selectTournament(message, tournaments, maid)
 		if (!tournament) return message.channel.send(`Error: Could not find pending tournament.`)
         const { name, id, url } = tournament
@@ -2130,6 +2130,7 @@ if (losscom.includes(cmd)) {
 		if (tournament.state === 'pending') return message.channel.send(`Sorry, ${tournament.name} has not started yet.`)
 		if (tournament.state !== 'underway') return message.channel.send(`Sorry, ${tournament.name} is not underway.`)
 		const matchesArr = await getMatches(tournamentId)
+		console.log('matchesArr', matchesArr)
 		let matchId = false
 		let scores = false
 		for (let i = 0; i < matchesArr.length; i++) {
@@ -2137,7 +2138,9 @@ if (losscom.includes(cmd)) {
 			if (match.state !== 'open') continue
 			if (checkChallongePairing(match, losingEntry.participantId, winningEntry.participantId)) {
 				matchId = match.id
+				console.log('matchId', matchId)
 				scores = match.player1_id === winningEntry.participantId ? "1-0" : "0-1"
+				console.log('scores', scores)
 				break
 			}
 		}
@@ -2206,25 +2209,36 @@ if (losscom.includes(cmd)) {
 
 		message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your Tournament loss to ${winningPlayer.name} (+${chipsWinner}${starchips}) has been recorded.`)
 		const updatedMatchesArr = await getMatches(tournamentId)
+		console.log('updatedMatchesArr', updatedMatchesArr)
 		const winnersNextMatch = findNextMatch(updatedMatchesArr, matchId, winningEntry.participantId)
+		console.log('winnersNextMatch', winnersNextMatch)
 		const winnersNextOpponent = winnersNextMatch ? await findNextOpponent(tournamentId, updatedMatchesArr, winnersNextMatch, winningEntry.participantId) : null
+		console.log('winnersNextOpponent', winnersNextOpponent)
 		const winnerMatchWaitingOn = winnersNextOpponent ? null : findOtherPreReqMatch(updatedMatchesArr, winnersNextMatch, matchId) 
+		console.log('winnerMatchWaitingOn', winnerMatchWaitingOn)
 		const winnerWaitingOnP1 = winnerMatchWaitingOn && winnerMatchWaitingOn.p1 && winnerMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: winnerMatchWaitingOn.p1 } }) : null
+		console.log('winnerWaitingOnP1', winnerWaitingOnP1)
 		const winnerWaitingOnP2 = winnerMatchWaitingOn && winnerMatchWaitingOn.p1 && winnerMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: winnerMatchWaitingOn.p2 } }) : null
+		console.log('winnerWaitingOnP2', winnerWaitingOnP2)
 
-		const loserEliminated = tournament.type === 'single elimination' ? true :
-			tournament.type === 'double elimination' && losingEntry.losses >= 2 ? true :
+		const loserEliminated = tournament.tournament_type === 'single elimination' ? true :
+			tournament.tournament_type === 'double elimination' && losingEntry.losses >= 2 ? true :
 			false
 
-		console.log('tournament.type', tournament.type)
+		console.log('tournament.tournament_type', tournament.tournament_type)
 		console.log('losingEntry.losses', losingEntry.losses)
 		console.log('loserEliminated', loserEliminated)
 
 		const losersNextMatch = loserEliminated ? null : findNextMatch(updatedMatchesArr, matchId, losingEntry.participantId)
+		console.log('losersNextMatch', losersNextMatch)
 		const losersNextOpponent = losersNextMatch ? await findNextOpponent(tournamentId, updatedMatchesArr, losersNextMatch, winningEntry.participantId) : null
+		console.log('losersNextOpponent', losersNextOpponent)
 		const loserMatchWaitingOn = losersNextOpponent ? null : findOtherPreReqMatch(updatedMatchesArr, losersNextMatch, matchId) 
+		console.log('loserMatchWaitingOn', loserMatchWaitingOn)
 		const loserWaitingOnP1 = loserMatchWaitingOn && loserMatchWaitingOn.p1 && loserMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: loserMatchWaitingOn.p1 }, include: Player }) : null
+		console.log('loserWaitingOnP1', loserWaitingOnP1)
 		const loserWaitingOnP2 = loserMatchWaitingOn && loserMatchWaitingOn.p1 && loserMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: loserMatchWaitingOn.p2 }, include: Player }) : null
+		console.log('loserWaitingOnP2', loserWaitingOnP2)
 
 		setTimeout(() => {
 			if (loserEliminated) return message.channel.send(`${losingPlayer.name}, You are eliminated from the tournament. Better luck next time!`)
@@ -2540,10 +2554,10 @@ if (noshowcom.includes(cmd)) {
 			`Sorry, ${noShow.user.username} is not in the tournament.`
 			)
 	
-		const tournaments = await Tournament.findAll()
+		const tournaments = await Tournament.findAll({ order: [['createdAt', 'ASC']] })
 		if (!tournaments.length) return message.channel.send(`There is no active tournament.`)
 	
-		const tournament = await selectTournament(message, tournaments)
+		const tournament = await selectTournament(message, tournaments, maid)
 		if (!tournament) return message.channel.send(`Please select a valid tournament.`)
 		
 		return challongeClient.matches.index({
@@ -2785,7 +2799,7 @@ if(joincom.includes(cmd)) {
 
 	if (game === 'Tournament') {							
 		if (isTourPlayer(member)) return message.channel.send(`Sorry, you can only play in one tournament at a time.`)
-		const tournaments = await Tournament.findAll({ where: { state: 'pending' } })
+		const tournaments = await Tournament.findAll({ where: { state: 'pending' }, order: [['createdAt', 'ASC']] })
 		const count = await Tournament.count({ where: { state: 'underway' } })
 		const tournament = await selectTournament(message, tournaments, maid)
 		if (!tournament && count) return message.channel.send(`Sorry, the tournament already started.`)
@@ -3016,7 +3030,7 @@ if(dropcom.includes(cmd)) {
 		)
 	
 	if (game === 'Tournament') {
-		const tournaments = await Tournament.findAll()
+		const tournaments = await Tournament.findAll({ order: [['createdAt', 'ASC']] })
 		if (!tournaments.length) return message.channel.send(`There is no active tournament.`)
 
 		const tournament = await selectTournament(message, tournaments, maid)
@@ -3071,7 +3085,7 @@ if (cmd.toLowerCase() === `!remove`) {
 	if (!playerId) return message.channel.send(`Please specify the player you wish to remove from ${game !== 'Trivia' ? 'the' : ''} ${game}.`)
 
 	if (game === 'Tournament') {
-		const tournaments = await Tournament.findAll()
+		const tournaments = await Tournament.findAll({ order: [['createdAt', 'ASC']] })
 		if (!tournaments.length) return message.channel.send(`There is no active tournament.`)
 
 		const tournament = await selectTournament(message, tournaments, maid)

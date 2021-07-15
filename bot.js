@@ -3018,7 +3018,7 @@ if (cmd === `!end`) {
 		})
 
 		if (status === 200) {
-			const allEntries = await Entry.findAll({ where: { tournamentId: tournamentId }})
+			const allEntries = await Entry.findAll({ where: { tournamentId: tournament.id }})
 			for (let i = 0; i < allEntries.length; i++) {
 				const entry = allEntries[i]
 				const playerId = entry.playerId	

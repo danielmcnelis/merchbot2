@@ -3072,7 +3072,7 @@ if (cmd.toLowerCase() === `!remove`) {
 		const tournaments = await Tournament.findAll()
 		if (!tournaments.length) return message.channel.send(`There is no active tournament.`)
 
-		const tournament = await selectTournament(message, tournaments)
+		const tournament = await selectTournament(message, tournaments, maid)
 		if (!tournament) return message.channel.send(`Please select a valid tournament.`)
 		
 		const entry = await Entry.findOne({ where: { playerId }, include: Player})

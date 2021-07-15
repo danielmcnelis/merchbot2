@@ -283,7 +283,7 @@ const putMatchResult = async (tournamentId, matchId, winnerId, scores) => {
 const findNextMatch = (matchesArr, matchId, participantId) => {
     for (let i = 0; i < matchesArr.length; i++) {
         const match = matchesArr[i].match
-        if (match.state !== 'open') continue
+        if (match.state === 'complete') continue
         if (match.prerequisite_match_ids_csv.includes(matchId) && (match.player1_id === participantId || match.player2_id === participantId)) {
             return match.id
         }

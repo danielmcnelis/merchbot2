@@ -2788,6 +2788,13 @@ if(joincom.includes(cmd)) {
 		const tournament = await selectTournament(message, tournaments, maid)
 		if (!tournament && count) return message.channel.send(`Sorry, the tournament already started.`)
 		if (!tournament && !count) return message.channel.send(`There is no active tournament.`)
+
+		// const info = await Info.findOne({ where: {
+		// 	element: 'registration',
+		// 	status: 'waiting'
+		// }})
+
+		// if (!info) return message.channel.send(`Someone else is signing up for a tournament. Please wait.`)
 		
 		return challongeClient.tournaments.show({
 			id: tournament.id,
@@ -3010,7 +3017,7 @@ if(dropcom.includes(cmd)) {
 		const tournaments = await Tournament.findAll()
 		if (!tournaments.length) return message.channel.send(`There is no active tournament.`)
 
-		const tournament = await selectTournament(message, tournaments)
+		const tournament = await selectTournament(message, tournaments, maid)
 		if (!tournament) return message.channel.send(`Please select a valid tournament.`)
 		
 		const entry = await Entry.findOne({ where: { playerId: maid }, include: Player})
@@ -3018,10 +3025,11 @@ if(dropcom.includes(cmd)) {
 
 		return challongeClient.participants.index({
 			id: tournament.id,
-			callback: (err, data) => {
+			callback: async (err, data) => {
 				if (err) {
 					return message.channel.send(`Could not find tournament: "${tournament.name}".`)
 				} else {
+					await entry.destroy()
 					return removeParticipant(message, message.member, data, entry.participantId, tournament.id, true)
 				}
 			}

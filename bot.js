@@ -762,11 +762,13 @@ if(startcom.includes(cmd)) {
                     await addSheet(spreadsheetId, 'Summary')
                     await writeToSheet(spreadsheetId, 'Summary', 'RAW', sheet2Data)
                     //await uploadDeckFolder(name)
-					message.channel.send(`Please wait while I open some pack(s)... ${blue}`)
 					
-					for (let i = 0; i < entries.length; i++) {
-						const playerId = entries[i].playerId
-						await awardPack(message.channel, playerId, set, 1, false)
+					if (entries.length > 8) {
+						message.channel.send(`Please wait while I open some pack(s)... ${blue}`)
+						for (let i = 0; i < entries.length; i++) {
+							const playerId = entries[i].playerId
+							await awardPack(message.channel, playerId, set, 1, false)
+						}
 					}
 
 					return message.channel.send(`Let's go! Your tournament is starting now: https://challonge.com/${url} ${FiC}`)

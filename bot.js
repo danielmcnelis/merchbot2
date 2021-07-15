@@ -2903,7 +2903,7 @@ if(cmd === '!resubmit') {
 	if (!entry) return message.channel.send(`Sorry, the tournament already started.`)
 	
 	return challongeClient.tournaments.show({
-		id: tournament.id,
+		id: entry.tournament.id,
 		callback: async (err, data) => {
 			if (err) {
 				return message.channel.send(`Could not find tournament: "${tournament.name}".`)

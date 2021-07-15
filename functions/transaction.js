@@ -107,7 +107,7 @@ const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer) => {
                     card_name ? await selectPrint(message, sellerId, card_name) :
                     null
         
-        const count = print && print.set_code === 'CPK' ? await Inventory.findOne({ where: { printId: print.id } }) : true
+        const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true
 
         if (!print || !count) {
             message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
@@ -204,7 +204,7 @@ const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer) => 
                 card_name ? await selectPrint(message, buyerId, card_name) :
                 null
     
-    const count = print && print.set_code === 'CPK' ? await Inventory.findOne({ where: { printId: print.id } }) : true
+    const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true
 
     if (!print || !count) {
         message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
@@ -313,7 +313,7 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
                 card_name ? await selectPrint(message, sellerId, card_name) :
                 null
     
-    const count = print && print.set_code === 'CPK' ? await Inventory.findOne({ where: { printId: print.id } }) : true
+    const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true
 
     if ((!print || !count) && !walletField) {
         message.channel.send(`Sorry, I do not recognize the card: "${query}".`)

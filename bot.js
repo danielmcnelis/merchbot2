@@ -6,7 +6,7 @@ const fs = require('fs')
 const axios = require('axios')
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
-const { fire, tix, credits, blue, red, yellow, stoned, stare, leatherbound, wokeaf, koolaid, cavebob, evil, DOC, CPK, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('./static/emojis.json')
+const { fire, tix, credits, blue, red, yellow, stoned, stare, leatherbound, wokeaf, koolaid, cavebob, evil, DOC, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('./static/emojis.json')
 const { aliuscom, nicknamecom, joincom, bindercom, wishlistcom, invcom, calccom, bracketcom, dropcom, queuecom, checklistcom, startcom, infocom, dbcom, noshowcom, legalcom, listcom, pfpcom, botcom, rolecom, statscom, profcom, losscom, h2hcom, undocom, rankcom, manualcom, yescom, nocom, deckcom } = require('./static/commands.json')
 const { triviaRole, botRole, modRole, adminRole, tourRole, toRole, fpRole, muteRole, arenaRole, ambassadorRole } = require('./static/roles.json')
 const { gutterChannelId, generalChannelId, rulesChannelId, rulingsChannelId, introChannelId, discussionChannelId, staffChannelId, botSpamChannelId, welcomeChannelId, announcementsChannelId, registrationChannelId, replaysChannelId, duelRequestsChannelId, marketPlaceChannelId, shopChannelId, tournamentChannelId, arenaChannelId, keeperChannelId, triviaChannelId, draftChannelId, gauntletChannelId, bugreportsChannelId, suggestionsChannelId } = require('./static/channels.json')
@@ -337,8 +337,8 @@ if (cmd === `!fix_atk/def`) {
 
 // //CPK
 // if (cmd === `!cpk`) {
-// 	const CPK = {
-// 		code: "CPK",
+// 	const CH! = {
+// 		code: "CH1",
 // 		name: "Chaos Pack",
 // 		type: "tour",
 // 		emoji: "CPK",
@@ -364,8 +364,8 @@ if (cmd === `!fix_atk/def`) {
 // 		secrets_per_box: 0
 // 	}
 
-// 	await Set.create(CPK)
-// 	message.channel.send(`I created a set: CPK. Please reset the bot for these changes to take full effect.`)
+// 	await Set.create(CH1)
+// 	message.channel.send(`I created a set: CH1. Please reset the bot for these changes to take full effect.`)
 // }
 
 //INIT
@@ -1428,7 +1428,7 @@ if (cmd === `!shop`) {
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
 		if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
-		const count = print && print.set_code === 'CPK' ? await Inventory.count({ where: { printId: print.id }}) : true
+		const count = print && print.set_code === 'CH1' ? await Inventory.count({ where: { printId: print.id }}) : true
 		const card = `${eval(print.rarity)}${print.card_code} - ${count ? print.card_name : '???'}`
 		const inv = await Inventory.findOne({ where: {
 			printId: print.id,
@@ -1828,7 +1828,7 @@ if(bindercom.includes(cmd)) {
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-		const count = print && print.set_code === 'CPK' ? await Inventory.findOne({ where: { printId: print.id } }) : true
+		const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true
 		if (!print || !count) {
 			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 			continue
@@ -1901,7 +1901,7 @@ if(cmd === `!search`) {
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-	const count = print && print.set_code === 'CPK' ? await Inventory.findOne({ where: { printId: print.id } }) : true
+	const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true
 	if (!print || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 
@@ -1978,7 +1978,7 @@ if(wishlistcom.includes(cmd)) {
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-		const count = print && print.set_code === 'CPK' ? await Inventory.findOne({ where: { printId: print.id } }) : true
+		const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true
 		if (!print || !count) {
 			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 			continue
@@ -3789,7 +3789,7 @@ if(invcom.includes(cmd)) {
 	const card_name = query && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints, fuzzyPrints2) : null
 	const print = valid_card_code ? await Print.findOne({ where: { card_code } }) : card_name ? await selectPrint(message, maid, card_name) : null
 	if (card_name && !print) return
-	const count = print && print.set_code === 'CPK' ? await Inventory.count({ where: { printId: print.id } }) : true
+	const count = print && print.set_code === 'CH1' ? await Inventory.count({ where: { printId: print.id } }) : true
 
 	const inventory = !query.length ? await Inventory.findAll({ 
 		where: { 
@@ -3852,7 +3852,7 @@ if(invcom.includes(cmd)) {
 			console.log(err)
 		}
 
-		const count_2 = row.print.set_code === 'CPK' ? await Inventory.count({ where: { printId: row.printId } }) : true
+		const count_2 = row.print.set_code === 'CH1' ? await Inventory.count({ where: { printId: row.printId } }) : true
 		results.push(`${eval(row.print.rarity)}${row.card_code} - ${count_2 ? row.print.card_name : '???'} - ${row.quantity}`) 
 	}
 
@@ -3929,7 +3929,7 @@ if(checklistcom.includes(cmd)) {
 		}
 
 		const box_emoji = cards.includes(row.card_code) ? checkmark : emptybox
-		const count = code === 'CPK' ? await Inventory.count({ where: { printId: row.id } }) : true
+		const count = code === 'CH1' ? await Inventory.count({ where: { printId: row.id } }) : true
 		results.push(`${box_emoji} ${eval(row.rarity)}${row.card_code} - ${count ? row.card_name : '???'}`) 
 	}
 

@@ -335,38 +335,38 @@ if (cmd === `!fix_atk/def`) {
 	return message.channel.send(`You fixed the ATK/DEF stats of ${updated} cards in the Format Library database.`)
 }
 
-//CPK
-if (cmd === `!cpk`) {
-	const CPK = {
-		code: "CPK",
-		name: "Chaos Pack",
-		type: "tour",
-		emoji: "CPK",
-		alt_emoji: "CPK",
-		size: 20,
-		commons: 9,
-		rares: 6,
-		supers: 4,
-		ultras: 1,
-		secrets: 0,
-		specials: 0,
-		spec_for_sale: false,
-		unit_price: 15,
-		unit_sales: 0,
-		cards_per_pack: 3,
-		box_price: 315,
-		packs_per_box: 20,
-		commons_per_pack: 2,
-		commons_per_box: 40,
-		rares_per_box: 14,
-		supers_per_box: 5,
-		ultras_per_box: 1,
-		secrets_per_box: 0
-	}
+// //CPK
+// if (cmd === `!cpk`) {
+// 	const CPK = {
+// 		code: "CPK",
+// 		name: "Chaos Pack",
+// 		type: "tour",
+// 		emoji: "CPK",
+// 		alt_emoji: "CPK",
+// 		size: 20,
+// 		commons: 9,
+// 		rares: 6,
+// 		supers: 4,
+// 		ultras: 1,
+// 		secrets: 0,
+// 		specials: 0,
+// 		spec_for_sale: false,
+// 		unit_price: 15,
+// 		unit_sales: 0,
+// 		cards_per_pack: 3,
+// 		box_price: 315,
+// 		packs_per_box: 20,
+// 		commons_per_pack: 2,
+// 		commons_per_box: 40,
+// 		rares_per_box: 14,
+// 		supers_per_box: 5,
+// 		ultras_per_box: 1,
+// 		secrets_per_box: 0
+// 	}
 
-	await Set.create(CPK)
-	message.channel.send(`I created a set: CPK. Please reset the bot for these changes to take full effect.`)
-}
+// 	await Set.create(CPK)
+// 	message.channel.send(`I created a set: CPK. Please reset the bot for these changes to take full effect.`)
+// }
 
 //INIT
 if (cmd === `!init`) {

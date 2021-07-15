@@ -2783,6 +2783,7 @@ if(queuecom.includes(cmd)) {
 	}
 }
 
+
 //JOIN
 if(joincom.includes(cmd)) {
 	const member = message.member
@@ -2797,7 +2798,7 @@ if(joincom.includes(cmd)) {
 	const player = await Player.findOne({ where: { id: maid }})
 	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 
-	if (game === 'Tournament') {							
+	if (game === 'Tournament') {
 		if (isTourPlayer(member)) return message.channel.send(`Sorry, you can only play in one tournament at a time.`)
 		const tournaments = await Tournament.findAll({ where: { state: 'pending' }, order: [['createdAt', 'ASC']] })
 		const count = await Tournament.count({ where: { state: 'underway' } })
@@ -2821,50 +2822,38 @@ if(joincom.includes(cmd)) {
 					message.channel.send(`Please check your DMs.`)
 					const dbName = player.duelingBook ? player.duelingBook : await askForDBUsername(member, player)
 					if (!dbName) return
-					const resubmission = await Entry.count({ where: { playerId: player.id } })
-					const deckListUrl = await getDeckListTournament(member, player, resubmission)
+					const deckListUrl = await getDeckListTournament(member, player, resubmission = false)
 					if (!deckListUrl) return
 					const deckName = await getDeckNameTournament(member, player)
 					if (!deckName) return
 
-					if (resubmission) {
-						const entry = await Entry.findOne({ where: { playerId: player.id } })
-						await entry.update({
-							url: deckListUrl,
-							name: deckName,
-							type: deckName
-						})
+					challongeClient.participants.create({
+						id: tournament.id,
+						participant: {
+							name: member.user.username
+						},
+						callback: async (err, data) => {
+							if (err) {
+								console.log(err)
+								return message.author.send(`Error: "${tournament.name}" could not be accessed.`)
+							} else {												
+								member.roles.add(tourRole)
+								await Entry.create({
+									pilot: player.name,
+									url: deckListUrl,
+									name: deckName,
+									type: deckName,
+									category: 'Other',
+									participantId: data.participant.id,
+									playerId: player.id,
+									tournamentId: tournament.id
+								})
 
-						return message.author.send(`Thanks! I have your updated deck list for the tournament.`)
-					} else {
-						challongeClient.participants.create({
-							id: tournament.id,
-							participant: {
-								name: member.user.username
-							},
-							callback: async (err, data) => {
-								if (err) {
-									console.log(err)
-									return message.author.send(`Error: "${tournament.name}" could not be accessed.`)
-								} else {												
-									member.roles.add(tourRole)
-									await Entry.create({
-										pilot: player.name,
-										url: deckListUrl,
-										name: deckName,
-										type: deckName,
-										category: 'Other',
-										participantId: data.participant.id,
-										playerId: player.id,
-										tournamentId: tournament.id
-									})
-
-									message.author.send(`Thanks! I have all the information we need from you. Good luck in the tournament!`)
-									return client.channels.cache.get(tournamentChannelId).send(`<@${player.id}> is now registered for the tournament!`)
-								}
+								message.author.send(`Thanks! I have all the information we need from you. Good luck in the tournament!`)
+								return client.channels.cache.get(tournamentChannelId).send(`<@${player.id}> is now registered for the tournament!`)
 							}
-						})	
-					}
+						}
+					})	
 				}
 			}
 		})
@@ -2897,6 +2886,41 @@ if(joincom.includes(cmd)) {
 	} else {
 		return message.channel.send(`You were already in the ${game} queue.`)
 	}
+}
+
+
+//RESUBMIT
+if(cmd === '!resubmit') {
+	const member = message.member	
+	const player = await Player.findOne({ where: { id: maid }})
+	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!isTourPlayer(member)) return message.channel.send(`You are not currently signed-up for a tournament.`)
+	const entry = await Entry.findOne({ where: { playerId: player.id }, include: Tournament })
+	if (!entry) return message.channel.send(`You are not currently signed-up for a tournament.`)
+	if (entry.tournament.state !== 'pending') return message.channel.send(`Sorry, the tournament already started.`)
+	
+	return challongeClient.tournaments.show({
+		id: tournament.id,
+		callback: async (err, data) => {
+			if (err) {
+				return message.channel.send(`Could not find tournament: "${tournament.name}".`)
+			} else {
+				message.channel.send(`Please check your DMs.`)
+				const deckListUrl = await getDeckListTournament(member, player, resubmission = true)
+				if (!deckListUrl) return
+				const deckName = await getDeckNameTournament(member, player)
+				if (!deckName) return
+
+				await entry.update({
+					url: deckListUrl,
+					name: deckName,
+					type: deckName
+				})
+
+				return message.author.send(`Thanks! I have your updated deck list for the tournament.`)
+			}	
+		}
+	})
 }
 
 //RESET

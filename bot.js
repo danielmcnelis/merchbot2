@@ -2094,7 +2094,7 @@ if (losscom.includes(cmd)) {
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
 	//: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
 	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
-	: "Tournament"
+	: "Ranked"
 
 	const hasArenaRole = isArenaPlayer(message.member)
 	const hasTourRole = isTourPlayer(message.member)
@@ -2764,7 +2764,7 @@ if(joincom.includes(cmd)) {
 	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
 	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
 	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
-	: "Tournament"
+	: null
 
 	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannelId}> or <#${triviaChannelId}>.`)
 	
@@ -3591,6 +3591,24 @@ if(cmd === `!award`) {
 	const quantity = parseInt(args[1]) ? parseInt(args[1]) : 1
 	const query = parseInt(args[1]) ? args.slice(2).join(" ") : args.slice(1).join(" ")
 	if (!quantity || !query) return message.channel.send(`Please specify the query you wish to award.`)
+
+	if (query === 'chaospacks' || query === 'chaospack' || query === 'chaos packs' || query === 'chaos pack' || query === 'ch1' || query === 'cpk') {
+		const set = await Set.findOne({ where: { code: 'CH1' } })
+		if (!set) return message.channel.send(`Could not find set: "CH1".`)
+		const filter = m => m.author.id === message.author.id
+		const msg = await message.channel.send(`Are you sure you want to award ${quantity} Chaos Pack(s) to ${player.name}?`)
+		const collected = await msg.channel.awaitMessages(filter, {
+			max: 1,
+			time: 15000
+		}).then(async collected => {
+			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+			message.channel.send(`Please wait while I open your pack(s)... ${blue}`)			
+			return awardPack(message.channel, recipient, set, quantity)
+		}).catch(err => {
+			console.log(err)
+			return message.channel.send(`Sorry, time's up.`)
+		})
+	}
 
 	const set_code = query.toUpperCase()
 	const valid_set_code = !!(set_code.length === 3 && await Set.count({where: { code: set_code }}))

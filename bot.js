@@ -3012,12 +3012,10 @@ if (cmd === `!end`) {
 		const tournament = await Tournament.findOne({ where: { name: { [Op.iLike]: name } } })
 		if (!tournament) return message.channel.send(`Could not find tournament: "${name}".`)
 
-		// const { status } = await axios({
-		// 	method: 'post',
-		// 	url: `https://formatlibrary:${challongeAPIKey}@api.challonge.com/v1/tournaments/${tournament.id}/finalize.json`
-		// })
-
-		const status = 200
+		const { status } = await axios({
+			method: 'post',
+			url: `https://formatlibrary:${challongeAPIKey}@api.challonge.com/v1/tournaments/${tournament.id}/finalize.json`
+		})
 
 		if (status === 200) {
 			const allEntries = await Entry.findAll({ where: { tournamentId: tournament.id }})

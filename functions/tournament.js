@@ -59,13 +59,16 @@ const getDeckListTournament = async (member, player, resubmission = false) => {
         if (url.includes("www.duelingbook.com/deck")) {		
             member.send('Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.')
             const issues = await saveYDK(member, url)
+
+            console.log('issues', issues)
             
-            if (issues['illegalCards'].length || issues['forbiddenCards'].length || issues['limitedCards'].length || issues['semiLimitedCards'].length) {
+            if (issues['illegalCards'].length || issues['forbiddenCards'].length || issues['limitedCards'].length || issues['semiLimitedCards'].length || issues['phantomCards'].length) {
                 let response = `I'm sorry, ${player.name}, your deck is not legal. ${FiC}`
                 if (issues['illegalCards'].length) response += `\n\nThe following cards are not in this game:\n${issues['illegalCards'].join('\n')}`
                 if (issues['forbiddenCards'].length) response += `\n\nThe following cards are forbidden:\n${issues['forbiddenCards'].join('\n')}`
                 if (issues['limitedCards'].length) response += `\n\nThe following cards are limited:\n${issues['limitedCards'].join('\n')}`
                 if (issues['semiLimitedCards'].length) response += `\n\nThe following cards are semi-limited:\n${issues['semiLimitedCards'].join('\n')}`
+                if (issues['phantomCards'].length) response += `\n\nThe following cards are not in your Inventory at the given quantity:\n${issues['phantomCards'].join('\n')}`
                 response += `\n\nPlease edit your deck and try again once it's legal. If you believe this message is in error, contact the Tournament Organizer.`
             
                 member.send(response)

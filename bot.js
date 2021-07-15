@@ -2781,8 +2781,10 @@ if(joincom.includes(cmd)) {
 	const player = await Player.findOne({ where: { id: maid }})
 	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 
-	if (game === 'Tournament') {
+	if (game === 'Tournament') {							
+		if (isTourPlayer(member)) return message.channel.send(`Sorry, you can only play in one tournament at a time.`)
 		const tournaments = await Tournament.findAll({ where: { state: 'pending' } })
+		const count = await Tournament.count({ where: { state: 'underway' } })
 		const tournament = await selectTournament(message, tournaments, maid)
 		if (!tournament && count) return message.channel.send(`Sorry, the tournament already started.`)
 		if (!tournament && !count) return message.channel.send(`There is no active tournament.`)

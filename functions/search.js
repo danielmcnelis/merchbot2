@@ -3,7 +3,7 @@
 const Discord = require('discord.js')
 const fs = require('fs')
 const { Op } = require('sequelize')
-const { Card, Nickname, Print } = require('../db/index.js')
+const { Card, Nickname, Inventory, Print } = require('../db/index.js')
 
 //CARD SEARCH
 const search = async (query, fuzzyCards, fuzzyCards2) => {
@@ -74,6 +74,60 @@ const fetchAllForgedCards = async () => {
     return allForgedCards
 }
 
+//FETCH ALL YOUR SINGLES
+const fetchYourSingles = async (allForgedCards, playerId) => {
+	const invs = await Inventory.findAll({ 
+		where: {
+			playerId: playerId,
+			quantity: {
+				[Op.gte]: 1
+			}
+		},
+		include: Print
+	})
+
+	const names = invs.map(inv => inv.print.card_name)
+	const yourSingles = allForgedCards.filter(card => names.includes(card.name))
+    return yourSingles
+}
+
+
+//FETCH ALL YOUR DOUblES
+const fetchYourDoubles = async (allForgedCards, playerId) => {
+	const invs = await Inventory.findAll({ 
+		where: {
+			playerId: playerId,
+			quantity: {
+				[Op.gte]: 2
+			}
+		},
+		include: Print
+	})
+
+	const names = invs.map(inv => inv.print.card_name)
+	const yourDoubles = allForgedCards.filter(card => names.includes(card.name))
+    return yourDoubles
+}
+
+
+//FETCH ALL YOUR DOUblES
+const fetchYourTriples = async (allForgedCards, playerId) => {
+	const invs = await Inventory.findAll({ 
+		where: {
+			playerId: playerId,
+			quantity: {
+				[Op.gte]: 3
+			}
+		},
+		include: Print
+	})
+
+	const names = invs.map(inv => inv.print.card_name)
+	const yourTriples = allForgedCards.filter(card => names.includes(card.name))
+    return yourTriples
+}
+
+
 //FETCH UNIQUE PRINTS
 const fetchAllUniquePrintNames = async () => {
     const prints = []
@@ -131,6 +185,9 @@ module.exports = {
 	fetchAllCards,
 	fetchAllForgedCards,
 	fetchAllUniquePrintNames,
+	fetchYourDoubles,
+	fetchYourSingles,
+	fetchYourTriples,
     findCard,
 	search
 }

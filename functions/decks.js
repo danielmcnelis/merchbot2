@@ -7,7 +7,7 @@ const errors = require('../static/errors.json')
 const { approve } = require('../static/emojis.json')
 const { Op } = require('sequelize')
 const { convertCardsArrayToObject } = require('./utility.js')
-const { fetchAllForgedCards } = require('./search.js')
+const { fetchAllForgedCards, fetchYourDoubles, fetchYourSingles, fetchYourTriples } = require('./search.js')
 const { Auction, Bid, Card, Print, Set, Inventory,  Tournament, Status } = require('../db')
 const decks = require('../static/decks.json')
 
@@ -70,6 +70,7 @@ const saveYDK = async (member, url) => {
     const options = new firefox.Options()
     options.addArguments("-headless")
     const username = member.user ? member.user.username : member.username    
+    const playerId = member.user ? member.user.id : member.id    
     const driver = await new Builder().forBrowser('firefox').setFirefoxOptions(options).build()
     
     try {
@@ -105,6 +106,9 @@ const saveYDK = async (member, url) => {
         cards_arr.sort()
         const cards_obj = convertCardsArrayToObject(cards_arr)
         const allForgedCards = await fetchAllForgedCards()
+        const yourSingles = await fetchYourSingles(allForgedCards, playerId)
+        const yourDoubles = await fetchYourDoubles(allForgedCards, playerId)
+        const yourTriples = await fetchYourTriples(allForgedCards, playerId)
 
         const allForbiddenCards = await Status.findAll({ 
             where: {
@@ -129,10 +133,34 @@ const saveYDK = async (member, url) => {
             while (id.length < 8) id = '0' + id
             return id
         })
+
+        const singleIds = yourSingles.map(card => {
+            let id = card.image.slice(0,-4)
+            while (id.length < 8) id = '0' + id
+            return id
+        })
+
+        console.log('singleIds', singleIds)
+
+        const doubleIds = yourDoubles.map(card => {
+            let id = card.image.slice(0,-4)
+            while (id.length < 8) id = '0' + id
+            return id
+        })
+        console.log('doubleIds', doubleIds)
+
+        const tripleIds = yourTriples.map(card => {
+            let id = card.image.slice(0,-4)
+            while (id.length < 8) id = '0' + id
+            return id
+        })
+        console.log('tripleIds', tripleIds)
+
         const forbiddenCardIds = allForbiddenCards.map(card => card.konamiCode)
         const limitedCardIds = allLimitedCards.map(card => card.konamiCode)
         const semiLimitedCardIds = allSemiLimitedCards.map(card => card.konamiCode)
 
+        let phantomCards = []
         let illegalCards = []
         let forbiddenCards = []
         let limitedCards = []
@@ -171,8 +199,32 @@ const saveYDK = async (member, url) => {
                             }
                         })
         
-                        semiLimitedCards.push(semiLimitedCard.name)
-                }
+                    semiLimitedCards.push(semiLimitedCard.name)
+                } else if (!tripleIds.includes(key) && cards_obj[key] >= 3) {
+                    const phantomCard = await Card.findOne({
+                        where: {
+                                image: imageFile
+                            }
+                        })
+        
+                        phantomCards.push(phantomCard.name)
+                } else if (!doubleIds.includes(key) && cards_obj[key] >= 2) {
+                    const phantomCard = await Card.findOne({
+                        where: {
+                                image: imageFile
+                            }
+                        })
+        
+                        phantomCards.push(phantomCard.name)
+                } else if (!singleIds.includes(key) && cards_obj[key] >= 1) {
+                    const phantomCard = await Card.findOne({
+                        where: {
+                                image: imageFile
+                            }
+                        })
+        
+                        phantomCards.push(phantomCard.name)
+                } 
             } else {
                 const illegalCard = await Card.findOne({
                     where: {
@@ -205,6 +257,7 @@ const saveYDK = async (member, url) => {
 			console.log(`${username}'s deck was saved!`)
 		})
         
+        phantomCards.sort()
         illegalCards.sort()
         forbiddenCards.sort()
         limitedCards.sort()
@@ -212,6 +265,7 @@ const saveYDK = async (member, url) => {
         unrecognizedCards.sort()
 
         const issues = {
+            phantomCards,
             illegalCards,
             forbiddenCards,
             limitedCards,

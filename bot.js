@@ -3029,7 +3029,6 @@ if(dropcom.includes(cmd)) {
 				if (err) {
 					return message.channel.send(`Could not find tournament: "${tournament.name}".`)
 				} else {
-					await entry.destroy()
 					return removeParticipant(message, message.member, data, entry.participantId, tournament.id, true)
 				}
 			}

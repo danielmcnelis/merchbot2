@@ -298,6 +298,7 @@ const findOtherPreReqMatch = (matchesArr, nextMatchId, completedMatchId) => {
         const match = matchesArr[i].match
         if (match.id === nextMatchId) {
             const pre_reqs = match.prerequisite_match_ids_csv.split(",")
+            console.log('pre_reqs', pre_reqs)
             if (pre_reqs[0] === completedMatchId) return getPairing(matchesArr, pre_reqs[1])
             else if (pre_reqs[1] === completedMatchId) return getPairing(matchesArr, pre_reqs[0])
             else return false
@@ -326,6 +327,7 @@ const getPairing = (matchesArr, matchId) => {
         p2
     }
 
+    console.log('pairing', pairing)
     return pairing
 }
 

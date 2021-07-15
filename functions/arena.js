@@ -79,6 +79,7 @@ const startArena = async(guild) => {
                 }, 11000)
             }
         }, i * 5000)
+    }
 
     return setTimeout(async () => {
         const count = await Arena.count({ where: {

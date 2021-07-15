@@ -2225,6 +2225,8 @@ if (losscom.includes(cmd)) {
 			tournament.tournament_type === 'double elimination' && losingEntry.losses >= 2 ? true :
 			false
 
+		if (loserEliminated) message.member.roles.remove(tourRole)
+
 		console.log('tournament.tournament_type', tournament.tournament_type)
 		console.log('losingEntry.losses', losingEntry.losses)
 		console.log('loserEliminated', loserEliminated)
@@ -2791,7 +2793,7 @@ if(joincom.includes(cmd)) {
 	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
 	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
 	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
-	: "Tournament"
+	: null
 
 	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannelId}> or <#${triviaChannelId}>.`)
 	
@@ -2895,9 +2897,10 @@ if(cmd === '!resubmit') {
 	const player = await Player.findOne({ where: { id: maid }})
 	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	if (!isTourPlayer(member)) return message.channel.send(`You are not currently signed-up for a tournament.`)
-	const entry = await Entry.findOne({ where: { playerId: player.id }, include: Tournament })
-	if (!entry) return message.channel.send(`You are not currently signed-up for a tournament.`)
-	if (entry.tournament.state !== 'pending') return message.channel.send(`Sorry, the tournament already started.`)
+	const entries = await Entry.findAll({ where: { playerId: player.id }, include: Tournament })
+	if (!entries.length) return message.channel.send(`You are not currently signed-up for a tournament.`)
+	const entry = entries.filter((e) => e.tournament.state === 'pending')[0]
+	if (!entry) return message.channel.send(`Sorry, the tournament already started.`)
 	
 	return challongeClient.tournaments.show({
 		id: tournament.id,

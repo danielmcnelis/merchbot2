@@ -41,6 +41,34 @@ const checkCoreSetComplete = async (playerId, quantity = 1) => {
     return false
 }
 
+
+const check6TribesComplete = async (playerId, goal = 1) => {
+    const task = goal === 1 ? 'h8' : 'l6'
+
+    const count = await Diary.count({
+        where: {
+            playerId: playerId,
+            [task]: true
+        }
+    })
+
+    if (count) return false
+
+    let score = 0
+    
+    const profile = await Profile.findOne({ where: { playerId: playerId }})
+    if (profile.beast_wins >= goal) score++
+    if (profile.dinosaur_wins >= goal) score++
+    if (profile.fish_wins >= goal) score++
+    if (profile.plant_wins >= goal) score++
+    if (profile.reptile_wins >= goal) score++
+    if (profile.rock_wins >= goal) score++
+
+    if (score >= 6) return true
+    else return false
+}
+
+
 const completeTask = async (channel, playerId, task, milliseconds = 2000) => {
     if (playerId === merchbotId) return console.log('abort task completion for @MerchBot')
 

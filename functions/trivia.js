@@ -79,7 +79,18 @@ const startTrivia = async (guild) => {
             }
             
             return channel.send(`Unfortunately, Trivia cannot begin without 5 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`)
-        } 
+        } else {
+            info.round = 1
+            info.status = 'active'
+            await info.save()
+            assignTriviaRoles(guild, allTriviaEntries)
+            setTimeout(() => {
+                channel.send(`<@&${triviaRole}>, look alive bookworms! Trivia starts in 10 seconds. ${wut}\n\nP.S. Remember: answer questions **in your DMs**.`)
+            }, 1000)
+            return setTimeout(() => {
+                return askQuestion(guild, channel, info, allTriviaEntries, questionsArr)
+            }, 11000)
+        }
     }, 61000)
 }
 

@@ -72,7 +72,7 @@ const startArena = async(guild) => {
                 await info.save()
                 assignArenaRoles(guild, allArenaEntries)
                 setTimeout(() => {
-                    channel.send(`<@&${arenaRole}>, square-up gamers! The Arena starts in 10 seconds. ${cavebob}\n\nP.S. If you aren't playing within 5 minutes of this message, **it's a game loss**!`)
+                    arenaChannel.send(`<@&${arenaRole}>, square-up gamers! The Arena starts in 10 seconds. ${cavebob}\n\nP.S. If you aren't playing within 5 minutes of this message, **it's a game loss**!`)
                 }, 1000)
                 return setTimeout(() => {
                     return startRound(info)
@@ -110,7 +110,7 @@ const startArena = async(guild) => {
             await info.save()
             assignArenaRoles(guild, allArenaEntries)
             setTimeout(() => {
-                channel.send(`<@&${arenaRole}>, square-up gamers! The Arena starts in 10 seconds. ${cavebob}\n\nP.S. If you aren't playing within 5 minutes of this message, **it's a game loss**!`)
+                arenaChannel.send(`<@&${arenaRole}>, square-up gamers! The Arena starts in 10 seconds. ${cavebob}\n\nP.S. If you aren't playing within 5 minutes of this message, **it's a game loss**!`)
             }, 1000)
             return setTimeout(() => {
                 return startRound(info)

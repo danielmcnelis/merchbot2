@@ -86,7 +86,12 @@ const startArena = async(guild) => {
             active: true
         } })
 
-        if (count !== 6) {
+        const active = await Info.count({ where: {
+            element: 'arena',
+            status: 'active'
+        } })
+
+        if (count !== 6 && !active) {
             const missingArenaEntries = await Arena.findAll({ 
                 where: { 
                     active: false
@@ -104,7 +109,7 @@ const startArena = async(guild) => {
             }
             
             return arenaChannel.send(`Unfortunately, The Arena cannot begin without 6 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`)
-        } else {
+        } else if (count === 6 && !active) {
             info.round = 1
             info.status = 'active'
             await info.save()

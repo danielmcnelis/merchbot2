@@ -61,7 +61,12 @@ const startTrivia = async (guild) => {
             active: true
         } })
 
-        if (count !== 5) {
+        const active = await Info.count({ where: {
+            element: 'trivia',
+            status: 'active'
+        } })
+
+        if (count !== 5 && !active) {
             const missingTriviaEntries = await Trivia.findAll({ 
                 where: { 
                     active: false
@@ -79,7 +84,7 @@ const startTrivia = async (guild) => {
             }
             
             return channel.send(`Unfortunately, Trivia cannot begin without 5 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`)
-        } else {
+        } else if (count === 5 && !active) {
             info.round = 1
             info.status = 'active'
             await info.save()

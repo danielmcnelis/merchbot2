@@ -538,7 +538,7 @@ const getExcludedPrintIds = async (message, rarity, set, exclusions) => {
 // GET BARTER DIRECTION
 const getBarterDirection = async (message) => {
     const options = [
-        `(1) A Card`
+        `(1) A Card`,
         `(2) Vouchers`,
     ]
 

@@ -42,7 +42,7 @@ const { makeSheet, addSheet, writeToSheet } = require('./functions/sheets.js')
 const { askForAdjustConfirmation, askForCardSlot, collectNicknames, getNewMarketPrice, askForSetToPrint, selectPrint, askForRarity } = require('./functions/print.js')
 const { uploadDeckFolder } = require('./functions/drive.js')
 const { fetchAllCardNames, fetchAllCards, fetchAllUniquePrintNames, findCard, search } = require('./functions/search.js')
-const { getBarterCard, getVoucher, checkShopShouldBe, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
+const { getBarterCard, getVoucher, getBarterDirection, askForBarterConfirmation, checkShopShouldBe, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
 const { awardPack } = require('./functions/packs.js')
 const { createTrade, processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
 const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard } = require('./functions/profile.js')
@@ -1131,7 +1131,7 @@ if(deckcom.includes(cmd)) {
 
 		const set = await Set.findOne({ where: { 
 			code: decks[deck].set_code
-		 }})
+		}})
 
 		if (!set) return message.channel.send(`Could not find set with code "${decks[deck].set_code}".`)
 		if (!set.for_sale) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} ${eval(set.alt_emoji)} is out of stock.`)
@@ -4713,16 +4713,18 @@ if(cmd === `!barter`) {
 	const medium_complete = diary.m1 && diary.m2 && diary.m3 && diary.m4 && diary.m5 && diary.m6 && diary.m7 && diary.m8 && diary.m9 && diary.m10
 	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 
-	const voucher = await getVoucher(message)
-	const selected_option = await getBarterCard(message, voucher, medium_complete)
+	const direction = await getBarterDirection(message)
+	let voucher = direction === 'get_card' ? await getVoucher(message, direction) : null
+	const selected_option = direction === 'get_card' ? await getBarterCard(message, voucher, medium_complete) : await getTradeInCard(message, medium_complete)
 	if (!selected_option) return
+	if (!voucher) voucher = selected_option[3]
 
 	const print = await Print.findOne({ where: { card_code: selected_option[1] } })
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 	if (!print) return message.channel.send(`Could not find card: "${selected_option[1]}".`)
 
 	const price = selected_option[0]
-	if (wallet[voucher] < price) return message.channel.send(`Sorry, you only have ${wallet[voucher]} ${eval(voucher)} and ${card} costs ${price} ${eval(voucher)}.`)
+	if (direction === 'get_card' && wallet[voucher] < price) return message.channel.send(`Sorry, you only have ${wallet[voucher]} ${eval(voucher)} and ${card} costs ${price} ${eval(voucher)}.`)
 
 	const inv = await Inventory.findOne({ where: {
 		printId: print.id,
@@ -4730,26 +4732,46 @@ if(cmd === `!barter`) {
 		playerId: maid 
 	}})
 
-	if (inv) {
+	if (direction === 'get_vouchers' && (!inv || inv.quantity < 1)) return message.channel.send(`Sorry, you do not any copies of ${card}.`)
+
+	const confirmation = await askForBarterConfirmation(message, voucher, card, price, direction)
+	if (!confirmation) return
+
+	if (inv && direction === 'get_card') {
 		inv.quantity++
 		await inv.save()
-	} else {
+
+		wallet[voucher] -= price
+		await wallet.save()
+	} else if (!inv && direction === 'get_card') {
 		await Inventory.create({
 			printId: print.id,
 			card_code: print.card_code,
 			playerId: maid,
 			quantity: 1
 		})
+
+		wallet[voucher] -= price
+		await wallet.save()
+	} else if (inv && direction === 'get_vouchers') {
+		inv.quantity--
+		await inv.save()
+
+		wallet[voucher] += price
+		await wallet.save()
+	} else {
+		return message.channel.send(`Something went wrong. You do not appear to have any copies of ${card}.`)
 	}
 
-	wallet[voucher] -= price
-	await wallet.save()
 	
-	if (print.set_code === 'APC' && inv && inv.quantity >= 3 ) completeTask(message.channel, maid, 'h5')
-	if (print.set_code !== 'APC' && await checkCoreSetComplete(maid, 1)) completeTask(message.channel, maid, 'h4')
-	if (print.set_code !== 'APC' && await checkCoreSetComplete(maid, 3)) completeTask(message.channel, maid, 'l3', 3000)
-	return message.channel.send(`Thanks! You exchanged ${price} ${eval(voucher)} for a copy of ${card}.`)
+	if (direction === 'get_card' && print.set_code === 'APC' && inv && inv.quantity >= 3 ) completeTask(message.channel, maid, 'h5')
+	if (direction === 'get_card' && print.set_code !== 'APC' && await checkCoreSetComplete(maid, 1)) completeTask(message.channel, maid, 'h4')
+	if (direction === 'get_card' && print.set_code !== 'APC' && await checkCoreSetComplete(maid, 3)) completeTask(message.channel, maid, 'l3', 3000)
+	const response = direction === 'get_card' ? `Thanks! You exchanged ${price} ${eval(voucher)} for a copy of ${card}.` :
+				`Thanks! You exchanged a copy of ${card} for ${price} ${eval(voucher)}.`
+	return message.channel.send(response)
 }
+
 
 //BID
 if(cmd === `!bid`) {

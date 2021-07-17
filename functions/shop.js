@@ -535,6 +535,39 @@ const getExcludedPrintIds = async (message, rarity, set, exclusions) => {
     return printIds
 }
 
+// GET BARTER DIRECTION
+const getBarterDirection = async (message) => {
+    const options = [
+        `(1) A Card`
+        `(2) Vouchers`,
+    ]
+
+    const filter = m => m.author.id === message.member.user.id
+	const msg = await message.channel.send(`What would you like to **receive** in this exchange?\n${options.join("\n")}`)
+    const collected = await msg.channel.awaitMessages(filter, {
+		max: 1,
+        time: 15000
+    }).then(async collected => {
+		const response = collected.first().content.toLowerCase()
+        let direction
+        if(response.includes('1') || response.includes('card')) {
+            direction = 'get_card'
+        } else if(response.includes('2') || response.includes('vouch')) {
+            direction = 'get_vouchers'
+        } else {
+            message.channel.send(`You did not select a valid option.`)
+            return false
+        }
+
+        return direction
+    }).catch(err => {
+		console.log(err)
+        message.channel.send(`Sorry, time's up.`)
+        return false
+	})
+
+    return collected
+}
 
 // GET VOUCHER
 const getVoucher = async (message) => {
@@ -644,13 +677,116 @@ const getBarterCard = async (message, voucher, medium_complete) => {
     return collected
 }
 
+
+// GET TRADE-IN CARD
+const getTradeInCard = async (message, medium_complete) => {
+    const wares = [
+        [10, 'APC-001', `(1) ${ult}APC-001 - Desmanian Devil - 10 ${mushroom}`, 'mushroom'],
+        [10, 'APC-002', `(2) ${ult}APC-002 - Koa'ki Meiru Guardian - 10 ${moai}`, 'moai'],
+        [10, 'APC-003', `(3) ${ult}APC-003 - Rose Lover - 10 ${rose}`, 'rose'],
+        [10, 'APC-004', `(4) ${ult}APC-004 - Moray of Greed - 10 ${hook}`, 'hook'],
+        [10, 'APC-005', `(5) ${ult}APC-005 - Spacetime Transcendence - 10 ${egg}`, 'egg'],
+        [10, 'APC-006', `(6) ${ult}APC-006 - Viper's Rebirth - 10 ${cactus}`, 'cactus']
+    ]
+
+    const advanced_wares = [
+        [20, 'DOC-180', `(7) ${ult}DOC-180 - Peropero Cerperus - 20 ${mushroom}`, 'mushroom'],
+        [20, 'DOC-174', `(8) ${ult}DOC-174 - Block Golem - 20 ${moai}`, 'moai'],
+        [30, 'DOC-178', `(9) ${ult}DOC-178 - Mardel, Generaider Boss of Light - 30 ${rose}`, 'rose'],
+        [20, 'DOC-181', `(10) ${ult}DOC-181 - Sharkraken - 20 ${hook}`, 'hook'],
+        [40, 'DOC-176', `(11) ${ult}DOC-176 - Giant Rex - 40 ${egg}`, 'egg'],
+        [30, 'DOC-177', `(12) ${ult}DOC-177 - Ipiria - 30 ${cactus}`, 'cactus']
+    ]
+
+    const options = medium_complete ? wares : [...wares, ...advanced_wares]
+    if (options.length === 1) return options[0]
+    const cards = options.map((o) => o[2])
+
+    const filter = m => m.author.id === message.member.user.id
+	const msg = await message.channel.send(`Which card would you like to trade-in?\n${cards.join("\n")}`)
+    const collected = await msg.channel.awaitMessages(filter, {
+		max: 1,
+        time: 15000
+    }).then(async collected => {
+		const response = collected.first().content.toLowerCase()
+        let index
+        if(response.includes('1') || response.includes('APC-001') || response.includes('devil') || response.includes('desm')) {
+            index = 0
+        } else if(response.includes('2') || response.includes('APC-002') || response.includes('koa') || response.includes('guardian')) {
+            index = 1
+        } else if(response.includes('3') || response.includes('APC-003') || response.includes('rose') || response.includes('lover')) {
+            index = 2
+        } else if(response.includes('4') || response.includes('APC-004') || response.includes('moray') || response.includes('greed')) {
+            index = 3
+        } else if(response.includes('5') || response.includes('APC-005') || response.includes('space') || response.includes('trans')) {
+            index = 4
+        } else if(response.includes('6') || response.includes('APC-006') || response.includes('viper') || response.includes('rebirth')) {
+            index = 5
+        } else if(medium_complete && response.includes('7') || response.includes('DOC-180') || response.includes('pero') || response.includes('cerp')) {
+            index = 6
+        } else if(medium_complete && response.includes('8') || response.includes('DOC-174') || response.includes('block') || response.includes('golem')) {
+            index = 7
+        } else if(medium_complete && response.includes('9') || response.includes('DOC-178') || response.includes('mardel') || response.includes('generaider')) {
+            index = 8
+        } else if(medium_complete && response.includes('10') || response.includes('DOC-181') || response.includes('shark') || response.includes('kraken')) {
+            index = 9
+        } else if(medium_complete && response.includes('11') || response.includes('DOC-176') || response.includes('giant') || response.includes('rex')) {
+            index = 10
+        } else if(medium_complete && response.includes('12') || response.includes('DOC-177') || response.includes('ipir')) {
+            index = 11
+        } else {
+            message.channel.send(`You did not select a valid option.`)
+            return false
+        }
+
+        const selected_option = options[index]
+        return selected_option
+    }).catch(err => {
+		console.log(err)
+        message.channel.send(`Sorry, time's up.`)
+        return false
+	})
+
+    return collected
+}
+
+
+// ASK FOR BARTER CONFIRMATION
+const askForBarterConfirmation = async (message, voucher, card, price, direction) => {
+    const prompt = direction === 'get_card' ? `Are you sure you want to exchange ${price} ${eval(voucher)} for a copy of ${card}?` :
+        `Are you sure you want to exchange a copy of ${card} for ${price} ${eval(voucher)}?`
+        
+    const filter = m => m.author.id === message.author.id
+    const msg = await message.channel.send(prompt)
+    const collected = await msg.channel.awaitMessages(filter, {
+        max: 1,
+        time: 15000
+    }).then(async collected => {
+        if (yescom.includes(collected.first().content.toLowerCase())) {
+            return true
+        } else {
+            message.channel.send(`No problem. Have a nice day.`)
+            return false
+        }  
+    }).catch(err => {
+        console.log(err)
+        message.channel.send(`Sorry, time's up.`)
+        return false
+    })
+
+    return collected
+}
+
+
 module.exports = {
+    askForBarterConfirmation,
     askForDumpConfirmation,
     askForExclusions,
     checkShopOpen,
     checkShopShouldBe,
     closeShop,
     getBarterCard,
+    getBarterDirection,
     getDumpRarity,
     getDumpQuantity,
     getExclusions,

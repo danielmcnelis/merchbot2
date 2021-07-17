@@ -120,7 +120,6 @@ const checkDiaryComplete = async (channel, playerId, diary, difficulty) => {
         )
     ) {
         return setTimeout(async () => {
-            const num = difficulty === 'Elite' ? 4 : difficulty === 'Hard' ? 3 : difficulty === 'Moderate' ? 2 : 1 
             channel.send(`<@${playerId}>, Congrats! You completed your ${difficulty} Diary${leatherbound}!`)
             channel.send(`\n${blue} ${koolaid} ${legend} ${cavebob} ${cultured}`)
 
@@ -128,7 +127,7 @@ const checkDiaryComplete = async (channel, playerId, diary, difficulty) => {
             daily.cobble_progress = 0
             await daily.save()
 
-            const gotSecret = await awardPack(channel, playerId, null, num)
+            const gotSecret = await awardPack(channel, playerId, null)
 			if (gotSecret) await completeTask(channel, playerId, 'm4')
             return
         }, 2000)

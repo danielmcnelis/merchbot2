@@ -42,7 +42,7 @@ const { makeSheet, addSheet, writeToSheet } = require('./functions/sheets.js')
 const { askForAdjustConfirmation, askForCardSlot, collectNicknames, getNewMarketPrice, askForSetToPrint, selectPrint, askForRarity } = require('./functions/print.js')
 const { uploadDeckFolder } = require('./functions/drive.js')
 const { fetchAllCardNames, fetchAllCards, fetchAllUniquePrintNames, findCard, search } = require('./functions/search.js')
-const { getBarterCard, checkShopShouldBe, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
+const { getBarterCard, getVoucher, checkShopShouldBe, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
 const { awardPack } = require('./functions/packs.js')
 const { createTrade, processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
 const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard } = require('./functions/profile.js')
@@ -3458,7 +3458,7 @@ if(cmd === `!daily`) {
 		let num = master_complete ? 5 : elite_complete ? 4 : hard_complete ? 3 : moderate_complete ? 2 : 1
 		if (num) setTimeout(() => {
 			message.channel.send(`Oh look, ${daily.player.name}, you cobbled together a pack!`, {files:[`./public/packs/7outof7.png`]})
-			const gotSecret = awardPack(message.channel, daily.playerId, set, num)
+			const gotSecret = await awardPack(message.channel, daily.playerId, set, num)
 			if (gotSecret) completeTask(message.channel, daily.playerId, 'm4')
 		}, 4000)
 	} else {
@@ -3681,7 +3681,7 @@ if(cmd === `!award`) {
 		}).then(async collected => {
 			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
 			message.channel.send(`Please wait while I open your pack(s)... ${blue}`)			
-			return awardPack(message.channel, recipient, set, quantity, prize = true)
+			return awardPack(message.channel, recipient, set, quantity)
 		}).catch(err => {
 			console.log(err)
 			return message.channel.send(`Sorry, time's up.`)
@@ -4697,40 +4697,32 @@ if(cmd === `!buy`) {
 	} else {
 		if (await checkCoreSetComplete(buyerId, 1)) completeTask(message.channel, buyerId, 'h4', 4000)
 		if (await checkCoreSetComplete(buyerId, 3)) completeTask(message.channel, buyerId, 'l3', 5000)
-		return message.channel.send(`${buyingPlayer.name} bought ${invoice.quantity} ${invoice.card} from ${sellingPlayer.name} for ${invoice.total_price}${stardust}.`)
+		return message.channel.send(`${buyingPlayer.name} bought ${invoice.card} from ${sellingPlayer.name} for ${invoice.total_price}${stardust}.`)
 	}
 }
 
 //BARTER
 if(cmd === `!barter`) {
-	const wallet = await Wallet.findOne({  
+	const player = await Player.findOne({  
 		where: { playerId: maid }, 
-		include: Player
+		include: [Diary, Wallet]
 	})
 
-	if (!wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	const diary = player.diary
+	const wallet = player.wallet
+	const medium_complete = diary.m1 && diary.m2 && diary.m3 && diary.m4 && diary.m5 && diary.m6 && diary.m7 && diary.m8 && diary.m9 && diary.m10
+	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 
-	const card_name = await getBarterCard(message)
-	if (!card_name) return
+	const voucher = await getVoucher(message)
+	const selected_option = await getBarterCard(message, voucher, medium_complete)
+	if (!selected_option) return
 
-	const print = await Print.findOne({ where: {
-		card_name,
-		set_code: 'APC'
-	}})
-
+	const print = await Print.findOne({ where: { card_code: selected_option[1] } })
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+	if (!print) return message.channel.send(`Could not find card: "${selected_option[1]}".`)
 
-	if (!print) return message.channel.send(`Could not find APC: "card_name".`)
-
-	const currency = card_name === 'Desmanian Devil' ? 'mushroom' :
-		card_name === `Koa'ki Meiru Guardian` ? 'moai' :
-		card_name === 'Rose Lover' ? 'rose' :
-		card_name === 'Moray of Greed' ? 'hook' :
-		card_name === 'Spacetime Transcendence' ? 'egg' :
-		card_name === `Viper's Rebirth` ? 'cactus' :
-		null
-
-	if (wallet[currency] < 10) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${wallet[currency]} ${eval(currency)} and ${card} costs 10 ${eval(currency)}.`)
+	const price = selected_option[0]
+	if (wallet[voucher] < price) return message.channel.send(`Sorry, you only have ${wallet[voucher]} ${eval(voucher)} and ${card} costs ${price} ${eval(currency)}.`)
 
 	const inv = await Inventory.findOne({ where: {
 		printId: print.id,
@@ -4750,14 +4742,13 @@ if(cmd === `!barter`) {
 		})
 	}
 
-	wallet[currency] -= 10
+	wallet[voucher] -= price
 	await wallet.save()
 	
 	if (print.set_code === 'APC' && inv && inv.quantity >= 3 ) completeTask(message.channel, maid, 'h5')
-	if (await checkCoreSetComplete(maid, 1)) completeTask(message.channel, maid, 'h4')
-	if (await checkCoreSetComplete(maid, 3)) completeTask(message.channel, maid, 'l3', 3000)
-	
-	return message.channel.send(`Thanks! You exchanged 10 ${eval(currency)} for a copy of ${card}.`)
+	if (print.set_code !== 'APC' && await checkCoreSetComplete(maid, 1)) completeTask(message.channel, maid, 'h4')
+	if (print.set_code !== 'APC' && await checkCoreSetComplete(maid, 3)) completeTask(message.channel, maid, 'l3', 3000)
+	return message.channel.send(`Thanks! You exchanged ${price} ${eval(voucher)} for a copy of ${card}.`)
 }
 
 //BID

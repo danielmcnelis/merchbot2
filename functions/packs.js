@@ -9,7 +9,7 @@ const { client } = require('../static/clients.js')
 const merchbotId = '584215266586525696'
 const { blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
 
-const awardPack = async (channel, playerId, set, num, prize = false) => {
+const awardPack = async (channel, playerId, set, num = 1, prize = false) => {
 	const member = channel.guild.members.cache.get(playerId)
 
     if (!set) set = await Set.findOne({ where: { code: 'DOC' } })

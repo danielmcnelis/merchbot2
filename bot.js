@@ -4732,7 +4732,7 @@ if(cmd === `!barter`) {
 		playerId: maid 
 	}})
 
-	if (direction === 'get_vouchers' && (!inv || inv.quantity < 1)) return message.channel.send(`Sorry, you do not any copies of ${card}.`)
+	if (direction === 'get_vouchers' && (!inv || inv.quantity < 1)) return message.channel.send(`Sorry, you do not have any copies of ${card}.`)
 
 	const confirmation = await askForBarterConfirmation(message, voucher, card, price, direction)
 	if (!confirmation) return

@@ -791,6 +791,7 @@ module.exports = {
     getDumpQuantity,
     getExclusions,
     getExcludedPrintIds,
+    getTradeInCard,
     getShopCountdown,
     getVoucher,
     openShop,

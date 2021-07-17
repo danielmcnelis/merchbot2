@@ -3456,7 +3456,7 @@ if(cmd === `!daily`) {
 	if (easy_complete && (daily.cobble_progress + daysPassed) >= 7) {
 		daily.cobble_progress = 0
 		let num = master_complete ? 5 : elite_complete ? 4 : hard_complete ? 3 : moderate_complete ? 2 : 1
-		if (num) setTimeout(() => {
+		if (num) setTimeout(async () => {
 			message.channel.send(`Oh look, ${daily.player.name}, you cobbled together a pack!`, {files:[`./public/packs/7outof7.png`]})
 			const gotSecret = await awardPack(message.channel, daily.playerId, set, num)
 			if (gotSecret) completeTask(message.channel, daily.playerId, 'm4')

@@ -698,7 +698,7 @@ const getTradeInCard = async (message, medium_complete) => {
         [30, 'DOC-177', `(12) ${ult}DOC-177 - Ipiria - 30 ${cactus}`, 'cactus']
     ]
 
-    const options = medium_complete ? wares : [...wares, ...advanced_wares]
+    const options = medium_complete ? [...wares, ...advanced_wares] : wares
     if (options.length === 1) return options[0]
     const cards = options.map((o) => o[2])
 

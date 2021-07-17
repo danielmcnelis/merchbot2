@@ -4704,7 +4704,7 @@ if(cmd === `!buy`) {
 //BARTER
 if(cmd === `!barter`) {
 	const player = await Player.findOne({  
-		where: { playerId: maid }, 
+		where: { id: maid }, 
 		include: [Diary, Wallet]
 	})
 

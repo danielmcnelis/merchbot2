@@ -4722,7 +4722,7 @@ if(cmd === `!barter`) {
 	if (!print) return message.channel.send(`Could not find card: "${selected_option[1]}".`)
 
 	const price = selected_option[0]
-	if (wallet[voucher] < price) return message.channel.send(`Sorry, you only have ${wallet[voucher]} ${eval(voucher)} and ${card} costs ${price} ${eval(currency)}.`)
+	if (wallet[voucher] < price) return message.channel.send(`Sorry, you only have ${wallet[voucher]} ${eval(voucher)} and ${card} costs ${price} ${eval(voucher)}.`)
 
 	const inv = await Inventory.findOne({ where: {
 		printId: print.id,

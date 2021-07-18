@@ -3670,7 +3670,7 @@ if(cmd === `!award`) {
 	const query = parseInt(args[1]) ? args.slice(2).join(" ").toLowerCase() : args.slice(1).join(" ").toLowerCase()
 	if (!quantity || !query) return message.channel.send(`Please specify the query you wish to award.`)
 
-	const set_code = query.includes('chaospack') || query.includes('chaos pack') || query === 'ch1' ? 'CH1' :
+	let set_code = query.includes('chaospack') || query.includes('chaos pack') || query === 'ch1' ? 'CH1' :
 	query === 'pack' || query === 'packs' || query === 'doc' ? 'DOC' : null
 
 	if (set_code) {
@@ -3695,7 +3695,7 @@ if(cmd === `!award`) {
 		}, 5000)
 	}
 
-	const set_code = query.toUpperCase()
+	set_code = query.slice(0, 3).toUpperCase()
 	const valid_set_code = !!(set_code.length === 3 && await Set.count({where: { code: set_code }}))
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))

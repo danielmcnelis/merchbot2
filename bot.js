@@ -3698,9 +3698,9 @@ if(cmd === `!award`) {
 			return message.channel.send(`Sorry, time's up.`)
 		})
 
-		return setTimeout(() => {
-			return completeTask(message.channel, recipient, 'm8')
-		}, 5000)
+		// if (set_code === 'CH1') return setTimeout(() => {
+		// 	return completeTask(message.channel, recipient, 'm8')
+		// }, 5000)
 	}
 
 	set_code = query.slice(0, 3).toUpperCase()

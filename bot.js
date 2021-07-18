@@ -2636,6 +2636,11 @@ if (noshowcom.includes(cmd)) {
 
 //H2H
 if (h2hcom.includes(cmd)) {
+	const game_mode = message.channel === client.channels.cache.get(arenaChannelId) ? 'arena' :
+		message.channel === client.channels.cache.get(keeperChannelId) ? 'keeper' :
+		message.channel === client.channels.cache.get(draftChannelId) ? 'draft' :
+		'ranked'
+
 	const usersMap = message.mentions.users
 	const userIds = [...usersMap.keys()]
 	const player1Id = message.mentions.users.first() ? message.mentions.users.first().id : null	
@@ -2652,10 +2657,13 @@ if (h2hcom.includes(cmd)) {
 	if (!player2 && player2Id === maid) return message.channel.send(`You are not in the database.`)
 	if (!player2 && player2Id !== maid) return message.channel.send(`The second user is not in the database.`)
 
-	const p1Wins = await Match.count({ where: { winnerId: player1Id, loserId: player2Id } })
-	const p2Wins = await Match.count({ where: { winnerId: player2Id, loserId: player1Id } })
-
-	return message.channel.send(`${FiC} --- H2H Results --- ${FiC}`+
+	const p1Wins = game_mode !== 'ranked' ? await Match.count({ where: { winnerId: player1Id, loserId: player2Id, game_mode: game_mode } }) :
+		await Match.count({ where: { winnerId: player1Id, loserId: player2Id, [Op.or]: [{ game_mode: 'ranked' }, { game_mode: 'tournament' }] } })
+		
+	const p2Wins = game_mode !== 'ranked' ? await Match.count({ where: { winnerId: player2Id, loserId: player1Id, game_mode: game_mode } }) :
+		await Match.count({ where: { winnerId: player2Id, loserId: player1Id, [Op.or]: [{ game_mode: 'ranked' }, { game_mode: 'tournament' }] } })
+	
+	return message.channel.send(`${FiC} --- H2H ${capitalize(game_mode)} Results --- ${FiC}`+
 	`\n${player1.name} has won ${p1Wins}x`+
 	`\n${player2.name} has won ${p2Wins}x`)
 }

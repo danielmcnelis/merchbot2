@@ -131,6 +131,7 @@ const checkDiaryComplete = async (channel, playerId, diary, difficulty) => {
 }
 
 module.exports = {
+    check6TribesComplete,
     checkCoreSetComplete,
     completeTask
 }

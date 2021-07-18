@@ -1674,7 +1674,7 @@ if(cmd === `!diary`) {
 	const diary = await Diary.findOne({ where: { playerId: playerId } })
 	if (!diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
-	const moderate_complete = diary.m1 && diary.m2 && diary.m3 && diary.m4 && diary.m5 && diary.m6 && diary.m7 && diary.m8 && diary.m9 && diary.m10
+	const medium_complete = diary.m1 && diary.m2 && diary.m3 && diary.m4 && diary.m5 && diary.m6 && diary.m7 && diary.m8 && diary.m9 && diary.m10
 	const hard_complete = diary.h1 && diary.h2 && diary.h3 && diary.h4 && diary.h5 && diary.h6 && diary.h7 && diary.h8
 	const elite_complete = diary.l1 && diary.l2 && diary.l3 && diary.l4 && diary.l5 && diary.l6
 	//const master_complete = diary.s1 && diary.s2 && diary.s3 && diary.s4
@@ -1689,7 +1689,7 @@ if(cmd === `!diary`) {
 
 	if (input) {
 		if(input === 'e' || input === 'ez' || input === 'easy' || input.startsWith('ea')) { diary_to_display = 'Easy'; bonuses = diaries.Easy.bonuses }
-		else if(input === 'm' || input.startsWith('me') || input.startsWith('mo')) { diary_to_display = 'Moderate'; bonuses = diaries.Moderate.bonuses }
+		else if(input === 'm' || input.startsWith('me') || input.startsWith('mo')) { diary_to_display = 'Medium'; bonuses = diaries.Medium.bonuses }
 		else if(input === 'h' || input.startsWith('ha')) { diary_to_display = 'Hard'; bonuses = diaries.Hard.bonuses }
 		else if(input === 'l' || input.startsWith('el')) { diary_to_display = 'Elite'; bonuses = diaries.Elite.bonuses }
 		else return message.channel.send(`I do not recognize the "${input}" Diary.`)
@@ -1697,8 +1697,8 @@ if(cmd === `!diary`) {
 	} else if (!diary_to_display) {
 		//if (master_complete || elite_complete) { diary_to_display = 'Master'; bonuses = diaries.Master.bonuses }
 		if (hard_complete) { diary_to_display = 'Elite'; bonuses = diaries.Elite.bonuses }
-		else if (moderate_complete) { diary_to_display = 'Hard'; bonuses = diaries.Hard.bonuses }
-		else if (easy_complete) { diary_to_display = 'Moderate'; bonuses = diaries.Moderate.bonuses }
+		else if (medium_complete) { diary_to_display = 'Hard'; bonuses = diaries.Hard.bonuses }
+		else if (easy_complete) { diary_to_display = 'Medium'; bonuses = diaries.Medium.bonuses }
 		else { diary_to_display = 'Easy'; bonuses = diaries.Easy.bonuses }
 	}
 
@@ -1720,17 +1720,17 @@ if(cmd === `!diary`) {
 		score = Math.round(score / 12 * 100)
 	}
 
-	if (diary_to_display === 'Moderate') {
-		if(diary.m1) { score++ ;tasks.push(`~~${diaries.Moderate.m1}~~`)} else tasks.push(diaries.Moderate.m1)
-		if(diary.m2) { score++ ;tasks.push(`~~${diaries.Moderate.m2}~~`)} else tasks.push(diaries.Moderate.m2)
-		if(diary.m3) { score++ ;tasks.push(`~~${diaries.Moderate.m3}~~`)} else tasks.push(diaries.Moderate.m3)
-		if(diary.m4) { score++ ;tasks.push(`~~${diaries.Moderate.m4}~~`)} else tasks.push(diaries.Moderate.m4)
-		if(diary.m5) { score++ ;tasks.push(`~~${diaries.Moderate.m5}~~`)} else tasks.push(diaries.Moderate.m5)
-		if(diary.m6) { score++ ;tasks.push(`~~${diaries.Moderate.m6}~~`)} else tasks.push(diaries.Moderate.m6)
-		if(diary.m7) { score++ ;tasks.push(`~~${diaries.Moderate.m7}~~`)} else tasks.push(diaries.Moderate.m7)
-		if(diary.m8) { score++ ;tasks.push(`~~${diaries.Moderate.m8}~~`)} else tasks.push(diaries.Moderate.m8)
-		if(diary.m9) { score++ ;tasks.push(`~~${diaries.Moderate.m9}~~`)} else tasks.push(diaries.Moderate.m9)
-		if(diary.m10) { score++ ;tasks.push(`~~${diaries.Moderate.m10}~~`)} else tasks.push(diaries.Moderate.m10)
+	if (diary_to_display === 'Medium') {
+		if(diary.m1) { score++ ;tasks.push(`~~${diaries.Medium.m1}~~`)} else tasks.push(diaries.Medium.m1)
+		if(diary.m2) { score++ ;tasks.push(`~~${diaries.Medium.m2}~~`)} else tasks.push(diaries.Medium.m2)
+		if(diary.m3) { score++ ;tasks.push(`~~${diaries.Medium.m3}~~`)} else tasks.push(diaries.Medium.m3)
+		if(diary.m4) { score++ ;tasks.push(`~~${diaries.Medium.m4}~~`)} else tasks.push(diaries.Medium.m4)
+		if(diary.m5) { score++ ;tasks.push(`~~${diaries.Medium.m5}~~`)} else tasks.push(diaries.Medium.m5)
+		if(diary.m6) { score++ ;tasks.push(`~~${diaries.Medium.m6}~~`)} else tasks.push(diaries.Medium.m6)
+		if(diary.m7) { score++ ;tasks.push(`~~${diaries.Medium.m7}~~`)} else tasks.push(diaries.Medium.m7)
+		if(diary.m8) { score++ ;tasks.push(`~~${diaries.Medium.m8}~~`)} else tasks.push(diaries.Medium.m8)
+		if(diary.m9) { score++ ;tasks.push(`~~${diaries.Medium.m9}~~`)} else tasks.push(diaries.Medium.m9)
+		if(diary.m10) { score++ ;tasks.push(`~~${diaries.Medium.m10}~~`)} else tasks.push(diaries.Medium.m10)
 		score = Math.round(score / 10 * 100)
 	}
 
@@ -1765,7 +1765,7 @@ if(cmd === `!diary`) {
 	// }
 
 	const diary_image = diary_to_display === 'Easy' ? 'https://i.imgur.com/bZpSKCG.jpg' :
-		diary_to_display === 'Moderate' ? 'https://i.imgur.com/deUr5ts.jpg' :
+		diary_to_display === 'Medium' ? 'https://i.imgur.com/deUr5ts.jpg' :
 		diary_to_display === 'Hard' ? 'https://i.imgur.com/ZOAwIED.jpg' :
 		diary_to_display === 'Elite' ? 'https://i.imgur.com/rGgVdBm.jpg' :
 		'https://i.imgur.com/rGgVdBm.jpg'
@@ -3448,14 +3448,14 @@ if(cmd === `!daily`) {
 	if (await checkCoreSetComplete(maid, 3)) completeTask(message.channel, maid, 'l3', 5000)
 
 	const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
-	const moderate_complete = diary.m1 && diary.m2 && diary.m3 && diary.m4 && diary.m5 && diary.m6 && diary.m7 && diary.m8 && diary.m9 && diary.m10
+	const medium_complete = diary.m1 && diary.m2 && diary.m3 && diary.m4 && diary.m5 && diary.m6 && diary.m7 && diary.m8 && diary.m9 && diary.m10
 	const hard_complete = diary.h1 && diary.h2 && diary.h3 && diary.h4 && diary.h5 && diary.h6 && diary.h7 && diary.h8
 	const elite_complete = diary.l1 && diary.l2 && diary.l3 && diary.l4 && diary.l5 && diary.l6
 	const master_complete = diary.s1 && diary.s2 && diary.s3 && diary.s4
 
 	if (easy_complete && (daily.cobble_progress + daysPassed) >= 7) {
 		daily.cobble_progress = 0
-		let num = master_complete ? 5 : elite_complete ? 4 : hard_complete ? 3 : moderate_complete ? 2 : 1
+		let num = master_complete ? 5 : elite_complete ? 4 : hard_complete ? 3 : medium_complete ? 2 : 1
 		if (num) setTimeout(async () => {
 			message.channel.send(`Oh look, ${daily.player.name}, you cobbled together a pack!`, {files:[`./public/packs/7outof7.png`]})
 			const gotSecret = await awardPack(message.channel, daily.playerId, set, num)
@@ -3504,7 +3504,7 @@ if(cmd === `!alc` ||cmd === `!alch` || cmd === `!alchemy`) {
 	})
 
 	const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
-	const moderate_complete = diary.m1 && diary.m2 && diary.m3 && diary.m4 && diary.m5 && diary.m6 && diary.m7 && diary.m8 && diary.m9 && diary.m10
+	const medium_complete = diary.m1 && diary.m2 && diary.m3 && diary.m4 && diary.m5 && diary.m6 && diary.m7 && diary.m8 && diary.m9 && diary.m10
 	const hard_complete = diary.h1 && diary.h2 && diary.h3 && diary.h4 && diary.h5 && diary.h6 && diary.h7 && diary.h8
 	const elite_complete = diary.l1 && diary.l2 && diary.l3 && diary.l4 && diary.l5 && diary.l6
 	//const master_complete = diary.s1 && diary.s2 && diary.s3 && diary.s4
@@ -3528,7 +3528,7 @@ if(cmd === `!alc` ||cmd === `!alch` || cmd === `!alchemy`) {
 		(
 			daily.alchemy_1 &&
 			(daily.alchemy_2 || !easy_complete) &&
-			(daily.alchemy_3 || !moderate_complete) &&
+			(daily.alchemy_3 || !medium_complete) &&
 			(daily.alchemy_4 || !hard_complete) &&
 			(daily.alchemy_5 || !elite_complete)
 		)
@@ -3638,7 +3638,7 @@ if(cmd === `!burn`) {
 
 	if (!achievement) return message.channel.send(`Please specify an achievement (E4, M7, H1, L2, etc.)`)
 	if (!valid_tasks.includes(achievement)) return message.channel.send(`Sorry, ${achievement.toUpperCase()} is not a valid task.`)
-	const difficulty = achievement.startsWith('e') ? 'Easy' : achievement.startsWith('m') ? 'Moderate' : achievement.startsWith('h') ? 'Hard' : 'Elite'
+	const difficulty = achievement.startsWith('e') ? 'Easy' : achievement.startsWith('m') ? 'Medium' : achievement.startsWith('h') ? 'Hard' : 'Elite'
 
 	const diary = await Diary.findOne({ where: { playerId: playerId }, include: Player })
 	if (!diary) return message.channel.send(`That user is not in the database.`)
@@ -3667,20 +3667,23 @@ if(cmd === `!award`) {
 	if (!player) return message.channel.send(`That user is not in the database.`)
 
 	const quantity = parseInt(args[1]) ? parseInt(args[1]) : 1
-	const query = parseInt(args[1]) ? args.slice(2).join(" ") : args.slice(1).join(" ")
+	const query = parseInt(args[1]) ? args.slice(2).join(" ").toLowerCase() : args.slice(1).join(" ").toLowerCase()
 	if (!quantity || !query) return message.channel.send(`Please specify the query you wish to award.`)
 
-	if (query === 'chaospacks' || query === 'chaospack' || query === 'chaos packs' || query === 'chaos pack' || query === 'ch1' || query === 'cpk') {
-		const set = await Set.findOne({ where: { code: 'CH1' } })
-		if (!set) return message.channel.send(`Could not find set: "CH1".`)
+	const set_code = query.includes('chaospack') || query.includes('chaos pack') || query === 'ch1' ? 'CH1' :
+	query === 'pack' || query === 'packs' || query === 'doc' ? 'DOC' : null
+
+	if (set_code) {
+		const set = await Set.findOne({ where: { code: set_code } })
+		if (!set) return message.channel.send(`Could not find set: "${set_code}".`)
 		const filter = m => m.author.id === message.author.id
-		const msg = await message.channel.send(`Are you sure you want to award ${quantity} Chaos Pack(s) to ${player.name}?`)
+		const msg = await message.channel.send(`Are you sure you want to award ${quantity} ${set_code} ${eval(set_code)} ${quantity > 1 ? 'Packs' : 'Pack'} to ${player.name}?`)
 		const collected = await msg.channel.awaitMessages(filter, {
 			max: 1,
 			time: 15000
 		}).then(async collected => {
 			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
-			message.channel.send(`Please wait while I open your pack(s)... ${blue}`)			
+			message.channel.send(`Please wait while I open your ${quantity > 1 ? 'packs' : 'pack'}... ${blue}`)			
 			return awardPack(message.channel, recipient, set, quantity)
 		}).catch(err => {
 			console.log(err)
@@ -4714,6 +4717,7 @@ if(cmd === `!barter`) {
 	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 
 	const direction = await getBarterDirection(message)
+	if (!direction) return
 	let voucher = direction === 'get_card' ? await getVoucher(message, direction) : null
 	const selected_option = direction === 'get_card' ? await getBarterCard(message, voucher, medium_complete) : await getTradeInCard(message, medium_complete)
 	if (!selected_option) return

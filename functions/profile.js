@@ -1,6 +1,6 @@
 
 //PROFILE FUNCTIONS
-const { Inventory } = require('../db')
+const { Inventory, Print } = require('../db')
 const { yescom, nocom } = require('../static/commands.json')
 const { findCard } = require('./search.js')
 

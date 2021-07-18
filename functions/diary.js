@@ -87,7 +87,7 @@ const completeTask = async (channel, playerId, task, milliseconds = 2000) => {
     await diary.save()
 
     const difficulty = task.startsWith('e') ? 'Easy' :
-        task.startsWith('m') ? 'Moderate' : 
+        task.startsWith('m') ? 'Medium' : 
         task.startsWith('h') ? 'Hard' : 
         task.startsWith('l') ? 'Elite' : 
         'Master'
@@ -109,7 +109,7 @@ const checkDiaryComplete = async (channel, playerId, diary, difficulty) => {
             difficulty === 'Easy' &&
             diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
         ) || (
-            difficulty === 'Moderate' &&
+            difficulty === 'Medium' &&
             diary.m1 && diary.m2 && diary.m3 && diary.m4 && diary.m5 && diary.m6 && diary.m7 && diary.m8 && diary.m9 && diary.m10
         ) || (
             difficulty === 'Hard' &&
@@ -122,10 +122,6 @@ const checkDiaryComplete = async (channel, playerId, diary, difficulty) => {
         return setTimeout(async () => {
             channel.send(`<@${playerId}>, Congrats! You completed your ${difficulty} Diary${leatherbound}!`)
             channel.send(`\n${blue} ${koolaid} ${legend} ${cavebob} ${cultured}`)
-
-            const daily = await Daily.findOne({ where: { playerId }})
-            daily.cobble_progress = 0
-            await daily.save()
 
             const gotSecret = await awardPack(channel, playerId, null)
 			if (gotSecret) await completeTask(channel, playerId, 'm4')

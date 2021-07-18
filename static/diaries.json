@@ -14,7 +14,7 @@
         "e12": "12) Fight in the Arena.",
         "bonuses": ["1) +1 Daily use of Alchemy.", "2) +1 Weekly free Pack.", "3) Ranked Bonus: +1 Starchip for wins"]
     },
-    "Moderate": {
+    "Medium": {
         "m1": "1) Obtain the Platinum Rank.",
         "m2": "2) Win 3 Ranked Matches in a row.",
         "m3": "3) Purchase 5 or more Packs at once.",

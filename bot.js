@@ -1279,9 +1279,9 @@ if(profcom.includes(cmd)) {
 	})
 
 	const easy_summary = easy_tasks / 12 === 1 ? `100% ${legend}` : `${Math.round(easy_tasks / 12 * 100)}%`
-	const medium_summary = medium_tasks / 12 === 1 ? `100% ${legend}` : `${Math.round(medium_tasks / 10 * 100)}%`
-	const hard_summary = hard_tasks / 12 === 1 ? `100% ${legend}` : `${Math.round(hard_tasks / 8 * 100)}%`
-	const elite_summary = elite_tasks / 12 === 1 ? `100% ${legend}` : `${Math.round(elite_tasks / 6 * 100)}%`
+	const medium_summary = medium_tasks / 10 === 1 ? `100% ${legend}` : `${Math.round(medium_tasks / 10 * 100)}%`
+	const hard_summary = hard_tasks / 8 === 1 ? `100% ${legend}` : `${Math.round(hard_tasks / 8 * 100)}%`
+	const elite_summary = elite_tasks / 6 === 1 ? `100% ${legend}` : `${Math.round(elite_tasks / 6 * 100)}%`
 	//const master_summary = master_tasks / 12 === 1 ? `100% ${legend}` : `${Math.round(master_tasks / 4 * 100)}%`
 	//\nMaster Diary: ${master_summary}
 

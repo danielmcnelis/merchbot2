@@ -3685,7 +3685,7 @@ if(cmd === `!award`) {
 		const set = await Set.findOne({ where: { code: set_code } })
 		if (!set) return message.channel.send(`Could not find set: "${set_code}".`)
 		const filter = m => m.author.id === message.author.id
-		const msg = await message.channel.send(`Are you sure you want to award ${quantity} ${set_code} ${eval(set_code)} ${quantity > 1 ? 'Packs' : 'Pack'} to ${player.name}?`)
+		const msg = await message.channel.send(`Are you sure you want to award ${quantity} ${set_code} ${eval(set.emoji)} ${quantity > 1 ? 'Packs' : 'Pack'} to ${player.name}?`)
 		const collected = await msg.channel.awaitMessages(filter, {
 			max: 1,
 			time: 15000

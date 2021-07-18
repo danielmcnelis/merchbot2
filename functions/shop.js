@@ -680,7 +680,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
 
 // GET TRADE-IN CARD
 const getTradeInCard = async (message, medium_complete) => {
-    const wares = [
+    const options = [
         [10, 'APC-001', `(1) ${ult}APC-001 - Desmanian Devil - 10 ${mushroom}`, 'mushroom'],
         [10, 'APC-002', `(2) ${ult}APC-002 - Koa'ki Meiru Guardian - 10 ${moai}`, 'moai'],
         [10, 'APC-003', `(3) ${ult}APC-003 - Rose Lover - 10 ${rose}`, 'rose'],
@@ -689,17 +689,6 @@ const getTradeInCard = async (message, medium_complete) => {
         [10, 'APC-006', `(6) ${ult}APC-006 - Viper's Rebirth - 10 ${cactus}`, 'cactus']
     ]
 
-    const advanced_wares = [
-        [20, 'DOC-180', `(7) ${ult}DOC-180 - Peropero Cerperus - 20 ${mushroom}`, 'mushroom'],
-        [20, 'DOC-174', `(8) ${ult}DOC-174 - Block Golem - 20 ${moai}`, 'moai'],
-        [30, 'DOC-178', `(9) ${ult}DOC-178 - Mardel, Generaider Boss of Light - 30 ${rose}`, 'rose'],
-        [20, 'DOC-181', `(10) ${ult}DOC-181 - Sharkraken - 20 ${hook}`, 'hook'],
-        [40, 'DOC-176', `(11) ${ult}DOC-176 - Giant Rex - 40 ${egg}`, 'egg'],
-        [30, 'DOC-177', `(12) ${ult}DOC-177 - Ipiria - 30 ${cactus}`, 'cactus']
-    ]
-
-    const options = medium_complete ? [...wares, ...advanced_wares] : wares
-    if (options.length === 1) return options[0]
     const cards = options.map((o) => o[2])
 
     const filter = m => m.author.id === message.member.user.id
@@ -722,18 +711,6 @@ const getTradeInCard = async (message, medium_complete) => {
             index = 4
         } else if(response.includes('6') || response.includes('APC-006') || response.includes('viper') || response.includes('rebirth')) {
             index = 5
-        } else if(medium_complete && response.includes('7') || response.includes('DOC-180') || response.includes('pero') || response.includes('cerp')) {
-            index = 6
-        } else if(medium_complete && response.includes('8') || response.includes('DOC-174') || response.includes('block') || response.includes('golem')) {
-            index = 7
-        } else if(medium_complete && response.includes('9') || response.includes('DOC-178') || response.includes('mardel') || response.includes('generaider')) {
-            index = 8
-        } else if(medium_complete && response.includes('10') || response.includes('DOC-181') || response.includes('shark') || response.includes('kraken')) {
-            index = 9
-        } else if(medium_complete && response.includes('11') || response.includes('DOC-176') || response.includes('giant') || response.includes('rex')) {
-            index = 10
-        } else if(medium_complete && response.includes('12') || response.includes('DOC-177') || response.includes('ipir')) {
-            index = 11
         } else {
             message.channel.send(`You did not select a valid option.`)
             return false

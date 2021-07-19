@@ -869,7 +869,7 @@ if(cmd === `!unmute`) {
     
 //ROLE 
 if (rolecom.includes(cmd)) {
-	if (message.members.roles.cache.some((role) => role.id === nattfpRole)) {
+	if (message.member.roles.cache.some((role) => role.id === nattfpRole)) {
 		return message.channel.send(`You are not allowed to tag other Forged Players.`)
 	} else if (!message.member.roles.cache.some(role => role.id === fpRole)) {
 		message.member.roles.add(fpRole)

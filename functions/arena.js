@@ -12,14 +12,20 @@ const { awardCard } = require('./award.js')
 const { decks, vouchers, prizes, victories, apcs, verbs, encouragements } = require('../static/arenas.json')
 
 //GET ARENA SAMPLE DECK
-const getArenaSample = async (message) => {
+const getArenaSample = async (message, query) => {
+    if (query && query.includes('bea')) return 'beast'
+    if (query && query.includes('dino')) return 'dinosaur'
+    if (query && query.includes('fish')) return 'fish'
+    if (query && query.includes('plant')) return 'reptile'
+    if (query && query.includes('rep')) return 'reptile'
+    if (query && query.includes('rock')) return 'rock'
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send(`Please select a tribe:\n(1) Beast\n(2) Dinosaur\n(3) Fish\n(4) Plant\n(5) Reptile\n(6) Rock`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 10000
 	}).then(collected => {
-        let tribe
+        let tribe = false
 		const response = collected.first().content.toLowerCase()
         if(response.includes('bea') || response.includes('1')) tribe = 'beast' 
         else if(response.includes('dino') || response.includes('2')) tribe = 'dinosaur'

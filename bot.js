@@ -1114,7 +1114,7 @@ if(infocom.includes(cmd)) {
 //DECK
 if(deckcom.includes(cmd)) {
 	if (mcid === arenaChannelId) {
-		const deck = args[0] || await getArenaSample(message)
+		await getArenaSample(message, args[0])
 		if (!deck) return
 		if (!arenas.decks[deck]) return message.channel.send(`I do not recognize that tribe.`)
 
@@ -1448,11 +1448,13 @@ if (cmd === `!shop`) {
 			playerId: merchbotId,
 			quantity: { [Op.gt]: 0 }
 		}})
+
+		const auction = await Auction.findOne({ where: { printId: print.id } })
 		const market_price = print.market_price
 		const selling_price = Math.ceil(market_price * 1.1)
 		const buying_price = Math.ceil(market_price * 0.7)
 		if (!inv) return message.channel.send(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - Out of Stock.`)
-		return message.channel.send(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - ${inv.quantity}`)
+		return message.channel.send(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - ${inv.quantity}${auction ? ` - ${no}`: ''}`)
 	}
 }
 

@@ -2785,7 +2785,7 @@ if (rankcom.includes(cmd)) {
 		const filtered_wallets = allWallets.filter((wallet) => memberIds.includes(wallet.playerId))
 		if (x > filtered_wallets.length) return message.channel.send(`I need a smaller number. We only have ${filtered_wallets.length} Forged players.`)
 		const transformed_wallets = filtered_wallets.map(async (w) => {
-			const inv = await Inventory.findAll({ where: {playerId: w.playerId } })
+			const inv = await Inventory.findAll({ where: {playerId: w.playerId }, include: Print })
 			let networth = w.starchips + (w.stardust / 10)
 			inv.forEach((row) => {
 				networth += (row.print.market_price * row.quantity / 10)
@@ -2851,15 +2851,17 @@ if (rankcom.includes(cmd)) {
 			})
 
 			console.log('correct_answers', correct_answers)
-			if (correct_answers > 0) transformed_knowledges.push([smarts.player.name, correct_answers])
+			if (correct_answers > 0) transformed_knowledges.push([smarts.player.name, smarts.playerId, correct_answers])
 		}
 
-		const filtered_knowledges = transformed_knowledges.filter((smarts) => memberIds.includes(smarts.playerId))
+		console.log('transformed_knowledges', transformed_knowledges)
+
+		const filtered_knowledges = transformed_knowledges.filter((p) => memberIds.includes(p[1]))
 		if (x > filtered_knowledges.length) return message.channel.send(`I need a smaller number. We only have ${filtered_knowledges.length} Trivia players.`)
 		
 		const topBookworms = filtered_knowledges.slice(0, x)
 		for (let i = 0; i < x; i++) {
-			result[i+1] = `${topBookworms[i][1]} Qs - ${topBookworms[i][0]}`
+			result[i+1] = `${topBookworms[i][2]} Qs - ${topBookworms[i][0]}`
 		} 
 	}
 

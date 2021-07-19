@@ -2743,32 +2743,115 @@ if (rankcom.includes(cmd)) {
 	if (mcid !== botSpamChannelId &&
 		mcid !== generalChannelId &&
 		mcid !== duelRequestsChannelId &&
-		mcid !== tournamentChannelId
+		mcid !== tournamentChannelId &&
+		mcid !== arenaChannelId &&
+		mcid !== triviaChannelId &&
+		mcid !== marketPlaceChannelId
 	) return message.channel.send(`Please use this command in <#${botSpamChannelId}>, <#${duelRequestsChannelId}> or <#${generalChannelId}>.`)
+	
+	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
+	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
+	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
+	: message.channel === client.channels.cache.get(marketPlaceChannelId) ? "Market"
+	: "Ranked"
+	
 	const x = parseInt(args[0]) || 10
-	const result = []
-	x === 1 ? result[0] = `${FiC} --- The Best Forged Player --- ${FiC}`
-	: result[0] = `${FiC} --- Top ${x} Forged Players --- ${FiC}`
-
 	if (x < 1) return message.channel.send("Please provide a number greater than 0.")
 	if (x > 100 || isNaN(x)) return message.channel.send("Please provide a number less than or equal to 100.")
-	
-	const allPlayers = await Player.findAll({ 
-		where: {
-			[Op.or]: [ { wins: { [Op.gt]: 0 } }, { losses: { [Op.gt]: 0 } } ]
-		},
-		order: [['stats', 'DESC']]
-	})
-
 	const membersMap = await message.guild.members.fetch()
 	const memberIds = [...membersMap.keys()]
-	const filtered_players = allPlayers.filter((player) => memberIds.includes(player.id))
-			
-	if (x > filtered_players.length) return message.channel.send(`I need a smaller number. We only have ${filtered_players.length} Forged players.`)
+	const result = []
+	
+	if (game === 'Ranked') {
+		x === 1 ? result[0] = `${FiC} --- The Best Forged Player --- ${FiC}`
+		: result[0] = `${FiC} --- Top ${x} Forged Players --- ${FiC}`
+		
+		const allPlayers = await Player.findAll({ 
+			where: {
+				[Op.or]: [ { wins: { [Op.gt]: 0 } }, { losses: { [Op.gt]: 0 } } ]
+			},
+			order: [['stats', 'DESC']]
+		})
+	
+		const filtered_players = allPlayers.filter((player) => memberIds.includes(player.id))
+		if (x > filtered_players.length) return message.channel.send(`I need a smaller number. We only have ${filtered_players.length} Forged players.`)
+		const topPlayers = filtered_players.slice(0, x)
+		for (let i = 0; i < x; i++) result[i+1] = `${(i+1)}. ${getMedal(topPlayers[i].stats)} ${topPlayers[i].name}`
+	} else if (game === 'Market') {
+		x === 1 ? result[0] = `${FiC} --- The Wealthiest Player --- ${FiC}`
+		: result[0] = `${FiC} --- Top ${x} Richest Players --- ${FiC}`
+		
+		const allWallets = await Wallet.findAll({ include: Player })
+		const filtered_wallets = allWallets.filter((wallet) => memberIds.includes(wallet.playerId))
+		if (x > filtered_wallets.length) return message.channel.send(`I need a smaller number. We only have ${filtered_wallets.length} Forged players.`)
+		const transformed_wallets = filtered_wallets.map((w) => [w.player.name, w.starchips + Math.round(w.stardust / 10)])
+		transformed_wallets.sort((a, b) => b[1] - a[1])
+		const topWallets = transformed_wallets.slice(0, x)
+		for (let i = 0; i < x; i++) result[i+1] = `${(i+1)}. ${(topWallets[i][1])}${starchips} - ${topWallets[i][0]}`
+	} else if (game === 'Arena') {
+		x === 1 ? result[0] = `${FiC} --- The Champion of the Arena --- ${FiC}`
+		: result[0] = `${FiC} --- Top ${x} Arena Players --- ${FiC}`
+		
+		const allProfiles = await Profile.findAll({ 
+			where: {
+				[Op.or]: [ 
+					{ beast_wins: { [Op.gt]: 0 } }, 
+					{ dinosaur_wins: { [Op.gt]: 0 } }, 
+					{ fish_wins: { [Op.gt]: 0 } }, 
+					{ plant_wins: { [Op.gt]: 0 } }, 
+					{ reptile_wins: { [Op.gt]: 0 } }, 
+					{ rock_wins: { [Op.gt]: 0 } } 
+				]
+			},
+			include: Player,
+			order: [[Player, 'name', 'ASC']]
+		})
+	
+		const filtered_profiles = allProfiles.filter((profile) => memberIds.includes(profile.playerId))
+		if (x > filtered_profiles.length) return message.channel.send(`I need a smaller number. We only have ${filtered_profiles.length} Arena winners.`)
+		const transformed_profiles = filtered_profiles.map((p) => [p.player.name, p.beast_wins, p.dinosaur_wins, p.fish_wins, p.plant_wins, p.reptile_wins, p.rock_wins])
+		transformed_profiles.sort((a, b) => (b[1] + b[2] + b[3] + b[4] + b[5] + b[6]) - (a[1] + a[2] + a[3] + a[4] + a[5] + a[6]))
+		const topProfiles = transformed_profiles.slice(0, x)
+		for (let i = 0; i < x; i++) {
+			const p = topProfiles[i]
+			const beasts = p[1] >= 3 ? eval(beast) + eval(beast) + eval(beast) : p[1] === 2 ? eval(beast) + eval(beast) : p[1] === 1 ? eval(beast) : ''
+			const dinos = p[2] >= 3 ? eval(dinosaur) + eval(dinosaur) + eval(dinosaur) : p[2] === 2 ? eval(dinosaur) + eval(dinosaur) : p[2] === 1 ? eval(dinosaur) : ''
+			const fishes = p[3] >= 3 ? eval(fish) + eval(fish) + eval(fish) : p[3] === 2 ? eval(fish) + eval(fish) : p[3] === 1 ? eval(fish) : ''
+			const plants = p[4] >= 3 ? eval(plant) + eval(plant) + eval(plant) : p[4] === 2 ? eval(plant) + eval(plant) : p[4] === 1 ? eval(plant) : ''
+			const reptiles = p[5] >= 3 ? eval(reptile) + eval(reptile) + eval(reptile) : p[5] === 2 ? eval(reptile) + eval(reptile) : p[5] === 1 ? eval(reptile) : ''
+			const rocks = p[6] >= 3 ? eval(rock) + eval(rock) + eval(rock) : p[6] === 2 ? eval(rock) + eval(rock) : p[6] === 1 ? eval(rock) : ''
+			result[i+1] = `${(i+1)}. ${p[1] + p[2] + p[3] + p[4] + p[5] + p[6]} W - ${p[0]} - ${beasts + dinos + fishes + plants + reptiles + rocks}`
+		} 
+	} else if (game === 'Trivia') {
+		x === 1 ? result[0] = `${FiC} --- The Top Bookworm --- ${FiC}`
+		: result[0] = `${FiC} --- Top ${x} Trivia Players --- ${FiC}`
+		
+		const allKnowledges = await Knowledge.findAll({ 
+			include: Player,
+			order: [[Player, 'name', 'ASC']]
+		})
 
-	const topPlayers = filtered_players.slice(0, x)
+		const transformed_knowledges = []
 
-	for (let i = 0; i < x; i++) result[i+1] = `${(i+1)}. ${getMedal(topPlayers[i].stats)} ${topPlayers[i].name}`
+		for (let i = 0; i < allKnowledges.length; i++) {
+			const smarts = allKnowledges[i]
+			let correct_answers = 0
+			const knowledge_keys = Object.keys(smarts.dataValues)
+			knowledge_keys.forEach(function(key) {
+				if (key.startsWith('question') && smarts[key]) correct_answers++
+			})
+
+			if (correct_answers > 0) transformed_knowledges.push([smarts.player.name], correct_answers)
+		}
+
+		const filtered_knowledges = transformed_knowledges.filter((smarts) => memberIds.includes(smarts.playerId))
+		if (x > filtered_knowledges.length) return message.channel.send(`I need a smaller number. We only have ${filtered_knowledges.length} Trivia players.`)
+		
+		const topBookworms = filtered_knowledges.slice(0, x)
+		for (let i = 0; i < x; i++) {
+			result[i+1] = `${topBookworms[i][1]} Qs - ${topBookworms[i][0]}`
+		} 
+	}
 
 	message.channel.send(result.slice(0,30))
 	if (result.length > 30) message.channel.send(result.slice(30,60))

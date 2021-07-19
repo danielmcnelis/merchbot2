@@ -6,7 +6,7 @@ const fs = require('fs')
 const axios = require('axios')
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
-const { fire, tix, credits, blue, red, yellow, stoned, stare, leatherbound, wokeaf, koolaid, cavebob, evil, DOC, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('./static/emojis.json')
+const { fire, tix, credits, blue, red, yellow, stoned, stare, leatherbound, wokeaf, koolaid, cavebob, evil, DOC, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, cultured, com, rar, sup, ult, scr, checkmark, emptybox } = require('./static/emojis.json')
 const { aliuscom, nicknamecom, joincom, bindercom, wishlistcom, invcom, calccom, bracketcom, dropcom, queuecom, checklistcom, startcom, infocom, dbcom, noshowcom, legalcom, listcom, pfpcom, botcom, rolecom, statscom, profcom, losscom, h2hcom, undocom, rankcom, manualcom, yescom, nocom, deckcom } = require('./static/commands.json')
 const { triviaRole, botRole, modRole, adminRole, tourRole, toRole, fpRole, muteRole, arenaRole, ambassadorRole } = require('./static/roles.json')
 const { gutterChannelId, generalChannelId, rulesChannelId, rulingsChannelId, introChannelId, discussionChannelId, staffChannelId, botSpamChannelId, welcomeChannelId, announcementsChannelId, registrationChannelId, replaysChannelId, duelRequestsChannelId, marketPlaceChannelId, shopChannelId, tournamentChannelId, arenaChannelId, keeperChannelId, triviaChannelId, draftChannelId, gauntletChannelId, bugreportsChannelId, suggestionsChannelId } = require('./static/channels.json')
@@ -2786,15 +2786,20 @@ if (rankcom.includes(cmd)) {
 		if (x > filtered_wallets.length) return message.channel.send(`I need a smaller number. We only have ${filtered_wallets.length} Forged players.`)
 		const transformed_wallets = filtered_wallets.map(async (w) => {
 			const inv = await Inventory.findAll({ where: {playerId: w.playerId }, include: Print })
-			let networth = w.starchips + (w.stardust / 10)
+			let networth = parseInt(w.starchips) + (parseInt(w.stardust) / 10)
+			console.log('w.player.name', w.player.name)
+			console.log('networth from wallet only', networth)
 			inv.forEach((row) => {
-				networth += (row.print.market_price * row.quantity / 10)
+				networth += (parseInt(row.print.market_price) * parseInt(row.quantity) / 10)
 			})
 		
+			console.log('networth after looping inv', networth)
 			return [w.player.name, Math.round(networth)]
 		})
+		console.log('transformed_wallets', transformed_wallets)
 		transformed_wallets.sort((a, b) => b[1] - a[1])
 		const topWallets = transformed_wallets.slice(0, x)
+		console.log('topWallets', topWallets)
 		for (let i = 0; i < x; i++) result[i+1] = `${(i+1)}. ${(topWallets[i][1])}${starchips} - ${topWallets[i][0]}`
 	} else if (game === 'Arena') {
 		x === 1 ? result[0] = `${FiC} --- The Champion of the Arena --- ${FiC}`
@@ -2822,13 +2827,7 @@ if (rankcom.includes(cmd)) {
 		const topProfiles = transformed_profiles.slice(0, x)
 		for (let i = 0; i < x; i++) {
 			const p = topProfiles[i]
-			const beasts = p[1] >= 3 ? beast + beast + beast : p[1] === 2 ? beast + beast : p[1] === 1 ? beast : ''
-			const dinos = p[2] >= 3 ? dinosaur + dinosaur + dinosaur : p[2] === 2 ? dinosaur + dinosaur : p[2] === 1 ? dinosaur : ''
-			const fishes = p[3] >= 3 ? fish + fish + fish : p[3] === 2 ? fish + fish : p[3] === 1 ? fish : ''
-			const plants = p[4] >= 3 ? plant + plant + plant : p[4] === 2 ? plant + plant : p[4] === 1 ? plant : ''
-			const reptiles = p[5] >= 3 ? reptile + reptile + reptile : p[5] === 2 ? reptile + reptile : p[5] === 1 ? reptile : ''
-			const rocks = p[6] >= 3 ? rock + rock + rock : p[6] === 2 ? rock + rock : p[6] === 1 ? rock : ''
-			result[i+1] = `${(i+1)}. ${p[1] + p[2] + p[3] + p[4] + p[5] + p[6]} W - ${p[0]} - ${beasts + dinos + fishes + plants + reptiles + rocks}`
+			result[i+1] = `${(i+1)}. ${p[1] + p[2] + p[3] + p[4] + p[5] + p[6]} W - ${p[0]} - ${p[1] ? `${beast} ` : ''}${p[2] ? `${dinosaur} ` : ''}${p[3] ? `${fish} ` : ''}${p[4] ? `${plant} ` : ''}${p[5] ? `${reptile} ` : ''}${p[6] ? `${rock} ` : ''}`
 		} 
 	} else if (game === 'Trivia') {
 		x === 1 ? result[0] = `${FiC} --- The Top Bookworm --- ${FiC}`
@@ -2845,23 +2844,23 @@ if (rankcom.includes(cmd)) {
 			const smarts = allKnowledges[i]
 			let correct_answers = 0
 			const knowledge_keys = Object.keys(smarts.dataValues)
-			if (i === 0) console.log('knowledge keys', knowledge_keys)
 			knowledge_keys.forEach(function(key) {
 				if (key.startsWith('question') && smarts[key]) correct_answers++
 			})
 
-			console.log('correct_answers', correct_answers)
 			if (correct_answers > 0) transformed_knowledges.push([smarts.player.name, smarts.playerId, correct_answers])
 		}
 
 		console.log('transformed_knowledges', transformed_knowledges)
-
 		const filtered_knowledges = transformed_knowledges.filter((p) => memberIds.includes(p[1]))
 		if (x > filtered_knowledges.length) return message.channel.send(`I need a smaller number. We only have ${filtered_knowledges.length} Trivia players.`)
-		
+		filtered_knowledges.sort((a, b) => b[2] - a[2])
+		console.log('filtered_knowledges', filtered_knowledges)
 		const topBookworms = filtered_knowledges.slice(0, x)
+		console.log('topBookworms', topBookworms)
+
 		for (let i = 0; i < x; i++) {
-			result[i+1] = `${topBookworms[i][2]} Qs - ${topBookworms[i][0]}`
+			result[i+1] = `${i+1}. ${topBookworms[i][2]} ${cultured} - ${topBookworms[i][0]}`
 		} 
 	}
 

@@ -2784,7 +2784,9 @@ if (rankcom.includes(cmd)) {
 		const allWallets = await Wallet.findAll({ include: Player })
 		const filtered_wallets = allWallets.filter((wallet) => memberIds.includes(wallet.playerId))
 		if (x > filtered_wallets.length) return message.channel.send(`I need a smaller number. We only have ${filtered_wallets.length} Forged players.`)
-		const transformed_wallets = filtered_wallets.map(async (w) => {
+		const transformed_wallets = []
+
+		for (let i = 0; i < filtered_wallets.length; i++) {
 			const inv = await Inventory.findAll({ where: {playerId: w.playerId }, include: Print })
 			let networth = parseInt(w.starchips) + (parseInt(w.stardust) / 10)
 			console.log('w.player.name', w.player.name)
@@ -2794,8 +2796,9 @@ if (rankcom.includes(cmd)) {
 			})
 		
 			console.log('networth after looping inv', networth)
-			return [w.player.name, Math.round(networth)]
-		})
+			transformed_wallets.push([w.player.name, Math.round(networth)])
+		}
+
 		console.log('transformed_wallets', transformed_wallets)
 		transformed_wallets.sort((a, b) => b[1] - a[1])
 		const topWallets = transformed_wallets.slice(0, x)

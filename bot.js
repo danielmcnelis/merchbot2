@@ -2784,7 +2784,15 @@ if (rankcom.includes(cmd)) {
 		const allWallets = await Wallet.findAll({ include: Player })
 		const filtered_wallets = allWallets.filter((wallet) => memberIds.includes(wallet.playerId))
 		if (x > filtered_wallets.length) return message.channel.send(`I need a smaller number. We only have ${filtered_wallets.length} Forged players.`)
-		const transformed_wallets = filtered_wallets.map((w) => [w.player.name, w.starchips + Math.round(w.stardust / 10)])
+		const transformed_wallets = filtered_wallets.map(async (w) => {
+			const inv = await Inventory.findAll({ where: {playerId: w.playerId } })
+			let networth = w.starchips + (w.stardust / 10)
+			inv.forEach((row) => {
+				networth += (row.print.market_price * row.quantity / 10)
+			})
+		
+			return [w.player.name, Math.round(networth)]
+		})
 		transformed_wallets.sort((a, b) => b[1] - a[1])
 		const topWallets = transformed_wallets.slice(0, x)
 		for (let i = 0; i < x; i++) result[i+1] = `${(i+1)}. ${(topWallets[i][1])}${starchips} - ${topWallets[i][0]}`
@@ -2814,12 +2822,12 @@ if (rankcom.includes(cmd)) {
 		const topProfiles = transformed_profiles.slice(0, x)
 		for (let i = 0; i < x; i++) {
 			const p = topProfiles[i]
-			const beasts = p[1] >= 3 ? eval(beast) + eval(beast) + eval(beast) : p[1] === 2 ? eval(beast) + eval(beast) : p[1] === 1 ? eval(beast) : ''
-			const dinos = p[2] >= 3 ? eval(dinosaur) + eval(dinosaur) + eval(dinosaur) : p[2] === 2 ? eval(dinosaur) + eval(dinosaur) : p[2] === 1 ? eval(dinosaur) : ''
-			const fishes = p[3] >= 3 ? eval(fish) + eval(fish) + eval(fish) : p[3] === 2 ? eval(fish) + eval(fish) : p[3] === 1 ? eval(fish) : ''
-			const plants = p[4] >= 3 ? eval(plant) + eval(plant) + eval(plant) : p[4] === 2 ? eval(plant) + eval(plant) : p[4] === 1 ? eval(plant) : ''
-			const reptiles = p[5] >= 3 ? eval(reptile) + eval(reptile) + eval(reptile) : p[5] === 2 ? eval(reptile) + eval(reptile) : p[5] === 1 ? eval(reptile) : ''
-			const rocks = p[6] >= 3 ? eval(rock) + eval(rock) + eval(rock) : p[6] === 2 ? eval(rock) + eval(rock) : p[6] === 1 ? eval(rock) : ''
+			const beasts = p[1] >= 3 ? beast + beast + beast : p[1] === 2 ? beast + beast : p[1] === 1 ? beast : ''
+			const dinos = p[2] >= 3 ? dinosaur + dinosaur + dinosaur : p[2] === 2 ? dinosaur + dinosaur : p[2] === 1 ? dinosaur : ''
+			const fishes = p[3] >= 3 ? fish + fish + fish : p[3] === 2 ? fish + fish : p[3] === 1 ? fish : ''
+			const plants = p[4] >= 3 ? plant + plant + plant : p[4] === 2 ? plant + plant : p[4] === 1 ? plant : ''
+			const reptiles = p[5] >= 3 ? reptile + reptile + reptile : p[5] === 2 ? reptile + reptile : p[5] === 1 ? reptile : ''
+			const rocks = p[6] >= 3 ? rock + rock + rock : p[6] === 2 ? rock + rock : p[6] === 1 ? rock : ''
 			result[i+1] = `${(i+1)}. ${p[1] + p[2] + p[3] + p[4] + p[5] + p[6]} W - ${p[0]} - ${beasts + dinos + fishes + plants + reptiles + rocks}`
 		} 
 	} else if (game === 'Trivia') {
@@ -2837,11 +2845,13 @@ if (rankcom.includes(cmd)) {
 			const smarts = allKnowledges[i]
 			let correct_answers = 0
 			const knowledge_keys = Object.keys(smarts.dataValues)
+			if (i === 0) console.log('knowledge keys', knowledge_keys)
 			knowledge_keys.forEach(function(key) {
 				if (key.startsWith('question') && smarts[key]) correct_answers++
 			})
 
-			if (correct_answers > 0) transformed_knowledges.push([smarts.player.name], correct_answers)
+			console.log('correct_answers', correct_answers)
+			if (correct_answers > 0) transformed_knowledges.push([smarts.player.name, correct_answers])
 		}
 
 		const filtered_knowledges = transformed_knowledges.filter((smarts) => memberIds.includes(smarts.playerId))

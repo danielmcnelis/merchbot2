@@ -3,7 +3,7 @@ const { Auction, Bid, Card, Match, Player, Tournament, Print, Set, Wallet, Diary
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { nocom, yescom } = require('../static/commands.json')
-const { mushroom, hook, rose, moai, egg, cactus, yellow, ygocard, pack, open, closed, DOC, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, fish, rock, dinosaur, plant, reptile, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
+const { yes, no, mushroom, hook, rose, moai, egg, cactus, yellow, ygocard, pack, open, closed, DOC, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, fish, rock, dinosaur, plant, reptile, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
 const { awardPacksToShop } = require('./packs')
 const adminId = '194147938786738176'
 const { client } = require('../static/clients.js')
@@ -281,6 +281,9 @@ const updateShop = async () => {
             }
         }
 
+        const auctions = await Auction.findAll()
+        const auction_printIds = auctions.map((a) => a.printId)
+
         const shopInv = await Inventory.findAll({ 
             where: { 
                 playerId: merchbotId,
@@ -295,11 +298,13 @@ const updateShop = async () => {
         results.push(`\n${ygocard} --- Single Cards --- ${ygocard}`)
     
         for (let i = 0; i < shopInv.length; i++) {
-            const row = shopInv[i]
-            const market_price = row.print.market_price
+            const inv = shopInv[i]
+            const print = inv.print
+            const excluded = !!auction_printIds.includes(print.id)
+            const market_price = print.market_price
             const selling_price = Math.ceil(market_price * 1.1)
             const buying_price = Math.ceil(market_price * 0.7)
-            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(row.print.rarity)}${row.card_code} - ${row.print.card_name} - ${row.quantity}`) 
+            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(print.rarity)}${inv.card_code} - ${print.card_name} - ${inv.quantity}${excluded ? ` - ${no}` : ''}`) 
         }
     
         for (let i = 0; i < results.length; i += 10) shopChannel.send(results.slice(i, i+10))

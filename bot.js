@@ -1114,7 +1114,7 @@ if(infocom.includes(cmd)) {
 //DECK
 if(deckcom.includes(cmd)) {
 	if (mcid === arenaChannelId) {
-		await getArenaSample(message, args[0])
+		const deck = await getArenaSample(message, args[0])
 		if (!deck) return
 		if (!arenas.decks[deck]) return message.channel.send(`I do not recognize that tribe.`)
 

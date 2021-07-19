@@ -2787,6 +2787,7 @@ if (rankcom.includes(cmd)) {
 		const transformed_wallets = []
 
 		for (let i = 0; i < filtered_wallets.length; i++) {
+			const w = filtered_wallets[i]
 			const inv = await Inventory.findAll({ where: {playerId: w.playerId }, include: Print })
 			let networth = parseInt(w.starchips) + (parseInt(w.stardust) / 10)
 			console.log('w.player.name', w.player.name)

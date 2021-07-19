@@ -2781,7 +2781,7 @@ if (rankcom.includes(cmd)) {
 		x === 1 ? result[0] = `${FiC} --- The Wealthiest Player --- ${FiC}`
 		: result[0] = `${FiC} --- Top ${x} Richest Players --- ${FiC}`
 		
-		const allWallets = await Wallet.findAll({ include: Player })
+		const allWallets = await Wallet.findAll({ where: { playerId: { [Op.not]: merchbotId } }, include: Player })
 		const filtered_wallets = allWallets.filter((wallet) => memberIds.includes(wallet.playerId))
 		if (x > filtered_wallets.length) return message.channel.send(`I need a smaller number. We only have ${filtered_wallets.length} Forged players.`)
 		const transformed_wallets = []

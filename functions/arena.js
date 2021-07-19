@@ -16,7 +16,7 @@ const getArenaSample = async (message, query) => {
     if (query && query.includes('bea')) return 'beast'
     if (query && query.includes('dino')) return 'dinosaur'
     if (query && query.includes('fish')) return 'fish'
-    if (query && query.includes('plant')) return 'reptile'
+    if (query && query.includes('plant')) return 'plant'
     if (query && query.includes('rep')) return 'reptile'
     if (query && query.includes('rock')) return 'rock'
     const filter = m => m.author.id === message.author.id

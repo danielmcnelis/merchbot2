@@ -209,7 +209,7 @@ if (cmd === `!test2`) {
 	console.log('winnerIds', winnerIds)
 	const filtered_winnerIds = winnerIds.filter((w, index) => {
 		if (index === 0) return w
-		if (!winnerIds.sliced(0, index - 1).includes(w)) return w
+		if (!winnerIds.slice(0, index - 1).includes(w)) return w
 	})
 	console.log('filtered_winnerIds', filtered_winnerIds)
 }
@@ -224,7 +224,7 @@ if(cmd === `!write_all_m8`) {
 	console.log('winnerIds', winnerIds)
 	const filtered_winnerIds = winnerIds.filter((w, index) => {
 		if (index === 0) return w
-		if (!winnerIds.sliced(0, index - 1).includes(w)) return w
+		if (!winnerIds.slice(0, index - 1).includes(w)) return w
 	})
 	console.log('filtered_winnerIds', filtered_winnerIds)
 

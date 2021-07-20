@@ -6,7 +6,7 @@ const fs = require('fs')
 const axios = require('axios')
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
-const { fire, tix, credits, blue, red, yellow, stoned, stare, leatherbound, wokeaf, koolaid, cavebob, evil, DOC, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, cultured, com, rar, sup, ult, scr, checkmark, emptybox, yes, no } = require('./static/emojis.json')
+const { ygocard, fire, tix, credits, blue, red, yellow, stoned, stare, leatherbound, wokeaf, koolaid, cavebob, evil, DOC, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, cultured, com, rar, sup, ult, scr, checkmark, emptybox, yes, no } = require('./static/emojis.json')
 const { aliuscom, nicknamecom, joincom, bindercom, wishlistcom, invcom, calccom, bracketcom, dropcom, queuecom, checklistcom, startcom, infocom, dbcom, noshowcom, legalcom, listcom, pfpcom, botcom, rolecom, statscom, profcom, losscom, h2hcom, undocom, rankcom, manualcom, yescom, nocom, deckcom } = require('./static/commands.json')
 const { triviaRole, botRole, modRole, adminRole, tourRole, toRole, fpRole, muteRole, arenaRole, ambassadorRole } = require('./static/roles.json')
 const { gutterChannelId, generalChannelId, rulesChannelId, rulingsChannelId, introChannelId, discussionChannelId, staffChannelId, botSpamChannelId, welcomeChannelId, announcementsChannelId, registrationChannelId, replaysChannelId, duelRequestsChannelId, marketPlaceChannelId, shopChannelId, tournamentChannelId, arenaChannelId, keeperChannelId, triviaChannelId, draftChannelId, gauntletChannelId, bugreportsChannelId, suggestionsChannelId } = require('./static/channels.json')
@@ -200,41 +200,6 @@ if(cmd === `!test`) {
 	return message.channel.send(`Behold!`, attachment)
 }
 
-//TEST 2
-if (cmd === `!test2`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	const allTournamentMatches = await Match.findAll({ where: { game_mode: 'tournament' } })
-	console.log('allTournamentMatches', allTournamentMatches)
-	const winnerIds = allTournamentMatches.map((m) => m.winnerId)
-	console.log('winnerIds', winnerIds)
-	const filtered_winnerIds = winnerIds.filter((w, index) => {
-		if (index === 0) return w
-		if (!winnerIds.slice(0, index - 1).includes(w)) return w
-	})
-	console.log('filtered_winnerIds', filtered_winnerIds)
-}
-
-
-//WRITE ALL M8
-if(cmd === `!write_all_m8`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	const allTournamentMatches = await Match.findAll({ where: { game_mode: 'tournament' } })
-	console.log('allTournamentMatches', allTournamentMatches)
-	const winnerIds = allTournamentMatches.map((m) => m.winnerId)
-	console.log('winnerIds', winnerIds)
-	const filtered_winnerIds = winnerIds.filter((w, index) => {
-		if (index === 0) return w
-		if (!winnerIds.slice(0, index - 1).includes(w)) return w
-	})
-	console.log('filtered_winnerIds', filtered_winnerIds)
-
-	for (let i = 0; i < filtered_winnerIds.length; i++) {
-		const winnerId = filtered_winnerIds[i]
-		setTimeout(() => completeTask(message.channel, winnerId, 'm8'), i * 2000)
-	}
-
-	return
-}
 
 //IMPORT_DATA
 if (cmd === `!import_data`) {
@@ -1491,6 +1456,65 @@ if (cmd === `!shop`) {
 		if (!inv) return message.channel.send(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - Out of Stock.`)
 		return message.channel.send(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - ${inv.quantity}${auction ? ` - ${no}`: ''}`)
 	}
+}
+
+
+//POPULATION
+if (cmd === `!pop` || cmd === `!population`) {
+	// if (mcid !== botSpamChannelId &&
+	// 	mcid !== generalChannelId &&
+	// 	mcid !== marketPlaceChannelId
+	// ) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
+
+	if (!args.length) return message.channel.send(`Please specify a card.`)
+
+	const query = args.join(' ')
+	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
+	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
+	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }, include: Set}) : card_name ? await selectPrint(message, maid, card_name) : null
+	const count = print && print.set_code === 'CH1' ? await Inventory.count({ where: { printId: print.id }}) : true
+	if (!print || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+
+	const invs = await Inventory.findAll({ where: {
+		printId: print.id,
+		quantity: { [Op.gt]: 0 }
+	}})
+
+	const quants = invs.map((i) => i.quantity)
+	const total = quants.length ? quants.reduce((a, b) => a + b) : 0
+
+	const equivalentPrints = await Print.findAll({ where: {
+		set_code: print.set_code,
+		rarity: print.rarity
+	}})
+
+	let total_equivalents = 0
+	for (let i = 0; i < equivalentPrints.length; i++) {
+		const eq_print = equivalentPrints[i]
+		const eq_invs = await Inventory.findAll({ where: { 
+			printId: eq_print.id,
+			quantity: { [Op.gt]: 0 }  
+		}})
+
+		if (!eq_invs.length) continue
+		const eq_quants = eq_invs.map((i) => i.quantity)
+		const subtotal = eq_quants.reduce((a, b) => a + b)
+		total_equivalents += subtotal
+	}
+
+	const avg_eq_pop = Math.round(10 * total_equivalents / equivalentPrints.length) / 10
+
+	const merchbotinv = await Inventory.findOne({ where: {
+		printId: print.id,
+		quantity: { [Op.gt]: 0 },
+		playerId: merchbotId
+	}})
+
+	const shop_pop = merchbotinv ? merchbotinv.quantity : 0
+	const shop_percent = total ? `${Math.round(1000 * shop_pop / total) / 10}%` : 'N/A'
+	return message.channel.send(`${ygocard} --- Population Stats --- ${ygocard}\n${card}\nTotal Population: ${total}\nAvg ${eval(print.rarity)} ${print.set_code} ${eval(print.set.emoji)} Pop: ${avg_eq_pop}\nShop Inventory: ${shop_percent}`)
 }
 
 //COUNT

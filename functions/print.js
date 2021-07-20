@@ -108,8 +108,7 @@ const collectNicknames = async (message, card_name) => {
 const selectPrint = async (message, playerId, card_name) => {
     const prints = await Print.findAll({ 
         where: { card_name: card_name },
-        order: [['createdAt', 'ASC']],
-        include: Set
+        order: [['createdAt', 'ASC']]
     })
 
     if (!prints.length) return null

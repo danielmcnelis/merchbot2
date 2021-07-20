@@ -1461,10 +1461,10 @@ if (cmd === `!shop`) {
 
 //POPULATION
 if (cmd === `!pop` || cmd === `!population`) {
-	// if (mcid !== botSpamChannelId &&
-	// 	mcid !== generalChannelId &&
-	// 	mcid !== marketPlaceChannelId
-	// ) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
+	if (mcid !== botSpamChannelId &&
+		mcid !== generalChannelId &&
+		mcid !== marketPlaceChannelId
+	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
 
 	if (!args.length) return message.channel.send(`Please specify a card.`)
 
@@ -1476,7 +1476,7 @@ if (cmd === `!pop` || cmd === `!population`) {
 	const count = print && print.set_code === 'CH1' ? await Inventory.count({ where: { printId: print.id }}) : true
 	if (!print || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
-
+	const set = await Set.findOne({ where: { id: print.setId }})
 	const invs = await Inventory.findAll({ where: {
 		printId: print.id,
 		quantity: { [Op.gt]: 0 }
@@ -1514,7 +1514,7 @@ if (cmd === `!pop` || cmd === `!population`) {
 
 	const shop_pop = merchbotinv ? merchbotinv.quantity : 0
 	const shop_percent = total ? `${Math.round(1000 * shop_pop / total) / 10}%` : 'N/A'
-	return message.channel.send(`${ygocard} --- Population Stats --- ${ygocard}\n${card}\nTotal Population: ${total}\nAvg ${eval(print.rarity)} ${print.set_code} ${eval(print.set.emoji)} Pop: ${avg_eq_pop}\nShop Inventory: ${shop_percent}`)
+	return message.channel.send(`${ygocard} --- Population Stats --- ${ygocard}\n${card}\nTotal Population: ${total}\nAvg ${eval(print.rarity)} ${print.set_code} ${eval(set.emoji)} Pop: ${avg_eq_pop}\nShop Inventory: ${shop_percent}`)
 }
 
 //COUNT

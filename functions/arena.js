@@ -207,8 +207,8 @@ const startRound = async (info, entries) => {
         )
 
         completeTask(arenaChannel, playerId, 'm10', 12000)
-        if (await check6TribesComplete(playerId, 1)) completeTask(message.channel, playerId, 'h8', 4000)
-        if (await check6TribesComplete(playerId, 3)) completeTask(message.channel, playerId, 'l6', 5000)
+        if (await check6TribesComplete(playerId, 1)) completeTask(arenaChannel, playerId, 'h8', 4000)
+        if (await check6TribesComplete(playerId, 3)) completeTask(arenaChannel, playerId, 'l6', 5000)
         return endArena(arenaChannel, info, entries)
     } else if (info.round === 6) {
         if (entries[0].score > entries[1].score) {
@@ -237,8 +237,8 @@ const startRound = async (info, entries) => {
             )
 
             completeTask(arenaChannel, playerId, 'm10', 12000)
-            if (await check6TribesComplete(playerId, 1)) completeTask(message.channel, playerId, 'h8', 4000)
-            if (await check6TribesComplete(playerId, 3)) completeTask(message.channel, playerId, 'l6', 5000)
+            if (await check6TribesComplete(playerId, 1)) completeTask(arenaChannel, playerId, 'h8', 4000)
+            if (await check6TribesComplete(playerId, 3)) completeTask(arenaChannel, playerId, 'l6', 5000)
             return endArena( arenaChannel, info, entries)
         } else if ((entries[0].score === entries[1].score) && entries[1].score > entries[2].score) {
         //2 way tie

@@ -200,6 +200,41 @@ if(cmd === `!test`) {
 	return message.channel.send(`Behold!`, attachment)
 }
 
+//TEST 2
+if (cmd === `!test2`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	const allTournamentMatches = await Match.findAll({ where: { game_mode: 'tournament' } })
+	console.log('allTournamentMatches', allTournamentMatches)
+	const winnerIds = allTournamentMatches.map((m) => m.winnerId)
+	console.log('winnerIds', winnerIds)
+	const filtered_winnerIds = winnerIds.filter((w, index) => {
+		if (index === 0) return w
+		if (!winnerIds.sliced(0, index - 1).includes(w)) return w
+	})
+	console.log('filtered_winnerIds', filtered_winnerIds)
+}
+
+
+//WRITE ALL M8
+if(cmd === `!write_all_m8`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	const allTournamentMatches = await Match.findAll({ where: { game_mode: 'tournament' } })
+	console.log('allTournamentMatches', allTournamentMatches)
+	const winnerIds = allTournamentMatches.map((m) => m.winnerId)
+	console.log('winnerIds', winnerIds)
+	const filtered_winnerIds = winnerIds.filter((w, index) => {
+		if (index === 0) return w
+		if (!winnerIds.sliced(0, index - 1).includes(w)) return w
+	})
+	console.log('filtered_winnerIds', filtered_winnerIds)
+
+	for (let i = 0; i < filtered_winnerIds.length; i++) {
+		const winnerId = filtered_winnerIds[i]
+		setTimeout(() => completeTask(message.channel, winnerId, 'm8'), i * 2000)
+	}
+
+	return
+}
 
 //IMPORT_DATA
 if (cmd === `!import_data`) {
@@ -2213,12 +2248,13 @@ if (losscom.includes(cmd)) {
 		})
 
 		completeTask(message.channel, winningPlayer.id, 'e3')
-		if (winningPlayer.stats >= 530) completeTask(message.channel, winningPlayer.id, 'm1', 3000)
-		if (winningPlayer.stats >= 590) completeTask(message.channel, winningPlayer.id, 'h1', 3000)
-		if (winningPlayer.stats >= 650) completeTask(message.channel, winningPlayer.id, 'l1', 3000)
-		if (winningPlayer.current_streak === 3) completeTask(message.channel, winningPlayer.id, 'm2', 5000) 
-		if (winningPlayer.vanquished_foes === 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
-		if (winningPlayer.current_streak === 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
+		completeTask(message.channel, winningPlayer.id, 'm8', 3000)
+		if (winningPlayer.stats >= 530) completeTask(message.channel, winningPlayer.id, 'm1', 4000)
+		if (winningPlayer.stats >= 590) completeTask(message.channel, winningPlayer.id, 'h1', 4000)
+		if (winningPlayer.stats >= 650) completeTask(message.channel, winningPlayer.id, 'l1', 4000)
+		if (winningPlayer.current_streak >= 3) completeTask(message.channel, winningPlayer.id, 'm2', 5000) 
+		if (winningPlayer.vanquished_foes >= 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
+		if (winningPlayer.current_streak >= 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
 
 		message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your Tournament loss to ${winningPlayer.name} (+${chipsWinner}${starchips}) has been recorded.`)
 		const updatedMatchesArr = await getMatches(tournamentId)

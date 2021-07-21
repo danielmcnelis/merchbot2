@@ -1636,12 +1636,11 @@ if(cmd === `!trades`) {
 
 	const summaries = []
 	const partners = []
-	const ids = []
+	const transaction_ids = []
 
 	for (let i = 0; i < trades.length; i++) {
 		const trade = trades[i]
-		const id = trade.id
-
+		const transaction_id = trade.transaction_id
 		const senderId = trade.senderId
 		const receiverId = trade.receiverId
 		const sender_name = trade.sender_name
@@ -1650,7 +1649,7 @@ if(cmd === `!trades`) {
 		if (senderId !== maid && !partners.includes(senderId)) partners.push(senderId)
 		if (receiverId !== maid && !partners.includes(receiverId)) partners.push(receiverId)
 
-		if (ids.includes(id)) {
+		if (transaction_ids.includes(transaction_id)) {
 			const summary = summaries[summaries.length-1]
 			if (summary.p1_name === sender_name) {
 				summary.p2_receives.push(item)
@@ -1658,13 +1657,13 @@ if(cmd === `!trades`) {
 				summary.p1_receives.push(item)
 			}
 		} else {
+			transaction_ids.push(transaction_id)
 			const summary = {
 				p1_name: sender_name,
 				p2_name: receiver_name,
 				p1_receives: [],
 				p2_receives: [item]
 			}
-			ids.push(id)
 			summaries.push(summary)
 		}
 	}

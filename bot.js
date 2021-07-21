@@ -1661,7 +1661,7 @@ if(cmd === `!trades`) {
 			const summary = {
 				p1_name: sender_name,
 				p2_name: receiver_name,
-				p1_receive: [],
+				p1_receives: [],
 				p2_receives: [item]
 			}
 			ids.push(id)
@@ -1679,8 +1679,9 @@ if(cmd === `!trades`) {
 	}
 
 	for (let i = 0; i < summaries.length; i++) {
+		console.log('summary', summary)
 		const summary = summaries[i]
-		results.push(`Trade ${i+1}:\n${summary.p1_name} received: ${summary.p1_receive.join(", ")}\n${summary.p2_name} received: ${summary.p2_receive.join(", ")}`)
+		results.push(`Trade ${i+1}:\n${summary.p1_name} received: ${summary.p1_receives.join(", ")}\n${summary.p2_name} received: ${summary.p2_receives.join(", ")}`)
 	}
 
 	players.sort()

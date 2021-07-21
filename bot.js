@@ -1685,7 +1685,12 @@ if(cmd === `!trades`) {
 
 	players.sort()
 	message.channel.send(`You have traded with the following players:\n${players.join("\n")}`)
-	return message.channel.send(`Here is the summary of all your trades:\n${results.join("\n\n")}`)
+
+	message.channel.send(`Here is the summary of all your trades:\n${results.slice(0, 10).join("\n\n")}`)
+	for (let i = 10 ; i < results.length; i += 10) {
+		message.channel.send(results.slice(i, i + 10).join("\n\n"))
+	}
+	return
 }
 
 

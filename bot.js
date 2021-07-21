@@ -1624,7 +1624,8 @@ if(cmd === `!chart`) {
 
 //TRADES
 if(cmd === `!trades`) {
-	const player = await Player.findOne({ where: { id: maid } })
+	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
+	const player = await Player.findOne({ where: { id: playerId } })
 	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 
 	const trades = await Trade.findAll({ where: { 
@@ -1633,16 +1634,43 @@ if(cmd === `!trades`) {
 
 	if (!trades.length) return message.channel.send(`You have not made any trades.`)
 
+	const summaries = []
 	const partners = []
+	const ids = []
 
-	trades.forEach((trade) => {
+	for (let i = 0; i < trades.length; i++) {
+		const trade = trades[i]
+		const id = trade.id
+
 		const senderId = trade.senderId
 		const receiverId = trade.receiverId
+		const sender_name = trade.sender_name
+		const receiver_name = trade.receiver_name
+		const item = `${trade.quantity} ${trade.item}`
 		if (senderId !== maid && !partners.includes(senderId)) partners.push(senderId)
 		if (receiverId !== maid && !partners.includes(receiverId)) partners.push(receiverId)
-	})
 
+		if (ids.includes(id)) {
+			const summary = summaries[summaries.length-1]
+			if (summary.p1_name === sender_name) {
+				summary.p2_receives.push(item)
+			} else {
+				summary.p1_receives.push(item)
+			}
+		} else {
+			const summary = {
+				p1_name: sender_name,
+				p2_name: receiver_name,
+				p1_receive: [],
+				p2_receives: [item]
+			}
+			ids.push(id)
+			summaries.push(summary)
+		}
+	}
+	
 	const players = []
+	const results = []
 
 	for (let i = 0; i < partners.length; i++) {
 		const player = await Player.findOne({ where: { id: partners[i] }})
@@ -1650,10 +1678,16 @@ if(cmd === `!trades`) {
 		players.push(player.name)
 	}
 
-	players.sort()
+	for (let i = 0; i < summaries.length; i++) {
+		const summary = summaries[i]
+		results.push(`Trade ${i+1}:\n${summary.p1_name} received: ${summary.p1_receive.join(", ")}\n${summary.p2_name} received: ${summary.p2_receive.join(", ")}`)
+	}
 
-	return message.channel.send(`You have traded with the following players:\n${players.join("\n")}`)
+	players.sort()
+	message.channel.send(`You have traded with the following players:\n${players.join("\n")}`)
+	return message.channel.send(`Here is the summary of all your trades:\n${results.join("\n\n")}`)
 }
+
 
 
 //UPDATE TRADES

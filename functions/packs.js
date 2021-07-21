@@ -228,7 +228,7 @@ const awardPacksToShop = async (num) => {
         if (!yourUltras.length) for (let i = 0; i < set.ultras_per_box; i++) odds.push("ultras")
         if (!yourSecrets.length) for (let i = 0; i < set.secrets_per_box; i++) odds.push("secrets")
     
-        const luck = (j + 1) < packs_from_boxes ? odds[j % 24] : getRandomElement(odds)
+        const luck = j < packs_from_boxes ? odds[j % 24] : getRandomElement(odds)
         const yourFoil = getRandomElement(eval(luck))
     
         const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil]

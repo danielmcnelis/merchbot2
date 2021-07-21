@@ -1629,7 +1629,7 @@ if(cmd === `!trades`) {
 	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 
 	const trades = await Trade.findAll({ where: { 
-		[Op.or]: [{ senderId: maid }, { receiverId: maid }]
+		[Op.or]: [{ senderId: playerId }, { receiverId: playerId }]
 	}})
 
 	if (!trades.length) return message.channel.send(`You have not made any trades.`)

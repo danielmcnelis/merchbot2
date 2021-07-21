@@ -1637,6 +1637,55 @@ if(cmd === `!trades`) {
 	const summaries = []
 	const partners = []
 	const transaction_ids = []
+	const map = {
+		stardust: {
+			card_name: null,
+			card_code: null,
+			rarity: 'stardust'
+		},
+		mushroom: {
+			card_name: null,
+			card_code: null,
+			rarity: 'mushroom'
+		},
+		egg: {
+			card_name: null,
+			card_code: null,
+			rarity: 'egg'
+		},
+		hook: {
+			card_name: null,
+			card_code: null,
+			rarity: 'hook'
+		},
+		rose: {
+			card_name: null,
+			card_code: null,
+			rarity: 'rose'
+		},
+		cactus: {
+			card_name: null,
+			card_code: null,
+			rarity: 'cactus'
+		},
+		moai: {
+			card_name: null,
+			card_code: null,
+			rarity: 'moai'
+		}
+	}
+
+	const all_prints = await Print.findAll()
+
+	for (let i = 0; i < all_prints.length; i++) {
+		const print = all_prints[i]
+		const card_code = print.card_code
+		map[card_code] = {
+			card_name: print.card_name,
+			card_code: print.card_code,
+			rarity: print.rarity
+		}
+	}
 
 	for (let i = 0; i < trades.length; i++) {
 		const trade = trades[i]
@@ -1645,7 +1694,7 @@ if(cmd === `!trades`) {
 		const receiverId = trade.receiverId
 		const sender_name = trade.sender_name
 		const receiver_name = trade.receiver_name
-		const item = `${trade.quantity} ${trade.item}`
+		const item = `${trade.quantity} ${eval(map[trade.item].rarity)} ${map[trade.item].card_code ? `${map[trade.item].card_code} - ` : ''}${map[trade.item].card_name || ''}`
 		if (senderId !== maid && !partners.includes(senderId)) partners.push(senderId)
 		if (receiverId !== maid && !partners.includes(receiverId)) partners.push(receiverId)
 
@@ -1685,10 +1734,9 @@ if(cmd === `!trades`) {
 
 	players.sort()
 	message.channel.send(`You have traded with the following players:\n${players.join("\n")}`)
-
-	message.channel.send(`Here is the summary of all your trades:\n${results.slice(0, 10).join("\n\n")}`)
-	for (let i = 10 ; i < results.length; i += 10) {
-		message.channel.send(results.slice(i, i + 10).join("\n\n"))
+	message.channel.send(`Here is the summary of all your trades:\n${results.slice(0, 5).join("\n\n")}`)
+	for (let i = 5 ; i < results.length; i += 5) {
+		message.channel.send(results.slice(i, i + 5).join("\n\n"))
 	}
 	return
 }

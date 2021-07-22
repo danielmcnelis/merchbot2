@@ -1624,7 +1624,7 @@ if(cmd === `!chart`) {
 
 //TRADES
 if(cmd === `!trades`) {
-	if (mcid !== botSpamChannelId ||
+	if (mcid !== botSpamChannelId &&
 		mcid !== gutterChannelId
 	) return message.channel.send(`Please use this command in <#${botSpamChannelId}>.`)
 

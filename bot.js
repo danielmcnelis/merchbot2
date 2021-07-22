@@ -1721,7 +1721,7 @@ if (cmd === `!hist` || cmd === `!history`) {
 
 		for (let j = 0; j < trade_components.length; j++) {
 			const component = trade_components[j]
-			const item = `${component.quantity} ${eval(map[component.item].rarity)} ${map[component.item].card_code ? `${map[component.item].card_code} - ` : ''}${map[component.item].card_name || ''}`
+			const item = `${component.quantity}${eval(map[component.item].rarity)} ${map[component.item].card_code ? `${map[component.item].card_code} - ` : ''}${map[component.item].card_name || ''}`
 
 			if (component.sender_name === summary.p1_name) summary.p2_receives.push(item)
 			else summary.p1_receives.push(item)
@@ -1735,12 +1735,14 @@ if (cmd === `!hist` || cmd === `!history`) {
 	for (let i = 0; i < summaries.length; i++) {
 		const summary = summaries[i]
 		const days = summary.days
-		results.push(`__**Trade ${i+1} - ${days ? days : 'Earlier Today'} ${days === 0 ? '' : days === 1 ? 'Day Ago' : 'Days Ago'}**__\n${summary.p1_name} received:\n${summary.p1_receives.join("\n")}\n\n${summary.p2_name} received:\n${summary.p2_receives.join("\n")}`)
+		results.push(`**Trade ${i+1}** - ${days ? days : 'Earlier Today'} ${days === 0 ? '' : days === 1 ? 'Day Ago' : 'Days Ago'}\n${summary.p1_name} received:\n${summary.p1_receives.join("\n")}\n\n${summary.p2_name} received:\n${summary.p2_receives.join("\n")}`)
 	}
 
-	message.channel.send(`${results.slice(0, 5).join("\n----\n") + "\n----"}`)
+	console.log('results', results)
+
+	message.channel.send(`${results.slice(0, 5).join("\n\n")}`)
 	for (let i = 5 ; i < results.length; i += 5) {
-		message.channel.send(results.slice(i, i + 5).join("\n----\n") + "\n----")
+		message.channel.send(results.slice(i, i + 5).join("\n\n"))
 	}
 	return
 }

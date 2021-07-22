@@ -1624,6 +1624,10 @@ if(cmd === `!chart`) {
 
 //TRADES
 if(cmd === `!trades`) {
+	if (mcid !== botSpamChannelId ||
+		mcid !== gutterChannelId
+	) return message.channel.send(`Please use this command in <#${botSpamChannelId}>.`)
+
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const player = await Player.findOne({ where: { id: playerId } })
 	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)

@@ -1737,7 +1737,11 @@ if (cmd === `!hist` || cmd === `!history`) {
 		results.push(`__**Trade ${i+1} - ${days ? days : 'Earlier Today'} ${days === 0 ? '' : days === 1 ? 'Day Ago' : 'Days Ago'}**__\n${summary.p1_name} received:\n${summary.p1_receives.join("\n")}\n\n${summary.p2_name} received:\n${summary.p2_receives.join("\n")}`)
 	}
 
-	return message.channel.send(`${results.join("\n\n")}`)
+	message.channel.send(`${results.slice(0, 5).join("\n----------------\n") + "\n----------------"}`)
+	for (let i = 5 ; i < results.length; i += 5) {
+		message.channel.send(results.slice(i, i + 5).join("\n----------------\n") + "\n----------------")
+	}
+	return
 }
 
 //TRADES

@@ -1708,8 +1708,9 @@ if (cmd === `!hist` || cmd === `!history`) {
 		const sender_name = trade_components[0].sender_name
 		const receiver_name = trade_components[0].receiver_name
 		const date = trade_components[0].createdAt
-		const days = today.setHours(0, 0, 0, 0) - date.setHours(0, 0, 0, 0) / (1000*60*60*24)
-
+		console.log('date', date)
+		const days = (today.setHours(0, 0, 0, 0) - date.setHours(0, 0, 0, 0)) / (1000*60*60*24)
+		console.log('days', days)
 		const summary = {
 			days: days,
 			p1_name: sender_name,
@@ -1737,9 +1738,9 @@ if (cmd === `!hist` || cmd === `!history`) {
 		results.push(`__**Trade ${i+1} - ${days ? days : 'Earlier Today'} ${days === 0 ? '' : days === 1 ? 'Day Ago' : 'Days Ago'}**__\n${summary.p1_name} received:\n${summary.p1_receives.join("\n")}\n\n${summary.p2_name} received:\n${summary.p2_receives.join("\n")}`)
 	}
 
-	message.channel.send(`${results.slice(0, 5).join("\n----------------\n") + "\n----------------"}`)
+	message.channel.send(`${results.slice(0, 5).join("\n----\n") + "\n----"}`)
 	for (let i = 5 ; i < results.length; i += 5) {
-		message.channel.send(results.slice(i, i + 5).join("\n----------------\n") + "\n----------------")
+		message.channel.send(results.slice(i, i + 5).join("\n----\n") + "\n----")
 	}
 	return
 }

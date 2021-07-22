@@ -1737,7 +1737,7 @@ if(cmd === `!trades`) {
 
 	players.sort()
 	//message.channel.send(`You have traded with the following players:\n${players.join("\n")}`)
-	message.channel.send(`${results.slice(0, 5).join("\n----------------\n")}`)
+	message.channel.send(`${results.slice(0, 5).join("\n----------------\n") + "\n----------------"}`)
 	for (let i = 5 ; i < results.length; i += 5) {
 		message.channel.send(results.slice(i, i + 5).join("\n----------------\n") + "\n----------------")
 	}

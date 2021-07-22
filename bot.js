@@ -1728,15 +1728,14 @@ if(cmd === `!trades`) {
 
 	for (let i = 0; i < summaries.length; i++) {
 		const summary = summaries[i]
-		console.log('summary', summary)
-		results.push(`Trade ${i+1}:\n${summary.p1_name} received: ${summary.p1_receives.join(", ")}\n${summary.p2_name} received: ${summary.p2_receives.join(", ")}`)
+		results.push(`Trade ${i+1}:\n${summary.p1_name}\n\nreceived:\n${summary.p1_receives.join("\n")}\n\n${summary.p2_name} received:\n${summary.p2_receives.join("\n")}`)
 	}
 
 	players.sort()
-	message.channel.send(`You have traded with the following players:\n${players.join("\n")}`)
-	message.channel.send(`Here is the summary of all your trades:\n${results.slice(0, 5).join("\n\n")}`)
+	//message.channel.send(`You have traded with the following players:\n${players.join("\n")}`)
+	message.channel.send(`${results.slice(0, 5).join("\n----------------")}`)
 	for (let i = 5 ; i < results.length; i += 5) {
-		message.channel.send(results.slice(i, i + 5).join("\n\n"))
+		message.channel.send(results.slice(i, i + 5).join("\n----------------"))
 	}
 	return
 }

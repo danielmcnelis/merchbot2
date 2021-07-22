@@ -1622,6 +1622,123 @@ if(cmd === `!chart`) {
 	)
 }
 
+//HISTORY
+if (cmd === `!hist` || cmd === `!history`) {
+	if (mcid !== botSpamChannelId &&
+		mcid !== gutterChannelId
+	) return message.channel.send(`Please use this command in <#${botSpamChannelId}>.`)
+
+	const query = args.join(' ')
+	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
+	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
+	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
+	const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true
+	if (!print || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+	const item = print.card_code
+
+	const trades = await Trade.findAll({ 
+		where: { 
+			item: item
+		},
+		order: [['createdAt', 'DESC']]
+	})
+
+	if (!trades.length) return message.channel.send(`There have been no trades involving ${card}.`)
+
+	const transaction_ids = trades.slice(0, 10).map((t) => t.transaction_id)
+	const summaries = []
+	const map = {
+		stardust: {
+			card_name: null,
+			card_code: null,
+			rarity: 'stardust'
+		},
+		mushroom: {
+			card_name: null,
+			card_code: null,
+			rarity: 'mushroom'
+		},
+		egg: {
+			card_name: null,
+			card_code: null,
+			rarity: 'egg'
+		},
+		hook: {
+			card_name: null,
+			card_code: null,
+			rarity: 'hook'
+		},
+		rose: {
+			card_name: null,
+			card_code: null,
+			rarity: 'rose'
+		},
+		cactus: {
+			card_name: null,
+			card_code: null,
+			rarity: 'cactus'
+		},
+		moai: {
+			card_name: null,
+			card_code: null,
+			rarity: 'moai'
+		}
+	}
+
+	const all_prints = await Print.findAll()
+
+	for (let i = 0; i < all_prints.length; i++) {
+		const print = all_prints[i]
+		const card_code = print.card_code
+		map[card_code] = {
+			card_name: print.card_name,
+			card_code: print.card_code,
+			rarity: print.rarity
+		}
+	}
+
+	const today = new Date()
+
+	for (let i = 0; i < transaction_ids.length; i++) {
+		const transaction_id = transaction_ids[i]
+		const trade_components = await Trade.findAll({ where: { transaction_id: transaction_id } })
+		if (!trade_components.length) continue
+		const sender_name = trade_components[0].sender_name
+		const receiver_name = trade_components[0].receiver_name
+		const date = trade_components[0].createdAt
+		const daysPassed = today.setHours(0, 0, 0, 0) - date.setHours(0, 0, 0, 0) / (1000*60*60*24)
+
+		const summary = {
+			daysPassed: daysPassed,
+			p1_name: sender_name,
+			p2_name: receiver_name,
+			p1_receives: [],
+			p2_receives: []
+		}
+
+		for (let j = 0; j < trade_components.length; j++) {
+			const component = trade_components[j]
+			const item = `${component.quantity} ${eval(map[component.item].rarity)} ${map[component.item].card_code ? `${map[component.item].card_code} - ` : ''}${map[component.item].card_name || ''}`
+
+			if (component.sender_name === summary.p1_name) summary.p2_receives.push(item)
+			else summary.p1_receives.push(item)
+		}
+		
+		summaries.push(summary)	
+	}
+
+	const results = []
+
+	for (let i = 0; i < summaries.length; i++) {
+		const summary = summaries[i]
+		results.push(`__**Trade ${i+1} - ${daysPassed ? daysPassed : 'Earlier Today'} ${daysPassed === 0 ? '' : daysPassed === 1 ? 'Day' : 'Days'} Ago**__\n${summary.p1_name} received:\n${summary.p1_receives.join("\n")}\n\n${summary.p2_name} received:\n${summary.p2_receives.join("\n")}`)
+	}
+
+	return message.channel.send(`${results.join("\n\n")}`)
+}
+
 //TRADES
 if(cmd === `!trades`) {
 	if (mcid !== botSpamChannelId &&

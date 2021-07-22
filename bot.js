@@ -1735,7 +1735,7 @@ if (cmd === `!hist` || cmd === `!history`) {
 	for (let i = 0; i < summaries.length; i++) {
 		const summary = summaries[i]
 		const days = summary.days
-		results.push(`**Trade ${i+1}** - ${days ? days : 'Earlier Today'} ${days === 0 ? '' : days === 1 ? 'Day Ago' : 'Days Ago'}\n${summary.p1_name} received:\n${summary.p1_receives.join("\n")}\n\n${summary.p2_name} received:\n${summary.p2_receives.join("\n")}`)
+		results.push(`**Trade ${i+1}** - ${days ? days : 'Earlier Today'} ${days === 0 ? '' : days === 1 ? 'Day Ago' : 'Days Ago'}\n${summary.p1_name} received:\n${summary.p1_receives.join("\n")}\n${summary.p2_name} received:\n${summary.p2_receives.join("\n")}`)
 	}
 
 	console.log('results', results)

@@ -1739,7 +1739,8 @@ if (cmd === `!hist` || cmd === `!history`) {
 	}
 
 	console.log('results', results)
-	for (let i = 0 ; i < results.length; i++) message.channel.send(results[i])
+	message.channel.send(`I sent you the trade history you requested.`)
+	for (let i = 0 ; i < results.length; i++) message.author.send(results[i])
 	return
 }
 

@@ -2428,7 +2428,7 @@ if (losscom.includes(cmd)) {
 				break
 			}
 		}
-
+		
 		const success = await putMatchResult(tournamentId, matchId, winningEntry.participantId, scores)
 		if (!success) return message.channel.send(`Error: could not update bracket for ${tournament.name}.`)
 

@@ -8,7 +8,7 @@ const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { ygocard, fire, tix, credits, blue, red, yellow, stoned, stare, leatherbound, wokeaf, koolaid, cavebob, evil, DOC, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, cultured, com, rar, sup, ult, scr, checkmark, emptybox, yes, no } = require('./static/emojis.json')
 const { aliuscom, nicknamecom, joincom, bindercom, wishlistcom, invcom, calccom, bracketcom, dropcom, queuecom, checklistcom, startcom, infocom, dbcom, noshowcom, legalcom, listcom, pfpcom, botcom, rolecom, statscom, profcom, losscom, h2hcom, undocom, rankcom, manualcom, yescom, nocom, deckcom } = require('./static/commands.json')
-const { triviaRole, botRole, modRole, adminRole, tourRole, toRole, fpRole, muteRole, arenaRole, ambassadorRole } = require('./static/roles.json')
+const { bookwormsRole, gamersRole, triviaRole, botRole, modRole, adminRole, tourRole, toRole, fpRole, muteRole, arenaRole, ambassadorRole } = require('./static/roles.json')
 const { gutterChannelId, generalChannelId, rulesChannelId, rulingsChannelId, introChannelId, discussionChannelId, staffChannelId, botSpamChannelId, welcomeChannelId, announcementsChannelId, registrationChannelId, replaysChannelId, duelRequestsChannelId, marketPlaceChannelId, shopChannelId, tournamentChannelId, arenaChannelId, keeperChannelId, triviaChannelId, draftChannelId, gauntletChannelId, bugreportsChannelId, suggestionsChannelId } = require('./static/channels.json')
 const decks = require('./static/decks.json')
 const types = require('./static/types.json')
@@ -869,12 +869,34 @@ if(cmd === `!unmute`) {
     
 //ROLE 
 if (rolecom.includes(cmd)) {
-	if (!message.member.roles.cache.some(role => role.id === fpRole)) {
-		message.member.roles.add(fpRole)
-		return message.channel.send(`You now have the Forged Players role.`)
+	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
+	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
+	: null
+
+	if (game === 'Arena') {
+		if (!message.member.roles.cache.some(role => role.id === gamersRole)) {
+			message.member.roles.add(gamersRole)
+			return message.channel.send(`You now have the Gamers role.`)
+		} else {
+			message.member.roles.remove(gamersRole)
+			return message.channel.send(`You no longer have the Gamers role.`)
+		}
+	} else if (game === 'Trivia') {
+		if (!message.member.roles.cache.some(role => role.id === bookwormsRole)) {
+			message.member.roles.add(bookwormsRole)
+			return message.channel.send(`You now have the Bookworms role.`)
+		} else {
+			message.member.roles.remove(bookwormsRole)
+			return message.channel.send(`You no longer have the Bookworms role.`)
+		}
 	} else {
-		message.member.roles.remove(fpRole)
-		return message.channel.send(`You no longer have the Forged Players role.`)
+		if (!message.member.roles.cache.some(role => role.id === fpRole)) {
+			message.member.roles.add(fpRole)
+			return message.channel.send(`You now have the Forged Players role.`)
+		} else {
+			message.member.roles.remove(fpRole)
+			return message.channel.send(`You no longer have the Forged Players role.`)
+		}
 	}
 }
 

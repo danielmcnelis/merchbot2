@@ -920,7 +920,6 @@ if (botcom.includes(cmd)) {
 		.addField('Daily Commands',
 			`!daily - Get daily rewards for checking in.`
 			+ `\n!alc (card) - Convert a card into ${starchips}.`
-			//+ `\n!gift (@user + card) - Gift a card to another player.`
 		)
 		.addField('Inventory Commands',
 			`!inv (set or card) - View your Inventory.`
@@ -1002,7 +1001,6 @@ if (cmd === `!mod`) {
 			`!create (tournament name) - Create a new tournament.`
 			+ `\n!signup (@user) - Directly add a player to the bracket.`
 			+ `\n!remove (@user) - Remove a player from the bracket.`
-			//+ `\n!seed - Assign seeds to participants based on rankings.`
 			+ `\n!start - Start the next tournament.`
 			+ `\n!noshow (@user) - Report a tournament no-show.`
 			+ `\n!end - End the current tournament.`
@@ -1403,11 +1401,6 @@ if(cmd === `!reset_ref`) {
 	return message.channel.send(`${message.mentions.users.first().username}'s referral was reset.`)
 }
 
-//GIFT //not working
-if(cmd === `!gift`) {
-	return Merch.data.awardStarchips(client, message, rMem, 30)
-}
-
 //SHOP
 if (cmd === `!shop`) {
 	if (!args.length) {
@@ -1646,10 +1639,6 @@ if(cmd === `!chart`) {
 
 //HISTORY
 if (cmd === `!hist` || cmd === `!history`) {
-	if (mcid !== botSpamChannelId &&
-		mcid !== gutterChannelId
-	) return message.channel.send(`Please use this command in <#${botSpamChannelId}>.`)
-
 	const query = args.join(' ')
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
@@ -1890,55 +1879,6 @@ if(cmd === `!trades`) {
 
 
 
-//UPDATE TRADES
-if(cmd === `!update_trades`) {
-	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	
-	const allProfiles = await Profile.findAll()
-	const obj = {}
-
-	allProfiles.forEach((prof) => {
-		const playerId = prof.playerId
-		obj[playerId] = []
-	})
-
-	console.log('allProfiles.length', allProfiles.length)
-
-	console.log('obj', obj)
-
-	const allTrades = await Trade.findAll()
-
-	console.log('allTrades.length', allTrades.length)
-
-	allTrades.forEach((trade) => {
-		const senderId = trade.senderId
-		const receiverId = trade.receiverId
-
-		console.log('senderId', senderId)
-		console.log('receiverId', receiverId)
-
-		console.log()
-
-		if (!obj[senderId].includes(receiverId)) obj[senderId].push(receiverId)
-		if (!obj[receiverId].includes(senderId)) obj[receiverId].push(senderId)
-	})
-
-	for (let i = 0; i < allProfiles.length; i++) {
-		const profile = allProfiles[i]
-		const playerId = profile.playerId
-		console.log('playerId', playerId)
-		const trade_partners = obj[playerId].length
-		console.log('trade_partners', trade_partners)
-
-		profile.trade_partners = trade_partners
-		await profile.save()
-	}
-
-	console.log('obj', obj)
-	return message.channel.send(`Player profiles have been updated to reflect the number of trade partners.`)
-}
-
-
 //RNG
 if(cmd === `!rng`) {
 	const num = parseInt(args[0])
@@ -1960,7 +1900,10 @@ if(cmd === `!flip` || cmd === `!coin`) {
 }
 
 //DAIRY
-if(cmd === `!dairy`) return message.channel.send('<:cow:598743989101002762>')
+if(cmd === `!dairy`) return message.channel.send('🐮')
+
+//SHIP
+if(cmd === `!ship`) return message.channel.send('🚢')
 
 //DIARY
 if(cmd === `!diary`) {

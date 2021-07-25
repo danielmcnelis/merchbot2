@@ -267,7 +267,7 @@ const startRound = async (info, entries) => {
             ` vs ${eval(entries[1].tribe)} <@${entries[1].playerId}> ${eval(entries[1].tribe)}`
 
             return arenaChannel.send(`${title}\n${match}`)
-        } else if ((entries[0].score === entries[1].score === entries[2].score) && entries[2].score > entries[3].score) {
+        } else if (entries[0].score === entries[1].score && entries[1].score === entries[2].score && entries[2].score > entries[3].score) {
         //3 way tie
             for (let i = 0; i < entries.length; i++) {
                 const entry = entries[i]
@@ -281,7 +281,7 @@ const startRound = async (info, entries) => {
 
             arenaChannel.send(`The shadows grew long over the battlefield, and the gladiators had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena.`)
             return endArena( arenaChannel, info, entries)
-        } else if ((entries[0].score === entries[1].score === entries[2].score === entries[3].score) && entries[3].score > entries[4].score) {
+        } else if (entries[0].score === entries[1].score && entries[1].score === entries[2].score && entries[2].score  === entries[3].score && entries[3].score > entries[4].score) {
         //4 way tie
             for (let i = 0; i < entries.length; i++) {
                 const entry = entries[i]

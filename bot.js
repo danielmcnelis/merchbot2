@@ -2434,7 +2434,7 @@ if (losscom.includes(cmd)) {
 		const today = `${y}-${m}-${d}`
 		const count = await Match.count({
 			where: {
-				winnerId: maid,
+				winnerId: winningPlayer.id,
 				game_mode: {
 					[Op.or]: ['ranked', 'tournament']
 				},
@@ -2631,7 +2631,7 @@ if (losscom.includes(cmd)) {
 		const today = `${y}-${m}-${d}`
 		const count = await Match.count({
 			where: {
-				winnerId: maid,
+				winnerId: winningPlayer.id,
 				game_mode: {
 					[Op.or]: ['ranked', 'tournament']
 				},

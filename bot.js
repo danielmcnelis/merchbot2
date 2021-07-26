@@ -2403,6 +2403,21 @@ if (losscom.includes(cmd)) {
 		const diary = winningPlayer.diary
 		const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
 		const bonus = easy_complete ? 1 : 0
+		const date = new Date()
+		const today = date.slice(0, 10)
+		console.log('today', today)
+		const count = await Match.count({
+			where: {
+				winnerId: winningPlayer.id,
+				game_mode: {
+					[Op.or]: ['ranked', 'tournament']
+				},
+				createdAt: {
+					[Op.startsWith]: date
+				}
+			}
+		})
+		const bonus2 = count ? 0 : 3
 		const origStatsWinner = winningPlayer.stats
 		const origStatsLoser = losingPlayer.stats
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
@@ -2425,7 +2440,7 @@ if (losscom.includes(cmd)) {
 		if (winningPlayer.stats > winningPlayer.best_stats) winningPlayer.best_stats = winningPlayer.stats
 		await winningPlayer.save()
 
-		winningPlayer.wallet.starchips += chipsWinner
+		winningPlayer.wallet.starchips += (chipsWinner + bonus2)
 		await winningPlayer.wallet.save()
 
 		losingPlayer.stats -= delta
@@ -2444,7 +2459,7 @@ if (losscom.includes(cmd)) {
 			loser_name: losingPlayer.name,
 			loserId: losingPlayer.id,
 			delta: delta,
-			chipsWinner: chipsWinner,
+			chipsWinner: (chipsWinner + bonus2),
 			chipsLoser: chipsLoser
 		})
 
@@ -2456,7 +2471,7 @@ if (losscom.includes(cmd)) {
 		if (winningPlayer.current_streak >= 3) completeTask(message.channel, winningPlayer.id, 'm2', 5000) 
 		if (winningPlayer.vanquished_foes >= 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
 		if (winningPlayer.current_streak >= 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
-
+		if (bonus2) setTimeout(() => message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned an additional +3${starchips} for your first ranked win of the day! ${legend}`), 2000)
 		message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your Tournament loss to ${winningPlayer.name} (+${chipsWinner}${starchips}) has been recorded.`)
 		const updatedMatchesArr = await getMatches(tournamentId)
 		console.log('updatedMatchesArr', updatedMatchesArr)
@@ -2582,6 +2597,21 @@ if (losscom.includes(cmd)) {
 		const diary = winningPlayer.diary
 		const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
 		const bonus = easy_complete ? 1 : 0
+		const date = new Date()
+		const today = date.slice(0, 10)
+		console.log('today', today)
+		const count = await Match.count({
+			where: {
+				winnerId: winningPlayer.id,
+				game_mode: {
+					[Op.or]: ['ranked', 'tournament']
+				},
+				createdAt: {
+					[Op.startsWith]: date
+				}
+			}
+		})
+		const bonus2 = count ? 0 : 3
 		const origStatsWinner = winningPlayer.stats
 		const origStatsLoser = losingPlayer.stats
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
@@ -2604,7 +2634,7 @@ if (losscom.includes(cmd)) {
 		if (winningPlayer.stats > winningPlayer.best_stats) winningPlayer.best_stats = winningPlayer.stats
 		await winningPlayer.save()
 
-		winningPlayer.wallet.starchips += chipsWinner
+		winningPlayer.wallet.starchips += (chipsWinner + bonus2)
 		await winningPlayer.wallet.save()
 
 		losingPlayer.stats -= delta
@@ -2623,7 +2653,7 @@ if (losscom.includes(cmd)) {
 			loser_name: losingPlayer.name,
 			loserId: losingPlayer.id,
 			delta: delta,
-			chipsWinner: chipsWinner,
+			chipsWinner: (chipsWinner + bonus2),
 			chipsLoser: chipsLoser
 		})
 
@@ -2634,6 +2664,7 @@ if (losscom.includes(cmd)) {
 		if (winningPlayer.current_streak === 3) completeTask(message.channel, winningPlayer.id, 'm2', 5000) 
 		if (winningPlayer.vanquished_foes === 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
 		if (winningPlayer.current_streak === 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
+		if (bonus2) setTimeout(() => message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned an additional +3${starchips} for winning your 1st Ranked Match of the day!`), 2000)
 		return message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your loss to ${winningPlayer.name} (+${chipsWinner}${starchips}) has been recorded.`)
 	}
 }

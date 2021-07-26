@@ -2423,7 +2423,7 @@ if (losscom.includes(cmd)) {
 					[Op.or]: ['ranked', 'tournament']
 				},
 				createdAt: {
-					[Op.startsWith]: date
+					[Op.startsWith]: today
 				}
 			}
 		})
@@ -2621,7 +2621,7 @@ if (losscom.includes(cmd)) {
 					[Op.or]: ['ranked', 'tournament']
 				},
 				createdAt: {
-					[Op.startsWith]: date
+					[Op.startsWith]: today
 				}
 			}
 		})

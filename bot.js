@@ -192,6 +192,12 @@ if (!message.content.startsWith("!") && message.content.includes(`[`) && message
 
 //TEST
 if(cmd === `!test`) {
+	// const date = new Date()
+	// console.log('date', date)
+	// const d = date.getDate()
+	// const m = (date.getMonth() + 1) < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1
+	// const y = date.getFullYear()
+	// message.channel.send(`${y}-${m}-${d}`)
 	const canvas = Canvas.createCanvas(105, 158)
 	const context = canvas.getContext('2d')
 	const background = await Canvas.loadImage(`https://ygoprodeck.com/pics/89631139.jpg`)
@@ -2404,7 +2410,11 @@ if (losscom.includes(cmd)) {
 		const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
 		const bonus = easy_complete ? 1 : 0
 		const date = new Date()
-		const today = date.slice(0, 10)
+		console.log('date', date)
+		const d = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
+		const m = (date.getMonth() + 1) < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1
+		const y = date.getFullYear()
+		const today = `${y}-${m}-${d}`		
 		console.log('today', today)
 		const count = await Match.count({
 			where: {
@@ -2598,7 +2608,11 @@ if (losscom.includes(cmd)) {
 		const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
 		const bonus = easy_complete ? 1 : 0
 		const date = new Date()
-		const today = date.slice(0, 10)
+		console.log('date', date)
+		const d = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
+		const m = (date.getMonth() + 1) < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1
+		const y = date.getFullYear()
+		const today = `${y}-${m}-${d}`
 		console.log('today', today)
 		const count = await Match.count({
 			where: {

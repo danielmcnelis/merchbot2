@@ -272,6 +272,41 @@ if (cmd === `!import_images`) {
 	return message.channel.send(`Successfully imported high quality images for Forged in Chaos cards from YGOPRODeck.`)
 }
 
+//IMPORT_IMAGES
+if (cmd === `!import_missing_images`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	const file_names = fs.readdirSync('./public/card_images')
+	console.log('file_names', file_names)
+
+	const all_cards = await Card.findAll()
+	const image_urls = all_cards.map((c) => c.image)
+	let count = 0
+	let successes = 0
+	
+	for (let i = 0; i <= all_cards.length; i++) {
+		const name = all_cards[i].name
+		const image_url = all_cards[i].image
+		if (!file_names.includes(image_url)) {
+			console.log('missing', image_url)
+			count++
+			const url = `https://ygoprodeck.com/pics/${image_url}`
+			const writer = fs.createWriteStream(`./public/card_images/${image_url}`)
+
+			const response = await axios({
+				url,
+				method: 'GET',
+				responseType: 'stream'
+			})
+
+			const success = await response.data.pipe(writer)
+			if (success) successes++
+			console.log(`${success ? 'SUCCESS' : 'FAILURE'} downloading ${name} from ${image_url}`)
+		}
+	}
+
+	return message.channel.send(`Successfully downloaded ${successes} out of ${count} images from YGOPRODeck.com!`)
+}
+
 //UPDATE 
 if (cmd === `!update`) {
 	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)

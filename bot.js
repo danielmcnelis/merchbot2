@@ -304,6 +304,7 @@ if (cmd === `!import_missing_images`) {
 		}
 	}
 
+	console.log(1)
 	return message.channel.send(`Successfully downloaded ${successes} out of ${count} images from YGOPRODeck.com!`)
 }
 

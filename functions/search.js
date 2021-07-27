@@ -33,7 +33,7 @@ const search = async (query, fuzzyCards, fuzzyCards2) => {
 	
 	const attachment = fs.existsSync(`./public/card_images/${card.image}`) ?
 		new Discord.MessageAttachment(`./public/card_images/${card.image}`, card.image) :
-		null
+		false
 
 	const thumbnail = attachment ?
 		`attachment://${card.image}` :
@@ -45,12 +45,11 @@ const search = async (query, fuzzyCards, fuzzyCards2) => {
 	console.log('thumbnail', thumbnail)
 
 	const cardEmbed = new Discord.MessageEmbed()
-		.setColor(color)
-		.setTitle(card.name)
-		.attachFiles(attachment)
-		.setThumbnail(thumbnail)
-		.setDescription(`${labels}\n\n${card.description}\n\n${stats}`)
-
+	if (attachment) cardEmbed.attachFiles(attachment) 
+	cardEmbed.setColor(color)
+	cardEmbed.setTitle(card.name)
+	cardEmbed.setThumbnail(thumbnail)
+	cardEmbed.setDescription(`${labels}\n\n${card.description}\n\n${stats}`)
 	return cardEmbed
 }
 

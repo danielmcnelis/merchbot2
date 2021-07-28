@@ -260,7 +260,8 @@ const updateShop = async () => {
         const setsForSale = await Set.findAll({ 
             where: { 
                 for_sale: true
-             }
+             },
+             order: [['createdAt', 'DESC']]
         })
 
         for (let i = 0; i < setsForSale.length; i++) {
@@ -277,6 +278,9 @@ const updateShop = async () => {
                 if (set.name === 'Starter Series 1') {
                     results.push(`${set.unit_price}${eval(set.currency)} - Fish's Ire ${eval(set.emoji)} - Deck`)
                     results.push(`${set.unit_price}${eval(set.currency)} - Rock's Foundation ${eval(set.alt_emoji)} - Deck`)
+                } else if (set.name === 'Starter Series 2') {
+                    results.push(`${set.unit_price}${eval(set.currency)} - Dinosaur's Power ${eval(set.emoji)} - Deck`)
+                    results.push(`${set.unit_price}${eval(set.currency)} - Plant's Harmony ${eval(set.alt_emoji)} - Deck`)
                 }
             }
         }

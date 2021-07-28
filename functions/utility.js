@@ -214,6 +214,10 @@ const shuffleArray = (arr) => {
 //IS SAME DAY
 const isSameDay = (d1, d2) => d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate()
 
+
+//IS WITHIN 24H
+const isWithin24h = (t1, t2) => Math.abs(t1 - t2) <= (24 * 60 * 60 * 1000)
+
 module.exports = {
     capitalize,
     convertCardsArrayToObject,
@@ -233,6 +237,7 @@ module.exports = {
     isNewUser,
     isSameDay,
     isVowel,
+    isWithin24h,
     recalculate,
     shuffleArray
 }

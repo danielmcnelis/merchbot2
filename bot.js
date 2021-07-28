@@ -34,7 +34,7 @@ const { checkArenaProgress, getArenaSample, resetArena, startArena, startRound, 
 const { askQuestion, resetTrivia, startTrivia } = require('./functions/trivia.js')
 const { askForGrindAllConfirmation } = require('./functions/mod.js')
 const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Nickname, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
-const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isJazz, isMod, isTourPlayer, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
+const { getRandomString, isSameDay, isWithin24h, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isJazz, isMod, isTourPlayer, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
 const { checkDeckList, saveYDK, saveAllYDK, awardStarterDeck, getShopDeck } = require('./functions/decks.js')
 const { askForBidCancellation, askForBidPlacement, manageBidding } = require('./functions/bids.js')
 const { selectTournament, getTournamentType, seed, askForDBUsername, getDeckListTournament, getDeckNameTournament, directSignUp, removeParticipant, generateSheetData, getMatches, checkChallongePairing, putMatchResult, findNextMatch, findNextOpponent, findOtherPreReqMatch} = require('./functions/tournament.js')
@@ -192,35 +192,30 @@ if (!message.content.startsWith("!") && message.content.includes(`[`) && message
 
 //TEST
 if(cmd === `!test`) {
-	
 	// const canvas = Canvas.createCanvas(105, 158)
 	// const context = canvas.getContext('2d')
 	// const background = await Canvas.loadImage(`https://ygoprodeck.com/pics/89631139.jpg`)
 	// context.drawImage(background, 0, 0, canvas.width, canvas.height)
 	// const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `bewd.png`)
 	// return message.channel.send(`Behold!`, attachment)
-	const date = new Date()
-	date.setHours(0, 0, 0, 0)
-		console.log('date', date)
-		const d = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
-		const m = (date.getMonth() + 1) < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1
-		const y = date.getFullYear()
-		const today = `${y}-${m}-${d}`
-		console.log('today', today)
-		const count = await Match.count({
-			where: {
-				winnerId: maid,
-				game_mode: {
-					[Op.or]: ['ranked', 'tournament']
-				},
-				createdAt: {
-					[Op.gte]: today
-				}
-			}
-		})
-		const bonus2 = count ? 0 : 3
-
-		return message.channel.send(bonus2)
+	const statuses = await Status.findAll()
+    const date = new Date()
+	console.log('date', date)
+	const time = date.getTime()
+	console.log('time', time)
+    const new_changes = statuses.filter((s) => {
+		const updatedAt = s.updatedAt
+		console.log('updatedAt', updatedAt)
+		const updatedTime = updatedAt.getTime()
+		console.log('updatedTime', updatedTime)
+		console.log('24h in ms', 24 * 60 * 60 * 1000)
+		console.log('difference', time - updatedTime)
+        console.log(isWithin24h(time, updatedTime))
+		if (isWithin24h(date, updatedTime)) return s
+    })
+	const affected_cards = new_changes.map((c) => c.name)
+	console.log('affected_cards', affected_cards)
+	return
 }
 
 

@@ -1,5 +1,5 @@
 
-const { Card, Player, Print, Set, Wallet, Diary, Info, Inventory, Auction } = require('../db')
+const { Card, Player, Print, Set, Wallet, Diary, Info, Inventory, Auction, Status } = require('../db')
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { yescom } = require('../static/commands.json')
@@ -10,7 +10,7 @@ const { client } = require('../static/clients.js')
 const { fpRole } = require('../static/roles.json')
 const { findCard } = require('./search.js')
 const { selectPrint } = require('./print.js')
-const { capitalize } = require('./utility.js')
+const { capitalize, isSameDay, isWithin24h } = require('./utility.js')
 const { announcementsChannelId, botSpamChannelId, shopChannelId, staffChannelId } = require('../static/channels.json')
 const { completeTask } = require('./diary')
 
@@ -371,6 +371,16 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
 
 // PROCESS MERCHBOT SALE
 const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer) => {
+    const date = new Date()
+	const time = date.getTime()
+    const all_statuses = await Status.findAll()
+    const new_changes = all_statuses.filter((s) => {
+		const updatedAt = s.updatedAt
+		const updatedTime = updatedAt.getTime()
+		if (isWithin24h(time, updatedTime)) return s
+    })
+	const affected_cards = new_changes.map((c) => c.name)
+    
     const authorIsSeller = message.author.id === sellingPlayer.id
     const total_price = invoice.total_price
     const cards = invoice.cards
@@ -393,8 +403,10 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
 		const newPrice = quantity > 16 ? price / quantity :
                         ( price * quantity + ( (16 - quantity) * print.market_price ) ) / 16
             
-		print.market_price = newPrice
-		await print.save()
+        if (!affected_cards.includes(print.card_name)) {
+            print.market_price = newPrice
+            await print.save()
+        }
 		
         const buyerCount = await Inventory.count({ 
 			where: { 
@@ -455,6 +467,16 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
 
 // PROCESS P2P SALE
 const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => {
+    const date = new Date()
+	const time = date.getTime()
+    const all_statuses = await Status.findAll()
+    const new_changes = all_statuses.filter((s) => {
+		const updatedAt = s.updatedAt
+		const updatedTime = updatedAt.getTime()
+		if (isWithin24h(time, updatedTime)) return s
+    })
+	const affected_cards = new_changes.map((c) => c.name)
+
     const total_price = invoice.total_price
     const card = invoice.card
     const quantity = invoice.quantity
@@ -476,8 +498,10 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
         const newPrice = quantity >= 16 ? total_price / quantity :
                         ( total_price + ( (16 - quantity) * print.market_price ) ) / 16
 
-        print.market_price = newPrice
-        await print.save()
+        if (!affected_cards.includes(print.card_name)) {
+            print.market_price = newPrice
+            await print.save()
+        }
 
         const buyerCount = await Inventory.count({ 
             where: { 

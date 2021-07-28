@@ -850,7 +850,7 @@ if(startcom.includes(cmd)) {
 			`\nPlease wait while I open some packs... ${blue}`
 			)
 	
-			const gotSecret = await awardPack(message.channel, maid, set, 10)
+			const gotSecret = await awardPack(message.channel, maid, set, 16)
 			await completeTask(message.channel, maid, 'e1')
 			if (gotSecret) await completeTask(message.channel, maid, 'm4', 4000)
 			return message.channel.send(`I wish you luck on your journey, new duelist! ${master}`)

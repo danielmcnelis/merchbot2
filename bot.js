@@ -208,10 +208,10 @@ if(cmd === `!test`) {
 		console.log('updatedAt', updatedAt)
 		const updatedTime = updatedAt.getTime()
 		console.log('updatedTime', updatedTime)
-		console.log('24h in ms', 24 * 60 * 60 * 1000)
+		console.log('48h in ms', 48 * 60 * 60 * 1000)
 		console.log('difference', time - updatedTime)
-        console.log(isWithinXHours(time, updatedTime))
-		if (isWithinXHours(date, updatedTime)) return s
+        console.log(isWithinXHours(48, time, updatedTime))
+		if (isWithinXHours(48, date, updatedTime)) return s
     })
 	const affected_cards = new_changes.map((c) => c.name)
 	console.log('affected_cards', affected_cards)

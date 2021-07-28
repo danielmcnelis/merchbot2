@@ -215,8 +215,8 @@ const shuffleArray = (arr) => {
 const isSameDay = (d1, d2) => d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate()
 
 
-//IS WITHIN 24H
-const isWithin24h = (t1, t2) => Math.abs(t1 - t2) <= (24 * 60 * 60 * 1000)
+//IS WITHIN X HOURS
+const isWithinXHours = (x = 24, t1, t2) => Math.abs(t1 - t2) <= (x * 60 * 60 * 1000)
 
 module.exports = {
     capitalize,
@@ -237,7 +237,7 @@ module.exports = {
     isNewUser,
     isSameDay,
     isVowel,
-    isWithin24h,
+    isWithinXHours,
     recalculate,
     shuffleArray
 }

@@ -10,7 +10,7 @@ const { client } = require('../static/clients.js')
 const { fpRole } = require('../static/roles.json')
 const { findCard } = require('./search.js')
 const { selectPrint } = require('./print.js')
-const { capitalize, isSameDay, isWithin24h } = require('./utility.js')
+const { capitalize, isSameDay, isWithinXHours } = require('./utility.js')
 const { announcementsChannelId, botSpamChannelId, shopChannelId, staffChannelId } = require('../static/channels.json')
 const { completeTask } = require('./diary')
 
@@ -377,10 +377,10 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
     const new_changes = all_statuses.filter((s) => {
 		const updatedAt = s.updatedAt
 		const updatedTime = updatedAt.getTime()
-		if (isWithin24h(time, updatedTime)) return s
+		if (isWithinXHours(48, time, updatedTime)) return s
     })
 	const affected_cards = new_changes.map((c) => c.name)
-    
+
     const authorIsSeller = message.author.id === sellingPlayer.id
     const total_price = invoice.total_price
     const cards = invoice.cards
@@ -473,7 +473,7 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
     const new_changes = all_statuses.filter((s) => {
 		const updatedAt = s.updatedAt
 		const updatedTime = updatedAt.getTime()
-		if (isWithin24h(time, updatedTime)) return s
+		if (isWithinXHours(48, time, updatedTime)) return s
     })
 	const affected_cards = new_changes.map((c) => c.name)
 

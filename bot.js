@@ -34,7 +34,7 @@ const { checkArenaProgress, getArenaSample, resetArena, startArena, startRound, 
 const { askQuestion, resetTrivia, startTrivia } = require('./functions/trivia.js')
 const { askForGrindAllConfirmation } = require('./functions/mod.js')
 const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Nickname, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
-const { getRandomString, isSameDay, isWithin24h, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isJazz, isMod, isTourPlayer, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
+const { getRandomString, isSameDay, isWithinXHours, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isJazz, isMod, isTourPlayer, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
 const { checkDeckList, saveYDK, saveAllYDK, awardStarterDeck, getShopDeck } = require('./functions/decks.js')
 const { askForBidCancellation, askForBidPlacement, manageBidding } = require('./functions/bids.js')
 const { selectTournament, getTournamentType, seed, askForDBUsername, getDeckListTournament, getDeckNameTournament, directSignUp, removeParticipant, generateSheetData, getMatches, checkChallongePairing, putMatchResult, findNextMatch, findNextOpponent, findOtherPreReqMatch} = require('./functions/tournament.js')
@@ -210,8 +210,8 @@ if(cmd === `!test`) {
 		console.log('updatedTime', updatedTime)
 		console.log('24h in ms', 24 * 60 * 60 * 1000)
 		console.log('difference', time - updatedTime)
-        console.log(isWithin24h(time, updatedTime))
-		if (isWithin24h(date, updatedTime)) return s
+        console.log(isWithinXHours(time, updatedTime))
+		if (isWithinXHours(date, updatedTime)) return s
     })
 	const affected_cards = new_changes.map((c) => c.name)
 	console.log('affected_cards', affected_cards)

@@ -374,12 +374,27 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
     const date = new Date()
 	const time = date.getTime()
     const all_statuses = await Status.findAll()
-    const new_changes = all_statuses.filter((s) => {
-		const updatedAt = s.updatedAt
+    const new_changes = all_statuses.filter((status) => {
+		const updatedAt = status.updatedAt
 		const updatedTime = updatedAt.getTime()
-		if (isWithinXHours(48, time, updatedTime)) return s
+		if (isWithinXHours(48, time, updatedTime)) return status
     })
 	const affected_cards = new_changes.map((c) => c.name)
+
+    const all_prints = await Print.findAll()
+    const all_new_prints = all_prints.filter((print) => {
+		const createdAt = print.createdAt
+		const createdTime = createdAt.getTime()
+		if (isWithinXHours(48, time, createdTime)) return print
+    })
+    const all_old_prints = all_prints.filter((print) => {
+		const createdAt = print.createdAt
+		const createdTime = createdAt.getTime()
+		if (!isWithinXHours(48, time, createdTime)) return print
+    })
+    const all_new_print_names = all_new_prints.map((p) => p.card_name)
+    const all_old_print_names = all_old_prints.map((p) => p.card_name)
+    const all_new_reprint_names = all_new_print_names.filter((name) => all_old_print_names.includes(name))
 
     const authorIsSeller = message.author.id === sellingPlayer.id
     const total_price = invoice.total_price
@@ -403,7 +418,7 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
 		const newPrice = quantity > 16 ? price / quantity :
                         ( price * quantity + ( (16 - quantity) * print.market_price ) ) / 16
             
-        if (!affected_cards.includes(print.card_name)) {
+        if (!affected_cards.includes(print.card_name) && !all_new_reprint_names.includes(print.card_name)) {
             print.market_price = newPrice
             await print.save()
         }
@@ -477,6 +492,21 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
     })
 	const affected_cards = new_changes.map((c) => c.name)
 
+    const all_prints = await Print.findAll()
+    const all_new_prints = all_prints.filter((print) => {
+		const createdAt = print.createdAt
+		const createdTime = createdAt.getTime()
+		if (isWithinXHours(48, time, createdTime)) return print
+    })
+    const all_old_prints = all_prints.filter((print) => {
+		const createdAt = print.createdAt
+		const createdTime = createdAt.getTime()
+		if (!isWithinXHours(48, time, createdTime)) return print
+    })
+    const all_new_print_names = all_new_prints.map((p) => p.card_name)
+    const all_old_print_names = all_old_prints.map((p) => p.card_name)
+    const all_new_reprint_names = all_new_print_names.filter((name) => all_old_print_names.includes(name))
+
     const total_price = invoice.total_price
     const card = invoice.card
     const quantity = invoice.quantity
@@ -498,7 +528,7 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
         const newPrice = quantity >= 16 ? total_price / quantity :
                         ( total_price + ( (16 - quantity) * print.market_price ) ) / 16
 
-        if (!affected_cards.includes(print.card_name)) {
+        if (!affected_cards.includes(print.card_name) && !all_new_reprint_names.includes(print.card_name)) {
             print.market_price = newPrice
             await print.save()
         }

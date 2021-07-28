@@ -198,24 +198,23 @@ if(cmd === `!test`) {
 	// context.drawImage(background, 0, 0, canvas.width, canvas.height)
 	// const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `bewd.png`)
 	// return message.channel.send(`Behold!`, attachment)
-	const statuses = await Status.findAll()
     const date = new Date()
-	console.log('date', date)
 	const time = date.getTime()
-	console.log('time', time)
-    const new_changes = statuses.filter((s) => {
-		const updatedAt = s.updatedAt
-		console.log('updatedAt', updatedAt)
-		const updatedTime = updatedAt.getTime()
-		console.log('updatedTime', updatedTime)
-		console.log('48h in ms', 48 * 60 * 60 * 1000)
-		console.log('difference', time - updatedTime)
-        console.log(isWithinXHours(48, time, updatedTime))
-		if (isWithinXHours(48, date, updatedTime)) return s
+	const all_prints = await Print.findAll()
+    const all_new_prints = all_prints.filter((print) => {
+		const createdAt = print.createdAt
+		const createdTime = createdAt.getTime()
+		if (isWithinXHours(48, time, createdTime)) return print
     })
-	const affected_cards = new_changes.map((c) => c.name)
-	console.log('affected_cards', affected_cards)
-	return
+    const all_old_prints = all_prints.filter((print) => {
+		const createdAt = print.createdAt
+		const createdTime = createdAt.getTime()
+		if (!isWithinXHours(48, time, createdTime)) return print
+    })
+    const all_new_print_names = all_new_prints.map((p) => p.card_name)
+    const all_old_print_names = all_old_prints.map((p) => p.card_name)
+    const all_new_reprint_names = all_new_print_names.filter((name) => all_old_print_names.includes(name))
+	return console.log('all_new_reprint_names', all_new_reprint_names)
 }
 
 
@@ -389,38 +388,24 @@ if (cmd === `!fix_atk/def`) {
 	return message.channel.send(`You fixed the ATK/DEF stats of ${updated} cards in the Format Library database.`)
 }
 
-// //CPK
-// if (cmd === `!cpk`) {
-// 	const CH1 = {
-// 		code: "CH1",
-// 		name: "Chaos Pack",
-// 		type: "tour",
-// 		emoji: "CPK",
-// 		alt_emoji: "CPK",
-// 		size: 20,
-// 		commons: 9,
-// 		rares: 6,
-// 		supers: 4,
-// 		ultras: 1,
-// 		secrets: 0,
-// 		specials: 0,
-// 		spec_for_sale: false,
-// 		unit_price: 15,
-// 		unit_sales: 0,
-// 		cards_per_pack: 3,
-// 		box_price: 315,
-// 		packs_per_box: 20,
-// 		commons_per_pack: 2,
-// 		commons_per_box: 40,
-// 		rares_per_box: 14,
-// 		supers_per_box: 5,
-// 		ultras_per_box: 1,
-// 		secrets_per_box: 0
-// 	}
+//SS2
+if (cmd === `!ss2`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	const SS2 = {
+		code: "SS2",
+		name: "Starter Series 2",
+		type: "starter_deck",
+		emoji: "dinosaur",
+		alt_emoji: "plant",
+		size: 44,
+		commons: 42,
+		ultras: 2,
+		unit_price: 75
+	}
 
-// 	await Set.create(CH1)
-// 	message.channel.send(`I created a set: CH1. Please reset the bot for these changes to take full effect.`)
-// }
+	await Set.create(SS2)
+	message.channel.send(`I created a set: SS2.`)
+}
 
 //INIT
 if (cmd === `!init`) {
@@ -840,7 +825,7 @@ if(startcom.includes(cmd)) {
 		if (!set) return message.channel.send(`Could not find set: "DOC".`)
 	
 		const filter = m => m.author.id === maid
-		await message.channel.send(`Greetings, champ! Which deck would you like to start?\n- (1) Fish\'s Ire  ${fish}\n- (2) Rock\'s Foundation ${rock}`)
+		await message.channel.send(`Greetings, champ! Which deck would you like to start?\n- (1) Dinosaur\'s Power  ${dinosaur}\n- (2) Plant\'s Harmony ${plant}`)
 		
 		message.channel.awaitMessages(filter, {
 			max: 1,
@@ -849,10 +834,10 @@ if(startcom.includes(cmd)) {
 			const response = collected.first().content.toLowerCase()
 			let starter
 	
-			if(response.includes('fish') || response.includes(fish) || response.includes("(1)") || response === "1") {
-				starter = 'fish'
-			} else if(response.includes('rock') || response.includes(rock) || response.includes === "(2)" || response === "2") {
-				starter = 'rock'
+			if(response.includes('dino') || response.includes(dinosaur) || response.includes("(1)") || response === "1") {
+				starter = 'dinosaur'
+			} else if(response.includes('plant') || response.includes(plant) || response.includes === "(2)" || response === "2") {
+				starter = 'plant'
 			}
 	
 			if (!starter) return message.channel.send('You did not select a valid Starter Deck. Please type **!start** to try again.')
@@ -861,7 +846,7 @@ if(startcom.includes(cmd)) {
 			await createProfile(maid, starter)
 			message.member.roles.add(fpRole)
 			message.channel.send(`Excellent choice, ${message.author.username}! ${legend}` +
-			`\nYou received a copy of ${starter === "fish" ? `Fish's Ire ${fish}` : `Rock's Foundation ${rock}`} and the **Forged Players** role! ${wokeaf}` +
+			`\nYou received a copy of ${starter === "dinosaur" ? `Dinosaur's Power ${dinosaur}` : `Plant's Harmony ${plant}`} and the **Forged Players** role! ${wokeaf}` +
 			`\nPlease wait while I open some packs... ${blue}`
 			)
 	
@@ -1199,7 +1184,7 @@ if(deckcom.includes(cmd)) {
 		if (!wallet || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 
 		const deck = args[0] || await getShopDeck(message)
-		const valid_decks = ["fish", "rock"]
+		const valid_decks = ["fish", "rock", "dinosaur", "plant"]
 		if (!deck) return
 		if (!valid_decks.includes(deck)) return message.channel.send(`Sorry, I do not have that deck for sale.`)
 

@@ -14,15 +14,17 @@ const decks = require('../static/decks.json')
 //GET SHOP DECK
 const getShopDeck = async (message) => {
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`Please select a deck:\n(1) Fish's Ire\n(2) Rock's Foundation`)
+	const msg = await message.channel.send(`Please select a deck:\n(1) Dinosaur's Power\n(2) Plant's Harmony\n(1) Fish's Ire\n(2) Rock's Foundation`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
 	}).then(collected => {
         let deck
 		const response = collected.first().content.toLowerCase()
-        if(response.includes('fish') || response.includes('1')) deck = 'fish' 
-        else if(response.includes('rock') || response.includes('2')) deck = 'rock'
+        if(response.includes('dino') || response.includes('1')) deck = 'dinosaur' 
+        else if(response.includes('plant') || response.includes('2')) deck = 'plant'
+        else if(response.includes('fish') || response.includes('3')) deck = 'fish'
+        else if(response.includes('rock') || response.includes('4')) deck = 'rock'
         else message.channel.send(`Please specify a valid deck.`)
         return deck
 	}).catch(err => {

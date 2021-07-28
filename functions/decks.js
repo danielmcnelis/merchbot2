@@ -14,7 +14,7 @@ const decks = require('../static/decks.json')
 //GET SHOP DECK
 const getShopDeck = async (message) => {
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`Please select a deck:\n(1) Dinosaur's Power\n(2) Plant's Harmony\n(1) Fish's Ire\n(2) Rock's Foundation`)
+	const msg = await message.channel.send(`Please select a deck:\n(1) Dinosaur's Power\n(2) Plant's Harmony\n(3) Fish's Ire\n(4) Rock's Foundation`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000

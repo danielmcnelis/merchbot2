@@ -319,7 +319,7 @@ if (cmd === `!update`) {
 
 	for (let i = 0; i < newCards.length; i++) {
 		const newCard = newCards[i]
-		if (newCard.type === 'Token' || newCard.name.includes('(Skill Card)') || !newCard.misc_info[0].tcg_date ) continue
+		if (newCard.type === 'Token' || newCard.name.includes('(Skill Card)') || (!newCard.misc_info[0].tcg_date && !newCard.misc_info[0].ocg_date) ) continue
 		const image = `${newCard.id}.jpg`
 		const name = newCard.name
 		const newCardTypeArr = newCard.type.split(" ")
@@ -333,7 +333,7 @@ if (cmd === `!update`) {
 		const atk = newCard.atk || newCard.atk === 0 ? newCard.atk : null
 		const def = newCard.def || newCard.def === 0 ? newCard.def : null
 		const description = newCard.desc
-		const date = newCard.misc_info[0].tcg_date
+		const date = newCard.misc_info[0].tcg_date || newCard.misc_info[0].ocg_date
 		
 		try {
 			await Card.create({

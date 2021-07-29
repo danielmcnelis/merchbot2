@@ -4276,11 +4276,12 @@ if (cmd === `!census`) {
 	const memberIds = [...membersMap.keys()]
 	let update_count = 0
 	let create_count = 0
-	console.log('members.length', membersMap.length)
 	console.log('memberIds.length', memberIds.length)
-	for (let i = 0; i < membersMap.length; i++) {
+	for (let i = 0; i < memberIds.length; i++) {
 		const id = memberIds[i]
+		console.log('id', id)
 		const member = membersMap[id]
+		console.log('!!member', !!member)
 		const name = member.user.username
 		const tag = member.user.tag
 		console.log('name', name)

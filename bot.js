@@ -6,7 +6,7 @@ const fs = require('fs')
 const axios = require('axios')
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
-const { ygocard, fire, tix, credits, blue, red, yellow, stoned, stare, leatherbound, wokeaf, koolaid, cavebob, evil, DOC, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, cultured, com, rar, sup, ult, scr, checkmark, emptybox, yes, no } = require('./static/emojis.json')
+const { ygocard, fire, tix, credits, blue, red, yellow, stoned, stare, leatherbound, wokeaf, koolaid, cavebob, evil, DOC, ORF, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, cultured, com, rar, sup, ult, scr, checkmark, emptybox, yes, no } = require('./static/emojis.json')
 const { aliuscom, nicknamecom, joincom, bindercom, wishlistcom, invcom, calccom, bracketcom, dropcom, queuecom, checklistcom, startcom, infocom, dbcom, noshowcom, legalcom, listcom, pfpcom, botcom, rolecom, statscom, profcom, losscom, h2hcom, undocom, rankcom, manualcom, yescom, nocom, deckcom } = require('./static/commands.json')
 const { bookwormsRole, gamersRole, triviaRole, botRole, modRole, adminRole, tourRole, toRole, fpRole, muteRole, arenaRole, ambassadorRole } = require('./static/roles.json')
 const { gutterChannelId, generalChannelId, rulesChannelId, rulingsChannelId, introChannelId, discussionChannelId, staffChannelId, botSpamChannelId, welcomeChannelId, announcementsChannelId, registrationChannelId, replaysChannelId, duelRequestsChannelId, marketPlaceChannelId, shopChannelId, tournamentChannelId, arenaChannelId, keeperChannelId, triviaChannelId, draftChannelId, gauntletChannelId, bugreportsChannelId, suggestionsChannelId } = require('./static/channels.json')
@@ -388,23 +388,36 @@ if (cmd === `!fix_atk/def`) {
 	return message.channel.send(`You fixed the ATK/DEF stats of ${updated} cards in the Format Library database.`)
 }
 
-//SS2
-if (cmd === `!ss2`) {
+//ORF
+if (cmd === `!orf`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	const SS2 = {
-		code: "SS2",
-		name: "Starter Series 2",
-		type: "starter_deck",
-		emoji: "dinosaur",
-		alt_emoji: "plant",
-		size: 44,
-		commons: 42,
-		ultras: 2,
-		unit_price: 75
+	const ORF = {
+		code: "ORF",
+		name: "Origin of Fire",
+		type: "mini",
+		emoji: "ORF",
+		alt_emoji: "ORF",
+		size: 50,
+		commons: 24,
+		rares: 10,
+		supers: 10,
+		ultras: 6,
+		unit_price: 10,
+		spec_for_sale: false,
+		unit_sales: 0,
+		cards_per_pack: 5,
+		packs_per_box: 8,
+		commons_per_pack: 3,
+		rares_per_pack: 1,
+		commons_per_box: 24,
+		rares_per_box: 8,
+		supers_per_box: 7,
+		ultras_per_box: 1,
+		secrets_per_box: 0
 	}
 
-	await Set.create(SS2)
-	message.channel.send(`I created a set: SS2.`)
+	await Set.create(ORF)
+	message.channel.send(`I created a set: ORF.`)
 }
 
 //INIT
@@ -515,7 +528,7 @@ if (cmd === `!init`) {
 		})
 	}
 
-	message.channel.send(`I created 3 sets (SS1, DOC, APC), ${prints.length} prints, ${nicknames.length} nicknames, and ${statuses.length} statuses. Please reset the bot for these changes to take full effect.`)
+	message.channel.send(`I created 3 sets (SS1, DOC, ORF, APC), ${prints.length} prints, ${nicknames.length} nicknames, and ${statuses.length} statuses. Please reset the bot for these changes to take full effect.`)
 
 	if (!(await isNewUser(merchbotId))) return message.channel.send(`The Shop has already been initiated.`)
 	await createPlayer(merchbotId, 'MerchBot', 'MerchBot#1002')
@@ -4473,7 +4486,7 @@ if(checklistcom.includes(cmd)) {
 //PACK
 if(cmd === `!pack`) {
 	const num = args.length === 1 && isFinite(args[0]) ? parseInt(args[0]) : args.length > 1 && isFinite(args[1]) ? parseInt(args[1]) : 1
-	const code = args.length === 1 && !isFinite(args[0]) ? args[0] : args.length > 1 && !isFinite(args[1]) ? args[1] : 'DOC'
+	const code = args.length === 1 && !isFinite(args[0]) ? args[0] : args.length > 1 && !isFinite(args[1]) ? args[1] : 'ORF'
 	if (code && code.startsWith('SS')) return message.channel.send(`Sorry, Starter Series cards are not sold by the pack.`)
 	const set = await Set.findOne({ where: { code: code.toUpperCase() }})
 
@@ -4603,55 +4616,17 @@ if(cmd === `!pack`) {
 				}
 			}
 
-			const card_1 = fs.existsSync(`./public/card_images/${images[0]}`) ? 
-				await Canvas.loadImage(`./public/card_images/${images[0]}`) :
-				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[0]}`)
-
-			const card_2 = fs.existsSync(`./public/card_images/${images[1]}`) ? 
-				await Canvas.loadImage(`./public/card_images/${images[1]}`) :
-				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[1]}`)
-
-			const card_3 = fs.existsSync(`./public/card_images/${images[2]}`) ? 
-				await Canvas.loadImage(`./public/card_images/${images[2]}`) :
-				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[2]}`)
-
-			const card_4 = fs.existsSync(`./public/card_images/${images[3]}`) ? 
-				await Canvas.loadImage(`./public/card_images/${images[3]}`) :
-				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[3]}`)
-
-			const card_5 = fs.existsSync(`./public/card_images/${images[4]}`) ? 
-				await Canvas.loadImage(`./public/card_images/${images[4]}`) :
-				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[4]}`)
-
-			const card_6 = fs.existsSync(`./public/card_images/${images[5]}`) ? 
-				await Canvas.loadImage(`./public/card_images/${images[5]}`) :
-				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[5]}`)
-
-			const card_7 = fs.existsSync(`./public/card_images/${images[6]}`) ? 
-				await Canvas.loadImage(`./public/card_images/${images[6]}`) :
-				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[6]}`)
-
-			const card_8 = fs.existsSync(`./public/card_images/${images[7]}`) ? 
-				await Canvas.loadImage(`./public/card_images/${images[7]}`) :
-				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[7]}`)
-
-			const card_9 = fs.existsSync(`./public/card_images/${images[8]}`) ? 
-				await Canvas.loadImage(`./public/card_images/${images[8]}`) :
-				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[8]}`)
-			
 			const card_width = 57
-			const canvas = Canvas.createCanvas(card_width * 9, 80)
+			const canvas = Canvas.createCanvas(card_width * set.cards_per_pack, 80)
 			const context = canvas.getContext('2d')
+
+			for (let i = 0; i < set.cards_per_pack; i++) {
+				const card = fs.existsSync(`./public/card_images/${images[i]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[i]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[i]}`)
+				if (canvas && context && card) context.drawImage(card, card_width * i, 0, card_width, canvas.height)
+			}
 	
-			if (canvas && context && card_1) context.drawImage(card_1, 0, 0, card_width, 80)
-			if (canvas && context && card_2) context.drawImage(card_2, card_width, 0, card_width, canvas.height)
-			if (canvas && context && card_3) context.drawImage(card_3, card_width * 2, 0, card_width, canvas.height)
-			if (canvas && context && card_4) context.drawImage(card_4, card_width * 3, 0, card_width, canvas.height)
-			if (canvas && context && card_5) context.drawImage(card_5, card_width * 4, 0, card_width, canvas.height)
-			if (canvas && context && card_6) context.drawImage(card_6, card_width * 5, 0, card_width, canvas.height)
-			if (canvas && context && card_7) context.drawImage(card_7, card_width * 6, 0, card_width, canvas.height)
-			if (canvas && context && card_8) context.drawImage(card_8, card_width * 7, 0, card_width, canvas.height)
-			if (canvas && context && card_9) context.drawImage(card_9, card_width * 8, 0, card_width, canvas.height)
 			const attachment =  canvas && context ?
 				new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`) :
 				false
@@ -4668,10 +4643,10 @@ if(cmd === `!pack`) {
 		await set.save()
 
 		completeTask(message.channel, maid, 'e6')
-		if (num >= 5) completeTask(message.channel, maid, 'm3', 3000)
+		if (set.type === 'core' && num >= 5) completeTask(message.channel, maid, 'm3', 3000)
 		if (gotSecret) completeTask(message.channel, maid, 'm4', 5000)
-		if (await checkCoreSetComplete(maid, 1)) completeTask(message.channel, 'h4', 5000)
-		if (await checkCoreSetComplete(maid, 3)) completeTask(message.channel, 'l3', 6000)
+		if (set.type === 'core' && await checkCoreSetComplete(maid, 1)) completeTask(message.channel, 'h4', 5000)
+		if (set.type === 'core' && await checkCoreSetComplete(maid, 3)) completeTask(message.channel, 'l3', 6000)
 		return
 	}).catch(err => {
 		console.log(err)

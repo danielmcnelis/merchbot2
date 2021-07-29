@@ -3,7 +3,7 @@ const { Auction, Bid, Print, Set, Inventory, Player, Wallet } = require('../db')
 const { yescom, nocom } = require('../static/commands.json')
 const { findCard } = require('./search.js')
 const { selectPrint } = require('./print.js')
-const { blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
+const { blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, ORF, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
 
 const manageBidding = async (message, player) => {
     const filter = m => m.author.id === message.author.id

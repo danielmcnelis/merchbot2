@@ -4263,8 +4263,10 @@ if (cmd === `!recalc`) {
 		await player.save()
 	}
 
-	for (let i = 0; i < matches.length; i++) await recalculate(match, i+1)	
-    return message.channel.send(`Recalculation complete!`)
+	for (let i = 0; i < matches.length; i++) {
+		await recalculate(match, i+1)	
+		if (i + 1 === matches.length) return message.channel.send(`Recalculation complete!`)
+	} 
 }
 
 //CENSUS
@@ -4273,10 +4275,12 @@ if (cmd === `!census`) {
 	const members = await message.guild.members.fetch()
 	let update_count = 0
 	let create_count = 0
+	console.log('members.length')
 	for (let i = 0; i < members.length; i++) {
 		const id = member.user.id
 		const name = member.user.username
 		const tag = member.user.tag
+		console.log('name', name)
 		const player = await Player.findOne({ where: { id: id } })
 		if (player && (player.name !== name || player.tag !== tag)) {
 			update_count++
@@ -4287,9 +4291,9 @@ if (cmd === `!census`) {
 			create_count++
 			await createPlayer(id, name, tag)
 		}
-	}
 
-	return message.channel.send(`Census complete! You added ${create_count} ${create_count === 1 ? 'player' : 'players'} to the database and updated ${update_count} ${update_count === 1 ? 'other' : 'others'}.`)
+		if (i + 1 === members.length) return message.channel.send(`Census complete! You added ${create_count} ${create_count === 1 ? 'player' : 'players'} to the database and updated ${update_count} ${update_count === 1 ? 'other' : 'others'}.`)
+	}
 }
 
 //GRINDALL

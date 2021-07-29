@@ -4272,14 +4272,14 @@ if (cmd === `!recalc`) {
 //CENSUS
 if (cmd === `!census`) {
 	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	const members = await message.guild.members.fetch()
+	const membersMap = await message.guild.members.fetch()
 	const memberIds = [...membersMap.keys()]
 	let update_count = 0
 	let create_count = 0
-	console.log('members.length', members.length)
+	console.log('members.length', membersMap.length)
 	console.log('memberIds.length', memberIds.length)
-	for (let i = 0; i < members.length; i++) {
-		const member = members[i]
+	for (let i = 0; i < membersMap.length; i++) {
+		const member = membersMap[i]
 		const id = member.user.id
 		const name = member.user.username
 		const tag = member.user.tag

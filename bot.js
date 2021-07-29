@@ -4264,6 +4264,7 @@ if (cmd === `!recalc`) {
 	}
 
 	for (let i = 0; i < matches.length; i++) {
+		const match = matches[i]
 		await recalculate(match, i+1)	
 		if (i + 1 === matches.length) return message.channel.send(`Recalculation complete!`)
 	} 
@@ -4272,6 +4273,7 @@ if (cmd === `!recalc`) {
 //CENSUS
 if (cmd === `!census`) {
 	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	message.channel.send(`One moment please.`)
 	const membersMap = await message.guild.members.fetch()
 	const memberIds = [...membersMap.keys()]
 	let update_count = 0

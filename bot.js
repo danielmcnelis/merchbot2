@@ -4285,18 +4285,21 @@ if (cmd === `!census`) {
 		const name = member.user.username
 		const tag = member.user.tag
 		console.log('name', name)
+		console.log('tag', tag)
 		const player = await Player.findOne({ where: { id: id } })
 		if (player && (player.name !== name || player.tag !== tag)) {
 			update_count++
+			console.log('updating...')
 			player.name = name
 			player.tag = tag
 			await player.save()
 		} else if (!player && !member.user.bot) {
 			create_count++
+			console.log('creating...')
 			await createPlayer(id, name, tag)
 		}
 
-		if (i + 1 === members.length) return message.channel.send(`Census complete! You added ${create_count} ${create_count === 1 ? 'player' : 'players'} to the database and updated ${update_count} ${update_count === 1 ? 'other' : 'others'}.`)
+		if (i + 1 === memberIds.length) return message.channel.send(`Census complete! You added ${create_count} ${create_count === 1 ? 'player' : 'players'} to the database and updated ${update_count} ${update_count === 1 ? 'other' : 'others'}.`)
 	}
 }
 

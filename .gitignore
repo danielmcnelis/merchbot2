@@ -1,7 +1,6 @@
 secrets.json
 credentials.json
 trivia.json
-static/ygoprodeck.json
 geckodriver
 node_modules/
 .DS_Store

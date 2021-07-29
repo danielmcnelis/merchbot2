@@ -83,8 +83,8 @@ const createProfile = async (playerId, starter) => {
 const recalculate = async (match, z) => {
     const winnerId = match.winnerId
     const loserId = match.loserId
-    const winningPlayer = await Player.findOne({ where: { playerId: winnerId }})
-    const losingPlayer = await Player.findOne({ where: { playerId: loserId }})
+    const winningPlayer = await Player.findOne({ where: { id: winnerId }})
+    const losingPlayer = await Player.findOne({ where: { id: loserId }})
     const origStatsWinner = winningPlayer.stats
 	const origStatsLoser = losingPlayer.stats
 	const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))

@@ -1192,7 +1192,7 @@ if(deckcom.includes(cmd)) {
 		const merchbot_wallet = await Wallet.findOne( { where: { playerId: merchbotId } })
 		if (!wallet || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 
-		const deck = args[0] || await getShopDeck(message)
+		const deck = await getShopDeck(message, args[0])
 		const valid_decks = ["fish", "rock", "dinosaur", "plant"]
 		if (!deck) return
 		if (!valid_decks.includes(deck)) return message.channel.send(`Sorry, I do not have that deck for sale.`)
@@ -1213,7 +1213,10 @@ if(deckcom.includes(cmd)) {
 			time: 15000
 		}).then(async collected => {
 			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
-			
+			const code = deck === 'plant' || deck === 'dinosaur' ? 'SS2' : 'SS1'
+			const set = await Set.findOne({ where: { code: code } })
+			set.unit_sales++
+			await set.save()
 			await awardStarterDeck(maid, deck)
 			return message.channel.send(`Thank you for your purchase! I updated your Inventory with a copy of ${decks[deck].name} ${eval(deck)}.`)
 		}).catch(err => {

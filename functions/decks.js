@@ -12,7 +12,11 @@ const { Auction, Bid, Card, Print, Set, Inventory,  Tournament, Status } = requi
 const decks = require('../static/decks.json')
 
 //GET SHOP DECK
-const getShopDeck = async (message) => {
+const getShopDeck = async (message, deck = '') => {
+    if(deck.includes('dino')) return 'dinosaur' 
+    if(deck.includes('plant')) return 'plant'
+    if(deck.includes('fish')) return 'fish'
+    if(deck.includes('rock')) return 'rock'
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send(`Please select a deck:\n(1) Dinosaur's Power\n(2) Plant's Harmony\n(3) Fish's Ire\n(4) Rock's Foundation`)
 	const collected = await msg.channel.awaitMessages(filter, {

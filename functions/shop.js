@@ -203,13 +203,15 @@ const processBids = async () => {
 
 // RESTOCK
 const restock = async () => {
-	const allSetsForSale = await Set.findAll({ where: { for_sale: true }})
+	const allSetsForSale = await Set.findAll({ where: { for_sale: true }, order: [['createdAt', 'DESC']]})
 
 	let weightedCount = 0
+    let most_recent = false
 
 	for (let i = 0; i < allSetsForSale.length; i++) {
 		const set = allSetsForSale[i]
-		if (set.type === 'core' || set.type === 'mini') {
+		if (set.type === 'core') {
+            if (!most_recent) most_recent = 'core'
 			if (set.currency === 'starchips') {
 				weightedCount += set.unit_sales
 			} else {
@@ -221,6 +223,13 @@ const restock = async () => {
 			} else {
 				weightedCount += (set.unit_sales * 5 / 2)
 			}
+		} else if (set.type === 'mini') {
+            if (!most_recent) most_recent = 'mini'
+			if (set.currency === 'starchips') {
+				weightedCount += (set.unit_sales * 2 / 3)
+			} else {
+				weightedCount += (set.unit_sales / 3)
+			}
 		}
 
         set.unit_sales = 0
@@ -228,9 +237,12 @@ const restock = async () => {
 	}
 
     if (weightedCount < 1) weightedCount = 1
-	const count = Math.ceil(weightedCount / 8)
-    const packsAwarded = await awardPacksToShop(count)
-    if (!packsAwarded) return client.channels.cache.get(shopChannelId).send(`Error awarding ${count} packs to shop.`)
+    const core_count = most_recent === 'core' ?  Math.ceil(weightedCount / 8) : Math.ceil(weightedCount / 32)
+    const mini_count = most_recent === 'core' ?  0 : Math.ceil(weightedCount * 9 / 64)
+    const corePacksAwarded = await awardPacksToShop(core_count,  core = true)
+    const miniPacksAwarded = await awardPacksToShop(mini_count, core = false)
+    if (!corePacksAwarded) client.channels.cache.get(shopChannelId).send(`Error awarding ${core_count} packs to shop.`)
+    if (!miniPacksAwarded) client.channels.cache.get(shopChannelId).send(`Error awarding ${mini_count} packs to shop.`)
     else return postBids()
 }
 

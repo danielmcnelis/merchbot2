@@ -147,16 +147,20 @@ const awardPack = async (channel, playerId, set, num = 1, prize = false) => {
     return gotSecret
 }
 
-const awardPacksToShop = async (num) => {
+const awardPacksToShop = async (num, core = true) => {
 	const botSpamChannel = client.channels.cache.get(botSpamChannelId)
     if (!botSpamChannel) return console.log('Could not find #bot-spam channel.')
 
-    const coreSets = await Set.findAll({ where: {
-        type: 'core'
-    }, order: [["createdAt", "DESC"]]})
-
-    if (!coreSets.length) return botSpamChannel.send('No core sets found.')
-    const set = coreSets[0]
+    const sets = core ? 
+        await Set.findAll({ where: {
+            type: 'core'
+        }, order: [["createdAt", "DESC"]]}) :
+        await Set.findAll({ where: {
+            type: 'mini'
+        }, order: [["createdAt", "DESC"]]})
+                
+    if (!sets.length) return botSpamChannel.send(`No ${core ? 'core' : 'mini'} sets found.`)
+    const set = sets[0]
 
 	const commons = await Print.findAll({ 
 		where: {
@@ -228,7 +232,7 @@ const awardPacksToShop = async (num) => {
         if (!yourUltras.length) for (let i = 0; i < set.ultras_per_box; i++) odds.push("ultras")
         if (!yourSecrets.length) for (let i = 0; i < set.secrets_per_box; i++) odds.push("secrets")
     
-        const luck = j < packs_from_boxes ? odds[j % 24] : getRandomElement(odds)
+        const luck = j < packs_from_boxes ? odds[j % set.packs_per_box] : getRandomElement(odds)
         const yourFoil = getRandomElement(eval(luck))
     
         const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil]

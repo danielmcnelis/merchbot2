@@ -1588,7 +1588,7 @@ if(cmd === `!count`) {
 		mcid !== gutterChannelId
 	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
 
-	const allSetsForSale = await Set.findAll({ where: { for_sale: true }})
+	const allSetsForSale = await Set.findAll({ where: { for_sale: true }, order: [['createdAt', 'DESC']]})
 	const results = [`In this cycle The Shop has sold:`]
 	let weightedCount = 0
 
@@ -1602,12 +1602,7 @@ if(cmd === `!count`) {
 			}
 
 			results.push(`- ${set.unit_sales} ${set.unit_sales === 1 ? 'Pack' : 'Packs'} of ${set.code} ${eval(set.emoji)}`)
-		}
-	}
-
-	for (let i = 0; i < allSetsForSale.length; i++) {
-		const set = allSetsForSale[i]
-		if (set.type === 'starter_deck') {
+		} else if (set.type === 'starter_deck') {
 			if (set.currency === 'starchips') {
 				weightedCount += (set.unit_sales * 5)
 			} else {
@@ -1615,12 +1610,21 @@ if(cmd === `!count`) {
 			}
 
 			results.push(`- ${set.unit_sales} Starter ${set.unit_sales === 1 ? 'Deck' : 'Decks'} ${eval(set.emoji)} ${eval(set.alt_emoji)}`)
+		} else if (set.type === 'mini') {
+			if (set.currency === 'starchips') {
+				weightedCount += (set.unit_sales * 2 / 3)
+			} else {
+				weightedCount += (set.unit_sales / 3)
+			}
+
+			results.push(`- ${set.unit_sales} ${set.unit_sales === 1 ? 'Pack' : 'Packs'} of ${set.code} ${eval(set.emoji)}`)
 		}
 	}
 
 	if (weightedCount < 1) weightedCount = 1 
-	const count = Math.ceil(weightedCount / 8)
-	results.push(`\nIf The Shop closed now, we'd open ${count} ${count === 1 ? 'Pack' : 'Packs'} of DOC ${DOC} to restock our inventory.`)
+    const core_count = most_recent === 'core' ?  Math.ceil(weightedCount / 8) : Math.ceil(weightedCount / 32)
+    const mini_count = most_recent === 'core' ?  0 : Math.ceil(weightedCount * 9 / 64)
+	results.push(`\nIf The Shop closed now, we'd open ${mini_count} ${mini_count === 1 ? 'Pack' : 'Packs'} of ORF ${ORF} and ${core_count} ${core_count === 1 ? 'Pack' : 'Packs'} of DOC ${DOC} to restock our inventory.`)
 	return message.channel.send(results.join("\n"))
 }
 

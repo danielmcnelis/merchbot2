@@ -29,8 +29,6 @@ const openShop = async () => {
         const shopCountdown = getShopCountdown()
         const hoursLeftInPeriod = Math.floor(shopCountdown / (3600000))
         const minsLeftInPeriod = Math.ceil((shopCountdown % 3600000)/ 60000)
-        client.channels.cache.get(staffChannelId).send(`Dear Moderationers, The Shop will automatically **close** in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes.`)
-        client.channels.cache.get(staffChannelId).send(`${yellow}`)
 		return setTimeout(() => closeShop(), shopCountdown)
 	} 
 }
@@ -56,8 +54,6 @@ const closeShop = async () => {
         const shopCountdown = getShopCountdown()
         const hoursLeftInPeriod = Math.floor(shopCountdown / (3600000))
         const minsLeftInPeriod = Math.ceil((shopCountdown % 3600000)/ 60000)
-        client.channels.cache.get(staffChannelId).send(`Dear Moderationers, The Shop will automatically **open** in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes.`)
-        client.channels.cache.get(staffChannelId).send(`${yellow}`)
         return setTimeout(() => openShop(), shopCountdown)
 	} 
 }

@@ -95,12 +95,8 @@ client.on('ready', async () => {
 	if (shopOpen && shopShouldBe === 'closed') client.channels.cache.get(staffChannelId).send(`<@&${modRole}>, The Shop is unexpectedly open. Type **!close** to manually close it.`)
 
 	if (shopShouldBe === 'closed') {
-        client.channels.cache.get(staffChannelId).send(`Dear Moderationers, The Shop will automatically **open** in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes.`)
-        client.channels.cache.get(staffChannelId).send(`${yellow}`)
 		return setTimeout(() => openShop(), shopCountdown)
 	} else if (shopShouldBe === 'open') {
-        client.channels.cache.get(staffChannelId).send(`Dear Moderationers, The Shop will automatically **close** in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes.`)
-        client.channels.cache.get(staffChannelId).send(`${yellow}`)
 		return setTimeout(() => closeShop(), shopCountdown)
 	}
 })

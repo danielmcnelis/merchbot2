@@ -80,27 +80,39 @@ const createProfile = async (playerId, starter) => {
 }
 
 //RECALCULATE
-const recalculate = async (match, winner, loser, z) => {
-    return setTimeout(async function() {
-        const winnersRow = await Player.findOne({ where: { playerId: winner }})
-        const losersRow = await Player.findOne({ where: { playerId: loser }})
+const recalculate = async (match, z) => {
+    const winnerId = match.winnerId
+    const loserId = match.loserId
+    const winningPlayer = await Player.findOne({ where: { playerId: winnerId }})
+    const losingPlayer = await Player.findOne({ where: { playerId: loserId }})
+    const origStatsWinner = winningPlayer.stats
+	const origStatsLoser = losingPlayer.stats
+	const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
+    const previouslyDefeated = await Match.count({
+        where: {
+            winnerId: winningPlayer.id,
+            loserId: losingPlayer.id
+        }
+    })
 
-        const statsLoser = losersRow.stats
-        const statsWinner = winnersRow.stats
-        winnersRow.backup = statsWinner
-        losersRow.backup = statsLoser
-        const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((statsWinner - statsLoser) / 400))))))
-        winnersRow.stats += delta
-        losersRow.stats -= delta
-        winnersRow.wins++
-        losersRow.losses++
+    winningPlayer.stats += delta
+    winningPlayer.backup = origStatsWinner
+    winningPlayer.wins++
+    winningPlayer.current_streak++
+    if (!previouslyDefeated) winningPlayer.vanquished_foes++
+    if (winningPlayer.current_streak > winningPlayer.longest_streak) winningPlayer.longest_streak = winningPlayer.current_streak
+    if (winningPlayer.stats > winningPlayer.best_stats) winningPlayer.best_stats = winningPlayer.stats
+    await winningPlayer.save()
 
-        await winnersRow.save()
-        await losersRow.save()
-        await match.update({ delta })
+    losingPlayer.stats -= delta
+    losingPlayer.backup = origStatsLoser
+    losingPlayer.losses++
+    losingPlayer.current_streak = 0
+    await losingPlayer.save()
 
-        console.log(`Match ${z}: a loss by ${loser} to ${winner} has been incorporated in the recalculation.`)
-    }, (z*100 + 10000))
+    match.delta = delta
+    await match.save()
+    console.log(`Match ${z}: a loss by ${losingPlayer.name} to ${winningPlayer.name} has been incorporated in the recalculation.`)
 }
 
 

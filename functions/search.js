@@ -29,21 +29,12 @@ const search = async (query, fuzzyCards, fuzzyCards2) => {
 
 	const labels = card.card === "Monster" ? `**Attribute:** ${card.attribute}\n**Level:** ${card.level}\n**Release Date:** ${card.date}\n**[** ${classes.join(" / ")} **]**` : `**Category:** ${card.category}\n**Release Date:** ${card.date}` 
 	const stats = card.card === "Monster" ? `**ATK:** ${card.atk} **DEF:** ${card.def}` : ''
-
 	
 	const attachment = fs.existsSync(`./public/card_images/${card.image}`) ?
 		new Discord.MessageAttachment(`./public/card_images/${card.image}`, card.image) :
 		false
 
-	const thumbnail = attachment ?
-		`attachment://${card.image}` :
-		`https://ygoprodeck.com/pics/${card.image}`
-
-	console.log('card.image', card.image)
-	console.log('fs.existsSync(`./public/card_images/${card.image}`', fs.existsSync(`./public/card_images/${card.image}`))
-	console.log('!!attachment', !!attachment)	
-	console.log('thumbnail', thumbnail)
-
+	const thumbnail = attachment ? `attachment://${card.image}` : `https://ygoprodeck.com/pics/${card.image}`
 	const cardEmbed = new Discord.MessageEmbed()
 	if (attachment) cardEmbed.attachFiles(attachment) 
 	cardEmbed.setColor(color)

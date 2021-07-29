@@ -194,30 +194,12 @@ if(cmd === `!test`) {
 	// context.drawImage(background, 0, 0, canvas.width, canvas.height)
 	// const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `bewd.png`)
 	// return message.channel.send(`Behold!`, attachment)
-    const date = new Date()
-	const time = date.getTime()
-	const all_prints = await Print.findAll()
-    const all_new_prints = all_prints.filter((print) => {
-		const createdAt = print.createdAt
-		const createdTime = createdAt.getTime()
-		if (isWithinXHours(48, time, createdTime)) return print
-    })
-    const all_old_prints = all_prints.filter((print) => {
-		const createdAt = print.createdAt
-		const createdTime = createdAt.getTime()
-		if (!isWithinXHours(48, time, createdTime)) return print
-    })
-    const all_new_print_names = all_new_prints.map((p) => p.card_name)
-    const all_old_print_names = all_old_prints.map((p) => p.card_name)
-    const all_new_reprint_names = all_new_print_names.filter((name) => all_old_print_names.includes(name))
-	return console.log('all_new_reprint_names', all_new_reprint_names)
 }
 
 
 //IMPORT_DATA
 if (cmd === `!import_data`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
-
 	const { data } = await axios.get('https://db.ygoprodeck.com/api/v7/cardinfo.php?misc=Yes')
 	fs.writeFile("./static/ygoprodeck.json", JSON.stringify(data), (err) => { 
 		if (err) console.log(err)
@@ -230,7 +212,6 @@ if (cmd === `!import_data`) {
 if (cmd === `!import_images`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const allPrints = await Print.findAll({ order: [["card_name", "ASC"]] })
-	console.log('allPrints.length', allPrints.length)
 
 	for (let i = 0; i <= allPrints.length; i++) {
 		const print = allPrints[i]
@@ -245,7 +226,6 @@ if (cmd === `!import_images`) {
 		} 
 
 		console.log(`found card ${card.name}, ${card.image}`)
-
 		const url = `https://ygoprodeck.com/pics/${card.image}`
 		const writer = fs.createWriteStream(`./public/card_images/${card.image}`)
 
@@ -266,10 +246,7 @@ if (cmd === `!import_images`) {
 if (cmd === `!import_missing_images`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const file_names = fs.readdirSync('./public/card_images')
-	console.log('file_names', file_names)
-
 	const all_cards = await Card.findAll()
-	const image_urls = all_cards.map((c) => c.image)
 	let count = 0
 	let successes = 0
 	
@@ -294,14 +271,12 @@ if (cmd === `!import_missing_images`) {
 		}
 	}
 
-	console.log(1)
 	return message.channel.send(`Successfully downloaded ${successes} out of ${count} images from YGOPRODeck.com!`)
 }
 
 //UPDATE 
 if (cmd === `!update`) {
-	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
-
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const allCards = await Card.findAll()
 	const allCardNames = allCards.map((card) => card.name)
 
@@ -362,7 +337,6 @@ if (cmd === `!update`) {
 //FIX_ATK/DEF 
 if (cmd === `!fix_atk/def`) {
 	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
-
 	const ygoprodeckCards = ygoprodeck.data
 	let updated = 0
 
@@ -413,13 +387,12 @@ if (cmd === `!orf`) {
 	}
 
 	await Set.create(ORF)
-	message.channel.send(`I created a set: ORF.`)
+	message.channel.send(`I created a new set: ORF.`)
 }
 
 //INIT
 if (cmd === `!init`) {
-	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
-
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const count = await Info.count()
 	if (count) return message.channel.send(`The game has already been initialized.`)
 
@@ -524,7 +497,7 @@ if (cmd === `!init`) {
 		})
 	}
 
-	message.channel.send(`I created 3 sets (SS1, DOC, ORF, APC), ${prints.length} prints, ${nicknames.length} nicknames, and ${statuses.length} statuses. Please reset the bot for these changes to take full effect.`)
+	message.channel.send(`I created 3 sets (SS1, DOC, APC), ${prints.length} prints, ${nicknames.length} nicknames, and ${statuses.length} statuses. Please reset the bot for these changes to take full effect.`)
 
 	if (!(await isNewUser(merchbotId))) return message.channel.send(`The Shop has already been initiated.`)
 	await createPlayer(merchbotId, 'MerchBot', 'MerchBot#1002')
@@ -1777,9 +1750,7 @@ if (cmd === `!hist` || cmd === `!history`) {
 		const sender_name = trade_components[0].sender_name
 		const receiver_name = trade_components[0].receiver_name
 		const date = trade_components[0].createdAt
-		console.log('date', date)
 		const days = (today.setHours(0, 0, 0, 0) - date.setHours(0, 0, 0, 0)) / (1000*60*60*24)
-		console.log('days', days)
 		const summary = {
 			days: days,
 			p1_name: sender_name,
@@ -1807,7 +1778,6 @@ if (cmd === `!hist` || cmd === `!history`) {
 		results.push(`**Trade ${i+1}** - ${days ? days : 'Earlier Today'} ${days === 0 ? '' : days === 1 ? 'Day Ago' : 'Days Ago'}\n${summary.p1_name} received:\n${summary.p1_receives.join("\n")}\n${summary.p2_name} received:\n${summary.p2_receives.join("\n")}`)
 	}
 
-	console.log('results', results)
 	message.channel.send(`I sent you the trade history you requested.`)
 	for (let i = 0 ; i < results.length; i++) message.author.send(results[i])
 	return
@@ -2437,7 +2407,6 @@ if (losscom.includes(cmd)) {
 		if (tournament.state === 'pending') return message.channel.send(`Sorry, ${tournament.name} has not started yet.`)
 		if (tournament.state !== 'underway') return message.channel.send(`Sorry, ${tournament.name} is not underway.`)
 		const matchesArr = await getMatches(tournamentId)
-		console.log('matchesArr', matchesArr)
 		let matchId = false
 		let scores = false
 		for (let i = 0; i < matchesArr.length; i++) {
@@ -2445,9 +2414,7 @@ if (losscom.includes(cmd)) {
 			if (match.state !== 'open') continue
 			if (checkChallongePairing(match, losingEntry.participantId, winningEntry.participantId)) {
 				matchId = match.id
-				console.log('matchId', matchId)
 				scores = match.player1_id === winningEntry.participantId ? "1-0" : "0-1"
-				console.log('scores', scores)
 				break
 			}
 		}
@@ -2535,17 +2502,11 @@ if (losscom.includes(cmd)) {
 		if (bonus2) setTimeout(() => message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned an additional +3${starchips} for your first ranked win of the day! ${legend}`), 2000)
 		message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your Tournament loss to ${winningPlayer.name} (+${chipsWinner}${starchips}) has been recorded.`)
 		const updatedMatchesArr = await getMatches(tournamentId)
-		console.log('updatedMatchesArr', updatedMatchesArr)
 		const winnersNextMatch = findNextMatch(updatedMatchesArr, matchId, winningEntry.participantId)
-		console.log('winnersNextMatch', winnersNextMatch)
 		const winnersNextOpponent = winnersNextMatch ? await findNextOpponent(tournamentId, updatedMatchesArr, winnersNextMatch, winningEntry.participantId) : null
-		console.log('winnersNextOpponent', winnersNextOpponent)
 		const winnerMatchWaitingOn = winnersNextOpponent ? null : findOtherPreReqMatch(updatedMatchesArr, winnersNextMatch, matchId) 
-		console.log('winnerMatchWaitingOn', winnerMatchWaitingOn)
 		const winnerWaitingOnP1 = winnerMatchWaitingOn && winnerMatchWaitingOn.p1 && winnerMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: winnerMatchWaitingOn.p1 } }) : null
-		console.log('winnerWaitingOnP1', winnerWaitingOnP1)
 		const winnerWaitingOnP2 = winnerMatchWaitingOn && winnerMatchWaitingOn.p1 && winnerMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: winnerMatchWaitingOn.p2 } }) : null
-		console.log('winnerWaitingOnP2', winnerWaitingOnP2)
 
 		const loserEliminated = tournament.tournament_type === 'single elimination' ? true :
 			tournament.tournament_type === 'double elimination' && losingEntry.losses >= 2 ? true :
@@ -2553,20 +2514,11 @@ if (losscom.includes(cmd)) {
 
 		if (loserEliminated) message.member.roles.remove(tourRole)
 
-		console.log('tournament.tournament_type', tournament.tournament_type)
-		console.log('losingEntry.losses', losingEntry.losses)
-		console.log('loserEliminated', loserEliminated)
-
 		const losersNextMatch = loserEliminated ? null : findNextMatch(updatedMatchesArr, matchId, losingEntry.participantId)
-		console.log('losersNextMatch', losersNextMatch)
 		const losersNextOpponent = losersNextMatch ? await findNextOpponent(tournamentId, updatedMatchesArr, losersNextMatch, winningEntry.participantId) : null
-		console.log('losersNextOpponent', losersNextOpponent)
 		const loserMatchWaitingOn = losersNextOpponent ? null : findOtherPreReqMatch(updatedMatchesArr, losersNextMatch, matchId) 
-		console.log('loserMatchWaitingOn', loserMatchWaitingOn)
 		const loserWaitingOnP1 = loserMatchWaitingOn && loserMatchWaitingOn.p1 && loserMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: loserMatchWaitingOn.p1 }, include: Player }) : null
-		console.log('loserWaitingOnP1', loserWaitingOnP1)
 		const loserWaitingOnP2 = loserMatchWaitingOn && loserMatchWaitingOn.p1 && loserMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: loserMatchWaitingOn.p2 }, include: Player }) : null
-		console.log('loserWaitingOnP2', loserWaitingOnP2)
 
 		setTimeout(() => {
 			if (loserEliminated) return message.channel.send(`${losingPlayer.name}, You are eliminated from the tournament. Better luck next time!`)
@@ -2818,9 +2770,7 @@ if (manualcom.includes(cmd)) {
 	} else {
 		const diary = winningPlayer.diary
 		const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
-		console.log('winners easy diary is complete?', easy_complete)
 		const bonus = easy_complete ? 1 : 0
-		console.log('winners bonus:', bonus)
 		const origStatsWinner = winningPlayer.stats
 		const origStatsLoser = losingPlayer.stats
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
@@ -3124,20 +3074,15 @@ if (rankcom.includes(cmd)) {
 			const w = filtered_wallets[i]
 			const inv = await Inventory.findAll({ where: {playerId: w.playerId }, include: Print })
 			let networth = parseInt(w.starchips) + (parseInt(w.stardust) / 10)
-			console.log('w.player.name', w.player.name)
-			console.log('networth from wallet only', networth)
 			inv.forEach((row) => {
 				networth += (parseInt(row.print.market_price) * parseInt(row.quantity) / 10)
 			})
 		
-			console.log('networth after looping inv', networth)
 			transformed_wallets.push([w.player.name, Math.round(networth)])
 		}
 
-		console.log('transformed_wallets', transformed_wallets)
 		transformed_wallets.sort((a, b) => b[1] - a[1])
 		const topWallets = transformed_wallets.slice(0, x)
-		console.log('topWallets', topWallets)
 		for (let i = 0; i < x; i++) result[i+1] = `${(i+1)}. ${(topWallets[i][1])}${starchips} - ${topWallets[i][0]}`
 	} else if (game === 'Arena') {
 		x === 1 ? result[0] = `${FiC} --- The Champion of the Arena --- ${FiC}`
@@ -3189,13 +3134,10 @@ if (rankcom.includes(cmd)) {
 			if (correct_answers > 0) transformed_knowledges.push([smarts.player.name, smarts.playerId, correct_answers])
 		}
 
-		console.log('transformed_knowledges', transformed_knowledges)
 		const filtered_knowledges = transformed_knowledges.filter((p) => memberIds.includes(p[1]))
 		if (x > filtered_knowledges.length) return message.channel.send(`I need a smaller number. We only have ${filtered_knowledges.length} Trivia players.`)
 		filtered_knowledges.sort((a, b) => b[2] - a[2])
-		console.log('filtered_knowledges', filtered_knowledges)
 		const topBookworms = filtered_knowledges.slice(0, x)
-		console.log('topBookworms', topBookworms)
 
 		for (let i = 0; i < x; i++) {
 			result[i+1] = `${i+1}. ${topBookworms[i][2]} ${cultured} - ${topBookworms[i][0]}`
@@ -4291,6 +4233,65 @@ if(cmd === `!steal`) {
 	})
 }
 
+//RECALC
+    // Use this command to recalculate every player's Elo from scratch.
+    // This is needed when matches are directly added or deleted using postgreSQL.
+    // It's also required after using the !combine command, but the bot will remind you to do it.
+if (cmd === `!recalc`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	message.channel.send(`Recalculating data. Please wait...`)
+	const players = await Player.findAll()
+    const matches = await Match.findAll({
+            where: {
+                game_mode: {
+					[Op.or]: ['ranked', 'tournament']
+				},
+            }, order: [['createdAt', 'ASC']]
+        })
+
+    console.log(`Found ${matches.length} ranked and tournament matches.`)
+	for (let i = 0; i < players.length; i++) {
+		const player = players[i]
+		player.stats = 500
+		player.backup = 0
+		player.wins = 0
+		player.losses = 0
+		player.best_stats = 500
+		player.vanquished_foes = 0
+		player.current_streak = 0
+		player.longest_streak = 0
+		await player.save()
+	}
+
+	for (let i = 0; i < matches.length; i++) await recalculate(match, i+1)	
+    return message.channel.send(`Recalculation complete!`)
+}
+
+//CENSUS
+if (cmd === `!census`) {
+	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	const members = await message.guild.members.fetch()
+	let update_count = 0
+	let create_count = 0
+	for (let i = 0; i < members.length; i++) {
+		const id = member.user.id
+		const name = member.user.username
+		const tag = member.user.tag
+		const player = await Player.findOne({ where: { id: id } })
+		if (player && (player.name !== name || player.tag !== tag)) {
+			update_count++
+			player.name = name
+			player.tag = tag
+			await player.save()
+		} else if (!player && !member.user.bot) {
+			create_count++
+			await createPlayer(id, name, tag)
+		}
+	}
+
+	return message.channel.send(`Census complete! You added ${create_count} ${create_count === 1 ? 'player' : 'players'} to the database and updated ${update_count} ${update_count === 1 ? 'other' : 'others'}.`)
+}
+
 //GRINDALL
 if(cmd === `!grindall`) {
 	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
@@ -5264,9 +5265,6 @@ if(cmd === `!trade`) {
 			receiverId: initiatingPlayer.id
 		}
 	})
-
-	console.log('tradeHistory1', tradeHistory1)
-	console.log('tradeHistory2', tradeHistory2)
 
 	if (tradeHistory1 + tradeHistory2 === 0) {
 		const senderProfile = await Profile.findOne({where: { playerId: initiatingPlayer.id } })

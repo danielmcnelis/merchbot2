@@ -214,9 +214,7 @@ const awardPacksToShop = async (num, core = true) => {
 
     const results = []
     const boxes = Math.floor(num / set.packs_per_box)
-    console.log('boxes', boxes)
     const packs_from_boxes = boxes * set.packs_per_box
-    console.log('packs_from_boxes', packs_from_boxes)
 
     for (let j = 0; j < num; j++) {
         const yourCommons = set.commons_per_pack > 1 ? getRandomSubset(commons, set.commons_per_pack) : set.secrets_per_pack === 1 ? [getRandomElement(commons)] : []

@@ -59,8 +59,6 @@ const getDeckListTournament = async (member, player, resubmission = false) => {
         if (url.includes("www.duelingbook.com/deck")) {		
             member.send('Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.')
             const issues = await saveYDK(member, url)
-
-            console.log('issues', issues)
             
             if (issues['illegalCards'].length || issues['forbiddenCards'].length || issues['limitedCards'].length || issues['semiLimitedCards'].length || issues['phantomCards'].length) {
                 let response = `I'm sorry, ${player.name}, your deck is not legal. ${FiC}`
@@ -72,14 +70,12 @@ const getDeckListTournament = async (member, player, resubmission = false) => {
                 response += `\n\nPlease edit your deck and try again once it's legal. If you believe this message is in error, contact the Tournament Organizer.`
             
                 member.send(response)
-                //sendToTournamentChannel(player, url, null, false)
                 return false
             } else if (issues['unrecognizedCards'].length) {
                 let response = `I'm sorry, ${player.name}, the following card IDs were not found in our database:\n${issues['unrecognizedCards'].join('\n')}`
                 response += `\n\nThese cards are either alternate artwork, new to the TCG, OCG only, or incorrect in our database. Please contact the Tournament Organizer or the Admin if you can't resolve this.`
                 
                 member.send(response)
-                //sendToTournamentChannel(player, url, null, false)
                 return false
              } else {
                 member.send(`Thanks, ${player.name}, your deck is perfectly legal. ${approve}`)
@@ -159,7 +155,6 @@ const seed = async (message, tournamentId) => {
     const newbieEntries = entries.filter((e) => (e.player.wins === 0 && e.player.losses === 0)).map((e) => [e.participantId, e.player.name])
     const seeds = [...expEntries, ...shuffleArray(newbieEntries)]
 
-    console.log('seeds', seeds)
     let count = 0
 
     for (let i = 0; i < seeds.length; i++) {
@@ -177,7 +172,6 @@ const seed = async (message, tournamentId) => {
                 }
             })
 
-            console.log('seeded #', i+1)
             message.channel.send(`${name} is now the ${i+1} seed.`)
             count++
         } catch (err) {
@@ -199,8 +193,6 @@ const selectTournament = async (message, tournaments, playerId) => {
         max: 1,
         time: 15000
     }).then(collected => {
-        console.log(collected.first().content)
-        console.log(collected.first().content.match(/\d+/))
         const num = parseInt(collected.first().content.match(/\d+/))
         if (!num || !tournaments[num - 1]) {
             message.channel.send(`Sorry, ${collected.first().content} is not a valid option.`)
@@ -222,7 +214,6 @@ const removeParticipant = async (message, member, participants, participantId, t
     let keys = Object.keys(participants)
 
     keys.forEach(function(key) {
-        console.log('participants[key]', participants[key])
         if (participants[key].participant.name === member.user.username) {
             participantID = participants[key].participant.id
         }
@@ -298,7 +289,6 @@ const findOtherPreReqMatch = (matchesArr, nextMatchId, completedMatchId) => {
         const match = matchesArr[i].match
         if (match.id === nextMatchId) {
             const pre_reqs = match.prerequisite_match_ids_csv.split(",")
-            console.log('pre_reqs', pre_reqs)
             if (pre_reqs[0] === completedMatchId) {
                 const pairing = getPairing(matchesArr, pre_reqs[1])
                 return pairing
@@ -332,7 +322,6 @@ const getPairing = (matchesArr, matchId) => {
         p2
     }
 
-    console.log('pairing', pairing)
     return pairing
 }
 
@@ -409,11 +398,6 @@ const generateSheetData = async () => {
     const sheet2DataB = [[], ['Category', 'Entries', 'Percent']]
 
     allDecks.forEach(function (deck) {
-        console.log(deck.type)
-        console.log(deck.category)
-        console.log(deck.pilot)
-        console.log(deck.name)
-        console.log(deck.url)
         typeData[deck.type] ? typeData[deck.type]++ : typeData[deck.type] = 1
         catData[deck.category] ? catData[deck.category]++ : catData[deck.category] = 1
         const row = [deck.pilot, deck.name, deck.type, deck.url]

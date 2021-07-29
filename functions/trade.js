@@ -104,9 +104,6 @@ const getFinalConfirmation = async (message, cards, player) => {
 
 //GET TRADE SUMMARY
 const getTradeSummary = async (message, inputs, player) => {
-	console.log('inputs', inputs)
-	console.log('player.id', player.id)
-
 	const wallet = player.wallet
 	const printQuantities = []
 	const walletQuantities = []
@@ -118,12 +115,9 @@ const getTradeSummary = async (message, inputs, player) => {
 	for (let i = 0; i < inputs.length; i++) {
 		const input = inputs[i]
 		const args = input.split(' ').filter((el) => el !== '')
-		console.log('args', args)
 		if (!args.length) continue
 		const quantity = isFinite(args[0]) ? parseInt(args[0]) : 1
 		const query = isFinite(args[0]) ? args.slice(1).join(' ') : args.join(' ')
-		console.log('quantity', quantity)
-		console.log('query', query)
 
 		if (!query) {
 			message.channel.send(`Please specify the card(s) you wish to trade.`)
@@ -199,9 +193,7 @@ const getTradeSummary = async (message, inputs, player) => {
 		walletFields,
 		invs
     }
-
-    //console.log('summary', summary)
-
+	
     return summary
 }
 

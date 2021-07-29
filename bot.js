@@ -4280,7 +4280,7 @@ if (cmd === `!census`) {
 	for (let i = 0; i < memberIds.length; i++) {
 		const id = memberIds[i]
 		console.log('id', id)
-		const member = membersMap[id]
+		const member = membersMap.get(id)
 		console.log('!!member', !!member)
 		const name = member.user.username
 		const tag = member.user.tag

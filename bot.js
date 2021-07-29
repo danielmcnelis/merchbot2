@@ -1591,10 +1591,12 @@ if(cmd === `!count`) {
 	const allSetsForSale = await Set.findAll({ where: { for_sale: true }, order: [['createdAt', 'DESC']]})
 	const results = [`In this cycle The Shop has sold:`]
 	let weightedCount = 0
+	let most_recent = false
 
 	for (let i = 0; i < allSetsForSale.length; i++) {
 		const set = allSetsForSale[i]
 		if (set.type === 'core') {
+			if (!most_recent) most_recent = 'core'
 			if (set.currency === 'starchips') {
 				weightedCount += set.unit_sales
 			} else {
@@ -1611,6 +1613,7 @@ if(cmd === `!count`) {
 
 			results.push(`- ${set.unit_sales} Starter ${set.unit_sales === 1 ? 'Deck' : 'Decks'} ${eval(set.emoji)} ${eval(set.alt_emoji)}`)
 		} else if (set.type === 'mini') {
+			if (!most_recent) most_recent = 'mini'
 			if (set.currency === 'starchips') {
 				weightedCount += (set.unit_sales * 2 / 3)
 			} else {

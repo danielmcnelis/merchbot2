@@ -91,9 +91,12 @@ const recalculate = async (match, z) => {
     const previouslyDefeated = await Match.count({
         where: {
             winnerId: winningPlayer.id,
-            loserId: losingPlayer.id
+            loserId: losingPlayer.id,
+            createdAt: { [Op.lt]: match.createdAt }
         }
     })
+
+    console.log('!!previouslyDefeated', previouslyDefeated)
 
     winningPlayer.stats += delta
     winningPlayer.backup = origStatsWinner

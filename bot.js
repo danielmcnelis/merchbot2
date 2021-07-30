@@ -8,7 +8,7 @@ const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { ygocard, fire, tix, credits, blue, red, yellow, stoned, stare, leatherbound, wokeaf, koolaid, cavebob, evil, DOC, ORF, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, cultured, com, rar, sup, ult, scr, checkmark, emptybox, yes, no } = require('./static/emojis.json')
 const { aliuscom, nicknamecom, joincom, bindercom, wishlistcom, invcom, calccom, bracketcom, dropcom, queuecom, checklistcom, startcom, infocom, dbcom, noshowcom, legalcom, listcom, pfpcom, botcom, rolecom, statscom, profcom, losscom, h2hcom, undocom, rankcom, manualcom, yescom, nocom, deckcom } = require('./static/commands.json')
-const { bookwormsRole, gamersRole, triviaRole, botRole, modRole, adminRole, tourRole, toRole, fpRole, muteRole, arenaRole, ambassadorRole } = require('./static/roles.json')
+const { expertRole, noviceRole, triviaRole, botRole, modRole, adminRole, tourRole, toRole, fpRole, muteRole, arenaRole, ambassadorRole } = require('./static/roles.json')
 const { gutterChannelId, generalChannelId, rulesChannelId, rulingsChannelId, introChannelId, discussionChannelId, staffChannelId, botSpamChannelId, welcomeChannelId, announcementsChannelId, registrationChannelId, replaysChannelId, duelRequestsChannelId, marketPlaceChannelId, shopChannelId, tournamentChannelId, arenaChannelId, keeperChannelId, triviaChannelId, draftChannelId, gauntletChannelId, bugreportsChannelId, suggestionsChannelId } = require('./static/channels.json')
 const decks = require('./static/decks.json')
 const types = require('./static/types.json')
@@ -115,6 +115,13 @@ client.on('guildMemberAdd', async (member) => {
         createPlayer(member.user.id, member.user.username, member.user.tag) 
         return welcomeChannel.send(`${member} Welcome to the Forged in Chaos ${FiC} Discord server! Go to <#${botSpamChannelId}> and type **!start** to begin playing. ${legend}`)
     } else {
+		const player = await Player.findOne({ where: { id: member.user.id }})
+		if (player.stats >= 590) {
+			member.roles.add(expertRole)
+		} else {
+			member.roles.add(noviceRole)
+		}
+
         return welcomeChannel.send(`${member} Welcome back to the Forged in Chaos ${FiC} Discord server! We missed you. ${approve}`)
     }
 })
@@ -195,6 +202,27 @@ if(cmd === `!test`) {
 	// const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `bewd.png`)
 	// return message.channel.send(`Behold!`, attachment)
 }
+
+if (cmd === `!assign`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	const membersMap = await message.guild.members.fetch()
+	const memberIds = [...membersMap.keys()]
+	for (let i = 0; i < memberIds.length; i++) {
+		const id = memberIds[i]
+		const member = membersMap.get(id)
+		const player = await Player.findOne({ where: { id: id }})
+		if (player.stats >= 590) {
+			member.roles.add(expertRole)
+			member.roles.remove(noviceRole)
+		} else {
+			member.roles.add(noviceRole)
+			member.roles.remove(expertRole)
+		}
+
+		message.channel.send(`${member.user.username} was assigned the ${player.stats >= 590 ? 'Expert' : 'Novice'} Role.`)
+	}
+}
+
 
 
 //IMPORT_DATA
@@ -890,34 +918,12 @@ if(cmd === `!unmute`) {
     
 //ROLE 
 if (rolecom.includes(cmd)) {
-	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
-	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
-	: null
-
-	if (game === 'Arena') {
-		if (!message.member.roles.cache.some(role => role.id === gamersRole)) {
-			message.member.roles.add(gamersRole)
-			return message.channel.send(`You now have the Gamers role.`)
-		} else {
-			message.member.roles.remove(gamersRole)
-			return message.channel.send(`You no longer have the Gamers role.`)
-		}
-	} else if (game === 'Trivia') {
-		if (!message.member.roles.cache.some(role => role.id === bookwormsRole)) {
-			message.member.roles.add(bookwormsRole)
-			return message.channel.send(`You now have the Bookworms role.`)
-		} else {
-			message.member.roles.remove(bookwormsRole)
-			return message.channel.send(`You no longer have the Bookworms role.`)
-		}
+	if (!message.member.roles.cache.some(role => role.id === fpRole)) {
+		message.member.roles.add(fpRole)
+		return message.channel.send(`You now have the Forged Players role.`)
 	} else {
-		if (!message.member.roles.cache.some(role => role.id === fpRole)) {
-			message.member.roles.add(fpRole)
-			return message.channel.send(`You now have the Forged Players role.`)
-		} else {
-			message.member.roles.remove(fpRole)
-			return message.channel.send(`You no longer have the Forged Players role.`)
-		}
+		message.member.roles.remove(fpRole)
+		return message.channel.send(`You no longer have the Forged Players role.`)
 	}
 }
 
@@ -2480,6 +2486,16 @@ if (losscom.includes(cmd)) {
 		losingPlayer.wallet.starchips += chipsLoser
 		await losingPlayer.wallet.save()
 
+		if (winningPlayer.stats >= 590 && !winner.roles.cache.some(role => role.id === expertRole)) {
+			winner.roles.add(expertRole)
+			winner.roles.remove(noviceRole)
+		}
+
+		if (losingPlayer.stats < 590 && !loser.roles.cache.some(role => role.id === noviceRole)) {
+			loser.roles.add(noviceRole)
+			loser.roles.remove(expertRole)
+		}
+
 		await Match.create({
 			game_mode: "tournament",
 			winner_name: winningPlayer.name,
@@ -2673,6 +2689,16 @@ if (losscom.includes(cmd)) {
 			chipsLoser: chipsLoser
 		})
 
+		if (winningPlayer.stats >= 590 && !winner.roles.cache.some(role => role.id === expertRole)) {
+			winner.roles.add(expertRole)
+			winner.roles.remove(noviceRole)
+		}
+
+		if (losingPlayer.stats < 590 && !loser.roles.cache.some(role => role.id === noviceRole)) {
+			loser.roles.add(noviceRole)
+			loser.roles.remove(expertRole)
+		}
+
 		completeTask(message.channel, winningPlayer.id, 'e3')
 		if (winningPlayer.stats >= 530) completeTask(message.channel, winningPlayer.id, 'm1', 3000)
 		if (winningPlayer.stats >= 590) completeTask(message.channel, winningPlayer.id, 'h1', 3000)
@@ -2805,6 +2831,16 @@ if (manualcom.includes(cmd)) {
 		losingPlayer.wallet.starchips += chipsLoser
 		await losingPlayer.wallet.save()
 	
+		if (winningPlayer.stats >= 530 && !winner.roles.cache.some(role => role.id === expertRole)) {
+			winner.roles.add(expertRole)
+			winner.roles.remove(noviceRole)
+		}
+
+		if (losingPlayer.stats < 530 && !loser.roles.cache.some(role => role.id === noviceRole)) {
+			loser.roles.add(noviceRole)
+			loser.roles.remove(expertRole)
+		}
+
 		await Match.create({ 
 			game: "ranked",
 			winner_name: winningPlayer.name,

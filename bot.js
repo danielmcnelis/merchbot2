@@ -116,7 +116,7 @@ client.on('guildMemberAdd', async (member) => {
         return welcomeChannel.send(`${member} Welcome to the Forged in Chaos ${FiC} Discord server! Go to <#${botSpamChannelId}> and type **!start** to begin playing. ${legend}`)
     } else {
 		const player = await Player.findOne({ where: { id: member.user.id }})
-		if (player.stats >= 590) {
+		if (player.stats >= 530) {
 			member.roles.add(expertRole)
 		} else {
 			member.roles.add(noviceRole)
@@ -211,7 +211,7 @@ if (cmd === `!assign`) {
 		const id = memberIds[i]
 		const member = membersMap.get(id)
 		const player = await Player.findOne({ where: { id: id }})
-		if (player.stats >= 590) {
+		if (player.stats >= 530) {
 			member.roles.add(expertRole)
 			member.roles.remove(noviceRole)
 		} else {
@@ -219,7 +219,7 @@ if (cmd === `!assign`) {
 			member.roles.remove(expertRole)
 		}
 
-		message.channel.send(`${member.user.username} was assigned the ${player.stats >= 590 ? 'Expert' : 'Novice'} Role.`)
+		message.channel.send(`${member.user.username} was assigned the ${player.stats >= 530 ? 'Expert' : 'Novice'} Role.`)
 	}
 }
 
@@ -2488,12 +2488,12 @@ if (losscom.includes(cmd)) {
 		losingPlayer.wallet.starchips += chipsLoser
 		await losingPlayer.wallet.save()
 
-		if (winningPlayer.stats >= 590 && !winner.roles.cache.some(role => role.id === expertRole)) {
+		if (winningPlayer.stats >= 530 && !winner.roles.cache.some(role => role.id === expertRole)) {
 			winner.roles.add(expertRole)
 			winner.roles.remove(noviceRole)
 		}
 
-		if (losingPlayer.stats < 590 && !loser.roles.cache.some(role => role.id === noviceRole)) {
+		if (losingPlayer.stats < 530 && !loser.roles.cache.some(role => role.id === noviceRole)) {
 			loser.roles.add(noviceRole)
 			loser.roles.remove(expertRole)
 		}
@@ -2691,12 +2691,12 @@ if (losscom.includes(cmd)) {
 			chipsLoser: chipsLoser
 		})
 
-		if (winningPlayer.stats >= 590 && !winner.roles.cache.some(role => role.id === expertRole)) {
+		if (winningPlayer.stats >= 530 && !winner.roles.cache.some(role => role.id === expertRole)) {
 			winner.roles.add(expertRole)
 			winner.roles.remove(noviceRole)
 		}
 
-		if (losingPlayer.stats < 590 && !loser.roles.cache.some(role => role.id === noviceRole)) {
+		if (losingPlayer.stats < 530 && !loser.roles.cache.some(role => role.id === noviceRole)) {
 			loser.roles.add(noviceRole)
 			loser.roles.remove(expertRole)
 		}

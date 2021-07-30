@@ -109,7 +109,7 @@ client.on('guildMemberAdd', async (member) => {
     if (mutedPeople.includes(member.user.id)) {
             member.roles.add(muteRole)
             return welcomeChannel.send(`${member} Nice mute evasion, punk. LOL! ${lmfao}`)
-        }
+    }
 
     if (await isNewUser(member.user.id)) {
         createPlayer(member.user.id, member.user.username, member.user.tag) 

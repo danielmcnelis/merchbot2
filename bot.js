@@ -855,6 +855,7 @@ if(startcom.includes(cmd)) {
 			await awardStarterDeck(maid, starter)
 			await createProfile(maid, starter)
 			message.member.roles.add(fpRole)
+			message.member.roles.add(noviceRole)
 			message.channel.send(`Excellent choice, ${message.author.username}! ${legend}` +
 			`\nYou received a copy of ${starter === "dinosaur" ? `Dinosaur's Power ${dinosaur}` : `Plant's Harmony ${plant}`} and the **Forged Players** role! ${wokeaf}` +
 			`\nPlease wait while I open some packs... ${blue}`
@@ -1244,33 +1245,67 @@ if(calccom.includes(cmd)) {
 	const set_code = args[0].toUpperCase()
 	const set = await Set.findOne({ where: { code: set_code } })
 	if(!set) return message.channel.send(`I do not recognize the set code: "${set_code}"`)	
-	const commons = await Print.findAll({ where: { set_code, rarity: "com" } })
-	const rares = await Print.findAll({ where: { set_code, rarity: "rar" } })
-	const supers = await Print.findAll({ where: { set_code, rarity: "sup" } })
-	const ultras = await Print.findAll({ where: { set_code, rarity: "ult" } })
-	const secrets = await Print.findAll({ where: { set_code, rarity: "scr" } })
-	if(!commons.length && !rares.length && !supers.length && !ultras.length && !secrets.length) return message.channel.send(`Could not find prints for the set: "${set_code}"`)
-	
+
 	const avgMarketPrice = (array) => { 
 		const total = array.reduce((a, b) => {
 			return  { market_price: parseInt(a.market_price) + parseInt(b.market_price) }
 		})
-		
 		return total.market_price / array.length
 	}
 
-	const avgComPrice = commons.length ? avgMarketPrice(commons) : 1
-	const avgRarPrice = rares.length ? avgMarketPrice(rares) : 1
-	const avgSupPrice = supers.length ? avgMarketPrice(supers) : 1
-	const avgUltPrice = ultras.length ? avgMarketPrice(ultras) : 1
-	const avgScrPrice = secrets.length ? avgMarketPrice(secrets) : 1
-	const avgBoxPrice = (avgComPrice * set.commons_per_box) 
-	+ (avgRarPrice * set.rares_per_box) 
-	+ (avgSupPrice * set.supers_per_box) 
-	+ (avgUltPrice * set.ultras_per_box) 
-	+ (avgScrPrice * set.secrets_per_box) 
+	if (set.type === 'core' || set.type === 'mini' || set.type === 'tour') {
+		const commons = await Print.findAll({ where: { set_code: set_code, rarity: "com" } })
+		const rares = await Print.findAll({ where: { set_code: set_code, rarity: "rar" } })
+		const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup" } })
+		const ultras = await Print.findAll({ where: { set_code: set_code, rarity: "ult" } })
+		const secrets = await Print.findAll({ where: { set_code: set_code, rarity: "scr" } })
+		const avgComPrice = commons.length ? avgMarketPrice(commons) : 0
+		const avgRarPrice = rares.length ? avgMarketPrice(rares) : 0
+		const avgSupPrice = supers.length ? avgMarketPrice(supers) : 0
+		const avgUltPrice = ultras.length ? avgMarketPrice(ultras) : 0
+		const avgScrPrice = secrets.length ? avgMarketPrice(secrets) : 0
+		const avgBoxPrice = (avgComPrice * set.commons_per_box) 
+			+ (avgRarPrice * set.rares_per_box) 
+			+ (avgSupPrice * set.supers_per_box) 
+			+ (avgUltPrice * set.ultras_per_box) 
+			+ (avgScrPrice * set.secrets_per_box) 
+		const avgPackPrice = avgBoxPrice / set.packs_per_box
 
-	return message.channel.send(`The average resale value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Box is ${avgBoxPrice}${stardust}.`)
+		if (set.type === 'core') {
+			return message.channel.send(`The average resale value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Pack is ${Math.round(avgPackPrice * 100) / 100}${stardust} and a Box is ${Math.round(avgBoxPrice * 100) / 100}${stardust}.`)
+		} else {
+			return message.channel.send(`The average resale value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Pack is ${Math.round(avgPackPrice * 100) / 100}${stardust}.`)
+		}
+	} else if (set.type === 'starter_deck') {
+		const prints = await Print.findAll({ where: { set_code: set_code }})
+		let deck1Price = 0
+		let deck2Price = 0
+		let deck1
+		let deck2
+
+		const deck_names = Object.keys(decks)
+		deck_names.forEach((d) => {
+			if(decks[d].set_code === set_code) {
+				if (!deck1) deck1 = d
+				else deck2 = d
+			}
+		})
+		
+		for (let i = 0; i < prints.length; i++) {
+			const print = prints[i]
+			const market_price = print.market_price
+			const d1quantity = decks[deck1].cards[print.card_code] || 0
+			const d2quantity = decks[deck2].cards[print.card_code] || 0
+			deck1Price += (d1quantity * market_price)
+			deck2Price += (d2quantity * market_price)
+		}
+
+		return message.channel.send(`The average resale value of ${decks[deck1].name} ${eval(set.emoji)} is ${Math.round(deck1Price * 100) / 100}${stardust} and ${decks[deck2].name} ${eval(set.alt_emoji)} is ${Math.round(deck2Price * 100) / 100}${stardust}.`)		
+	} else if (set.type === 'promo') {
+		const prints = await Print.findAll({ where: { set_code: set_code }})
+		const avgPrice = prints.length ? avgMarketPrice(prints) : 0
+		return message.channel.send(`The average resale value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Promo is ${Math.round(avgPrice * 100) / 100}${stardust}.`)
+	}
 }
 
 //PROFILE
@@ -4921,10 +4956,7 @@ if(cmd === `!box`) {
 
 //DUMP
 if(cmd === `!dump`) {
-	if (mcid !== botSpamChannelId &&
-		mcid !== generalChannelId &&
-		mcid !== marketPlaceChannelId
-	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
+	if (mcid !== botSpamChannelId) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
 
 	const set_code = args.length ? args[0].toUpperCase() : 'DOC'
 	const set = await Set.findOne({where: { code: set_code }})

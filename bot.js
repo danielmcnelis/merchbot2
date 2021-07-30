@@ -1194,6 +1194,8 @@ if(deckcom.includes(cmd)) {
 			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
 			const code = deck === 'plant' || deck === 'dinosaur' ? 'SS2' : 'SS1'
 			const set = await Set.findOne({ where: { code: code } })
+			wallet[set.currency] -= set.unit_price
+			await wallet.save()
 			set.unit_sales++
 			await set.save()
 			await awardStarterDeck(maid, deck)

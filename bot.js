@@ -4232,14 +4232,6 @@ if(cmd === `!steal`) {
 	const query = parseInt(args[1]) ? args.slice(2).join(" ") : args.slice(1).join(" ")	
 	if (!quantity || !query) return message.channel.send(`Please specify the item you wish to steal.`)
 
-	const set_code = query.toUpperCase()
-	const valid_set_code = !!(!walletField && set_code.length === 3 && await Set.count({where: { code: set_code }}))
-	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-	const valid_card_code = !!(!walletField && card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-	const card_name = query && !walletField && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints, fuzzyPrints2) : null
-	const print = !walletField && valid_card_code ? await Print.findOne({ where: { card_code } }) : !walletField && card_name ? await selectPrint(message, maid, card_name) : null
-	if (card_name && !print) return
-
 	let walletField
 	if (query === 'sc' || query === 'starchip' || query === 'starchips' || query === 'chip' || query === 'chips') walletField = 'starchips'
 	if (query === 'sd' ||query === 'stardust' || query === 'dust') walletField = 'stardust'
@@ -4249,6 +4241,14 @@ if(cmd === `!steal`) {
 	if (query === 'moai' || query === 'moais' ) walletField = 'moai'
 	if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
 	if (query === 'rose' || query === 'roses' ) walletField = 'rose'
+
+	const set_code = query.toUpperCase()
+	const valid_set_code = !!(!walletField && set_code.length === 3 && await Set.count({where: { code: set_code }}))
+	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
+	const valid_card_code = !!(!walletField && card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
+	const card_name = query && !walletField && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints, fuzzyPrints2) : null
+	const print = !walletField && valid_card_code ? await Print.findOne({ where: { card_code } }) : !walletField && card_name ? await selectPrint(message, maid, card_name) : null
+	if (card_name && !print) return
 
 	if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the item: "${query}".`)
 	const loot = walletField ? `${eval(walletField)}` : ` ${eval(print.rarity)}${print.card_code} - ${print.card_name}` 

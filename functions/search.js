@@ -86,6 +86,8 @@ const getInventorySummary = async (allForgedCards, playerId) => {
 		else inv_map[name] = quantity
 	}
 
+	console.log('inv_map', inv_map)
+
 	const names = Object.keys(inv_map)
 	const one_of_names = []
 	const two_of_names = []

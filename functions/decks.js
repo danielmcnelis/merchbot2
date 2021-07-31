@@ -114,9 +114,9 @@ const saveYDK = async (member, url) => {
         const allForgedCards = await fetchAllForgedCards()
         const { yourSingles, yourDoubles, yourTriples } = await getInventorySummary(allForgedCards, playerId)
 
-        console.log('yourSingles', yourSingles)
-        console.log('yourDoubles', yourDoubles)
-        console.log('yourTriples', yourTriples)
+        // console.log('yourSingles', yourSingles)
+        // console.log('yourDoubles', yourDoubles)
+        // console.log('yourTriples', yourTriples)
        
         const allForbiddenCards = await Status.findAll({ 
             where: {

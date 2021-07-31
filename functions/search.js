@@ -87,15 +87,23 @@ const getInventorySummary = async (allForgedCards, playerId) => {
 	}
 
 	const names = Object.keys(inv_map)
-	const yourSingles = []
-	const yourDoubles = []
-	const yourTriples = []
+	const one_of_names = []
+	const two_of_names = []
+	const three_of_names = []
 
 	names.forEach((name) => {
-		if (inv_map[name] === 1) yourSingles.push(name)
-		else if (inv_map[name] === 2) yourDoubles.push(name)
-		else if (inv_map[name] >= 3) yourTriples.push(name)
+		if (inv_map[name] === 1) one_of_names.push(name)
+		else if (inv_map[name] === 2) two_of_names.push(name)
+		else if (inv_map[name] >= 3) three_of_names.push(name)
 	})
+
+	console.log('one_of_names', one_of_names)
+	console.log('two_of_names', two_of_names)
+	console.log('three_of_names', three_of_names)
+
+	const yourSingles = allForgedCards.filter(card => one_of_names.includes(card.name))
+	const yourDoubles = allForgedCards.filter(card => two_of_names.includes(card.name))
+	const yourTriples = allForgedCards.filter(card => three_of_names.includes(card.name))
 
 	const summary = {
 		yourSingles,

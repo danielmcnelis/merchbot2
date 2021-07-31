@@ -95,8 +95,8 @@ const getInventorySummary = async (allForgedCards, playerId) => {
 
 	names.forEach((name) => {
 		if (inv_map[name] >= 1) one_of_names.push(name)
-		else if (inv_map[name] >= 2) two_of_names.push(name)
-		else if (inv_map[name] >= 3) three_of_names.push(name)
+		if (inv_map[name] >= 2) two_of_names.push(name)
+		if (inv_map[name] >= 3) three_of_names.push(name)
 	})
 
 	console.log('one_of_names', one_of_names)

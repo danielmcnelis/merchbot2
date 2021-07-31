@@ -309,8 +309,8 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
     if (query === 'mushroom' || query === 'mushrooms') walletField = 'mushroom'
     if (query === 'rose' || query === 'roses' ) walletField = 'rose'
 
-    const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) :
-                card_name ? await selectPrint(message, sellerId, card_name) :
+    const print = valid_card_code && !walletField ? await Print.findOne({ where: { card_code: card_code }}) :
+                card_name && !walletField ? await selectPrint(message, sellerId, card_name) :
                 null
     
     const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true

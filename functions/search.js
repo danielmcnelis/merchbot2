@@ -65,7 +65,7 @@ const fetchAllForgedCards = async () => {
 }
 
 //FETCH ALL YOUR SINGLES
-const fetchYourSingles = async (allForgedCards, playerId) => {
+const getInventorySummary = async (allForgedCards, playerId) => {
 	const invs = await Inventory.findAll({ 
 		where: {
 			playerId: playerId,
@@ -76,46 +76,36 @@ const fetchYourSingles = async (allForgedCards, playerId) => {
 		include: Print
 	})
 
-	const names = invs.map(inv => inv.print.card_name)
-	const yourSingles = allForgedCards.filter(card => names.includes(card.name))
-    return yourSingles
-}
+	const inv_map = {}
 
+	for (let i = 0; i < invs.length; i++) {
+		const inv = invs[i]
+		const quantity = inv.quantity
+		const name = inv.print.card_name
+		if (inv_map[name]) inv_map[name] += quantity
+		else inv_map[name] = quantity
+	}
 
-//FETCH ALL YOUR DOUblES
-const fetchYourDoubles = async (allForgedCards, playerId) => {
-	const invs = await Inventory.findAll({ 
-		where: {
-			playerId: playerId,
-			quantity: {
-				[Op.gte]: 2
-			}
-		},
-		include: Print
+	const names = Object.keys(inv_map)
+	const yourSingles = []
+	const yourDoubles = []
+	const yourTriples = []
+
+	names.forEach((name) => {
+		if (inv_map[name] === 1) yourSingles.push(name)
+		else if (inv_map[name] === 2) yourDoubles.push(name)
+		else if (inv_map[name] >= 3) yourTriples.push(name)
 	})
 
-	const names = invs.map(inv => inv.print.card_name)
-	const yourDoubles = allForgedCards.filter(card => names.includes(card.name))
-    return yourDoubles
+	const summary = {
+		yourSingles,
+		yourDoubles,
+		yourTriples
+	}
+
+    return summary
 }
 
-
-//FETCH ALL YOUR DOUblES
-const fetchYourTriples = async (allForgedCards, playerId) => {
-	const invs = await Inventory.findAll({ 
-		where: {
-			playerId: playerId,
-			quantity: {
-				[Op.gte]: 3
-			}
-		},
-		include: Print
-	})
-
-	const names = invs.map(inv => inv.print.card_name)
-	const yourTriples = allForgedCards.filter(card => names.includes(card.name))
-    return yourTriples
-}
 
 
 //FETCH UNIQUE PRINTS
@@ -175,9 +165,7 @@ module.exports = {
 	fetchAllCards,
 	fetchAllForgedCards,
 	fetchAllUniquePrintNames,
-	fetchYourDoubles,
-	fetchYourSingles,
-	fetchYourTriples,
+	getInventorySummary,
     findCard,
 	search
 }

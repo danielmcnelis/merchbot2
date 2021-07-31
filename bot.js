@@ -1300,7 +1300,7 @@ if(calccom.includes(cmd)) {
 			deck2Price += (d2quantity * market_price)
 		}
 
-		return message.channel.send(`The average resale value of ${decks[deck1].name} ${eval(set.emoji)} is ${Math.round(deck1Price * 100) / 100}${stardust} and ${decks[deck2].name} ${eval(set.alt_emoji)} is ${Math.round(deck2Price * 100) / 100}${stardust}.`)		
+		return message.channel.send(`The resale value of ${decks[deck1].name} ${eval(set.emoji)} is ${Math.round(deck1Price * 100) / 100}${stardust} and ${decks[deck2].name} ${eval(set.alt_emoji)} is ${Math.round(deck2Price * 100) / 100}${stardust}.`)		
 	} else if (set.type === 'promo') {
 		const prints = await Print.findAll({ where: { set_code: set_code }})
 		const avgPrice = prints.length ? avgMarketPrice(prints) : 0
@@ -4146,27 +4146,24 @@ if(cmd === `!award`) {
 		})
 
 		return
-		// if (set_code === 'CH1') return setTimeout(() => {
-		// 	return completeTask(message.channel, recipient, 'm8')
-		// }, 5000)
 	}
 
-	set_code = query.slice(0, 3).toUpperCase()
-	const valid_set_code = !!(set_code.length === 3 && await Set.count({where: { code: set_code }}))
-	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-	const card_name = query && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints, fuzzyPrints2) : null
-	const print = valid_card_code ? await Print.findOne({ where: { card_code } }) : card_name ? await selectPrint(message, maid, card_name) : null
-
 	let walletField
-	if (query === 'sc' || query === 'starchip' || query === 'starchips' || query === 'chip' || query === 'chips') walletEmoji = starchips, walletField = 'starchips'
-	if (query === 'sd' ||query === 'stardust' || query === 'dust') walletField = 'stardust'
+	if (query === 'c' || query === 'sc' || query === 'starchip' || query === 'starchips' || query === 'chip' || query === 'chips') walletEmoji = starchips, walletField = 'starchips'
+	if (query === 'd' || query === 'sd' || query === 'stardust' || query === 'dust') walletField = 'stardust'
 	if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
 	if (query === 'egg' || query === 'eggs') walletField = 'egg'
 	if (query === 'hook' || query === 'hooks') walletField = 'hook'
 	if (query === 'moai' || query === 'moais' ) walletField = 'moai'
 	if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
 	if (query === 'rose' || query === 'roses' ) walletField = 'rose'
+
+	set_code = query.slice(0, 3).toUpperCase()
+	const valid_set_code = !!(!walletField && set_code.length === 3 && await Set.count({where: { code: set_code }}))
+	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
+	const valid_card_code = !walletField && !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
+	const card_name = query && !walletField && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints, fuzzyPrints2) : null
+	const print = !walletField && valid_card_code ? await Print.findOne({ where: { card_code } }) : !walletField && card_name ? await selectPrint(message, maid, card_name) : null
 
 	if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the item: "${query}".`)
 	const award = walletField ? `${eval(walletField)}` : ` ${eval(print.rarity)}${print.card_code} - ${print.card_name}` 
@@ -4236,11 +4233,11 @@ if(cmd === `!steal`) {
 	if (!quantity || !query) return message.channel.send(`Please specify the item you wish to steal.`)
 
 	const set_code = query.toUpperCase()
-	const valid_set_code = !!(set_code.length === 3 && await Set.count({where: { code: set_code }}))
+	const valid_set_code = !!(!walletField && set_code.length === 3 && await Set.count({where: { code: set_code }}))
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-	const card_name = query && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints, fuzzyPrints2) : null
-	const print = valid_card_code ? await Print.findOne({ where: { card_code } }) : card_name ? await selectPrint(message, maid, card_name) : null
+	const valid_card_code = !!(!walletField && card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
+	const card_name = query && !walletField && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints, fuzzyPrints2) : null
+	const print = !walletField && valid_card_code ? await Print.findOne({ where: { card_code } }) : !walletField && card_name ? await selectPrint(message, maid, card_name) : null
 	if (card_name && !print) return
 
 	let walletField
@@ -4578,10 +4575,25 @@ if(checklistcom.includes(cmd)) {
 
 //PACK
 if(cmd === `!pack`) {
-	const num = args.length === 1 && isFinite(args[0]) ? parseInt(args[0]) : args.length > 1 && isFinite(args[1]) ? parseInt(args[1]) : 1
-	const code = args.length === 1 && !isFinite(args[0]) ? args[0] : args.length > 1 && !isFinite(args[1]) ? args[1] : 'ORF'
-	if (code && code.startsWith('SS')) return message.channel.send(`Sorry, Starter Series cards are not sold by the pack.`)
-	const set = await Set.findOne({ where: { code: code.toUpperCase() }})
+	let num = 1
+	let code = 'ORF'
+	for (let i = 0; i < args.length; i++) {
+		if (isFinite(args[i])) {
+			num = parseInt(args[i])
+			break
+		} 
+	}
+
+	for (let i = 0; i < args.length; i++) {
+		if (!isFinite(args[i])) {
+			code = args[i].toUpperCase()
+			break
+		} 
+	}
+
+	const set = await Set.findOne({ where: { code: code }})
+	if (!set) return message.channel.send(`Could not find set code: ${code}.`)
+	if (!set.for_sale) return message.channel.send(`Sorry, ${code} ${eval(set.emoji)} Packs are not available.`)
 
 	const commons = await Print.findAll({ 
 		where: {
@@ -4632,9 +4644,6 @@ if(cmd === `!pack`) {
 	}).map(function(print) {
 		return print.card_code
 	})
-
-	if (!set) return message.channel.send(`There is no set with the code "${code.toUpperCase()}".`)
-	if (!set.for_sale) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} is out of stock.`)
 
 	const wallet = await Wallet.findOne( { where: { playerId: maid }, include: Player })
 	const merchbot_wallet = await Wallet.findOne( { where: { playerId: merchbotId } })
@@ -5292,9 +5301,8 @@ if(cmd === `!bid`) {
 //TRADE
 if(cmd === `!trade`) {
 	if (mcid !== botSpamChannelId &&
-		mcid !== generalChannelId &&
 		mcid !== marketPlaceChannelId
-	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
+	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}> or <#${botSpamChannelId}>.`)
 
 	const initiatorId = maid
 	const recieverId = message.mentions.users.first() ? message.mentions.users.first().id : null

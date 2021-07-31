@@ -299,6 +299,7 @@ const endTrivia = async (guild, channel, info, entries) => {
 
     for (let i = 0; i < entries.length; i++) {
         const entry = entries[i]
+        const score = entry.score
         const member = guild.members.cache.get(entry.playerId)
         member.roles.remove(triviaRole)
         if (prizes[i]) {
@@ -306,6 +307,11 @@ const endTrivia = async (guild, channel, info, entries) => {
             wallet.starchips += prizes[i]
             await wallet.save()
             setTimeout(() => channel.send(`<@${wallet.playerId}> was awarded ${prizes[i]}${starchips} for an impressive display of knowledge. Congratulations!`), i * 1000 + 1000)
+        } else if (score > 0) {
+            const wallet = await Wallet.findOne({ where: { playerId: entry.playerId }, include: Player })
+            wallet.stardust += (score * 3)
+            await wallet.save()
+            setTimeout(() => channel.send(`<@${wallet.playerId}> was awarded ${score * 3}${stardust} for their effort. Not bad!`), i * 1000 + 1000)
         }
 
         let correct_answers = 0

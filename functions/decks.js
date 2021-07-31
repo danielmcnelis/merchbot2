@@ -7,7 +7,7 @@ const errors = require('../static/errors.json')
 const { approve } = require('../static/emojis.json')
 const { Op } = require('sequelize')
 const { convertCardsArrayToObject } = require('./utility.js')
-const { fetchAllForgedCards, fetchYourDoubles, fetchYourSingles, fetchYourTriples } = require('./search.js')
+const { fetchAllForgedCards, getInventorySummary } = require('./search.js')
 const { Auction, Bid, Card, Print, Set, Inventory,  Tournament, Status } = require('../db')
 const decks = require('../static/decks.json')
 
@@ -112,10 +112,8 @@ const saveYDK = async (member, url) => {
         cards_arr.sort()
         const cards_obj = convertCardsArrayToObject(cards_arr)
         const allForgedCards = await fetchAllForgedCards()
-        const yourSingles = await fetchYourSingles(allForgedCards, playerId)
-        const yourDoubles = await fetchYourDoubles(allForgedCards, playerId)
-        const yourTriples = await fetchYourTriples(allForgedCards, playerId)
-
+        const { yourSingles, yourDoubles, yourTriples } = await getInventorySummary(allForgedCards, playerId)
+       
         const allForbiddenCards = await Status.findAll({ 
             where: {
                 current: 'forbidden'

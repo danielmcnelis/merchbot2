@@ -124,13 +124,6 @@ const getTradeSummary = async (message, inputs, player) => {
 			return false
 		}
 
-		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
-		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) :
-		card_name ? await selectPrint(message, player.id, card_name) :
-		null
-
 		let walletField
 		if (query === 'd' || query === 'sd' || query === 'stardust' || query === 'dust' ) walletField = 'stardust'
 		if (query === 'cactus' || query === 'cactuses' || query === 'cacti') walletField = 'cactus'
@@ -139,6 +132,13 @@ const getTradeSummary = async (message, inputs, player) => {
 		if (query === 'moai' || query === 'moais' ) walletField = 'moai'
 		if (query === 'mushroom' || query === 'mushrooms') walletField = 'mushroom'
 		if (query === 'rose' || query === 'roses' ) walletField = 'rose'
+
+		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
+		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
+		const print = valid_card_code && !walletField ? await Print.findOne({ where: { card_code: card_code }}) :
+		card_name && !walletField ? await selectPrint(message, player.id, card_name) :
+		null
 
 		if (!print && !walletField) {
 			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)

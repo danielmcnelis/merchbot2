@@ -1136,6 +1136,7 @@ if(infocom.includes(cmd)) {
 		`\n\nTo enter a Trivia contest, simply find 4 friends and get everyone to type **!join**.`+
 		` You will have 16 seconds to respond to each question via DM.`+
 		` After 10 rounds, the top 2 bookworms split 6 ${starchips} for their performance.`+
+		` Everyone else receives 3${stardust} for each question they answered correctly.`+
 		`\n\nAs you play more Trivia, your Profile will keep a record of your acumen.`+
 		` There are 1000 total questions, so hit the books and then hit those keys! ${red}`)
 	}

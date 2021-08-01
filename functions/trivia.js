@@ -121,7 +121,7 @@ const getTriviaConfirmation = async (guild, channel, trivia_entry) => {
         if(yescom.includes(response)) {
             trivia_entry.active = true
             await trivia_entry.save()
-            member.send(`Thanks! Trivia will be starting very soon.`)
+            member.send(`Thanks! Trivia will be starting very soon.\n\nP.S. If you have a disability that affects your typing, please contact Jazz about making Trivia more accessible. 👋`)
             return channel.send(`${member.user.username} confirmed their participation in Trivia!`)
         } else {
             member.send(`Okay, sorry to see you go!`)

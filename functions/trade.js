@@ -1,7 +1,7 @@
 
 
 //TRADE FUNCTIONS
-const { Inventory, Player, Set, Trade, Wallet } = require('../db')
+const { Inventory, Player, Set, Trade, Print, Wallet } = require('../db')
 const { Op } = require('sequelize')
 const { yescom, nocom } = require('../static/commands.json')
 const { starchips, stardust, com, rar, sup, ult, scr, egg, cactus, hook, moai, mushroom, rose } = require('../static/emojis.json')

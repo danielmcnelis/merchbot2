@@ -6,39 +6,32 @@ const fs = require('fs')
 const axios = require('axios')
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
-const { ygocard, fire, tix, credits, blue, red, yellow, stoned, stare, leatherbound, wokeaf, koolaid, cavebob, evil, DOC, ORF, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, rocks, sad, mad, beast, dinosaur, fish, plant, reptile, rock, starchips, egg, cactus, hook, moai, mushroom, rose, stardust, cultured, com, rar, sup, ult, scr, checkmark, emptybox, yes, no } = require('./static/emojis.json')
-const { aliuscom, nicknamecom, joincom, bindercom, wishlistcom, invcom, calccom, bracketcom, dropcom, queuecom, checklistcom, startcom, infocom, dbcom, noshowcom, legalcom, listcom, pfpcom, botcom, rolecom, statscom, profcom, losscom, h2hcom, undocom, rankcom, manualcom, yescom, nocom, deckcom } = require('./static/commands.json')
-const { expertRole, noviceRole, triviaRole, botRole, modRole, adminRole, tourRole, toRole, fpRole, muteRole, arenaRole, ambassadorRole } = require('./static/roles.json')
-const { gutterChannelId, generalChannelId, rulesChannelId, rulingsChannelId, introChannelId, discussionChannelId, staffChannelId, botSpamChannelId, welcomeChannelId, announcementsChannelId, registrationChannelId, replaysChannelId, duelRequestsChannelId, marketPlaceChannelId, shopChannelId, tournamentChannelId, arenaChannelId, keeperChannelId, triviaChannelId, draftChannelId, gauntletChannelId, bugreportsChannelId, suggestionsChannelId } = require('./static/channels.json')
+const { approve, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('./static/emojis.json')
+const { aliuscom, bindercom, botcom, bracketcom, calccom, checklistcom, dbcom, deckcom, dropcom, h2hcom, infocom, invcom, joincom, legalcom, listcom, losscom, manualcom, nicknamecom, nocom, noshowcom, pfpcom, profcom, queuecom, rankcom, rolecom, startcom, statscom, undocom, wishlistcom, yescom } = require('./static/commands.json')
+const { adminRole, ambassadorRole, arenaRole, botRole,expertRole, fpRole, modRole, muteRole, noviceRole, toRole, tourRole, triviaRole } = require('./static/roles.json')
+const { announcementsChannelId, arenaChannelId, botSpamChannelId, bugreportsChannelId, discussionChannelId, draftChannelId, duelRequestsChannelId, gauntletChannelId, generalChannelId, gutterChannelId, introChannelId, keeperChannelId, marketPlaceChannelId, registrationChannelId, replaysChannelId, rulesChannelId, rulingsChannelId, shopChannelId, staffChannelId, suggestionsChannelId, tournamentChannelId, triviaChannelId, welcomeChannelId } = require('./static/channels.json')
+
 const decks = require('./static/decks.json')
-const types = require('./static/types.json')
 const diaries = require('./static/diaries.json')
 const arenas = require('./static/arenas.json')
-const errors = require('./static/errors.json')
 const trivia = require('./trivia.json')
 const ygoprodeck = require('./static/ygoprodeck.json')
 const muted = require('./static/muted.json')
 const prints = require('./static/prints.json')
 const nicknames = require('./static/nicknames.json')
 const statuses = require('./static/statuses.json')
-const { 
-    getBuyerConfirmation,
-    getSellerConfirmation,
-    getInvoiceMerchBotPurchase,
-    getInvoiceMerchBotSale,
-    getInvoiceP2PSale,
-    processMerchBotSale,
-    processP2PSale } = require('./functions/transaction.js')
+
+const { getBuyerConfirmation, getInvoiceMerchBotPurchase, getInvoiceMerchBotSale, getInvoiceP2PSale, getSellerConfirmation, processMerchBotSale, processP2PSale } = require('./functions/transaction.js')
 const { getNewStatus } = require('./functions/status.js')
-const { checkArenaProgress, getArenaSample, resetArena, startArena, startRound, endArena } = require('./functions/arena.js')
+const { checkArenaProgress, endArena , getArenaSample, resetArena, startArena, startRound } = require('./functions/arena.js')
 const { askQuestion, resetTrivia, startTrivia } = require('./functions/trivia.js')
 const { askForGrindAllConfirmation } = require('./functions/mod.js')
 const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Nickname, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
 const { getRandomString, isSameDay, isWithinXHours, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isJazz, isMod, isTourPlayer, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
-const { checkDeckList, saveYDK, saveAllYDK, awardStarterDeck, getShopDeck } = require('./functions/decks.js')
+const { awardStarterDeck, checkDeckList, getShopDeck, saveAllYDK, saveYDK } = require('./functions/decks.js')
 const { askForBidCancellation, askForBidPlacement, manageBidding } = require('./functions/bids.js')
-const { selectTournament, getTournamentType, seed, askForDBUsername, getDeckListTournament, getDeckNameTournament, directSignUp, removeParticipant, generateSheetData, getMatches, checkChallongePairing, putMatchResult, findNextMatch, findNextOpponent, findOtherPreReqMatch} = require('./functions/tournament.js')
-const { makeSheet, addSheet, writeToSheet } = require('./functions/sheets.js')
+const { askForDBUsername, checkChallongePairing, directSignUp, findNextMatch, findNextOpponent, findOtherPreReqMatch, generateSheetData, getDeckListTournament, getDeckNameTournament, getMatches, getTournamentType, putMatchResult, removeParticipant, seed, selectTournament } = require('./functions/tournament.js')
+const { addSheet, makeSheet, writeToSheet } = require('./functions/sheets.js')
 const { askForAdjustConfirmation, askForCardSlot, collectNicknames, getNewMarketPrice, askForSetToPrint, selectPrint, askForRarity } = require('./functions/print.js')
 const { uploadDeckFolder } = require('./functions/drive.js')
 const { fetchAllCardNames, fetchAllCards, fetchAllUniquePrintNames, findCard, search } = require('./functions/search.js')

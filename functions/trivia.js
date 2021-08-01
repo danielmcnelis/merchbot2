@@ -136,13 +136,14 @@ const getTriviaConfirmation = async (guild, channel, trivia_entry) => {
 
 const getAnswer = async (guild, entry, question) => {
     const playerId = entry.playerId
+    const extraTime = playerId === '257021989078827010' ? 4000 : 0
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
 	const msg = await member.send(question)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
-		time: 16000
+		time: 16000 + extraTime
 	}).then(async collected => {
 		const response = collected.first().content
         entry.answer = response
@@ -197,8 +198,7 @@ const askQuestion = async (guild, channel, info, entries, questionsArr) => {
         await updatedEntries[2].save()
         await updatedEntries[3].save()
         await updatedEntries[4].save()
-    
-    
+
         let name = updatedEntries[0].player.name
         let timedOut = updatedEntries[0].answer === 'no answer' ? true : false
         let answer = updatedEntries[0].answer
@@ -242,7 +242,7 @@ const askQuestion = async (guild, channel, info, entries, questionsArr) => {
         }
 
         return setTimeout(() => postTriviaStandings(guild, channel, info, updatedEntries, questionsArr), 13000)
-    }, 19000)
+    }, 21000)
 }
 
 const checkAnswer = async (answer, fuzzyAnswers, stringency) => {

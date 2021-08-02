@@ -170,7 +170,24 @@ if (!message.content.startsWith("!") && message.content.includes(`{`) && message
 
 //TEST
 if(cmd === `!test`) {
-	return
+	const specials = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "sup",
+			card_code: {
+				[Op.substring]: ['SE']
+			}
+		},
+		order: [['card_slot', 'ASC']]
+	}).map(function(print) {
+		return print.card_code
+	})
+
+
+	const your_spec_1 = getRandomElement(specials.slice(0, 1))
+	const your_spec_2 = getRandomElement(specials.slice(2, 3))
+	console.log('your_spec_1', your_spec_1)
+	console.log('your_spec_2', your_spec_2)
 }
 
 // ASSIGN ROLES

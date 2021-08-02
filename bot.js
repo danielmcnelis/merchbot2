@@ -4659,7 +4659,7 @@ if(cmd === `!spec` || cmd === `!se`) {
 
 		for (let j = 0; j < 3; j++) {
 			const images = []
-			const results = [`\n${eval(set.emoji)} - ${set.name} Pack${num > 1 ? ` ${j + 1}` : ''} - ${eval(set.alt_emoji)}`]
+			const results = [`\n${eval(set.emoji)} - ${set.name} Pack ${j + 1} - ${eval(set.alt_emoji)}`]
 			const yourCommons = getRandomSubset(commons, set.commons_per_pack)
 			const yourRare = getRandomElement(rares)
 			const yourFoil = getRandomElement(eval(lucks[j]))

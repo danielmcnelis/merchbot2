@@ -4629,7 +4629,7 @@ if(cmd === `!spec` || cmd === `!se`) {
 		}}) 
 
 		const promos_canvas = Canvas.createCanvas(57 * 2, 80)
-		const promos_context = promo_canvas.getContext('2d')
+		const promos_context = promos_canvas.getContext('2d')
 
 		const promo_1 = fs.existsSync(`./public/card_images/${spec_card_1.image}`) ? 
 		await Canvas.loadImage(`./public/card_images/${spec_card_1.image}`) :

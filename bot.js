@@ -4633,7 +4633,7 @@ if(cmd === `!spec` || cmd === `!se`) {
 		await Canvas.loadImage(`https://ygoprodeck.com/pics/${spec_card_1.image}`)
 		if (promos_canvas && promos_context && promo_1) context.drawImage(promo_1, 0, 0, 57, 80)
 		
-		const promo_1 = fs.existsSync(`./public/card_images/${spec_card_2.image}`) ? 
+		const promo_2 = fs.existsSync(`./public/card_images/${spec_card_2.image}`) ? 
 		await Canvas.loadImage(`./public/card_images/${spec_card_2.image}`) :
 		await Canvas.loadImage(`https://ygoprodeck.com/pics/${spec_card_2.image}`)
 		if (promos_canvas && promos_context && promo_2) context.drawImage(promo_2, 57, 0, 57, 80)

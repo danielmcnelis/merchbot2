@@ -172,7 +172,6 @@ if (!message.content.startsWith("!") && message.content.includes(`{`) && message
 if(cmd === `!test`) {
 	const specials = await Print.findAll({ 
 		where: {
-			setId: set.id,
 			rarity: "sup",
 			card_code: {
 				[Op.substring]: ['SE']

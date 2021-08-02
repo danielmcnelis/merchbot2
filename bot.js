@@ -603,6 +603,10 @@ if (cmd === `!print`) {
 		for (let i = 1; i < set.secrets; i++) {
 			rarity_matrix.push("scr")
 		}
+
+		for (let i = 0; i < set.specials; i++) {
+			rarity_matrix.push("sup")
+		}
 	}
 
 	const rarity = set.type === 'core' ? rarity_matrix[card_slot] : await askForRarity(message, set, currentPrints)

@@ -4582,7 +4582,7 @@ if(cmd === `!spec` || cmd === `!se`) {
 			setId: set.id,
 			rarity: "sup",
 			card_code: {
-				[Op.substring]: 'SE'
+				[Op.substring]: ['SE']
 			}
 		},
 		order: [['card_slot', 'ASC']]

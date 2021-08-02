@@ -4620,6 +4620,41 @@ if(cmd === `!spec` || cmd === `!se`) {
 			card_code: your_spec_2
 		}}) 
 
+		const spec_inv_1 = await Inventory.findOne({ where: { 
+			card_code: spec_print_1.card_code,
+			printId: spec_print_1.id,
+			playerId: maid
+		}})
+
+		if (spec_inv_1) {
+			spec_inv_1.quantity++
+			await spec_inv_1.save()
+		} else {
+			await Inventory.create({ 
+				card_code: spec_print_1.card_code,
+				quantity: 1,
+				printId: spec_print_1.id,
+				playerId: maid
+			})
+		}
+
+		const spec_inv_2 = await Inventory.findOne({ where: { 
+			card_code: spec_print_2.card_code,
+			printId: spec_print_2.id,
+			playerId: maid
+		}})
+
+		if (spec_inv_2) {
+			spec_inv_2.quantity++
+			await spec_inv_2.save()
+		} else {
+			await Inventory.create({ 
+				card_code: spec_print_2.card_code,
+				quantity: 1,
+				printId: spec_print_2.id,
+				playerId: maid
+			})
+		}
 		const spec_card_1 = await Card.findOne({ where: {
 			name: spec_print_1.card_name
 		}}) 

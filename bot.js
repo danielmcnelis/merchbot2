@@ -4528,7 +4528,7 @@ if(cmd === `!spec` || cmd === `!se`) {
 	let code = args[0] || 'DOC'
 	const set = await Set.findOne({ where: { code: code }})
 	if (!set) return message.channel.send(`Could not find set code: ${code}.`)
-	if (!set.spec_for_sale) return message.channel.send(`Sorry, ${code} ${eval(set.emoji)} Special Editions are not available.`)
+	if (!set.specs_for_sale) return message.channel.send(`Sorry, ${code} ${eval(set.emoji)} Special Editions are not available.`)
 
 	const commons = await Print.findAll({ 
 		where: {

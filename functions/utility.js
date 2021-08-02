@@ -130,13 +130,13 @@ const isNewUser = async (playerId) => {
 const isJazz = (member) => member.user.id === '194147938786738176'
 
 //IS ADMIN?
-const isAdmin = (member) => member.roles.cache.some(role => role.id === adminRole) || member.user.id === '194147938786738176'
+const isAdmin = (member) => member.roles.cache.some(role => role.id === adminRole || member.user.id === '194147938786738176')
 
 //IS MOD?
-const isMod = (member) => member.roles.cache.some(role => role.id === modRole)
+const isMod = (member) => member.roles.cache.some(role => role.id === modRole || role.id === adminRole || member.user.id === '194147938786738176')
 
 //IS AMBASSADOR?
-const isAmbassador = (member) => member.roles.cache.some(role => role.id === ambassadorRole)
+const isAmbassador = (member) => member.roles.cache.some(role => role.id === ambassadorRole || role.id === modRole || role.id === adminRole || member.user.id === '194147938786738176')
 
 //IS ARENA PLAYER?
 const isArenaPlayer = (member) => member.roles.cache.some(role => role.id === arenaRole)

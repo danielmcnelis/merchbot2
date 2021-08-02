@@ -4,44 +4,51 @@ const Canvas = require('canvas')
 const Discord = require('discord.js')
 const fs = require('fs')
 const FuzzySet = require('fuzzyset')
-const { Op } = require('sequelize')
-const { approve, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('./static/emojis.json')
-const { aliuscom, bindercom, botcom, bracketcom, calccom, checklistcom, dbcom, deckcom, dropcom, h2hcom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, pfpcom, profcom, queuecom, rankcom, rolecom, startcom, statscom, undocom, wishlistcom, yescom } = require('./static/commands.json')
-const { adminRole, arenaRole, botRole,expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
-const { arenaChannelId, botSpamChannelId, bugreportsChannelId, discussionChannelId, draftChannelId, duelRequestsChannelId, gauntletChannelId, generalChannelId, gutterChannelId, introChannelId, keeperChannelId, marketPlaceChannelId, replaysChannelId, rulesChannelId, rulingsChannelId, shopChannelId, staffChannelId, suggestionsChannelId, tournamentChannelId, triviaChannelId, welcomeChannelId } = require('./static/channels.json')
-const { getBuyerConfirmation, getInvoiceMerchBotPurchase, getInvoiceMerchBotSale, getInvoiceP2PSale, getSellerConfirmation, processMerchBotSale, processP2PSale } = require('./functions/transaction.js')
-const { getNewStatus } = require('./functions/status.js')
-const { checkArenaProgress, endArena , getArenaSample, resetArena, startArena, startRound } = require('./functions/arena.js')
-const { askQuestion, resetTrivia, startTrivia } = require('./functions/trivia.js')
-const { askForGrindAllConfirmation } = require('./functions/mod.js')
-const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Nickname, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
-const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isJazz, isMod, isTourPlayer, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
-const { awardStarterDeck, getShopDeck } = require('./functions/decks.js')
-const { askForBidCancellation, askForBidPlacement, manageBidding } = require('./functions/bids.js')
-const { askForDBUsername, checkChallongePairing, findNextMatch, findNextOpponent, findOtherPreReqMatch, generateSheetData, getDeckListTournament, getDeckNameTournament, getMatches, getTournamentType, putMatchResult, removeParticipant, seed, selectTournament } = require('./functions/tournament.js')
-const { addSheet, makeSheet, writeToSheet } = require('./functions/sheets.js')
-const { askForAdjustConfirmation, collectNicknames, getNewMarketPrice, askForSetToPrint, selectPrint, askForRarity } = require('./functions/print.js')
-const { uploadDeckFolder } = require('./functions/drive.js')
-const { fetchAllCardNames, fetchAllUniquePrintNames, findCard, search } = require('./functions/search.js')
-const { getBarterCard, getVoucher, getTradeInCard, getBarterDirection, askForBarterConfirmation, checkShopShouldBe, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
-const { awardPack } = require('./functions/packs.js')
-const { processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
-const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard } = require('./functions/profile.js')
-const { checkCoreSetComplete, completeTask } = require('./functions/diary.js')
-const { client, challongeClient } = require('./static/clients.js')
-const { challongeAPIKey } = require('./secrets.json')
-const arenas = require('./static/arenas.json')
-const decks = require('./static/decks.json')
-const diaries = require('./static/diaries.json')
-const muted = require('./static/muted.json')
-const nicknames = require('./static/nicknames.json')
-const prints = require('./static/prints.json')
-const statuses = require('./static/statuses.json')
-const trivia = require('./trivia.json')
-const ygoprodeck = require('./static/ygoprodeck.json')
 const merchbotId = '584215266586525696'
 let fuzzyCards
 let fuzzyCards2
+
+// DATABASE IMPORTS
+const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Nickname, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
+const { Op } = require('sequelize')
+
+// FUNCTION IMPORTS
+const { checkArenaProgress, endArena , getArenaSample, resetArena, startArena, startRound } = require('./functions/arena.js')
+const { askForBidCancellation, askForBidPlacement, manageBidding } = require('./functions/bids.js')
+const { awardStarterDeck, getShopDeck } = require('./functions/decks.js')
+const { checkCoreSetComplete, completeTask } = require('./functions/diary.js')
+//const { uploadDeckFolder } = require('./functions/drive.js')
+const { askForGrindAllConfirmation } = require('./functions/mod.js')
+const { awardPack } = require('./functions/packs.js')
+const { askForAdjustConfirmation, collectNicknames, getNewMarketPrice, askForSetToPrint, selectPrint, askForRarity } = require('./functions/print.js')
+const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard } = require('./functions/profile.js')
+const { fetchAllCardNames, fetchAllUniquePrintNames, findCard, search } = require('./functions/search.js')
+const { addSheet, makeSheet, writeToSheet } = require('./functions/sheets.js')
+const { getBarterCard, getVoucher, getTradeInCard, getBarterDirection, askForBarterConfirmation, checkShopShouldBe, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
+const { getNewStatus } = require('./functions/status.js')
+const { askForDBUsername, checkChallongePairing, findNextMatch, findNextOpponent, findOtherPreReqMatch, generateSheetData, getDeckListTournament, getDeckNameTournament, getMatches, getTournamentType, putMatchResult, removeParticipant, seed, selectTournament } = require('./functions/tournament.js')
+const { processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
+const { getBuyerConfirmation, getInvoiceMerchBotPurchase, getInvoiceMerchBotSale, getInvoiceP2PSale, getSellerConfirmation, processMerchBotSale, processP2PSale } = require('./functions/transaction.js')
+const { askQuestion, resetTrivia, startTrivia } = require('./functions/trivia.js')
+const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isJazz, isMod, isTourPlayer, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
+
+// STATIC IMPORTS
+const arenas = require('./static/arenas.json')
+const { arenaChannelId, botSpamChannelId, bugreportsChannelId, discussionChannelId, draftChannelId, duelRequestsChannelId, gauntletChannelId, generalChannelId, gutterChannelId, introChannelId, keeperChannelId, marketPlaceChannelId, replaysChannelId, rulesChannelId, rulingsChannelId, shopChannelId, staffChannelId, suggestionsChannelId, tournamentChannelId, triviaChannelId, welcomeChannelId } = require('./static/channels.json')
+const { client, challongeClient } = require('./static/clients.js')
+const { aliuscom, bindercom, botcom, bracketcom, calccom, checklistcom, dbcom, deckcom, dropcom, h2hcom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, pfpcom, profcom, queuecom, rankcom, rolecom, startcom, statscom, undocom, wishlistcom, yescom } = require('./static/commands.json')
+const decks = require('./static/decks.json')
+const diaries = require('./static/diaries.json')
+const { approve, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('./static/emojis.json')
+const muted = require('./static/muted.json')
+const nicknames = require('./static/nicknames.json')
+const prints = require('./static/prints.json')
+const { adminRole, arenaRole, botRole,expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
+const { challongeAPIKey } = require('./secrets.json')
+const statuses = require('./static/statuses.json')
+const trivia = require('./trivia.json')
+const ygoprodeck = require('./static/ygoprodeck.json')
+const { is } = require('sequelize/types/lib/operators')
 
 //READY
 client.on('ready', async () => {
@@ -95,7 +102,7 @@ client.on('guildMemberAdd', async (member) => {
 	const userId = member.user.id
     const channel = client.channels.cache.get(welcomeChannelId)
     if (muted.includes(userId)) member.roles.add(muteRole)
-	
+
     if (await isNewUser(userId)) {
         createPlayer(userId, member.user.username, member.user.tag) 
         return channel.send(`${member} Welcome to the Forged in Chaos ${FiC} Discord server! Go to <#${botSpamChannelId}> and type **!start** to begin playing. ${legend}`)
@@ -128,22 +135,20 @@ client.on('message', async (message) => {
 			mcid === discussionChannelId ||
 			mcid === rulingsChannelId
 		) ||
-		//only allow !clear in discussion, replays, rules, shop, intro, bugreports
-		!message.content.startsWith("!clear") && ( 
-			mcid === replaysChannelId || 
-			mcid === rulesChannelId ||
-			mcid === shopChannelId || 
-			mcid === introChannelId || 
-			mcid === bugreportsChannelId
-		)
+		//no commands in replays, rules, shop, intro, bugreports
+		mcid === replaysChannelId || 
+		mcid === rulesChannelId ||
+		mcid === shopChannelId || 
+		mcid === introChannelId || 
+		mcid === bugreportsChannelId
 	) return
 
 	//remove extra spaces between arguments
-    const messageArray = message.content.split(" ")
-	for(let zeta = 0; zeta < messageArray.length; zeta ++) {
-		if (messageArray[zeta] == '') { 
-			messageArray.splice(zeta, 1)
-			zeta--
+    const messageArray = message.content.split(' ')
+	for(let i = 0; i < messageArray.length; i++) {
+		if (messageArray[i] === '') { 
+			messageArray.splice(i, 1)
+			i--
 		}
 	}
 
@@ -152,19 +157,10 @@ client.on('message', async (message) => {
     const args = messageArray.slice(1)
     const maid = message.author.id
 
-//CARD SEARCH 1
-if (!message.content.startsWith("!") && message.content.includes(`{`) && message.content.includes(`}`)) {
+//CARD SEARCH USING CURLY BRACKETS
+if (!message.content.startsWith("!") && message.content.includes(`{`) && message.content.includes(`}`)) { 
 	if (message.member.roles.cache.some(role => role.id === triviaRole)) return message.channel.send(`You cannot search for cards while playing Trivia.`)
 	const query = message.content.slice(message.content.indexOf('{') + 1, message.content.indexOf('}'))
-	const cardEmbed = await search(query, fuzzyCards, fuzzyCards2)
-	if (!cardEmbed) return message.channel.send(`Could not find card: "query".`)
-	else return message.channel.send(cardEmbed)
-}
-
-//CARD SEARCH 2
-if (!message.content.startsWith("!") && message.content.includes(`[`) && message.content.includes(`]`)) {
-	if (message.member.roles.cache.some(role => role.id === triviaRole)) return message.channel.send(`You cannot search for cards while playing Trivia.`)
-	const query = message.content.slice(message.content.indexOf('[') + 1, message.content.indexOf(']'))
 	const cardEmbed = await search(query, fuzzyCards, fuzzyCards2)
 	if (!cardEmbed) return message.channel.send(`Could not find card: "query".`)
 	else return message.channel.send(cardEmbed)
@@ -173,18 +169,13 @@ if (!message.content.startsWith("!") && message.content.includes(`[`) && message
 //PING 
     if (cmd === `!ping`) return message.channel.send('pong')
 
-
 //TEST
 if(cmd === `!test`) {
-	// const canvas = Canvas.createCanvas(105, 158)
-	// const context = canvas.getContext('2d')
-	// const background = await Canvas.loadImage(`https://ygoprodeck.com/pics/89631139.jpg`)
-	// context.drawImage(background, 0, 0, canvas.width, canvas.height)
-	// const attachment = new Discord.MessageAttachment(canvas.toBuffer(), `bewd.png`)
-	// return message.channel.send(`Behold!`, attachment)
+	return
 }
 
-if (cmd === `!assign`) {
+// ASSIGN ROLES
+if (cmd === `!assign_roles`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const membersMap = await message.guild.members.fetch()
 	const memberIds = [...membersMap.keys()]
@@ -203,7 +194,6 @@ if (cmd === `!assign`) {
 		message.channel.send(`${member.user.username} was assigned the ${player.stats >= 530 ? 'Expert' : 'Novice'} Role.`)
 	}
 }
-
 
 
 //IMPORT_DATA
@@ -283,8 +273,8 @@ if (cmd === `!import_missing_images`) {
 	return message.channel.send(`Successfully downloaded ${successes} out of ${count} images from YGOPRODeck.com!`)
 }
 
-//UPDATE 
-if (cmd === `!update`) {
+//UPDATE CARDS
+if (cmd === `!update_cards`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const allCards = await Card.findAll()
 	const allCardNames = allCards.map((card) => card.name)
@@ -343,9 +333,9 @@ if (cmd === `!update`) {
 }
 
 
-//FIX_ATK/DEF 
-if (cmd === `!fix_atk/def`) {
-	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
+//FIX CARDS 
+if (cmd === `!fix_cards`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const ygoprodeckCards = ygoprodeck.data
 	let updated = 0
 
@@ -367,8 +357,8 @@ if (cmd === `!fix_atk/def`) {
 	return message.channel.send(`You fixed the ATK/DEF stats of ${updated} cards in the Format Library database.`)
 }
 
-//ORF
-if (cmd === `!orf`) {
+//NEW SET
+if (cmd === `!new_set`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const ORF = {
 		code: "ORF",
@@ -517,10 +507,9 @@ if (cmd === `!init`) {
 
 //ALIUS 
 if (aliuscom.includes(cmd)) {
-	if (!isAdmin(message.member) && !isMod(message.member) && !isAmbassador(message.member)) return message.channel.send(`You do not have permission to do that.`)
-
+	if (!isAmbassador(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const query = args.join(' ')
-	if (!query) return message.channel.send(`Please specify a card you would like to create aliuses for.`)
+	if (!query) return message.channel.send(`Please specify a card.`)
 	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
 	if (!card_name) return message.channel.send(`Could not find card: "${query}".`)
 	const card = await Card.findOne({ where: { name: card_name }})
@@ -555,7 +544,7 @@ if (aliuscom.includes(cmd)) {
 //NICKNAME 
 if (nicknamecom.includes(cmd)) {
 	const query = args.join(' ')
-	if (!query) return message.channel.send(`Please specify a card you would like to nickname.`)
+	if (!query) return message.channel.send(`Please specify a card.`)
 	const card_name = await findCard(query, fuzzyCards, fuzzyCards2)
 	if (!card_name) return message.channel.send(`Could not find card: "${query}".`)
 	const card = await Card.findOne({ where: { name: card_name }})
@@ -574,7 +563,6 @@ if (nicknamecom.includes(cmd)) {
 //PRINT 
 if (cmd === `!print`) {
 	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
-
 	const info = await Info.findOne({ where: { element: 'set_to_print' }})
 	const set_code = info ? info.status : null
 	let set = set_code ? await Set.findOne({ where: { code: set_code }}) : await askForSetToPrint(message)
@@ -645,119 +633,30 @@ if (cmd === `!print`) {
 
 	return message.channel.send(`Created a new print: ${eval(rarity)}${card_code} - ${card_name} - ${stardust}${market_price}`)
 }
-
-
-//SAVE_NICKNAMES
-if (cmd === `!save_nicknames`) {
-	if (!isAdmin(message.member)) return message.channel.send('You do not have permission to do that.')
-	
-	const nicknamesArr = []
-	const allNicknames = await Nickname.findAll({ order: [["card_name", "ASC"]] })
-	for (let i = 0; i < allNicknames.length; i++) {
-		const nickname = allNicknames[i]
-		const elem = {
-			"alius": nickname.alius,
-			"card_name": nickname.card_name
-		}
-		nicknamesArr.push(elem)
-	}
-
-	return fs.writeFile("./static/nicknames.json", JSON.stringify(nicknamesArr), (err) => { 
-		if (err) console.log(err)
-		else message.channel.send(`You saved ${allNicknames.length} nicknames(s) to a local file!`)
-	})
-}
- 
-
-//SAVE_STATUSES
-if (cmd === `!save_statuses`) {
-	if (!isAdmin(message.member)) return message.channel.send('You do not have permission to do that.')
-	
-	const statusArr = []
-	const allStatuses = await Status.findAll({ order: [["name", "ASC"]] })
-	for (let i = 0; i < allStatuses.length; i++) {
-		const status = allStatuses[i]
-		const elem = {
-			"name": status.name,
-			"konami_code": status.konami_code,
-			"current": status.current
-		}
-		statusArr.push(elem)
-	}
-
-	return fs.writeFile("./static/statuses.json", JSON.stringify(statusArr), (err) => { 
-		if (err) console.log(err)
-		else message.channel.send(`You saved ${allStatuses.length} statuses to a local file!`)
-	})
-}
- 
-
-//SAVE_PRINTS
-if (cmd === `!save_prints`) {
-	if (!isAdmin(message.member)) return message.channel.send('You do not have permission to do that.')
-	const printsArr = []
-	const allPrints = await Print.findAll({ order: [["card_code", "ASC"]] })
-	for (let i = 0; i < allPrints.length; i++) {
-		const print = allPrints[i]
-		const market_price = print.rarity === 'com' ? 9 :
-			print.rarity === 'rar' ? 40 :
-			print.rarity === 'sup' ? 64 :
-			print.rarity === 'ult' && print.set_code.startsWith("SS") ? 109 :
-			print.rarity === 'ult' && print.set_code === "APC" ? 360 :
-			print.rarity === 'ult' ? 184 :
-			print.rarity === 'scr' ? 256 :
-			20
-
-		const elem = {
-			"card_name": print.card_name,
-			"card_id": print.card_id,
-			"set_code": print.set_code,
-			"card_slot": print.card_slot,
-			"card_code": print.card_code,
-			"rarity": print.rarity,
-			"market_price": market_price,
-			"setId": print.setId
-		}
-		printsArr.push(elem)
-	}
-
-	return fs.writeFile("./static/prints.json", JSON.stringify(printsArr), (err) => { 
-		if (err) console.log(err)
-		else message.channel.send(`You saved ${allPrints.length} print(s) to a local file!`)
-	})
-}
  
 
 //AVATAR 
 if (pfpcom.includes(cmd)) {
-	const person = message.mentions.users.first()
-	const reply = person ? person.displayAvatarURL() : message.author.displayAvatarURL()
-	return message.channel.send(reply)
+	const user = message.mentions.users.first()
+	const avatar = user ? user.displayAvatarURL() : message.author.displayAvatarURL()
+	return message.channel.send(avatar)
 }
 
-//NAME
-if (cmd === `!name`) {
-	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : null
-	if (!playerId) return	
-	const member = message.guild.members.cache.get(playerId)
-	const player = await Player.findOne({ where: { id: playerId } })
-	return message.channel.send(`The database name of ${member.user.username} is: ${player.name}.`)
-}
 
 //DUELINGBOOK NAME
 if (dbcom.includes(cmd)) {
-	const person = message.mentions.users.first()
-	const playerId = person ? person.id : maid
+	const user = message.mentions.users.first()
+	const playerId = user ? user.id : maid
 	const player = await Player.findOne({ where: { id: playerId } })
 
-	if (person && player.duelingBook) return message.channel.send(`${player.name}'s DuelingBook name is: ${player.duelingBook}.`)
-	if (person && !player.duelingBook) return message.channel.send(`${player.name} does not have a DuelingBook name in our database.`)
+	if (user && player.duelingBook) return message.channel.send(`${player.name}'s DuelingBook name is: ${player.duelingBook}.`)
+	if (user && !player.duelingBook) return message.channel.send(`${player.name} does not have a DuelingBook name in our database.`)
 
 	if (args.length) {
 		player.duelingBook = args.join(' ')
 		await player.save()
 		return message.channel.send(`Your DuelingBook username has been set to: ${player.duelingBook}.`)
-	} else if ( player.duelingBook) {
+	} else if (player.duelingBook) {
 		return message.channel.send(`Your DuelingBook username is: ${player.duelingBook}.`)
 	} else {
 		return message.channel.send(`You do not have a DuelingBook username registered to our database. Please use the command **!db** followed by your DuelingBook username to register it.`)
@@ -766,7 +665,7 @@ if (dbcom.includes(cmd)) {
 
 //STARTER OR START
 if(startcom.includes(cmd)) {
-	if (( message.channel === client.channels.cache.get(tournamentChannelId) && isMod(message.member) ) || isJazz(message.member) ) {
+	if ( message.channel === client.channels.cache.get(tournamentChannelId) && isMod(message.member) ) {
 		const tournaments = await Tournament.findAll({ where: { state: 'pending' }, order: [['createdAt', 'ASC']] })
 		const tournament = await selectTournament(message, tournaments, maid)
 		if (!tournament) return message.channel.send(`Error: Could not find pending tournament.`)
@@ -855,7 +754,7 @@ if(startcom.includes(cmd)) {
 
 //MUTE 
 if(cmd === `!mute`) {
-	if (!isAdmin(message.member) && !isMod(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
 	const member = message.mentions.members.first()
 	if (!member) return message.channel.send(`Please tag the user you wish to mute.`)
 	const mutedPeople = JSON.parse(fs.readFileSync('./static/muted.json'))['mutedPeople']
@@ -911,6 +810,12 @@ if (rolecom.includes(cmd)) {
 
 //BOT USER GUIDE 
 if (botcom.includes(cmd)) {
+	const rank = isJazz(message.member) ? 4 :
+		isAdmin(message.member) ? 3 :
+		isMod(message.member) ? 2 :
+		isAmbassador(message.member) ? 1 :
+		null
+	
 	const botEmbed = new Discord.MessageEmbed()
 		.setColor('#8062cc')
 		.setTitle('MerchBot - User Manual')
@@ -938,7 +843,8 @@ if (botcom.includes(cmd)) {
 		)
 		.addField('Shop Commands', 
 			`!pack (set + num) - Buy 1 or more Packs.`
-			+ `\n!box (set) - Buy a box of 24 Packs.`
+			+ `\n!spec (set) - Buy a Special Edition with 3 Packs.`
+			+ `\n!box (set) - Buy a Box of 24 Packs.`
 			+ `\n!deck (name) - Buy a Starter Deck.`
 			+ `\n!shop (card) - Check the shop value of a card.`
 			+ `\n!buy (num + card) - Buy a card from The Shop.`
@@ -956,6 +862,8 @@ if (botcom.includes(cmd)) {
 			+ `\n!binder (card) - Add or remove a card from your Binder.`
 			+ `\n!wish (card) - Add or remove a card from your Wishlist.`
 			+ `\n!search (card) - Search for cards in Binders and Wishlists.`
+			+ `\n!hist (card) - View the trade history for a card.`
+			+ `\n!pop (card) - Post the population stats for a card.`
 		)
 		.addField('Duel Commands',
 			`!stats (@user) - Post a player’s stats.`
@@ -980,7 +888,7 @@ if (botcom.includes(cmd)) {
 		)
 		.addField('Misc. Commands',
 			`!bot - View the MerchBot User Manual.`
-			+ (isAdmin(message.member) || isMod(message.member) ? `\n!mod - View the Moderator User Manual.` : '')
+			+ rank ? `\n!mod - View the ${rank} User Manual.` : ''
 			+ `\n!info - Post information about a channel.`
 			+ `\n!ref (@user) - Send a referral bonus to another player.`
 		)
@@ -991,41 +899,64 @@ if (botcom.includes(cmd)) {
 
 //MOD USER GUIDE 
 if (cmd === `!mod`) {
-	if (!isMod(message.member) && !isAdmin(message.member)) return message.channel.send("You do not have permission to do that.")
+	const rank = isJazz(message.member) ? 4 :
+		isAdmin(message.member) ? 3 :
+		isMod(message.member) ? 2 :
+		isAmbassador(message.member) ? 1 :
+		null
+	
+	if (!rank(message.member)) return message.channel.send("You do not have permission to do that.")
 	const botEmbed = new Discord.MessageEmbed()
 		.setColor('#8062cc')
-		.setTitle('MerchBot - Moderator User Manual')
+		.setTitle(`MerchBot - ${rank} User Manual`)
 		.setDescription('A Manager Bot for Forged in Chaos.' )
 		.setURL('https://forgedinchaos.com/')
 		.setAuthor('Jazz#2704', 'https://i.imgur.com/wz5TqmR.png', 'https://formatlibrary.com/')
 		.setThumbnail('https://i.imgur.com/p8H4dcu.png')
-		.addField('Mod-Only Game Commands',
-			`!manual (@winner + @loser) - Manually record a match result.`
-			+ `\n!undo - Undo the last match, even if you did not report it.`
-			+ `\n!award (@user + num + item) - Award an item to a player.`
-			+ `\n!steal (@user + num + item) - Steal an item from a player.`
-			+ `\n!adjust (card) - Adjust the market price of a card.`
+		.addField(`Main Game Commands`,
+			`!alias (card) - Add nicknames for a card.`
+			+ rank >= 2 ? `\n!manual (@winner + @loser) - Manually record a match result.` : ''
+			+ rank >= 2 ? `\n!undo - Undo the last match, even if you did not report it.` : ''
+			+ rank >= 2 ? `\n!award (@user + num + item) - Award an item to a player.` : ''
+			+ rank >= 2 ? `\n!steal (@user + num + item) - Steal an item from a player.` : ''
 		)
-		.addField('Mod-Only Tournament Commands',
+		.addField(`Mini-Game Commands`,
+			`!remove (@user) - Remove a player from a mini-game.`
+			+ `\n!reset - Reset a mini-game.`
+			+ `\n!resume - Resume a stalled mini-game.`
+			+ `\n!end - End a mini-game.`
+		)
+		
+	if (rank >= 2) {
+		botEmbed.addField('Mod-Only Discipline Commands',
+			`!mute (@user) - Mute a user.`
+			+ `\n!unmute (@user) - Unmute a user.`
+		)
+	}
+
+	if (rank >= 3) {
+		botEmbed.addField('Tournament Commands',
 			`!create (tournament name) - Create a new tournament.`
 			+ `\n!signup (@user) - Directly add a player to the bracket.`
 			+ `\n!remove (@user) - Remove a player from the bracket.`
 			+ `\n!start - Start the next tournament.`
 			+ `\n!noshow (@user) - Report a tournament no-show.`
-			+ `\n!end - End the current tournament.`
+			+ `\n!end (tournament) - End a tournament.`
+			+ `\n!destroy (tournament) - Destroy a tournament.`
 		)
-		.addField('Mod-Only Discipline Commands',
-			`!mute (@user) - Mute a user.`
-			+ `\n!unmute (@user) - Unmute a user.`
-		)
-		.addField('Admin-Only Commands', 
-			`!census - Update the information of all players in the database.`
-			+ `\n!recalc - Recaluate all player stats if needed.`
+
+		botEmbed.addField('Admin-Only Commands', 
+			`!adjust (card) - Adjust the market price of a card.`
+			+ `\n!move (card) - Move a card on the Forbidden & Limited List.`
+			+ `\n!print (card) - Print a card in the next set.`
+			+ `\n!census - Update the information of all players in the database.`
 			+ `\n!grindall - Grind everyone\'s Starchips into Stardust.`
+			+ `\n!recalc - Recaluate all player stats if needed.`
 		)
+	}
 		
 	message.author.send(botEmbed)
-	return message.channel.send("I messaged you the Moderator User Manual.")
+	return message.channel.send(`I messaged you the ${rank} User Manual.`)
 }
 
 //INFO
@@ -1116,6 +1047,7 @@ if(infocom.includes(cmd)) {
 		` \n- TV, Anime, Film\n- Science\n- Geography\n- History\n- Pop Culture\n- FiC Facts (!)`+
 		`\n\nTo enter a Trivia contest, simply find 4 friends and get everyone to type **!join**.`+
 		` You will have 16 seconds to respond to each question via DM.`+
+		` Do **not** look up answers online -- doing so will get you banned from Trivia.` +
 		` After 10 rounds, the top 2 bookworms split 6 ${starchips} for their performance.`+
 		` Everyone else receives 3${stardust} for each question they answered correctly.`+
 		`\n\nAs you play more Trivia, your Profile will keep a record of your acumen.`+
@@ -1192,10 +1124,7 @@ if(deckcom.includes(cmd)) {
 
 //EDIT
 if(cmd == `!edit`) {
-	if (mcid !== botSpamChannelId &&
-		mcid !== generalChannelId
-	) return message.channel.send(`Please use this command in <#${botSpamChannelId}> or <#${generalChannelId}>.`)
-
+	if (mcid !== botSpamChannelId) return message.channel.send(`Please use this command in <#${botSpamChannelId}>.`)
 	const profile = await Profile.findOne({ where: { playerId: maid } })
 	if (!profile) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	const wantsToChangeColor = await askToChangeProfile(message, 'color')
@@ -1292,6 +1221,7 @@ if(calccom.includes(cmd)) {
 
 //PROFILE
 if(profcom.includes(cmd)) {
+	if (mcid !== generalChannelId && mcid !== botSpamChannelId) return message.channel.send(`Please use this command in <#${botSpamChannelId}> or <#${generalChannelId}>.`)
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const player = await Player.findOne({ 
 		where: { 
@@ -1430,26 +1360,6 @@ if(cmd === `!ref` || cmd === `!refer` || cmd === `!referral`) {
 	})
 }
 
-//REFERRAL
-if(cmd === `!reset_ref`) {
-	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : null	
-	if (!playerId) return message.channel.send(`Please specify a player.`)
-	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	if (maid === playerId) return message.channel.send(`You cannot reset your own referral.`)
-	const playerProfile = await Profile.findOne({ where: { playerId: playerId }})
-	const diary = await Diary.findOne({ where: { playerId: playerId }})
-	if (!playerProfile || !diary) return message.channel.send(`That player is not in the database.`)
-	if (playerProfile.referral === false) return message.channel.send(`That player has not given a referral.`)
-
-	const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
-	if (easy_complete) return message.channel.send(`That player has completed the Easy Diary. Their referral is valid.`)
-
-	playerProfile.referral = false
-	await playerProfile.save()
-
-	return message.channel.send(`${message.mentions.users.first().username}'s referral was reset.`)
-}
-
 //SHOP
 if (cmd === `!shop`) {
 	if (!args.length) {
@@ -1525,13 +1435,7 @@ if (cmd === `!shop`) {
 
 //POPULATION
 if (cmd === `!pop` || cmd === `!population`) {
-	if (mcid !== botSpamChannelId &&
-		mcid !== generalChannelId &&
-		mcid !== marketPlaceChannelId
-	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
-
 	if (!args.length) return message.channel.send(`Please specify a card.`)
-
 	const query = args.join(' ')
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
@@ -1583,12 +1487,6 @@ if (cmd === `!pop` || cmd === `!population`) {
 
 //COUNT
 if(cmd === `!count`) {
-	if (mcid !== botSpamChannelId &&
-		mcid !== generalChannelId &&
-		mcid !== marketPlaceChannelId &&
-		mcid !== gutterChannelId
-	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
-
 	const allSetsForSale = await Set.findAll({ where: { for_sale: true }, order: [['createdAt', 'DESC']]})
 	const results = [`In this cycle The Shop has sold:`]
 	let weightedCount = 0
@@ -1803,17 +1701,13 @@ if (cmd === `!hist` || cmd === `!history`) {
 		results.push(`**Trade ${i+1}** - ${days ? days : 'Earlier Today'} ${days === 0 ? '' : days === 1 ? 'Day Ago' : 'Days Ago'}\n${summary.p1_name} received:\n${summary.p1_receives.join("\n")}\n${summary.p2_name} received:\n${summary.p2_receives.join("\n")}`)
 	}
 
-	message.channel.send(`I sent you the trade history you requested.`)
+	message.channel.send(`I messaged you the trade history you requested.`)
 	for (let i = 0 ; i < results.length; i++) message.author.send(results[i])
 	return
 }
 
 //TRADES
 if(cmd === `!trades`) {
-	if (mcid !== botSpamChannelId &&
-		mcid !== gutterChannelId
-	) return message.channel.send(`Please use this command in <#${botSpamChannelId}>.`)
-
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const player = await Player.findOne({ where: { id: playerId } })
 	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
@@ -1823,114 +1717,28 @@ if(cmd === `!trades`) {
 	}})
 
 	if (!trades.length) return message.channel.send(`You have not made any trades.`)
-
-	const summaries = []
-	const partners = []
-	const transaction_ids = []
-	const map = {
-		stardust: {
-			card_name: null,
-			card_code: null,
-			rarity: 'stardust'
-		},
-		mushroom: {
-			card_name: null,
-			card_code: null,
-			rarity: 'mushroom'
-		},
-		egg: {
-			card_name: null,
-			card_code: null,
-			rarity: 'egg'
-		},
-		hook: {
-			card_name: null,
-			card_code: null,
-			rarity: 'hook'
-		},
-		rose: {
-			card_name: null,
-			card_code: null,
-			rarity: 'rose'
-		},
-		cactus: {
-			card_name: null,
-			card_code: null,
-			rarity: 'cactus'
-		},
-		moai: {
-			card_name: null,
-			card_code: null,
-			rarity: 'moai'
-		}
-	}
-
-	const all_prints = await Print.findAll()
-
-	for (let i = 0; i < all_prints.length; i++) {
-		const print = all_prints[i]
-		const card_code = print.card_code
-		map[card_code] = {
-			card_name: print.card_name,
-			card_code: print.card_code,
-			rarity: print.rarity
-		}
-	}
+	const partnerIds = []
+	const partnerNames = []
 
 	for (let i = 0; i < trades.length; i++) {
 		const trade = trades[i]
-		const transaction_id = trade.transaction_id
 		const senderId = trade.senderId
 		const receiverId = trade.receiverId
 		const sender_name = trade.sender_name
 		const receiver_name = trade.receiver_name
-		const item = `${trade.quantity} ${eval(map[trade.item].rarity)} ${map[trade.item].card_code ? `${map[trade.item].card_code} - ` : ''}${map[trade.item].card_name || ''}`
-		if (senderId !== maid && !partners.includes(senderId)) partners.push(senderId)
-		if (receiverId !== maid && !partners.includes(receiverId)) partners.push(receiverId)
-
-		if (transaction_ids.includes(transaction_id)) {
-			const summary = summaries[summaries.length-1]
-			if (summary.p1_name === sender_name) {
-				summary.p2_receives.push(item)
-			} else {
-				summary.p1_receives.push(item)
-			}
-		} else {
-			transaction_ids.push(transaction_id)
-			const summary = {
-				p1_name: sender_name,
-				p2_name: receiver_name,
-				p1_receives: [],
-				p2_receives: [item]
-			}
-			summaries.push(summary)
-		}
-	}
-	
-	const players = []
-	const results = []
-
-	for (let i = 0; i < partners.length; i++) {
-		const player = await Player.findOne({ where: { id: partners[i] }})
-		if (!player) continue
-		players.push(player.name)
+		if (senderId !== maid && !partnerIds.includes(senderId)) {
+			partnerIds.push(senderId)
+			partnerNames.push(sender_name)
+		} else if (receiverId !== maid && !partnerIds.includes(receiverId)) {
+			partnerIds.push(receiverId)
+			partnerNames.push(receiver_name)
+		} 
 	}
 
-	for (let i = 0; i < summaries.length; i++) {
-		const summary = summaries[i]
-		results.push(`Trade ${i+1}:\n${summary.p1_name} received:\n${summary.p1_receives.join("\n")}\n\n${summary.p2_name} received:\n${summary.p2_receives.join("\n")}`)
-	}
-
-	players.sort()
-	message.channel.send(`You have traded with the following players:\n${players.join("\n")}`)
-	// message.channel.send(`${results.slice(0, 5).join("\n----------------\n") + "\n----------------"}`)
-	// for (let i = 5 ; i < results.length; i += 5) {
-	// 	message.channel.send(results.slice(i, i + 5).join("\n----------------\n") + "\n----------------")
-	// }
-	return
+	partnerNames.sort()
+	message.channel.send(`I messaged you your trading summary.`)
+	return message.author.send(`You have traded with ${partnerNames.length} players:\n${partnerNames.join("\n")}`)
 }
-
-
 
 //RNG
 if(cmd === `!rng`) {
@@ -1960,18 +1768,19 @@ if(cmd === `!ship`) return message.channel.send('🚢')
 
 //DIARY
 if(cmd === `!diary`) {
-	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
+	const user = message.mentions.users.first()
+	const playerId = user ? user.id : maid
 	if (playerId !== maid && !isAdmin(message.member) && !isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const diary = await Diary.findOne({ where: { playerId: playerId } })
 	if (!diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
 	const medium_complete = diary.m1 && diary.m2 && diary.m3 && diary.m4 && diary.m5 && diary.m6 && diary.m7 && diary.m8 && diary.m9 && diary.m10
 	const hard_complete = diary.h1 && diary.h2 && diary.h3 && diary.h4 && diary.h5 && diary.h6 && diary.h7 && diary.h8
-	const elite_complete = diary.l1 && diary.l2 && diary.l3 && diary.l4 && diary.l5 && diary.l6
-	//const master_complete = diary.s1 && diary.s2 && diary.s3 && diary.s4
-	const input = message.mentions.users.first() && args[1] ? args[1].toLowerCase() :
-				message.mentions.users.first() && !args[1] ? null :
-				!message.mentions.users.first() && args[0] ? args[0].toLowerCase() :
+	//const elite_complete = diary.l1 && diary.l2 && diary.l3 && diary.l4 && diary.l5 && diary.l6
+
+	const input = user && args[1] ? args[1].toLowerCase() :
+				user && !args[1] ? null :
+				!user && args[0] ? args[0].toLowerCase() :
 				null
 
 	const tasks = []
@@ -1986,7 +1795,7 @@ if(cmd === `!diary`) {
 		else return message.channel.send(`I do not recognize the "${input}" Diary.`)
 		//else if(input === 's' || input.startsWith('ma')) { diary_to_display = 'Master'; bonuses = diaries.Master.bonuses }
 	} else if (!diary_to_display) {
-		//if (master_complete || elite_complete) { diary_to_display = 'Master'; bonuses = diaries.Master.bonuses }
+		//if (elite_complete) { diary_to_display = 'Master'; bonuses = diaries.Master.bonuses }
 		if (hard_complete) { diary_to_display = 'Elite'; bonuses = diaries.Elite.bonuses }
 		else if (medium_complete) { diary_to_display = 'Hard'; bonuses = diaries.Hard.bonuses }
 		else if (easy_complete) { diary_to_display = 'Medium'; bonuses = diaries.Medium.bonuses }
@@ -2073,11 +1882,6 @@ if(cmd === `!diary`) {
 
 //BINDER
 if(bindercom.includes(cmd)) {
-	if (mcid !== botSpamChannelId &&
-		mcid !== generalChannelId &&
-		mcid !== marketPlaceChannelId
-	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
-
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const binder = await Binder.findOne({ where: { playerId }, include: Player})
 	if (!binder && playerId === maid) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
@@ -2190,13 +1994,7 @@ if(bindercom.includes(cmd)) {
 
 //SEARCH
 if(cmd === `!search`) {
-	if (mcid !== botSpamChannelId &&
-		mcid !== generalChannelId &&
-		mcid !== marketPlaceChannelId
-	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
-
 	if (!args.length) return message.channel.send(`Please specify a card to search for.`)
-
 	const allBinders = await Binder.findAll({ include: Player })
 	const allWishlists = await Wishlist.findAll({ include: Player })
 	
@@ -2237,11 +2035,6 @@ if(cmd === `!search`) {
 
 //WISHLIST
 if(wishlistcom.includes(cmd)) {
-	if (mcid !== botSpamChannelId &&
-		mcid !== generalChannelId &&
-		mcid !== marketPlaceChannelId
-	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
-
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const wishlist = await Wishlist.findOne({ where: { playerId }, include: Player})
 	if (!wishlist && playerId === maid) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
@@ -2732,7 +2525,7 @@ if (losscom.includes(cmd)) {
 
 //MANUAL
 if (manualcom.includes(cmd)) {
-	if (!isAdmin(message.member) && !isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
 
 	const usersMap = message.mentions.users
 	const userIds = [...usersMap.keys()]	
@@ -3079,15 +2872,6 @@ if (undocom.includes(cmd)) {
 
 //RANK
 if (rankcom.includes(cmd)) {
-	if (mcid !== botSpamChannelId &&
-		mcid !== generalChannelId &&
-		mcid !== duelRequestsChannelId &&
-		mcid !== tournamentChannelId &&
-		mcid !== arenaChannelId &&
-		mcid !== triviaChannelId &&
-		mcid !== marketPlaceChannelId
-	) return message.channel.send(`Please use this command in <#${botSpamChannelId}>, <#${duelRequestsChannelId}> or <#${generalChannelId}>.`)
-	
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
 	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
 	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
@@ -3380,7 +3164,7 @@ if(cmd === '!resubmit') {
 
 //RESET
 if (cmd === `!reset`) {
-	if (!isMod(message.member)) return message.channel.send('You do not have permission to do that.')
+	if (!isAmbassador(message.member) ) return message.channel.send('You do not have permission to do that.')
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
 	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
 	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
@@ -3405,7 +3189,7 @@ if (cmd === `!reset`) {
 
 //RESUME
 if (cmd === `!resume`) {
-	if (!isMod(message.member)) return message.channel.send('You do not have permission to do that.')
+	if (!isAmbassador(message.member)) return message.channel.send('You do not have permission to do that.')
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
 	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
 	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
@@ -3433,7 +3217,7 @@ if (cmd === `!resume`) {
 
 //END
 if (cmd === `!end`) {
-	if (!isMod(message.member) && !isJazz(message.member)) return message.channel.send('You do not have permission to do that.')
+	if (!isAmbassador(message.member)) return message.channel.send('You do not have permission to do that.')
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
 	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
 	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
@@ -3551,7 +3335,7 @@ if(dropcom.includes(cmd)) {
 
 //REMOVE
 if (cmd.toLowerCase() === `!remove`) {
-	if (!isMod(message.member)) return message.channel.send('You do not have permission to do that.')
+	if (!isAmbassador(message.member)) return message.channel.send('You do not have permission to do that.')
 	const member = message.mentions.members.first()
 	const playerId = member && member.user ? member.user.id : null
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
@@ -3596,7 +3380,7 @@ if (cmd.toLowerCase() === `!remove`) {
 
 //CREATE 
 if (cmd === `!create`) {
-	if (!isMod(message.member) && !isJazz(message.member)) return message.channel.send('You do not have permission to do that.')
+	if (!isAdmin(message.member) && !isMod(message.member)) return message.channel.send('You do not have permission to do that.')
 	if (!args.length) return message.channel.send(`Please provide a name for the new tournament.`)
 
 	const tournament_type = await getTournamentType(message)
@@ -3691,7 +3475,7 @@ if (bracketcom.includes(cmd)) {
 
 //DESTROY
 if (cmd === `!destroy`) {
-	if (!isAdmin(message.member) && !isJazz(message.member)) return message.channel.send('You do not have permission to do that.')
+	if (!isAdmin(message.member)) return message.channel.send('You do not have permission to do that.')
 	if (!args.length) return message.channel.send(`Please specify the name of the tournament you wish to destroy.`)
 
 	const name = args[0]
@@ -3765,7 +3549,6 @@ if(cmd === `!grind`) {
 
 //DAILY
 if(cmd === `!daily`) {
-	if (mcid !== botSpamChannelId && mcid !== generalChannelId) return message.channel.send(`Please use this command in <#${botSpamChannelId}> or <#${generalChannelId}>.`)
 	const daily = await Daily.findOne({ where: { playerId: maid }, include: Player })
 	const diary = await Diary.findOne({ where: { playerId: maid } })
 	if (!daily || !diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
@@ -3924,7 +3707,6 @@ if(cmd === `!daily`) {
 
 //ALCHEMY
 if(cmd === `!alc` ||cmd === `!alch` || cmd === `!alchemy`) {
-	if (mcid !== botSpamChannelId && mcid !== generalChannelId) return message.channel.send(`Please use this command in <#${botSpamChannelId}> or <#${generalChannelId}>.`)
 	const wallet = await Wallet.findOne({ 
 		where: { playerId: maid },
 		include: Player
@@ -4091,7 +3873,7 @@ if(cmd === `!burn`) {
 
 //AWARD
 if(cmd === `!award`) {
-	if (!isMod(message.member) && !isAdmin(message.member) &&!isJazz(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
 	const recipient = message.mentions.users.first() ? message.mentions.users.first().id : null	
 	if (!recipient) return message.channel.send(`Please @ mention a user to award.`)
 	if (recipient === maid) return message.channel.send(`You cannot give an award to yourself.`)
@@ -4290,7 +4072,7 @@ if(cmd === `!steal`) {
     // This is needed when matches are directly added or deleted using postgreSQL.
     // It's also required after using the !combine command, but the bot will remind you to do it.
 if (cmd === `!recalc`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	message.channel.send(`Recalculating data. Please wait...`)
 	const players = await Player.findAll()
     const matches = await Match.findAll({
@@ -4360,7 +4142,6 @@ if (cmd === `!census`) {
 //GRINDALL
 if(cmd === `!grindall`) {
 	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
-
 	const confirmation_1 = await askForGrindAllConfirmation(message, 0)
 	if (!confirmation_1) return
 	const confirmation_2 = await askForGrindAllConfirmation(message, 1)
@@ -4738,6 +4519,218 @@ if(cmd === `!pack`) {
 	})
 }
 
+
+//SPECIAL EDITION
+if(cmd === `!spec` || cmd === `!se`) {
+	let code = args[0] || 'DOC'
+	const set = await Set.findOne({ where: { code: code }})
+	if (!set) return message.channel.send(`Could not find set code: ${code}.`)
+	if (!set.spec_for_sale) return message.channel.send(`Sorry, ${code} ${eval(set.emoji)} Special Editions are not available.`)
+
+	const commons = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "com"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map(function(print) {
+		return print.card_code
+	})
+
+	const rares = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "rar"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map(function(print) {
+		return print.card_code
+	})
+
+	const supers = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "sup"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map(function(print) {
+		return print.card_code
+	})
+
+	const ultras = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "ult"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map(function(print) {
+		return print.card_code
+	})
+
+	const secrets = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "scr"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map(function(print) {
+		return print.card_code
+	})
+
+	const specials = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "sup",
+			card_code: {
+				[Op.substring]: 'SE'
+			}
+		},
+		order: [['card_slot', 'ASC']]
+	}).map(function(print) {
+		return print.card_code
+	})
+
+	const wallet = await Wallet.findOne( { where: { playerId: maid }, include: Player })
+	if (!wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	const money = wallet[set.currency]
+	if (money < (set.spec_price)) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Special Editions cost ${set.spec_price}${eval(set.currency)}.`)
+
+	const filter = m => m.author.id === message.author.id
+	const msg = await message.channel.send(`${wallet.player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.spec_price}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Special Edition?`)
+	const collected = await msg.channel.awaitMessages(filter, {
+		max: 1,
+		time: 15000
+	}).then(async collected => {
+		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+		
+		message.channel.send(`Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Special Edition.`)
+		let gotSecret = false
+
+		const your_spec_1 = getRandomElement(specials.slice(0, 1))
+		const your_spec_2 = getRandomElement(specials.slice(2, 3))
+
+		const spec_print_1 = await Print.findOne({ where: {
+			card_code: your_spec_1
+		}}) 
+
+		const spec_print_2 = await Print.findOne({ where: {
+			card_code: your_spec_2
+		}}) 
+
+		const spec_card_1 = await Card.findOne({ where: {
+			name: spec_print_1.card_name
+		}}) 
+
+		const spec_card_2 = await Card.findOne({ where: {
+			name: spec_print_2.card_name
+		}}) 
+
+		const promos_canvas = Canvas.createCanvas(57 * 2, 80)
+		const promos_context = promo_canvas.getContext('2d')
+
+		const promo_1 = fs.existsSync(`./public/card_images/${spec_card_1.image}`) ? 
+		await Canvas.loadImage(`./public/card_images/${spec_card_1.image}`) :
+		await Canvas.loadImage(`https://ygoprodeck.com/pics/${spec_card_1.image}`)
+		if (promos_canvas && promos_context && promo_1) context.drawImage(promo_1, 0, 0, 57, 80)
+		
+		const promo_1 = fs.existsSync(`./public/card_images/${spec_card_2.image}`) ? 
+		await Canvas.loadImage(`./public/card_images/${spec_card_2.image}`) :
+		await Canvas.loadImage(`https://ygoprodeck.com/pics/${spec_card_2.image}`)
+		if (promos_canvas && promos_context && promo_2) context.drawImage(promo_2, 57, 0, 57, 80)
+
+		const promos_attachment = promos_canvas && promos_context ?
+			new Discord.MessageAttachment(promos_canvas.toBuffer(), `specials.png`) :
+			false
+
+		message.author.send(
+			`${eval(set.emoji)} - ${set.name} Special Edition - ${eval(set.alt_emoji)}`
+			+ `\n${eval(spec_print_1.rarity)}${spec_print_1.card_code} - ${spec_print_1.card_name}`
+			+ `\n${eval(spec_print_2.rarity)}${spec_print_2.card_code} - ${spec_print_2.card_name}`
+		, promos_attachment)
+
+		const odds = []
+		for (let i = 0; i < set.supers_per_box; i++) odds.push("supers")
+		for (let i = 0; i < set.ultras_per_box; i++) odds.push("ultras")
+		for (let i = 0; i < set.secrets_per_box; i++) odds.push("secrets")
+		const lucks = getRandomSubset(odds, 3)
+
+		for (let j = 0; j < 3; j++) {
+			const images = []
+			const results = [`\n${eval(set.emoji)} - ${set.name} Pack${num > 1 ? ` ${j + 1}` : ''} - ${eval(set.alt_emoji)}`]
+			const yourCommons = getRandomSubset(commons, set.commons_per_pack)
+			const yourRare = getRandomElement(rares)
+			const yourFoil = getRandomElement(eval(lucks[j]))
+			const yourPack = [...yourCommons.sort(), yourRare, yourFoil]
+
+			for (let i = 0; i < yourPack.length; i++) {
+				const print = await Print.findOne({ where: {
+					card_code: yourPack[i]
+				}})
+
+				if (!print.id) return message.channel.send(`Error: ${yourPack[i]} does not exist in the Print database.`)
+				results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+
+				const card = await Card.findOne({ where: {
+					name: print.card_name
+				}})
+		
+				images.push(`${card.image}`)
+			
+				const inv = await Inventory.findOne({ where: { 
+					card_code: print.card_code,
+					printId: print.id,
+					playerId: maid
+				}})
+
+				if (inv) {
+					inv.quantity++
+					await inv.save()
+				} else {
+					await Inventory.create({ 
+						card_code: print.card_code,
+						quantity: 1,
+						printId: print.id,
+						playerId: maid
+					})
+
+					if (print.rarity === 'scr') gotSecret = true
+				}
+			}
+
+			const card_width = 57
+			const canvas = Canvas.createCanvas(card_width * set.cards_per_pack, 80)
+			const context = canvas.getContext('2d')
+
+			for (let i = 0; i < set.cards_per_pack; i++) {
+				const card = fs.existsSync(`./public/card_images/${images[i]}`) ? 
+				await Canvas.loadImage(`./public/card_images/${images[i]}`) :
+				await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[i]}`)
+				if (canvas && context && card) context.drawImage(card, card_width * i, 0, card_width, canvas.height)
+			}
+	
+			const attachment =  canvas && context ?
+				new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`) :
+				false
+			message.author.send(results.join("\n"), attachment)
+		}
+
+		wallet[set.currency] -= set.spec_price
+		await wallet.save()
+
+		set.unit_sales += 3
+		await set.save()
+
+		completeTask(message.channel, maid, 'e6')
+		if (gotSecret) completeTask(message.channel, maid, 'm4', 5000)
+		if (await checkCoreSetComplete(maid, 1)) completeTask(message.channel, 'h4', 5000)
+		if (await checkCoreSetComplete(maid, 3)) completeTask(message.channel, 'l3', 6000)
+		return
+	}).catch(err => {
+		console.log(err)
+		return message.channel.send(`Sorry, time's up.`)
+	})
+}
+
 //BOX
 if(cmd === `!box`) {
 	const code = args[0] || 'DOC'
@@ -4947,8 +4940,7 @@ if(cmd === `!box`) {
 
 //DUMP
 if(cmd === `!dump`) {
-	if (mcid !== botSpamChannelId) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
-
+	if (mcid !== botSpamChannelId) return message.channel.send(`Please use this command in <#${botSpamChannelId}>.`)
 	const set_code = args.length ? args[0].toUpperCase() : 'DOC'
 	const set = await Set.findOne({where: { code: set_code }})
 	if (!set) return message.channel.send(`Sorry, I do not recognized the set code: "${set_code}".`)
@@ -5070,11 +5062,6 @@ if(cmd === `!dump`) {
 
 //SELL
 if(cmd === `!sell`) {
-	if (mcid !== botSpamChannelId &&
-		mcid !== generalChannelId &&
-		mcid !== marketPlaceChannelId
-	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
-
 	if (!args.length) return message.channel.send(`Please specify the card(s) you wish to sell.`)
 	const sellerId = maid
 	const buyerId = message.mentions.users.first() ? message.mentions.users.first().id : merchbotId	
@@ -5126,11 +5113,6 @@ if(cmd === `!sell`) {
 
 //BUY
 if(cmd === `!buy`) {
-	if (mcid !== botSpamChannelId &&
-		mcid !== generalChannelId &&
-		mcid !== marketPlaceChannelId
-	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}>, <#${botSpamChannelId}> or <#${generalChannelId}>.`)
-
 	if (!args.length) return message.channel.send(`Please specify the card(s) you wish to buy.`)
 	const buyerId = maid
 	const sellerId = message.mentions.users.first() ? message.mentions.users.first().id : merchbotId	
@@ -5284,7 +5266,7 @@ if(cmd === `!bid`) {
 if(cmd === `!trade`) {
 	if (mcid !== botSpamChannelId &&
 		mcid !== marketPlaceChannelId
-	) return message.channel.send(`Please use this command in <#${marketPlaceChannelId}> or <#${botSpamChannelId}>.`)
+	) return message.channel.send(`Please use this command in <#${botSpamChannelId}> or <#${marketPlaceChannelId}>.`)
 
 	const initiatorId = maid
 	const recieverId = message.mentions.users.first() ? message.mentions.users.first().id : null
@@ -5422,20 +5404,20 @@ if(cmd === `!clear`) {
 
 //CLEAR
 if(cmd === `!clear_all`) {
-	if (!isJazz(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isAdmin(message.member)) return message.channel.send("You do not have permission to do that.")
     return setInterval(() => message.channel.bulkDelete(100), 5000) 
 }
 
 //OPEN
 if(cmd === `!open`) {
-	if (!isMod(message.member) && !isJazz(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isJazz(message.member)) return message.channel.send("You do not have permission to do that.")
 	message.channel.send(`Opening the shop now.`)
 	return openShop()
 }
 
 //CLOSE
 if(cmd === `!close`) {
-	if (!isMod(message.member) && !isJazz(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isJazz(message.member)) return message.channel.send("You do not have permission to do that.")
 	message.channel.send(`Closing the shop now.`)
 	return closeShop()
 }

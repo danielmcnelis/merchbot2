@@ -27,8 +27,6 @@ const openShop = async () => {
         updateShop()
         client.channels.cache.get(announcementsChannelId).send(`Good morning, <@&${fpRole}>, The Shop ${merchant} is now open! ${open}`)
         const shopCountdown = getShopCountdown()
-        const hoursLeftInPeriod = Math.floor(shopCountdown / (3600000))
-        const minsLeftInPeriod = Math.ceil((shopCountdown % 3600000)/ 60000)
 		return setTimeout(() => closeShop(), shopCountdown)
 	} 
 }
@@ -52,8 +50,6 @@ const closeShop = async () => {
         await restock()
 		client.channels.cache.get(announcementsChannelId).send(`Good evening, <@&${fpRole}>, The Shop ${merchant} is now closed! ${closed}`)
         const shopCountdown = getShopCountdown()
-        const hoursLeftInPeriod = Math.floor(shopCountdown / (3600000))
-        const minsLeftInPeriod = Math.ceil((shopCountdown % 3600000)/ 60000)
         return setTimeout(() => openShop(), shopCountdown)
 	} 
 }
@@ -276,6 +272,7 @@ const updateShop = async () => {
             const set = setsForSale[i]
             if (set.type === 'core') {
                 results.push(`${set.box_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Box`)
+                if (set.specs_for_sale) results.push(`${set.spec_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - SE`)
                 results.push(`${set.unit_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Pack`)
             } else if (set.type === 'mini') {
                 results.push(`${set.unit_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Pack`)
@@ -355,6 +352,7 @@ const postBids = async () => {
             const set = setsForSale[i]
             if (set.type === 'core') {
                 results.push(`${set.box_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Box`)
+                if (set.specs_for_sale) results.push(`${set.spec_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - SE`)
                 results.push(`${set.unit_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Pack`)
             } else if (set.type === 'mini') {
                 results.push(`${set.unit_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Pack`)

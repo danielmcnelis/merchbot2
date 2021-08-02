@@ -48,7 +48,6 @@ const { challongeAPIKey } = require('./secrets.json')
 const statuses = require('./static/statuses.json')
 const trivia = require('./trivia.json')
 const ygoprodeck = require('./static/ygoprodeck.json')
-const { is } = require('sequelize/types/lib/operators')
 
 //READY
 client.on('ready', async () => {

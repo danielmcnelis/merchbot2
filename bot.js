@@ -183,8 +183,8 @@ if(cmd === `!test`) {
 	})
 
 
-	const your_spec_1 = getRandomElement(specials.slice(0, 1))
-	const your_spec_2 = getRandomElement(specials.slice(2, 3))
+	const your_spec_1 = getRandomElement(specials.slice(0, 2))
+	const your_spec_2 = getRandomElement(specials.slice(2, 4))
 	console.log('your_spec_1', your_spec_1)
 	console.log('your_spec_2', your_spec_2)
 }
@@ -4625,8 +4625,8 @@ if(cmd === `!spec` || cmd === `!se`) {
 		message.channel.send(`Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Special Edition.`)
 		let gotSecret = false
 
-		const your_spec_1 = getRandomElement(specials.slice(0, 1))
-		const your_spec_2 = getRandomElement(specials.slice(2, 3))
+		const your_spec_1 = getRandomElement(specials.slice(0, 2))
+		const your_spec_2 = getRandomElement(specials.slice(2, 4))
 
 		const spec_print_1 = await Print.findOne({ where: {
 			card_code: your_spec_1

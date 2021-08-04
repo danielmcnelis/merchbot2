@@ -4569,7 +4569,10 @@ if(cmd === `!spec` || cmd === `!se`) {
 	const supers = await Print.findAll({ 
 		where: {
 			setId: set.id,
-			rarity: "sup"
+			rarity: "sup",
+			card_slot: {
+				[Op.lt]: 200
+			}
 		},
 		order: [['card_slot', 'ASC']]
 	}).map(function(print) {

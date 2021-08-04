@@ -924,7 +924,7 @@ if (cmd === `!mod`) {
 		isAmbassador(message.member) ? 1 :
 		null
 	
-	if (!rank(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!rank) return message.channel.send("You do not have permission to do that.")
 	const botEmbed = new Discord.MessageEmbed()
 		.setColor('#8062cc')
 		.setTitle(`MerchBot - ${rank} User Manual`)

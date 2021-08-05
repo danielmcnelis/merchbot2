@@ -39,7 +39,7 @@ const { client, challongeClient } = require('./static/clients.js')
 const { aliuscom, bindercom, botcom, bracketcom, calccom, checklistcom, dbcom, deckcom, dropcom, h2hcom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, pfpcom, profcom, queuecom, rankcom, rolecom, startcom, statscom, undocom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
-const { approve, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('./static/emojis.json')
+const { beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('./static/emojis.json')
 const muted = require('./static/muted.json')
 const nicknames = require('./static/nicknames.json')
 const prints = require('./static/prints.json')
@@ -109,7 +109,7 @@ client.on('guildMemberAdd', async (member) => {
 		const player = await Player.findOne({ where: { id: userId }})
 		if (player.stats >= 530) member.roles.add(expertRole)
 		else member.roles.add(noviceRole)
-        return channel.send(`${member} Welcome back to the Forged in Chaos ${FiC} Discord server! We missed you. ${approve}`)
+        return channel.send(`${member} Welcome back to the Forged in Chaos ${FiC} Discord server! We missed you. ${soldier}`)
     }
 })
     
@@ -375,29 +375,16 @@ if (cmd === `!fix_cards`) {
 //NEW SET
 if (cmd === `!new_set`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	const ORF = {
-		code: "ORF",
-		name: "Origin of Fire",
-		type: "mini",
-		emoji: "ORF",
-		alt_emoji: "ORF",
-		size: 50,
-		commons: 24,
-		rares: 10,
-		supers: 10,
-		ultras: 6,
-		unit_price: 10,
-		spec_for_sale: false,
-		unit_sales: 0,
-		cards_per_pack: 5,
-		packs_per_box: 8,
-		commons_per_pack: 3,
-		rares_per_pack: 1,
-		commons_per_box: 24,
-		rares_per_box: 8,
-		supers_per_box: 7,
-		ultras_per_box: 1,
-		secrets_per_box: 0
+	
+	const FPC = {
+		code: "FPC",
+		name: "Forged Prize Cards",
+		type: "promot",
+		emoji: "soldier",
+		alt_emoji: "soldier",
+		size: 8,
+		ultras: 8,
+		unit_price: 24
 	}
 
 	await Set.create(ORF)

@@ -387,7 +387,7 @@ if (cmd === `!new_set`) {
 	}
 
 	await Set.create(set)
-	message.channel.send(`I created a new set: ${set.name} ${set.emoji}${set.emoji !== set.alt_emoji ? ` ${set.alt_emoji}`}.`)
+	message.channel.send(`I created a new set: ${set.name} ${set.emoji}${set.emoji !== set.alt_emoji ? ` ${set.alt_emoji}` : ''}.`)
 }
 
 //INIT

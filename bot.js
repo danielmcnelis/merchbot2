@@ -376,19 +376,18 @@ if (cmd === `!fix_cards`) {
 if (cmd === `!new_set`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	
-	const FPC = {
+	const set = {
 		code: "FPC",
 		name: "Forged Prize Cards",
 		type: "promot",
 		emoji: "soldier",
 		alt_emoji: "soldier",
-		size: 8,
-		ultras: 8,
-		unit_price: 24
+		size: 1,
+		secrets: 1
 	}
 
-	await Set.create(ORF)
-	message.channel.send(`I created a new set: ORF.`)
+	await Set.create(set)
+	message.channel.send(`I created a new set: ${set.name} ${set.emoji}${set.emoji !== set.alt_emoji ? ` ${set.alt_emoji}`}.`)
 }
 
 //INIT

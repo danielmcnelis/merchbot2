@@ -94,7 +94,7 @@ const getFavoriteAuthor = async (message) => {
     return collected
 }
 
-const getFavoriteCard = async (message, fuzzyPrints, fuzzyPrints2) => {
+const getFavoriteCard = async (message, fuzzyPrints) => {
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send(`Please name a card in Forged in Chaos.`)
 	const collected = await msg.channel.awaitMessages(filter, {
@@ -103,7 +103,7 @@ const getFavoriteCard = async (message, fuzzyPrints, fuzzyPrints2) => {
 	}).then(async collected => {
 		const response = collected.first().content
 		if (response === 'none') return 'none'
-        const favorite_card = await findCard(response, fuzzyPrints, fuzzyPrints2) || false
+        const favorite_card = await findCard(response, fuzzyPrints) || false
 		const print = await Print.findOne({ where: { card_name: favorite_card }})
 		const count = await Inventory.count({ where: { printId: print.id }})
 		if (!favorite_card || !count) message.channel.send(`Could not find card: "${response}".`)

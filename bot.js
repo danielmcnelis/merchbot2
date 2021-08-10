@@ -4989,7 +4989,7 @@ if(cmd === `!dump`) {
 
 	const wish_to_exclude = await askForExclusions(message)
 	const exclusions = wish_to_exclude ? await getExclusions(message, rarity, set) : null
-	const excluded_prints = exclusions ? await getExcludedPrintIds(message, rarity, set, exclusions) : null
+	const excluded_prints = exclusions ? await getExcludedPrintIds(message, rarity, set, exclusions, fuzzyPrints) : null
 	if (excluded_prints === false) return
 	
 	const unfilteredInv = await Inventory.findAll({
@@ -5116,7 +5116,7 @@ if(cmd === `!sell`) {
 														args.join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim())
 	if (!shopSale && line_items.length > 1) return message.channel.send(`You cannot sell different cards to a player in the same transaction.`)
 
-	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_items, sellingPlayer) : await getInvoiceP2PSale(message, line_item = line_items[0], buyingPlayer, sellingPlayer)
+	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_items, sellingPlayer, fuzzyPrints) : await getInvoiceP2PSale(message, line_item = line_items[0], buyingPlayer, sellingPlayer, fuzzyPrints)
 	if (!invoice) return
 
 	if (invoice.total_price > buyingPlayer.wallet.stardust) return message.channel.send(`Sorry, ${buyingPlayer.name} only has ${buyingPlayer.wallet.stardust} and ${invoice.quantities[0] > 1 ? `${invoice.quantities[0]} copies of ` : ''}${invoice.cards[0]} costs ${invoice.total_price}${stardust}.`)
@@ -5169,7 +5169,7 @@ if(cmd === `!buy`) {
 														args.join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim())
 	if (line_item.length > 1) return message.channel.send(`You cannot buy different cards in the same transaction.`)
 
-	const invoice = shopSale ? await getInvoiceMerchBotPurchase(message, line_item, buyingPlayer) : await getInvoiceP2PSale(message, line_item[0], buyingPlayer, sellingPlayer)
+	const invoice = shopSale ? await getInvoiceMerchBotPurchase(message, line_item, buyingPlayer, fuzzyPrints) : await getInvoiceP2PSale(message, line_item[0], buyingPlayer, sellingPlayer, fuzzyPrints)
 	if (!invoice) return
 
 	if (invoice.total_price > buyingPlayer.wallet.stardust) return message.channel.send(`Sorry, you only have ${buyingPlayer.wallet.stardust}${stardust} and ${invoice.cards[0]} costs ${invoice.total_price}${stardust}.`)
@@ -5289,7 +5289,7 @@ if(cmd === `!bid`) {
 	} else if (player.bids.length) {
 		return manageBidding(message, player)
 	} else {
-		return askForBidPlacement(message, player)
+		return askForBidPlacement(message, player, fuzzyPrints)
 	}
 }
 
@@ -5320,14 +5320,14 @@ if(cmd === `!trade`) {
 	if (!receivingPlayer) return message.channel.send(`That user is not in the database.`)
 
 	const initiator_side = args.slice(1).join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim())
-	const initiatorSummary = await getTradeSummary(message, initiator_side, initiatingPlayer)
+	const initiatorSummary = await getTradeSummary(message, initiator_side, initiatingPlayer, fuzzyPrints)
 	if (!initiatorSummary) return
 	const initiator_confirmation = await getInitiatorConfirmation(message, initiatorSummary.cards, receivingPlayer)
 	if (!initiator_confirmation) return message.channel.send(`No problem. Have a nice day.`)
 
 	const receiver_side = await getReceiverSide(message, initiatorSummary.cards, receivingPlayer)
 	if (!receiver_side) return
-	const receiverSummary = await getTradeSummary(message, receiver_side, receivingPlayer)
+	const receiverSummary = await getTradeSummary(message, receiver_side, receivingPlayer, fuzzyPrints)
 	if (!receiverSummary) return
 	const receiver_confirmation = await getReceiverConfirmation(message, receiverSummary.cards, receivingPlayer)
 	if (!receiver_confirmation) return setTimeout(() => message.channel.send(`Sorry, ${initiatingPlayer.name}, this trade has been rejected.`), 2000)

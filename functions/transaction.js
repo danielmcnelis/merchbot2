@@ -76,7 +76,7 @@ const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlaye
 }
 
 // GET INVOICE MERCHBOT SALE
-const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer) => {
+const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer, fuzzyPrints) => {
 	const info = await Info.findOne({ where: { element: 'shop'} })
     const shopIsClosed = info.status === 'closed'
     const sellerId = sellingPlayer.id
@@ -100,7 +100,7 @@ const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer) => {
         }
 
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+		const card_name = await findCard(query, fuzzyPrints)
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) :
@@ -177,7 +177,7 @@ const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer) => {
 }
 
 // GET INVOICE MERCHBOT PURCHASE
-const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer) => {
+const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer, fuzzyPrints) => {
     const buyerId = buyingPlayer.id
     let total_price = 0
     const cards = []
@@ -197,7 +197,7 @@ const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer) => 
     } 
 
     const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-    const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+    const card_name = await findCard(query, fuzzyPrints)
     const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 
     const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) :
@@ -271,7 +271,7 @@ const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer) => 
 }
 
 // GET INVOICE P2P SALE
-const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer) => {
+const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer, fuzzyPrints) => {
     const sellerId = sellingPlayer.id
     const buyerId = buyingPlayer.id
     const authorIsSeller = message.author.id === sellerId
@@ -298,7 +298,7 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
     } 
 
     const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-    const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+    const card_name = await findCard(query, fuzzyPrints)
     const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 
     let walletField

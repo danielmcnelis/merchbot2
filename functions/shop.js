@@ -528,14 +528,14 @@ const getExclusions = async (message, rarity, set) => {
 }
 
 // GET EXCLUDED PRINTS
-const getExcludedPrintIds = async (message, rarity, set, exclusions) => {
+const getExcludedPrintIds = async (message, rarity, set, exclusions, fuzzyPrints) => {
     const playerId = message.author.id
     const printIds = []
 
     for (let i = 0; i < exclusions.length; i++) {
         const query = exclusions[i].split(' ').filter((el) => el !== '').join(' ')
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+		const card_name = await findCard(query, fuzzyPrints)
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) :

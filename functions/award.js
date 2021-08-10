@@ -3,7 +3,7 @@ const { yescom, nocom } = require('../static/commands.json')
 const { findCard } = require('./search.js')
 const { selectPrint } = require('./print.js')
 const { completeTask } = require('./diary.js')
-const { blue, red, stoned, stare, wokeaf, koolaid, cavebob, evil, DOC, ORF, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
+const { beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('./static/emojis.json')
 const { Message } = require('discord.js')
 
 const awardCard = async (channel, playerId, card_code, quantity = 1) => {

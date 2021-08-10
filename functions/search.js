@@ -6,8 +6,8 @@ const { Op } = require('sequelize')
 const { Card, Nickname, Inventory, Print } = require('../db/index.js')
 
 //CARD SEARCH
-const search = async (query, fuzzyCards, fuzzyCards2) => {
-	const card_name = await findCard(query, fuzzyCards, fuzzyCards2)
+const search = async (query, fuzzyCards) => {
+	const card_name = await findCard(query, fuzzyCards)
 	if (!card_name) return false
 
 	const card = await Card.findOne({ 
@@ -86,8 +86,6 @@ const getInventorySummary = async (allForgedCards, playerId) => {
 		else inv_map[name] = quantity
 	}
 
-	console.log('inv_map', inv_map)
-
 	const names = Object.keys(inv_map)
 	const one_of_names = []
 	const two_of_names = []
@@ -98,10 +96,6 @@ const getInventorySummary = async (allForgedCards, playerId) => {
 		if (inv_map[name] >= 2) two_of_names.push(name)
 		if (inv_map[name] >= 3) three_of_names.push(name)
 	})
-
-	console.log('one_of_names', one_of_names)
-	console.log('two_of_names', two_of_names)
-	console.log('three_of_names', three_of_names)
 
 	const yourSingles = allForgedCards.filter(card => one_of_names.includes(card.name))
 	const yourDoubles = allForgedCards.filter(card => two_of_names.includes(card.name))
@@ -123,7 +117,7 @@ const fetchAllUniquePrintNames = async () => {
     const prints = []
     const allUniquePrintNames = []
     const allPrints = await Print.findAll()
-    allPrints.forEach(function(print) { 
+    allPrints.forEach((print) => { 
         if (!prints.includes(print.card_name)) {
             prints.push(print.card_name)
             allUniquePrintNames.push(print.card_name)
@@ -134,39 +128,29 @@ const fetchAllUniquePrintNames = async () => {
 }
 
 //FIND CARD
-const findCard = async (query, fuzzyCards, fuzzyCards2) => {
+const findCard = async (query, fuzzyCards) => {
 	const nickname = await Nickname.findOne({ where: { alius: query.toLowerCase() } })
 	if (nickname && nickname.card_name) return nickname.card_name 
 
-    const fuzzy_card = fuzzyCards.get(query, null, 0.36) || []
-	const fuzzy_card_2 = fuzzyCards2.get(query, null, 0.36) || []
-	const fuzzy_results = [...fuzzy_card, ...fuzzy_card_2]
+    const fuzzy_search = fuzzyCards.get(query, null, 0.36) || []
+	fuzzy_search.sort((a, b) => b[0] - a[0])
+	if (!fuzzy_search[0]) return false
 
-	fuzzy_card.sort((a, b) => b[0] - a[0])
-	fuzzy_results.sort((a, b) => b[0] - a[0])
-
-	if (!fuzzy_results[0]) return
-
-	let alternate
+	let partial_match
 	if (query.length >= 10) {
-		for (let i = 0; i < fuzzy_card.length; i++) {
-			if (fuzzy_card[i][1].replace(/[^\w\s]/gi, "").toLowerCase().includes(query.toLowerCase())) {
-				alternate = fuzzy_card[i][1]
+		for (let i = 0; i < fuzzy_search.length; i++) {
+			const result = fuzzy_search[i][1]
+			if (result.replace(/[^\w\s]/gi, "").toLowerCase().includes(query.toLowerCase())) {
+				partial_match = result
 				break
 			}
 		}
 	}
 
-	if (fuzzy_results[0][0] < 0.9) {
-		for (let i = 0; i < fuzzy_card.length; i++) {
-			if (fuzzy_card[i][1].replace(/[^\w\s]/gi, "").toLowerCase().startsWith(query.toLowerCase())) {
-				alternate = fuzzy_card[i][1]
-				break
-			}
-		}
-	}
-
-	const card_name = alternate ? alternate : fuzzy_results[0][0] > 0.5 ? fuzzy_results[0][1] : null
+	const card_name = partial_match ? partial_match :
+		fuzzy_search[0][0] > 0.5 ? fuzzy_search[0][1] :
+		null
+		
     return card_name
 }
 

@@ -4,7 +4,7 @@ const {Builder, By, until} = require('selenium-webdriver')
 const firefox = require('selenium-webdriver/firefox')
 const fs = require('fs')
 const errors = require('../static/errors.json')
-const { approve } = require('../static/emojis.json')
+const { soldier } = require('../static/emojis.json')
 const { Op } = require('sequelize')
 const { convertCardsArrayToObject } = require('./utility.js')
 const { fetchAllForgedCards, getInventorySummary } = require('./search.js')
@@ -113,10 +113,6 @@ const saveYDK = async (member, url) => {
         const cards_obj = convertCardsArrayToObject(cards_arr)
         const allForgedCards = await fetchAllForgedCards()
         const { yourSingles, yourDoubles, yourTriples } = await getInventorySummary(allForgedCards, playerId)
-
-        // console.log('yourSingles', yourSingles)
-        // console.log('yourDoubles', yourDoubles)
-        // console.log('yourTriples', yourTriples)
        
         const allForbiddenCards = await Status.findAll({ 
             where: {
@@ -148,21 +144,18 @@ const saveYDK = async (member, url) => {
             return id
         })
 
-        console.log('singleIds', singleIds)
 
         const doubleIds = yourDoubles.map(card => {
             let id = card.image.slice(0,-4)
             while (id.length < 8) id = '0' + id
             return id
         })
-        console.log('doubleIds', doubleIds)
 
         const tripleIds = yourTriples.map(card => {
             let id = card.image.slice(0,-4)
             while (id.length < 8) id = '0' + id
             return id
         })
-        console.log('tripleIds', tripleIds)
 
         const forbiddenCardIds = allForbiddenCards.map(card => card.konamiCode)
         const limitedCardIds = allLimitedCards.map(card => card.konamiCode)
@@ -335,7 +328,7 @@ const checkDeckList = async (client, message, member, formatName, formatEmoji, f
             
                 return message.author.send(response)
             } else {
-                return message.author.send(`Your ${formatName} Format ${formatEmoji} deck is perfectly legal. You are good to go! ${approve}`)
+                return message.author.send(`Your ${formatName} Format ${formatEmoji} deck is perfectly legal. You are good to go! ${soldier}`)
             }
         } else {
             return message.author.send("Sorry, I only accept duelingbook.com/deck links.")      

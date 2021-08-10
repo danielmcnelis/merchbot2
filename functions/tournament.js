@@ -3,7 +3,7 @@ const axios = require('axios')
 const { challongeAPIKey } = require('../secrets.json')
 const { registrationChannelId } = require('../static/channels.json')
 const { tourRole } = require('../static/roles.json')
-const { approve, FiC } = require('../static/emojis.json')
+const { soldier, FiC } = require('../static/emojis.json')
 const { Arena, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist } = require('../db')
 const { client, challongeClient } = require('../static/clients.js')
 const { saveYDK, saveAllYDK } = require('./decks.js')
@@ -78,7 +78,7 @@ const getDeckListTournament = async (member, player, resubmission = false) => {
                 member.send(response)
                 return false
              } else {
-                member.send(`Thanks, ${player.name}, your deck is perfectly legal. ${approve}`)
+                member.send(`Thanks, ${player.name}, your deck is perfectly legal. ${soldier}`)
                 return url
             }
         } else {
@@ -105,7 +105,7 @@ const directSignUp = async (message, player, resubmission = false) => {
     }).then(async collected => {
         const url = collected.first().content
         if (url.includes("duelingbook.com/deck")) {		
-            message.author.send(`Thanks, ${message.author.username}, I now have the link to ${player.name}'s tournament deck. ${approve}`)
+            message.author.send(`Thanks, ${message.author.username}, I now have the link to ${player.name}'s tournament deck. ${soldier}`)
             return url
         } else {
             message.author.send("Sorry, I only accept duelingbook.com/deck links.")

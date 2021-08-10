@@ -5,8 +5,8 @@ const Discord = require('discord.js')
 const fs = require('fs')
 const FuzzySet = require('fuzzyset')
 const merchbotId = '584215266586525696'
-let fuzzyCards
-let fuzzyCards2
+const fuzzyCards = FuzzySet([], false)
+const fuzzyPrints = FuzzySet([], false)
 
 // DATABASE IMPORTS
 const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Nickname, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
@@ -39,7 +39,7 @@ const { client, challongeClient } = require('./static/clients.js')
 const { aliuscom, bindercom, botcom, bracketcom, calccom, checklistcom, dbcom, deckcom, dropcom, h2hcom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, pfpcom, profcom, queuecom, rankcom, rolecom, startcom, statscom, undocom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
-const { beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('./static/emojis.json')
+const { beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('./static/emojis.json')
 const muted = require('./static/muted.json')
 const nicknames = require('./static/nicknames.json')
 const prints = require('./static/prints.json')
@@ -53,22 +53,9 @@ const ygoprodeck = require('./static/ygoprodeck.json')
 client.on('ready', async () => {
 	console.log('MerchBot is online!')
 	const allCards = await fetchAllCardNames()
+    allCards.forEach((card) => fuzzyCards.add(card))
 	const allUniquePrints = await fetchAllUniquePrintNames()
-	fuzzyCards = FuzzySet([], false)
-    fuzzyCards2 = FuzzySet([], false, 2, 3)
-
-	fuzzyPrints = FuzzySet([], false)
-    fuzzyPrints2 = FuzzySet([], false, 2, 3)
-
-    allCards.forEach(function(card) {
-        fuzzyCards.add(card)
-        fuzzyCards2.add(card)
-    })
-
-    allUniquePrints.forEach(function(card) {
-        fuzzyPrints.add(card)
-        fuzzyPrints2.add(card)
-    })
+    allUniquePrints.forEach((card) => fuzzyPrints.add(card))
 
 	const shopShouldBe = checkShopShouldBe()
 	const shopCountdown = getShopCountdown()
@@ -86,8 +73,8 @@ client.on('ready', async () => {
 	}, 1000 * 60 * 10)
 
 	if (!shopShouldBe) return client.channels.cache.get(staffChannelId).send(`<@&${adminRole}>, The Shop status could not be read from the database.`)
-	if (!shopOpen && shopShouldBe === 'open') client.channels.cache.get(staffChannelId).send(`<@&${modRole}>, The Shop is unexpectedly closed. Type **!open** to manually open it.`)
-	if (shopOpen && shopShouldBe === 'closed') client.channels.cache.get(staffChannelId).send(`<@&${modRole}>, The Shop is unexpectedly open. Type **!close** to manually close it.`)
+	if (!shopOpen && shopShouldBe === 'open') client.channels.cache.get(staffChannelId).send(`<@&${modRole}>, The Shop is unexpectedly closed.`)
+	if (shopOpen && shopShouldBe === 'closed') client.channels.cache.get(staffChannelId).send(`<@&${modRole}>, The Shop is unexpectedly open.`)
 
 	if (shopShouldBe === 'closed') {
 		return setTimeout(() => openShop(), shopCountdown)
@@ -160,7 +147,7 @@ client.on('message', async (message) => {
 if (!message.content.startsWith("!") && message.content.includes(`{`) && message.content.includes(`}`)) { 
 	if (message.member.roles.cache.some(role => role.id === triviaRole)) return message.channel.send(`You cannot search for cards while playing Trivia.`)
 	const query = message.content.slice(message.content.indexOf('{') + 1, message.content.indexOf('}'))
-	const cardEmbed = await search(query, fuzzyCards, fuzzyCards2)
+	const cardEmbed = await search(query, fuzzyCards)
 	if (!cardEmbed) return message.channel.send(`Could not find card: "query".`)
 	else return message.channel.send(cardEmbed)
 }
@@ -387,7 +374,7 @@ if (cmd === `!new_set`) {
 	}
 
 	await Set.create(set)
-	message.channel.send(`I created a new set: ${set.name} ${set.emoji}${set.emoji !== set.alt_emoji ? ` ${set.alt_emoji}` : ''}.`)
+	message.channel.send(`I created a new set: ${set.name} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? ` ${eval(set.alt_emoji)}` : ''}.`)
 }
 
 //INIT
@@ -511,7 +498,7 @@ if (aliuscom.includes(cmd)) {
 	if (!isAmbassador(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const query = args.join(' ')
 	if (!query) return message.channel.send(`Please specify a card.`)
-	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+	const card_name = await findCard(query, fuzzyPrints)
 	if (!card_name) return message.channel.send(`Could not find card: "${query}".`)
 	const card = await Card.findOne({ where: { name: card_name }})
 	if (!card) return message.channel.send(`I could not find "${card_name}" in the Format Library database.`)
@@ -546,7 +533,7 @@ if (aliuscom.includes(cmd)) {
 if (nicknamecom.includes(cmd)) {
 	const query = args.join(' ')
 	if (!query) return message.channel.send(`Please specify a card.`)
-	const card_name = await findCard(query, fuzzyCards, fuzzyCards2)
+	const card_name = await findCard(query, fuzzyCards)
 	if (!card_name) return message.channel.send(`Could not find card: "${query}".`)
 	const card = await Card.findOne({ where: { name: card_name }})
 	if (!card) return message.channel.send(`I could not find "${card_name}" in the Format Library database.`)
@@ -574,7 +561,7 @@ if (cmd === `!print`) {
 	
 	const query = args.join(' ')
 	if (!query) return message.channel.send(`Please specify a card you would like to print.`)
-	const card_name = await findCard(query, fuzzyCards, fuzzyCards2)
+	const card_name = await findCard(query, fuzzyCards)
 	if (!card_name) return message.channel.send(`Could not find card: "${query}".`)
 	const card = await Card.findOne({ where: { name: card_name }})
 	if (!card) return message.channel.send(`I could not find "${card_name}" in the Format Library database.`)
@@ -1141,7 +1128,7 @@ if(cmd == `!edit`) {
 	const new_author = new_quote && wantsToChangeQuote ? await getFavoriteAuthor(message) : null
 
 	const wantsToChangeCard = await askToChangeProfile(message, 'card')
-	const new_card = wantsToChangeCard ? await getFavoriteCard(message, fuzzyPrints, fuzzyPrints2) : null
+	const new_card = wantsToChangeCard ? await getFavoriteCard(message, fuzzyPrints) : null
 
 	if (color.startsWith("#")) profile.color = color
 	if (new_quote) profile.quote = new_quote
@@ -1416,7 +1403,7 @@ if (cmd === `!shop`) {
 	} else {
 		const query = args.join(' ')
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+		const card_name = await findCard(query, fuzzyPrints)
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
 		const count = print && print.set_code === 'CH1' ? await Inventory.count({ where: { printId: print.id }}) : true
@@ -1443,7 +1430,7 @@ if (cmd === `!pop` || cmd === `!population`) {
 	if (!args.length) return message.channel.send(`Please specify a card.`)
 	const query = args.join(' ')
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+	const card_name = await findCard(query, fuzzyPrints)
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }, include: Set}) : card_name ? await selectPrint(message, maid, card_name) : null
 	const count = print && print.set_code === 'CH1' ? await Inventory.count({ where: { printId: print.id }}) : true
@@ -1529,8 +1516,8 @@ if(cmd === `!count`) {
 	}
 
 	if (weightedCount < 1) weightedCount = 1 
-    const core_count = most_recent === 'core' ?  Math.ceil(weightedCount / 8) : Math.ceil(weightedCount / 32)
-    const mini_count = most_recent === 'core' ?  0 : Math.ceil(weightedCount * 9 / 64)
+    const core_count = most_recent === 'core' ?  Math.ceil(weightedCount / 8) : Math.ceil(weightedCount / 12)
+    const mini_count = most_recent === 'core' ?  0 : Math.ceil(weightedCount / 16)
 	results.push(`\nIf The Shop closed now, we'd open ${mini_count} ${mini_count === 1 ? 'Pack' : 'Packs'} of ORF ${ORF} and ${core_count} ${core_count === 1 ? 'Pack' : 'Packs'} of DOC ${DOC} to restock our inventory.`)
 	return message.channel.send(results.join("\n"))
 }
@@ -1601,7 +1588,7 @@ if (cmd === `!hist` || cmd === `!history`) {
 	const query = args.join(' ')
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+	const card_name = await findCard(query, fuzzyPrints)
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
 	const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true
 	if (!print || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
@@ -1939,7 +1926,7 @@ if(bindercom.includes(cmd)) {
 		const query = inputs[j]
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+		const card_name = await findCard(query, fuzzyPrints)
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
 		const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true
 		if (!print || !count) {
@@ -2011,7 +1998,7 @@ if(cmd === `!search`) {
 	const query = args.join(' ')
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+	const card_name = await findCard(query, fuzzyPrints)
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
 	const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true
 	if (!print || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
@@ -2083,7 +2070,7 @@ if(wishlistcom.includes(cmd)) {
 		const query = inputs[j]
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-		const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+		const card_name = await findCard(query, fuzzyPrints)
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
 		const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true
 		if (!print || !count) {
@@ -3763,11 +3750,12 @@ if(cmd === `!alc` ||cmd === `!alch` || cmd === `!alchemy`) {
 	if (!args[0]) return message.channel.send(`Please specify the card you wish to transmute into ${starchips}.`)
 	
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+	const card_name = await findCard(query, fuzzyPrints)
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
 	if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+	if (print.set_code === 'FPC') return message.channel.send(`You cannot use alchemy on FPCs.`)
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 	const value = print.rarity === 'com' ? 1 : print.rarity === 'rar' ? 2 : print.rarity === 'sup' ? 4 : print.rarity === 'ult' ? 8 : 16 
 
@@ -3931,7 +3919,7 @@ if(cmd === `!award`) {
 	const valid_set_code = !!(!walletField && set_code.length === 3 && await Set.count({where: { code: set_code }}))
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const valid_card_code = !walletField && !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-	const card_name = query && !walletField && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints, fuzzyPrints2) : null
+	const card_name = query && !walletField && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints) : null
 	const print = !walletField && valid_card_code ? await Print.findOne({ where: { card_code } }) : !walletField && card_name ? await selectPrint(message, maid, card_name) : null
 
 	if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the item: "${query}".`)
@@ -4015,7 +4003,7 @@ if(cmd === `!steal`) {
 	const valid_set_code = !!(!walletField && set_code.length === 3 && await Set.count({where: { code: set_code }}))
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const valid_card_code = !!(!walletField && card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-	const card_name = query && !walletField && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints, fuzzyPrints2) : null
+	const card_name = query && !walletField && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints) : null
 	const print = !walletField && valid_card_code ? await Print.findOne({ where: { card_code } }) : !walletField && card_name ? await selectPrint(message, maid, card_name) : null
 	if (card_name && !print) return
 
@@ -4182,7 +4170,7 @@ if(invcom.includes(cmd)) {
 	const valid_set_code = !!(set_code.length === 3 && await Set.count({where: { code: set_code }}))
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-	const card_name = query && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints, fuzzyPrints2) : null
+	const card_name = query && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints) : null
 	const print = valid_card_code ? await Print.findOne({ where: { card_code } }) : card_name ? await selectPrint(message, maid, card_name) : null
 	if (card_name && !print) return
 	const count = print && print.set_code === 'CH1' ? await Inventory.count({ where: { printId: print.id } }) : true
@@ -5472,7 +5460,7 @@ if(cmd === `!adjust`) {
 	
 	const query = args.join(' ')	
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+	const card_name = await findCard(query, fuzzyPrints)
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
 	if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
@@ -5496,7 +5484,7 @@ if(cmd === `!move`) {
 	if (!args.length) return message.channel.send(`Please specify the card you wish to move on the Forbidden & Limited list.`)
 	
 	const query = args.join(' ')
-	const card_name = await findCard(query, fuzzyPrints, fuzzyPrints2)
+	const card_name = await findCard(query, fuzzyPrints)
 	const card = card_name ? await Card.findOne({ where: { name: card_name }}) : null
 	if (!card) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 	let konami_code = card.image.slice(0, -4)

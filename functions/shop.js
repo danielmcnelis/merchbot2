@@ -3,7 +3,7 @@ const { Auction, Bid, Card, Match, Player, Tournament, Print, Set, Wallet, Diary
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { nocom, yescom } = require('../static/commands.json')
-const { yes, no, mushroom, hook, rose, moai, egg, cactus, yellow, ygocard, pack, open, closed, DOC, ORF, milleye, merchant, FiC, approve, lmfao, god, legend, master, diamond, platinum, gold, silver, bronze, ROCK, sad, mad, beast, dragon, machine, spellcaster, warrior, zombie, fish, rock, dinosaur, plant, reptile, starchips, stardust, com, rar, sup, ult, scr, checkmark, emptybox } = require('../static/emojis.json')
+const { beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('./static/emojis.json')
 const { awardPacksToShop } = require('./packs')
 const adminId = '194147938786738176'
 const { client } = require('../static/clients.js')
@@ -233,8 +233,8 @@ const restock = async () => {
 	}
 
     if (weightedCount < 1) weightedCount = 1
-    const core_count = most_recent === 'core' ?  Math.ceil(weightedCount / 8) : Math.ceil(weightedCount / 32)
-    const mini_count = most_recent === 'core' ?  0 : Math.ceil(weightedCount * 9 / 64)
+    const core_count = most_recent === 'core' ?  Math.ceil(weightedCount / 8) : Math.ceil(weightedCount / 12)
+    const mini_count = most_recent === 'core' ?  0 : Math.ceil(weightedCount / 16)
     const corePacksAwarded = await awardPacksToShop(core_count,  core = true)
     const miniPacksAwarded = await awardPacksToShop(mini_count, core = false)
     if (!corePacksAwarded) client.channels.cache.get(shopChannelId).send(`Error awarding ${core_count} packs to shop.`)

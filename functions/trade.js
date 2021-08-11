@@ -103,7 +103,7 @@ const getFinalConfirmation = async (message, cards, player) => {
 }
 
 //GET TRADE SUMMARY
-const getTradeSummary = async (message, inputs, player) => {
+const getTradeSummary = async (message, inputs, player, fuzzyPrints) => {
 	const wallet = player.wallet
 	const printQuantities = []
 	const walletQuantities = []

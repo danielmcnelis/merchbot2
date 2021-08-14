@@ -185,13 +185,16 @@ const awardPacksToShop = async (num, core = true) => {
 	const supers = await Print.findAll({ 
 		where: {
 			setId: set.id,
-			rarity: "sup"
+			rarity: "sup",
+			card_slot: {
+				[Op.lt]: 200
+			}
 		},
 		order: [['card_slot', 'ASC']]
 	}).map(function(print) {
 		return print.card_code
 	})
-
+    
 	const ultras = await Print.findAll({ 
 		where: {
 			setId: set.id,

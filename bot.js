@@ -148,7 +148,7 @@ if (!message.content.startsWith("!") && message.content.includes(`{`) && message
 	if (message.member.roles.cache.some(role => role.id === triviaRole)) return message.channel.send(`You cannot search for cards while playing Trivia.`)
 	const query = message.content.slice(message.content.indexOf('{') + 1, message.content.indexOf('}'))
 	const cardEmbed = await search(query, fuzzyCards)
-	if (!cardEmbed) return message.channel.send(`Could not find card: "query".`)
+	if (!cardEmbed) return message.channel.send(`Could not find card: "${query}".`)
 	else return message.channel.send(cardEmbed)
 }
 

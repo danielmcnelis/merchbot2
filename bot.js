@@ -5291,9 +5291,9 @@ if(cmd === `!bid`) {
 	message.channel.send(`Please check your DMs.`)
 
 	if (player.bids.length === 3) {
-		return askForBidCancellation(message, player)
+		return askForBidCancellation(message, player, fuzzyPrints)
 	} else if (player.bids.length) {
-		return manageBidding(message, player)
+		return manageBidding(message, player, fuzzyPrints)
 	} else {
 		return askForBidPlacement(message, player, fuzzyPrints)
 	}

@@ -105,18 +105,20 @@ const collectNicknames = async (message, card_name) => {
     return collected
 }
 
-const selectPrint = async (message, playerId, card_name) => {
+const selectPrint = async (message, playerId, card_name, private = false) => {
     const prints = await Print.findAll({ 
         where: { card_name: card_name },
         order: [['createdAt', 'ASC']]
     })
+
+    const channel = private ? message.author : message.channel
 
     if (!prints.length) return null
     if (prints.length === 1) return prints[0]
     const options = prints.map((print, index) => `(${index + 1}) ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
 
     const filter = m => m.author.id === playerId
-    const msg = await message.channel.send(`Please select a print:\n${options.join('\n')}`)
+    const msg = await channel.send(`Please select a print:\n${options.join('\n')}`)
     const collected = await msg.channel.awaitMessages(filter, {
         max: 1,
         time: 15000

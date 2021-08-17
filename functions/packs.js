@@ -2,6 +2,7 @@
 const Discord = require('discord.js')
 const Canvas = require('canvas')
 const fs = require('fs')
+const { Op } = require('sequelize')
 const { Auction, Bid, Card, Print, Set, Inventory } = require('../db')
 const { getRandomElement, getRandomSubset } = require('./utility.js')
 const { botSpamChannelId } = require('../static/channels.json')

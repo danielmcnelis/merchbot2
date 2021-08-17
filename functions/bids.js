@@ -42,6 +42,7 @@ const manageBidding = async (message, player) => {
 
 const askForBidPlacement = async (message, player, fuzzyPrints) => {
     const filter = m => m.author.id === message.author.id
+    const fuzz = fuzzyPrints
     const msg = await message.author.send(`Which card would you like to bid on?`)
     const collected = await msg.channel.awaitMessages(filter, {
         max: 1,
@@ -50,7 +51,7 @@ const askForBidPlacement = async (message, player, fuzzyPrints) => {
         const query = collected.first().content
         const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
         const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-        const card_name = await findCard(query, fuzzyPrints)
+        const card_name = await findCard(query, fuzz)
         const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, player.id, card_name) : null
         const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true
         if (!print || !count) return message.author.send(`Sorry, I do not recognize the card: "${query}".`)

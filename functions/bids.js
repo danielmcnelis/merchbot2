@@ -5,7 +5,7 @@ const { findCard } = require('./search.js')
 const { selectPrint } = require('./print.js')
 const { beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
 
-const manageBidding = async (message, player) => {
+const manageBidding = async (message, player, fuzzyPrints) => {
     const filter = m => m.author.id === message.author.id
     const bidSummary = []
     if (player.bids.length) {
@@ -28,7 +28,7 @@ const manageBidding = async (message, player) => {
     }).then(async collected => {
         const response = collected.first().content.toLowerCase()
         if(response.includes('bid') || response.includes('place') || (bidSummary.length < 3 && response.includes('1'))) {
-            return askForBidPlacement(message, player)
+            return askForBidPlacement(message, player, fuzzyPrints)
         } else if(response.includes('can') || (bidSummary.length >= 3 && response.includes('1')) ||  (bidSummary.length < 3 && response.includes('2'))) {
             return askForBidCancellation(message, player)
         } else {
@@ -42,7 +42,6 @@ const manageBidding = async (message, player) => {
 
 const askForBidPlacement = async (message, player, fuzzyPrints) => {
     const filter = m => m.author.id === message.author.id
-    const fuzz = fuzzyPrints
     const msg = await message.author.send(`Which card would you like to bid on?`)
     const collected = await msg.channel.awaitMessages(filter, {
         max: 1,
@@ -51,7 +50,7 @@ const askForBidPlacement = async (message, player, fuzzyPrints) => {
         const query = collected.first().content
         const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
         const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-        const card_name = await findCard(query, fuzz)
+        const card_name = await findCard(query, fuzzyPrints)
         const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, player.id, card_name) : null
         const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true
         if (!print || !count) return message.author.send(`Sorry, I do not recognize the card: "${query}".`)
@@ -90,7 +89,7 @@ const askForBidPlacement = async (message, player, fuzzyPrints) => {
         message.author.send(`Thanks! You placed a ${amount}${stardust} bid on ${eval(print.rarity)}${print.card_code} - ${print.card_name}.`)
         const updatedPlayer = await Player.findOne({ where: { id: player.id }, include: [Bid, Wallet], order: [[Bid, 'amount', 'DESC']]})
         if (!updatedPlayer || player.bids.length >= 3) return
-        else return setTimeout(() => manageBidding(message, updatedPlayer), 2000)
+        else return setTimeout(() => manageBidding(message, updatedPlayer, fuzzyPrints), 2000)
     }).catch(err => {
         console.log(err)
         return message.author.send(`Sorry, time's up.`)
@@ -127,7 +126,7 @@ const askForBidAmount = async (message, player, print, card) => {
     return collected
 }
 
-const askForBidCancellation = async (message, player) => {
+const askForBidCancellation = async (message, player, fuzzyPrints) => {
     const filter = m => m.author.id === message.author.id
 
     const bidSummary = []
@@ -156,8 +155,8 @@ const askForBidCancellation = async (message, player) => {
             message.author.send(`You canceled your bid on ${bidSummary[index].slice(4)}.`)
             const updatedPlayer = await Player.findOne({ where: { id: player.id }, include: [Bid, Wallet], order: [[Bid, 'amount', 'DESC']]})
             if (!updatedPlayer) return
-            if (updatedPlayer.bids.length === 0) return setTimeout(() => askForBidPlacement(message, updatedPlayer), 2000)
-            else return setTimeout(() => manageBidding(message, updatedPlayer), 2000)
+            if (updatedPlayer.bids.length === 0) return setTimeout(() => askForBidPlacement(message, updatedPlayer, fuzzyPrints), 2000)
+            else return setTimeout(() => manageBidding(message, updatedPlayer, fuzzyPrints), 2000)
         }
     }).catch(err => {
         console.log(err)

@@ -351,7 +351,7 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
     } 
 
     if (sellerInv && sellerInv.quantity < quantity || sellerWallet && sellerWallet[walletField] < quantity) {
-        message.channel.send(`${authorIsSeller ? 'You only have' : shopSale ? 'I only have' : `${buyingPlayer} only has` } ${sellerInv ? sellerInv.quantity : sellerWallet[walletField]} ${card}${shopSale ? ' in stock.' : ''}.`)
+        message.channel.send(`${authorIsSeller ? 'You only have' : `${buyingPlayer} only has` } ${sellerInv ? sellerInv.quantity : sellerWallet[walletField]} ${card}.`)
         return false
     }
 

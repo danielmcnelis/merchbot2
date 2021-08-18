@@ -1151,7 +1151,7 @@ if(calccom.includes(cmd)) {
 
 	const avgMarketPrice = (array) => { 
 		const total = array.reduce((a, b) => a + Math.ceil(0.7 * b))
-		return total.market_price / array.length
+		return total / array.length
 	}
 
 	if (set.type === 'core' || set.type === 'mini' || set.type === 'tour') {

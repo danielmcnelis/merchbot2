@@ -1172,14 +1172,6 @@ if(calccom.includes(cmd)) {
 			+ (avgScrPrice * set.secrets_per_box) 
 		const avgPackPrice = avgBoxPrice / set.packs_per_box
 
-		console.log('avgComPrice', avgComPrice)
-		console.log('avgRarPrice', avgRarPrice)
-		console.log('avgSupPrice', avgSupPrice)
-		console.log('avgUltPrice', avgUltPrice)
-		console.log('avgScrPrice', avgScrPrice)
-		console.log('avgBoxPrice', avgBoxPrice)
-		console.log('avgPackPrice', avgPackPrice)
-
 		if (set.type === 'core') {
 			return message.channel.send(`The average resale value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Pack is ${Math.round(avgPackPrice * 100) / 100}${stardust} and a Box is ${Math.round(avgBoxPrice * 100) / 100}${stardust}.`)
 		} else {
@@ -1205,8 +1197,8 @@ if(calccom.includes(cmd)) {
 			const market_price = print.market_price
 			const d1quantity = decks[deck1].cards[print.card_code] || 0
 			const d2quantity = decks[deck2].cards[print.card_code] || 0
-			deck1Price += (d1quantity * market_price)
-			deck2Price += (d2quantity * market_price)
+			deck1Price += (d1quantity * Math.ceil(0.7 * market_price))
+			deck2Price += (d2quantity * Math.ceil(0.7 * market_price))
 		}
 
 		return message.channel.send(`The resale value of ${decks[deck1].name} ${eval(set.emoji)} is ${Math.round(deck1Price * 100) / 100}${stardust} and ${decks[deck2].name} ${eval(set.alt_emoji)} is ${Math.round(deck2Price * 100) / 100}${stardust}.`)		

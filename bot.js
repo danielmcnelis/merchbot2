@@ -1159,7 +1159,7 @@ if(calccom.includes(cmd)) {
 	if (set.type === 'core' || set.type === 'mini' || set.type === 'tour') {
 		const commons = await Print.findAll({ where: { set_code: set_code, rarity: "com" } })
 		const rares = await Print.findAll({ where: { set_code: set_code, rarity: "rar" } })
-		const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup" } })
+		const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup", card_slot: { [Op.lt]: 200 } } })
 		const ultras = await Print.findAll({ where: { set_code: set_code, rarity: "ult" } })
 		const secrets = await Print.findAll({ where: { set_code: set_code, rarity: "scr" } })
 		const avgComPrice = commons.length ? avgMarketPrice(commons) : 0
@@ -1173,6 +1173,14 @@ if(calccom.includes(cmd)) {
 			+ (avgUltPrice * set.ultras_per_box) 
 			+ (avgScrPrice * set.secrets_per_box) 
 		const avgPackPrice = avgBoxPrice / set.packs_per_box
+
+		console.log('avgComPrice', avgComPrice)
+		console.log('avgRarPrice', avgRarPrice)
+		console.log('avgSupPrice', avgSupPrice)
+		console.log('avgUltPrice', avgUltPrice)
+		console.log('avgScrPrice', avgScrPrice)
+		console.log('avgBoxPrice', avgBoxPrice)
+		console.log('avgPackPrice', avgPackPrice)
 
 		if (set.type === 'core') {
 			return message.channel.send(`The average resale value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Pack is ${Math.round(avgPackPrice * 100) / 100}${stardust} and a Box is ${Math.round(avgBoxPrice * 100) / 100}${stardust}.`)
@@ -3587,7 +3595,10 @@ if(cmd === `!daily`) {
 	const supers = await Print.findAll({ 
 		where: {
 			setId: set.id,
-			rarity: "sup"
+			rarity: "sup",
+			card_slot: {
+				[Op.lt]: 200
+			}
 		},
 		order: [['card_slot', 'ASC']]
 	}).map(function(print) {

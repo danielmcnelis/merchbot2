@@ -1150,18 +1150,16 @@ if(calccom.includes(cmd)) {
 	if(!set) return message.channel.send(`I do not recognize the set code: "${set_code}"`)	
 
 	const avgMarketPrice = (array) => { 
-		const total = array.reduce((a, b) => {
-			return  { market_price: parseInt(a.market_price) + parseInt(b.market_price) }
-		})
+		const total = array.reduce((a, b) => a + Math.ceil(0.7 * b))
 		return total.market_price / array.length
 	}
 
 	if (set.type === 'core' || set.type === 'mini' || set.type === 'tour') {
-		const commons = await Print.findAll({ where: { set_code: set_code, rarity: "com" } })
-		const rares = await Print.findAll({ where: { set_code: set_code, rarity: "rar" } })
-		const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup", card_slot: { [Op.lt]: 200 } } })
-		const ultras = await Print.findAll({ where: { set_code: set_code, rarity: "ult" } })
-		const secrets = await Print.findAll({ where: { set_code: set_code, rarity: "scr" } })
+		const commons = await Print.findAll({ where: { set_code: set_code, rarity: "com" } }).map((p) => p.market_price)
+		const rares = await Print.findAll({ where: { set_code: set_code, rarity: "rar" } }).map((p) => p.market_price)
+		const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup", card_slot: { [Op.lt]: 200 } } }).map((p) => p.market_price)
+		const ultras = await Print.findAll({ where: { set_code: set_code, rarity: "ult" } }).map((p) => p.market_price)
+		const secrets = await Print.findAll({ where: { set_code: set_code, rarity: "scr" } }).map((p) => p.market_price)
 		const avgComPrice = commons.length ? avgMarketPrice(commons) : 0
 		const avgRarPrice = rares.length ? avgMarketPrice(rares) : 0
 		const avgSupPrice = supers.length ? avgMarketPrice(supers) : 0

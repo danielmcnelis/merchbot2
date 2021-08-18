@@ -1403,22 +1403,33 @@ if (cmd === `!shop`) {
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 		const card_name = await findCard(query, fuzzyPrints)
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-		const count = print && print.set_code === 'CH1' ? await Inventory.count({ where: { printId: print.id }}) : true
-		if (!print || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
-		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
-		const inv = await Inventory.findOne({ where: {
-			printId: print.id,
-			playerId: merchbotId,
-			quantity: { [Op.gt]: 0 }
-		}})
+		const prints = valid_card_code ? await Print.findAll({ where: { card_code: card_code }}) : card_name ? await Print.findAll({ where: { card_name: card_name } }) : null
+		const count = prints.length === 1 && prints[0].set_code === 'CH1' ? await Inventory.count({ where: { printId: prints[0].id }}) : true
+		if (!prints.length || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+		const results = []
 
-		const auction = await Auction.findOne({ where: { printId: print.id } })
-		const market_price = print.market_price
-		const selling_price = Math.ceil(market_price * 1.1)
-		const buying_price = Math.ceil(market_price * 0.7)
-		if (!inv) return message.channel.send(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - Out of Stock.`)
-		return message.channel.send(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - ${inv.quantity}${auction ? ` - ${no}`: ''}`)
+		for (let i = 0; i < prints.length; i++) {
+			const print = prints[i]
+			const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+			const inv = await Inventory.findOne({ where: {
+				printId: print.id,
+				playerId: merchbotId,
+				quantity: { [Op.gt]: 0 }
+			}})
+	
+			const auction = await Auction.findOne({ where: { printId: print.id } })
+			const market_price = print.market_price
+			const selling_price = Math.ceil(market_price * 1.1)
+			const buying_price = Math.ceil(market_price * 0.7)
+
+			if (!inv) {
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - Out of Stock.`)
+			} else {
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - ${inv.quantity}${auction ? ` - ${no}`: ''}`)
+			}
+		}
+
+		return message.channel.send(results.join('\n'))
 	}
 }
 

@@ -2462,6 +2462,7 @@ if (losscom.includes(cmd)) {
 			winnerId: winningPlayer.id,
 			loser_name: losingPlayer.name,
 			loserId: losingPlayer.id,
+			delta: 0,
 			chipsWinner: 4,
 			chipsLoser: 2
 		})

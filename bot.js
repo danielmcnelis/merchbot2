@@ -34,7 +34,7 @@ const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createP
 
 // STATIC IMPORTS
 const arenas = require('./static/arenas.json')
-const { arenaChannelId, botSpamChannelId, bugreportsChannelId, discussionChannelId, draftChannelId, duelRequestsChannelId, gauntletChannelId, generalChannelId, gutterChannelId, introChannelId, keeperChannelId, marketPlaceChannelId, replaysChannelId, rulesChannelId, rulingsChannelId, shopChannelId, staffChannelId, suggestionsChannelId, tournamentChannelId, triviaChannelId, welcomeChannelId } = require('./static/channels.json')
+const { arenaChannelId, botSpamChannelId, bugreportsChannelId, discussionChannelId, draftChannelId, duelRequestsChannelId, pauperChannelId, gauntletChannelId, generalChannelId, gutterChannelId, introChannelId, keeperChannelId, marketPlaceChannelId, replaysChannelId, rulesChannelId, rulingsChannelId, shopChannelId, staffChannelId, suggestionsChannelId, tournamentChannelId, triviaChannelId, welcomeChannelId } = require('./static/channels.json')
 const { client, challongeClient } = require('./static/clients.js')
 const { aliuscom, bindercom, botcom, bracketcom, calccom, checklistcom, dbcom, deckcom, dropcom, h2hcom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, pfpcom, profcom, queuecom, rankcom, rolecom, startcom, statscom, undocom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
@@ -1023,6 +1023,19 @@ if(infocom.includes(cmd)) {
 		` Winners receive 4" + starchip + " while losers receive 2" + starchip + ".`+
 		` The winner of each leg receives a random Starter Deck " + ultEmoji + " from that generation.`+
 		` Whoever wins the most legs wins the Gauntlet, and receives an additional 10" + starchip + ".`)
+	}
+
+	if (mcid == pauperChannelId) { 
+		return message.channel.send(`${com}  ${com}  ${com}  --- Pauper Format ---  ${com}  ${com}  ${com}`+ 
+		`\nIn this channel, the rich and the poor are on a more equal playing field!`+
+		` This is a constructed format using cards in your Inventory.`+
+		` However, only cards that were **originally** printed as commons ${com} are allowed in this format.`+
+		` That means, for example, Starter Deck copies of Bottomless Trap Hole may not be played.`+
+		` Do you have what it takes to be a master budget player? ${green}`+
+		`\n\nPauper Format is played as 1v1, best-of-3 matches.`+
+		` Winners receive 4${starchips}, losers receive 2${starchips}.`+
+		` To report a loss, type **!loss @opponent**.`+
+		` These games do not affect your ranking for Tournaments, Diary tasks, etc.`)
 	}
 
 	if (mcid == keeperChannelId) { 
@@ -2201,6 +2214,7 @@ if (losscom.includes(cmd)) {
 	
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
 	//: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
+	: message.channel === client.channels.cache.get(pauperChannelId) ? "Pauper"
 	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
 	: "Ranked"
 
@@ -2435,6 +2449,24 @@ if (losscom.includes(cmd)) {
 		return message.channel.send(`You do not have the Arena Players role. Please report your loss in the appropriate channel.`)
 	} else if (hasArenaRole && game !== 'Arena') {
 		return message.channel.send(`You have the Arena Players role. Please report your Arena loss in <#${arenaChannelId}>, or get a Moderator to help you.`)
+	} else if (!hasArenaRole && game === 'Pauper') {
+		winningPlayer.wallet.starchips += 4
+		await winningPlayer.wallet.save()
+
+		losingPlayer.wallet.starchips += 2
+		await losingPlayer.wallet.save()
+
+		await Match.create({
+			game_mode: "pauper",
+			winner_name: winningPlayer.name,
+			winnerId: winningPlayer.id,
+			loser_name: losingPlayer.name,
+			loserId: losingPlayer.id,
+			chipsWinner: 4,
+			chipsLoser: 2
+		})
+		
+		return message.channel.send(`${losingPlayer.name} (+2${starchips}), your Pauper loss to ${winningPlayer.name} (+4${starchips}) has been recorded.`)
 	} else if (!hasArenaRole && game === 'Ranked') {
 		const diary = winningPlayer.diary
 		const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
@@ -2805,6 +2837,7 @@ if (h2hcom.includes(cmd)) {
 if (undocom.includes(cmd)) {
 	const game_mode = message.channel === client.channels.cache.get(arenaChannelId) ? 'arena' :
 		message.channel === client.channels.cache.get(keeperChannelId) ? 'keeper' :
+		message.channel === client.channels.cache.get(pauperChannelId) ? 'pauper' :
 		message.channel === client.channels.cache.get(draftChannelId) ? 'draft' :
 		'ranked'
 
@@ -2843,6 +2876,15 @@ if (undocom.includes(cmd)) {
 	
 		await lastMatch.destroy()
 		return message.channel.send(`The last Arena match in which ${winningPlayer.name} (-${lastMatch.chipsWinner}${starchips}) defeated ${losingPlayer.name} (-${lastMatch.chipsLoser}${starchips}) has been erased.`)
+	} if (game_mode === 'pauper') {
+		winningPlayer.wallet.starchips -= lastMatch.chipsWinner
+		await winningPlayer.wallet.save()
+
+		losingPlayer.wallet.starchips -= lastMatch.chipsLoser
+		await losingPlayer.wallet.save()
+	
+		await lastMatch.destroy()
+		return message.channel.send(`The last Pauper match in which ${winningPlayer.name} (-${lastMatch.chipsWinner}${starchips}) defeated ${losingPlayer.name} (-${lastMatch.chipsLoser}${starchips}) has been erased.`)
 	} else {
 		if (!winningPlayer.backup && maid !== loserId) return message.channel.send(`${winningPlayer.name} has no backup stats.${prompt}`)
 		if (!winningPlayer.backup && maid === loserId) return message.channel.send(`Your last opponent, ${winningPlayer.name}, has no backup stats.${prompt}`)

@@ -2467,7 +2467,7 @@ if (losscom.includes(cmd)) {
 			chipsLoser: 1
 		})
 		
-		return message.channel.send(`${losingPlayer.name} (+2${starchips}), your Pauper loss to ${winningPlayer.name} (+4${starchips}) has been recorded.`)
+		return message.channel.send(`${losingPlayer.name} (+1${starchips}), your Pauper loss to ${winningPlayer.name} (+3${starchips}) has been recorded.`)
 	} else if (!hasArenaRole && game === 'Ranked') {
 		const diary = winningPlayer.diary
 		const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12

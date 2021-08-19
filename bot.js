@@ -1026,16 +1026,16 @@ if(infocom.includes(cmd)) {
 	}
 
 	if (mcid == pauperChannelId) { 
-		return message.channel.send(`${com}  ${com}  ${com}  --- Pauper Format ---  ${com}  ${com}  ${com}`+ 
-		`\nIn this channel, the rich and the poor are on a more equal playing field!`+
+		return message.channel.send(`${com} --- Pauper Format --- ${rar}`+ 
+		`\nIn this channel, the rich and the poor fight on an even playing field!`+
 		` This is a constructed format using cards in your Inventory.`+
-		` However, only cards that were **originally** printed as commons ${com} are allowed in this format.`+
-		` That means, for example, Starter Deck copies of Bottomless Trap Hole may not be played.`+
-		` Do you have what it takes to be a master budget player? ${green}`+
-		`\n\nPauper Format is played as 1v1, best-of-3 matches.`+
+		` However, only cards that were **originally printed** as commons ${com} are allowed in this format.`+
+		` This means cards such as Starter Deck copies of Bottomless Trap Hole cannot be played.`+
+		`\n\nPauper Format is played as single games, not matches.`+
 		` Winners receive 4${starchips}, losers receive 2${starchips}.`+
 		` To report a loss, type **!loss @opponent**.`+
-		` These games do not affect your ranking for Tournaments, Diary tasks, etc.`)
+		` These games do not affect your ranking for Tournaments, Diary tasks, etc.` +
+		`\n\nDo you have what it takes to become a master budget player? ${cavebob}`)
 	}
 
 	if (mcid == keeperChannelId) { 
@@ -2450,10 +2450,10 @@ if (losscom.includes(cmd)) {
 	} else if (hasArenaRole && game !== 'Arena') {
 		return message.channel.send(`You have the Arena Players role. Please report your Arena loss in <#${arenaChannelId}>, or get a Moderator to help you.`)
 	} else if (!hasArenaRole && game === 'Pauper') {
-		winningPlayer.wallet.starchips += 4
+		winningPlayer.wallet.starchips += 3
 		await winningPlayer.wallet.save()
 
-		losingPlayer.wallet.starchips += 2
+		losingPlayer.wallet.starchips += 1
 		await losingPlayer.wallet.save()
 
 		await Match.create({
@@ -2463,8 +2463,8 @@ if (losscom.includes(cmd)) {
 			loser_name: losingPlayer.name,
 			loserId: losingPlayer.id,
 			delta: 0,
-			chipsWinner: 4,
-			chipsLoser: 2
+			chipsWinner: 3,
+			chipsLoser: 1
 		})
 		
 		return message.channel.send(`${losingPlayer.name} (+2${starchips}), your Pauper loss to ${winningPlayer.name} (+4${starchips}) has been recorded.`)
@@ -2577,8 +2577,14 @@ if (manualcom.includes(cmd)) {
 	if (!losingPlayer) return message.channel.send(`Sorry, ${loser.user.username} is not in the database.`)
 	if (!winningPlayer) (`Sorry, ${winner.user.username} was not in the database.`)
 
+	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
+	//: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
+	: message.channel === client.channels.cache.get(pauperChannelId) ? "Pauper"
+	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
+	: "Ranked"
+
 	if (winner.roles.cache.some(role => role.id === arenaRole) || loser.roles.cache.some(role => role.id === arenaRole)) {
-		if (message.channel !== client.channels.cache.get(arenaChannelId)) return message.channel.send(`Please report this loss in: <#${arenaChannelId}>`)
+		if (game !== "Arena") return message.channel.send(`Please report this loss in: <#${arenaChannelId}>`)
 		
 		const losingContestant = await Arena.findOne({ where: { playerId: loserId }})
 		if (!losingContestant) return message.channel.send(`You are not in the current Arena.`)
@@ -2639,6 +2645,25 @@ if (manualcom.includes(cmd)) {
 
 		message.channel.send(`A manual Arena loss by ${losingPlayer.name} (+2${starchips}) to ${winningPlayer.name} (+4${starchips}) has been recorded.`)
 		return checkArenaProgress(info)
+	} else if (game === 'Pauper') {
+		winningPlayer.wallet.starchips += 3
+		await winningPlayer.wallet.save()
+
+		losingPlayer.wallet.starchips += 1
+		await losingPlayer.wallet.save()
+
+		await Match.create({
+			game_mode: "pauper",
+			winner_name: winningPlayer.name,
+			winnerId: winningPlayer.id,
+			loser_name: losingPlayer.name,
+			loserId: losingPlayer.id,
+			delta: 0,
+			chipsWinner: 3,
+			chipsLoser: 1
+		})
+
+		return message.channel.send(`A manual Pauper loss by ${losingPlayer.name} (+1${starchips}) to ${winningPlayer.name} (+3${starchips}) has been recorded.`)
 	} else {
 		const diary = winningPlayer.diary
 		const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12

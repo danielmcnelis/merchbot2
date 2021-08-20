@@ -4392,7 +4392,8 @@ if(invcom.includes(cmd)) {
 			console.log(err)
 		}
 
-		if (row.print.set_code !== 'TEB') results.push(`${eval(row.print.rarity)}${row.card_code} - ${count_2 ? row.print.card_name : '???'} - ${row.quantity}`) 
+		console.log('row.print.set_code', row.print.set_code)
+		if (row.print.set_code !== 'TEB') results.push(`${eval(row.print.rarity)}${row.card_code} - ${row.print.card_name} - ${row.quantity}`) 
 	}
 
 	for (let i = 0; i < results.length; i += 30) {

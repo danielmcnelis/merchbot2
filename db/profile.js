@@ -67,6 +67,21 @@ const Profile = db.define('profile', {
         defaultValue: 0,        
         allowNull: false
     },
+    dragon_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,        
+        allowNull: false
+    },
+    spellcaster_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,        
+        allowNull: false
+    },
+    warrior_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,        
+        allowNull: false
+    },
     trivia_wins: {
         type: Sequelize.INTEGER,
         defaultValue: 0,  

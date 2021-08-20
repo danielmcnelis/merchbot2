@@ -4927,7 +4927,7 @@ if(cmd === `!box`) {
 	if (code.startsWith('SS')) return message.channel.send(`Sorry, Starter Series cards are not sold by the box.`)
 	const set = await Set.findOne({ where: { code: code.toUpperCase() }})
 	if (!set) return message.channel.send(`There is no set with the code "${code.toUpperCase()}".`)
-	if (!set.for_sale) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} is out of stock.`)
+	if (!set.for_sale) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} are not available.`)
 	if (!set.packs_per_box) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} is experiencing a glitch in the database. Please get an Admin to help you.`)
 
 	const wallet = await Wallet.findOne( { where: { playerId: maid }, include: Player })

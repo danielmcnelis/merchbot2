@@ -1590,10 +1590,12 @@ if(cmd === `!count`) {
 		}
 	}
 
+	console.log('weightedCount', weightedCount)
+
 	if (weightedCount < 1) weightedCount = 1 
     const core_count = most_recent === 'core' ?  Math.ceil(weightedCount / 8) : Math.ceil(weightedCount / 16)
     const mini_count = most_recent === 'core' ?  0 : Math.ceil(weightedCount * 3 / 32)
-	results.push(`\nIf The Shop closed now, we'd open ${mini_count} ${mini_count === 1 ? 'Pack' : 'Packs'} of ORF ${ORF} and ${core_count} ${core_count === 1 ? 'Pack' : 'Packs'} of DOC ${DOC} to restock our inventory.`)
+	results.push(`\nIf The Shop closed now, we'd open ${most_recent === 'mini' ? `${mini_count} ${mini_count === 1 ? 'Pack' : 'Packs'} of ORF ${ORF} and ` : ''}${core_count} ${core_count === 1 ? 'Pack' : 'Packs'} of TEB ${TEB} to restock our inventory.`)
 	return message.channel.send(results.join("\n"))
 }
 

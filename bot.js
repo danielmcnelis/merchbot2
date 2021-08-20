@@ -3910,7 +3910,7 @@ if(cmd === `!alc` ||cmd === `!alch` || cmd === `!alchemy`) {
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-	if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+	if (!print || print.set_code === 'TEB') return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 	if (print.set_code === 'FPC') return message.channel.send(`You cannot use alchemy on FPCs.`)
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 	const value = print.rarity === 'com' ? 1 : print.rarity === 'rar' ? 2 : print.rarity === 'sup' ? 4 : print.rarity === 'ult' ? 8 : 16 

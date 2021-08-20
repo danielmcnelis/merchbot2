@@ -143,7 +143,7 @@ const getTradeSummary = async (message, inputs, player, fuzzyPrints) => {
 		card_name && !walletField ? await selectPrint(message, player.id, card_name) :
 		null
 
-		if ((!print && !walletField) || print.set_code === 'RESTRICTED') {
+		if ((!print && !walletField) || (print && print.set_code === 'HIDDEN')) {
 			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 			return false
 		}

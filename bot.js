@@ -4409,7 +4409,7 @@ if(invcom.includes(cmd)) {
 			console.log(err)
 		}
 
-		if (row.print.set_code !== 'RESTRICTED') results.push(`${eval(row.print.rarity)}${row.card_code} - ${row.print.card_name} - ${row.quantity}`) 
+		if (row.print.set_code !== 'HIDDEN') results.push(`${eval(row.print.rarity)}${row.card_code} - ${row.print.card_name} - ${row.quantity}`) 
 	}
 
 	for (let i = 0; i < results.length; i += 30) {

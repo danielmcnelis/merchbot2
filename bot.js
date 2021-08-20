@@ -39,7 +39,7 @@ const { client, challongeClient } = require('./static/clients.js')
 const { aliuscom, bindercom, botcom, bracketcom, calccom, checklistcom, dbcom, deckcom, dropcom, h2hcom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, pfpcom, profcom, queuecom, rankcom, rolecom, startcom, statscom, undocom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
-const { beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, green, yes, ygocard } = require('./static/emojis.json')
+const { beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, green, yes, ygocard } = require('./static/emojis.json')
 const muted = require('./static/muted.json')
 const nicknames = require('./static/nicknames.json')
 const prints = require('./static/prints.json')
@@ -364,16 +364,52 @@ if (cmd === `!new_set`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	
 	const set = {
-		code: "FPC",
-		name: "Forged Prize Cards",
-		type: "promot",
-		emoji: "soldier",
-		alt_emoji: "soldier",
-		size: 1,
-		secrets: 1
+		code: "TEB",
+		name: "Thousand-Eyes Bible",
+		type: "core",
+		emoji: "TEB",
+		alt_emoji: "TEB",
+		size: 150,
+		commons: 72,
+		rares: 30,
+		supers: 27,
+		ultras: 15,
+		secrets: 6,
+		specials: 0,
+		for_sale: false,
+		spec_for_sale: false,
+		unit_price: 15,
+		unit_sales: 0,
+		cards_per_pack: 9,
+		box_price: 315,
+		packs_per_box: 24,
+		spec_price: 40,
+		packs_per_spec: 3,
+		commons_per_pack: 7,
+		rares_per_pack: 1,
+		commons_per_box: 168,
+		rares_per_box: 24,
+		supers_per_box: 18,
+		ultras_per_box: 5,
+		secrets_per_box: 1,
+		specs_per_spec: 2
+	}
+
+	const SS3 = {
+		code: "SS3",
+		name: "Starter Series 3",
+		type: "starter_deck",
+		emoji: "dragon",
+		alt_emoji: "spellcaster",
+		for_sale: false,
+		size: 44,
+		commons: 42,
+		ultras: 2,
+		unit_price: 75
 	}
 
 	await Set.create(set)
+	await Set.create(SS3)
 	message.channel.send(`I created a new set: ${set.name} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? ` ${eval(set.alt_emoji)}` : ''}.`)
 }
 

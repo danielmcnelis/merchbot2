@@ -774,7 +774,7 @@ if(startcom.includes(cmd)) {
 			)
 	
 			await awardPack(message.channel, maid, set1, 24)
-			await awardPack(message.channel, maid, set2, 10)
+			//await awardPack(message.channel, maid, set2, 10)
 			await completeTask(message.channel, maid, 'e1')
 			await completeTask(message.channel, maid, 'm4', 4000)
 			return message.channel.send(`I wish you luck on your journey, new duelist! ${master}`)
@@ -1142,7 +1142,7 @@ if(deckcom.includes(cmd)) {
 		}})
 
 		if (!set) return message.channel.send(`Could not find set with code "${decks[deck].set_code}".`)
-		if (!set.for_sale) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} ${eval(set.alt_emoji)} is out of stock.`)
+		if (!set.for_sale) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} ${eval(set.alt_emoji)} is not available.`)
 		const money = wallet[set.currency]
 		if (money < set.unit_price) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${money}${eval(set.currency)} and ${decks[deck].name} ${eval(deck)} costs ${set.unit_price}${eval(set.currency)}.`)
 

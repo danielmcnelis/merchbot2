@@ -4375,7 +4375,7 @@ if(invcom.includes(cmd)) {
 	const results = [`${player.name}'s Inventory:`]
 	const codes = []
 
-	if (!inventory.length && !print) return message.channel.send(`Sorry, I do not recognize: "${query}".`)
+	if (print.set_code === 'TEB' || (!inventory.length && !print)) return message.channel.send(`Sorry, I do not recognize: "${query}".`)
 	if (!inventory.length && print) results.push(`${eval(print.rarity)}${print.card_code} - ${count ? print.card_name : '???'} - 0`)
 
 	for (let i = 0; i < inventory.length; i++) {
@@ -4392,7 +4392,6 @@ if(invcom.includes(cmd)) {
 			console.log(err)
 		}
 
-		console.log('row.print.set_code', row.print.set_code)
 		if (row.print.set_code !== 'TEB') results.push(`${eval(row.print.rarity)}${row.card_code} - ${count_2 ? row.print.card_name : '???'} - ${row.quantity}`) 
 	}
 

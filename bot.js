@@ -5458,7 +5458,8 @@ if(cmd === `!bid`) {
 //TRADE
 if(cmd === `!trade`) {
 	if (mcid !== botSpamChannelId &&
-		mcid !== marketPlaceChannelId
+		mcid !== marketPlaceChannelId &&
+		mcid !== gutterChannelId
 	) return message.channel.send(`Please use this command in <#${botSpamChannelId}> or <#${marketPlaceChannelId}>.`)
 
 	const initiatorId = maid

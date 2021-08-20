@@ -1473,7 +1473,7 @@ if (cmd === `!shop`) {
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 		const prints = valid_card_code ? await Print.findAll({ where: { card_code: card_code }}) : card_name ? await Print.findAll({ where: { card_name: card_name } }) : null
 		const count = prints && prints.length === 1 && (prints[0].set_code === 'CH1' || prints[0].set_code === 'TEB') ? await Inventory.count({ where: { printId: prints[0].id }}) : true
-		if (!prints.length || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+		if (!prints || !prints.length || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 		const results = []
 
 		for (let i = 0; i < prints.length; i++) {

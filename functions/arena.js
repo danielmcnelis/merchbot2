@@ -2,7 +2,7 @@
 const { Arena, Diary, Info, Player, Profile, Wallet, Match } = require('../db')
 const { Op } = require('sequelize')
 const { yescom, nocom } = require('../static/commands.json')
-const { beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, dragon, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, spellcaster, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
+const { gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, dragon, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, spellcaster, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
 const { arenaRole } = require('../static/roles.json')
 const { arenaChannelId } = require('../static/channels.json')
 const { client } = require('../static/clients.js')
@@ -23,7 +23,7 @@ const getArenaSample = async (message, query) => {
     if (query && (query.includes('spell') || query.includes('cast'))) return 'spellcaster'
     if (query && query.includes('war')) return 'warrior'
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`Please select a tribe:\n(1) Beast\n(2) Dinosaur\(3) Dragon\n(4) Fish\n(5) Plant\n(6) Reptile\n(7) Rock\n(8) Spellcaster\n(9) Warrior`)
+	const msg = await message.channel.send(`Please select a tribe:\n(1) Beast\n(2) Dinosaur\n(3) Dragon\n(4) Fish\n(5) Plant\n(6) Reptile\n(7) Rock\n(8) Spellcaster\n(9) Warrior`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 10000

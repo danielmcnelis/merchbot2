@@ -4392,7 +4392,7 @@ if(invcom.includes(cmd)) {
 			console.log(err)
 		}
 
-		const count_2 = (row.print.set_code === 'CH1' || row.print.set_code === 'TEB') ? await Inventory.count({ where: { printId: row.printId } }) : true
+		const count_2 = row.print.set_code === 'TEB' ? false : true
 		if (count_2) results.push(`${eval(row.print.rarity)}${row.card_code} - ${count_2 ? row.print.card_name : '???'} - ${row.quantity}`) 
 	}
 

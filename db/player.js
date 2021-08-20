@@ -101,6 +101,16 @@ const Player = db.define('player', {
         type: Sequelize.INTEGER,
         defaultValue: 0,
         allowNull: false
+    },
+    pauper_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false
+    },
+    pauper_losses: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false
     }
 })
 

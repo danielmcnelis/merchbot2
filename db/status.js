@@ -14,6 +14,10 @@ const Status = db.define('status', {
     current: {
         type: Sequelize.STRING,        
         allowNull: true
+    },
+    pauper: {
+        type: Sequelize.STRING,        
+        allowNull: true
     }
 })
 

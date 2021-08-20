@@ -2145,7 +2145,7 @@ if(wishlistcom.includes(cmd)) {
 	if (!args.length || playerId !== maid) {
 		const prints = []
 		
-		for (let i = 0; i < 10; i++) {
+		for (let i = 0; i < 18; i++) {
 			const card_code = wishlist[`slot_${i + 1}`]
 			if (!card_code) continue
 			const print = await Print.findOne({ where: { card_code }})
@@ -2170,6 +2170,14 @@ if(wishlistcom.includes(cmd)) {
 		wishlist.slot_8 = null
 		wishlist.slot_9 = null
 		wishlist.slot_10 = null
+		wishlist.slot_11 = null
+		wishlist.slot_12 = null
+		wishlist.slot_13 = null
+		wishlist.slot_14 = null
+		wishlist.slot_15 = null
+		wishlist.slot_16 = null
+		wishlist.slot_17 = null
+		wishlist.slot_18 = null
 
 		await wishlist.save()
 		return message.channel.send(`Your wishlist has been emptied.`)
@@ -2207,7 +2215,7 @@ if(wishlistcom.includes(cmd)) {
 
 		let success = false
 		let i = 0
-		while (!success && i < 10) {
+		while (!success && i < 18) {
 			if (!wishlist[`slot_${i + 1}`]) {
 				success = true
 				wishlist[`slot_${i + 1}`] = print.card_code

@@ -44,7 +44,11 @@ const Daily = db.define('daily', {
         type: Sequelize.DATE,
         allowNull: true
     },
-    last_gift: {
+    last_box: {
+        type: Sequelize.DATE,
+        allowNull: true
+    },
+    last_wager: {
         type: Sequelize.DATE,
         allowNull: true
     }

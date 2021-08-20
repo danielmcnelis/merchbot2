@@ -42,6 +42,38 @@ const Wishlist = db.define('wishlist', {
     slot_10: {
         type: Sequelize.TEXT,
         allowNull: true
+    },
+    slot_11: {
+        type: Sequelize.TEXT,
+        allowNull: true
+    },
+    slot_12: {
+        type: Sequelize.TEXT,
+        allowNull: true
+    },
+    slot_13: {
+        type: Sequelize.TEXT,
+        allowNull: true
+    },
+    slot_14: {
+        type: Sequelize.TEXT,
+        allowNull: true
+    },
+    slot_15: {
+        type: Sequelize.TEXT,
+        allowNull: true
+    },
+    slot_16: {
+        type: Sequelize.TEXT,
+        allowNull: true
+    },
+    slot_17: {
+        type: Sequelize.TEXT,
+        allowNull: true
+    },
+    slot_18: {
+        type: Sequelize.TEXT,
+        allowNull: true
     }
 })
 

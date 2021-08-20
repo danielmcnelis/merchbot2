@@ -736,14 +736,18 @@ if(startcom.includes(cmd)) {
 		if(await isNewUser(maid)) await createPlayer(maid, message.author.username, message.author.tag)
 		if(await hasProfile(maid)) return message.channel.send("You already received your first Starter Deck.")
 	
-		const set = await Set.findOne({ where: {
+		const set1 = await Set.findOne({ where: {
 			code: 'DOC'
 		}})
 	
-		if (!set) return message.channel.send(`Could not find set: "DOC".`)
+		const set2 = await Set.findOne({ where: {
+			code: 'TEB'
+		}})
+
+		if (!set1 || !set2) return message.channel.send(`Could not find sets: "DOC" or "TEB".`)
 	
 		const filter = m => m.author.id === maid
-		await message.channel.send(`Greetings, champ! Which deck would you like to start?\n- (1) Dinosaur\'s Power  ${dinosaur}\n- (2) Plant\'s Harmony ${plant}`)
+		await message.channel.send(`Greetings, champ! Which deck would you like to start?\n- (1) Dragon\'s Inferno ${dragon}\n- (2) Spellcaster\'s Art ${spellcaster}`)
 		
 		message.channel.awaitMessages(filter, {
 			max: 1,
@@ -752,10 +756,10 @@ if(startcom.includes(cmd)) {
 			const response = collected.first().content.toLowerCase()
 			let starter
 	
-			if(response.includes('dino') || response.includes(dinosaur) || response.includes("(1)") || response === "1") {
-				starter = 'dinosaur'
-			} else if(response.includes('plant') || response.includes(plant) || response.includes === "(2)" || response === "2") {
-				starter = 'plant'
+			if(response.includes('drag') || response.includes(dragon) || response.includes("(1)") || response === "1") {
+				starter = 'dragon'
+			} else if(response.includes('spell') || response.includes('cast') || response.includes(spellcaster) || response.includes === "(2)" || response === "2") {
+				starter = 'spellcaster'
 			}
 	
 			if (!starter) return message.channel.send('You did not select a valid Starter Deck. Please type **!start** to try again.')
@@ -765,13 +769,14 @@ if(startcom.includes(cmd)) {
 			message.member.roles.add(fpRole)
 			message.member.roles.add(noviceRole)
 			message.channel.send(`Excellent choice, ${message.author.username}! ${legend}` +
-			`\nYou received a copy of ${starter === "dinosaur" ? `Dinosaur's Power ${dinosaur}` : `Plant's Harmony ${plant}`} and the **Forged Players** role! ${wokeaf}` +
+			`\nYou received a copy of ${starter === "dragon" ? `Dragon's Inferno ${dragon}` : `Spellcaster's Art ${spellcaster}`} and the **Forged Players** role! ${wokeaf}` +
 			`\nPlease wait while I open some packs... ${blue}`
 			)
 	
-			const gotSecret = await awardPack(message.channel, maid, set, 16)
+			await awardPack(message.channel, maid, set1, 24)
+			await awardPack(message.channel, maid, set2, 10)
 			await completeTask(message.channel, maid, 'e1')
-			if (gotSecret) await completeTask(message.channel, maid, 'm4', 4000)
+			await completeTask(message.channel, maid, 'm4', 4000)
 			return message.channel.send(`I wish you luck on your journey, new duelist! ${master}`)
 		}).catch(err => {
 			console.log(err)
@@ -1027,7 +1032,7 @@ if(infocom.includes(cmd)) {
 	}
 
 	if (mcid == arenaChannelId) { 
-		return message.channel.send(`${beast}   ${dinosaur}   ${fish}  ----- The Arena -----  ${plant}   ${reptile}   ${rock}`+ 
+		return message.channel.send(`${beast}   ${dinosaur}   ${dragon}   ${fish}  ----- The Arena -----  ${plant}   ${reptile}   ${rock}   ${spellcaster}   ${warrior}`+ 
 		`\nIn this channel, you get to test out the game's most powerful cards.`+
 		` Simply align yourself with a Tribe and wage war at their side.`+
 		`\n\nTo compete in the Arena, type **!join** in <#${arenaChannelId}>.`+
@@ -1045,7 +1050,7 @@ if(infocom.includes(cmd)) {
 		return message.channel.send(`${gloveEmoji} --- The Gauntlet --- ${gloveEmoji}`+ 
 		`\nThe Gauntlet is the ultimate test of endurance and technical play.`+
 		` In this 2-Player game-mode, you're asked to succeed with Starter Decks from every generation of Forged`+
-		` from Fish's Ire ${fish} to Rock's Foundation ${rock}.`
+		` from Fish's Ire ${fish} to Spellcaster's Art ${spellcaster}.`
 		`\n\nTo enter the Gauntlet, simply use **!challenge @opponent** <#${gauntletChannelId}>.`+
 		` Once a challenge is accepted, each player will receive a Starter Deck via DM.`+
 		` The Gauntlet is separated into \"legs\" for each of the Starter Deck generations.`+
@@ -1128,7 +1133,7 @@ if(deckcom.includes(cmd)) {
 		if (!wallet || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 
 		const deck = await getShopDeck(message, args[0])
-		const valid_decks = ["fish", "rock", "dinosaur", "plant"]
+		const valid_decks = ["dragon", "spellcaster", "dinosaur", "plant", "fish", "rock"]
 		if (!deck) return
 		if (!valid_decks.includes(deck)) return message.channel.send(`Sorry, I do not have that deck for sale.`)
 
@@ -1148,7 +1153,9 @@ if(deckcom.includes(cmd)) {
 			time: 15000
 		}).then(async collected => {
 			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
-			const code = deck === 'plant' || deck === 'dinosaur' ? 'SS2' : 'SS1'
+			const code = deck === 'dragon' || deck === 'spellcaster' ? 'SS3' :
+				deck === 'plant' || deck === 'dinosaur' ? 'SS2' :
+				'SS1'
 			const set = await Set.findOne({ where: { code: code } })
 			wallet[set.currency] -= set.unit_price
 			await wallet.save()
@@ -1285,7 +1292,13 @@ if(profcom.includes(cmd)) {
 	const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "November", "December"]
 	const month = months[parseInt(player.profile.start_date.slice(5, 7)) - 1]
 	const year = player.profile.start_date.slice(0, 4)
-	const deck_name = player.profile.starter === 'fish' ? `Fish's Ire` : player.profile.starter === 'rock' ? `Rock's Foundation` : ''
+	const deck_name = player.profile.starter === 'fish' ? `Fish's Ire` :
+		player.profile.starter === 'rock' ? `Rock's Foundation` :
+		player.profile.starter === 'dinosaur' ? `Dinosaur's Power` :
+		player.profile.starter === 'plant' ? `Plant's Harmony` :
+		player.profile.starter === 'dragon' ? `Dragon's Inferno` :
+		player.profile.starter === 'spellcaster' ? `Spellcaster's Art` :
+		''
 	const card = await Card.findOne({ 
 		where: { 
 			name: player.profile.card
@@ -1335,12 +1348,18 @@ if(profcom.includes(cmd)) {
 	let plants = ''
 	let reptiles = ''
 	let rocks = ''
+	let dragons = ''
+	let spellcasters = ''
+	let warriors = ''
 	for (let i = 0; i < player.profile.beast_wins && i < 3; i++) beasts += `${beast} `
 	for (let i = 0; i < player.profile.dinosaur_wins && i < 3; i++) dinosaurs += `${dinosaur} `
 	for (let i = 0; i < player.profile.fish_wins && i < 3; i++) fishes += `${fish} `
 	for (let i = 0; i < player.profile.plant_wins && i < 3; i++) plants += `${plant} `
 	for (let i = 0; i < player.profile.reptile_wins && i < 3; i++) reptiles += `${reptile} `
 	for (let i = 0; i < player.profile.rock_wins && i < 3; i++) rocks += `${rock} `
+	for (let i = 0; i < player.profile.dragon_wins && i < 3; i++) dragons += `${dragon} `
+	for (let i = 0; i < player.profile.spellcaster_wins && i < 3; i++) spellcasters += `${spellcaster} `
+	for (let i = 0; i < player.profile.warrior_wins && i < 3; i++) warriors += `${warrior} `
 
 	const win_rate = player.wins || player.losses ? `${Math.round(player.wins / (player.wins + player.losses) * 100)}%` : `N/A`
 	//const keeper_win_rate = player.keeper_wins || player.keeper_losses ? `${Math.round(player.keeper_wins / (player.keeper_wins + player.keeper_losses) * 100)}%` : `N/A`
@@ -1353,7 +1372,7 @@ if(profcom.includes(cmd)) {
 		.setDescription(`Member Since: ${month} ${day}, ${year}${deck_name ? `\nFirst Deck: ${eval(player.profile.starter)} ${deck_name} ${eval(player.profile.starter)}` : ""}`)
 		.addField('Diary Progress', `Easy Diary: ${easy_summary}\nMedium Diary: ${medium_summary}\nHard Diary: ${hard_summary}\nElite Diary: ${elite_summary}`)
 		.addField('Ranked Stats', `Best Medal: ${getMedal(player.best_stats, true)}\nWin Rate: ${win_rate}\nHighest Elo: ${player.best_stats.toFixed(2)}\nVanquished Foes: ${player.vanquished_foes}\nLongest Streak: ${player.longest_streak}`)
-		.addField('Arena Stats', `Beast Wins: ${player.profile.beast_wins} ${beasts}\nDinosaur Wins: ${player.profile.dinosaur_wins} ${dinosaurs}\nFish Wins: ${player.profile.fish_wins} ${fishes}\nPlant Wins: ${player.profile.plant_wins} ${plants}\nReptile Wins: ${player.profile.reptile_wins} ${reptiles}\nRock Wins: ${player.profile.rock_wins} ${rocks}`)
+		.addField('Arena Stats', `Beast Wins: ${player.profile.beast_wins} ${beasts}\nDinosaur Wins: ${player.profile.dinosaur_wins} ${dinosaurs}\nFish Wins: ${player.profile.fish_wins} ${fishes}\nPlant Wins: ${player.profile.plant_wins} ${plants}\nReptile Wins: ${player.profile.reptile_wins} ${reptiles}\nRock Wins: ${player.profile.rock_wins} ${rocks}\nDragon Wins: ${player.profile.dragon_wins} ${dragons}\nSpellcaster Wins: ${player.profile.spellcaster_wins} ${spellcasters}\nWarrior Wins: ${player.profile.warrior_wins} ${warriors}`)
 		.addField('Other Stats', `Net Worth: ${Math.floor(networth)}${starchips}\nTrade Partners: ${player.profile.trade_partners}\nTrivia Wins: ${player.profile.trivia_wins}\nTrivia Answers: ${correct_answers} out of 1000`)
 		.setImage(card_image)
 		.setFooter(quote)
@@ -1453,7 +1472,7 @@ if (cmd === `!shop`) {
 		const card_name = await findCard(query, fuzzyPrints)
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 		const prints = valid_card_code ? await Print.findAll({ where: { card_code: card_code }}) : card_name ? await Print.findAll({ where: { card_name: card_name } }) : null
-		const count = prints.length === 1 && prints[0].set_code === 'CH1' ? await Inventory.count({ where: { printId: prints[0].id }}) : true
+		const count = prints.length === 1 && (prints[0].set_code === 'CH1' || prints[0].set_code === 'TEB') ? await Inventory.count({ where: { printId: prints[0].id }}) : true
 		if (!prints.length || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 		const results = []
 
@@ -1491,7 +1510,7 @@ if (cmd === `!pop` || cmd === `!population`) {
 	const card_name = await findCard(query, fuzzyPrints)
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }, include: Set}) : card_name ? await selectPrint(message, maid, card_name) : null
-	const count = print && print.set_code === 'CH1' ? await Inventory.count({ where: { printId: print.id }}) : true
+	const count = print && (print.set_code === 'CH1' || print.set_code === 'TEB') ? await Inventory.count({ where: { printId: print.id }}) : true
 	if (!print || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 	const set = await Set.findOne({ where: { id: print.setId }})
@@ -1589,6 +1608,9 @@ if(cmd === `!chart`) {
 	let plantWins = 0
 	let reptileWins = 0
 	let rockWins = 0
+	let dragonWins = 0
+	let spellcasterWins = 0
+	let warriorWins = 0
 
 	for (let i = 0; i < allProfiles.length; i++) {
 		const profile = allProfiles[i]
@@ -1598,12 +1620,15 @@ if(cmd === `!chart`) {
 		plantWins += profile.plant_wins
 		reptileWins += profile.reptile_wins
 		rockWins += profile.rock_wins
+		dragonWins += profile.dragon_wins
+		spellcasterWins += profile.spellcaster_wins
+		warriorWins += profile.warrior_wins
 	}
 
-	const winsArr = [beastWins, dinosaurWins, fishWins, plantWins, reptileWins, rockWins]
+	const winsArr = [beastWins, dinosaurWins, fishWins, plantWins, reptileWins, rockWins, dragonWins, spellcasterWins, warriorWins]
 	winsArr.sort((a, b) => b - a)
 	const longest = winsArr[0]
-	const totalWinners = beastWins + dinosaurWins + fishWins + plantWins + reptileWins + rockWins
+	const totalWinners = beastWins + dinosaurWins + fishWins + plantWins + reptileWins + rockWins + dragonWins + spellcasterWins + warriorWins
 
 	const beastBars = Math.round((beastWins / longest) * 10)
 	const dinosaurBars = Math.round((dinosaurWins / longest) * 10)
@@ -1611,6 +1636,9 @@ if(cmd === `!chart`) {
 	const plantBars = Math.round((plantWins / longest) * 10)
 	const reptileBars = Math.round((reptileWins / longest) * 10)
 	const rockBars = Math.round((rockWins / longest) * 10)
+	const dragonBars = Math.round((dragonWins / longest) * 10)
+	const spellcasterBars = Math.round((spellcasterWins / longest) * 10)
+	const warriorBars = Math.round((warriorWins / longest) * 10)
 
 	let beasts = beast
 	let dinosaurs = dinosaur
@@ -1618,6 +1646,9 @@ if(cmd === `!chart`) {
 	let plants = plant
 	let reptiles = reptile
 	let rocks = rock
+	let dragons = dragon
+	let spellcasters = spellcaster
+	let warriors = warrior
 
 	for (let i = 1; i < beastBars; i++) beasts += beast
 	for (let i = 1; i < dinosaurBars; i++) dinosaurs += dinosaur
@@ -1625,6 +1656,9 @@ if(cmd === `!chart`) {
 	for (let i = 1; i < plantBars; i++) plants += plant
 	for (let i = 1; i < reptileBars; i++) reptiles += reptile
 	for (let i = 1; i < rockBars; i++) rocks += rock
+	for (let i = 1; i < dragonBars; i++) dragons += dragon
+	for (let i = 1; i < spellcasterBars; i++) spellcasters += spellcaster
+	for (let i = 1; i < warriorBars; i++) warriors += warrior
 
 	const arr = [
 		[beastWins, `${beast} - ${beastWins} - ${beasts}`], 
@@ -1632,7 +1666,10 @@ if(cmd === `!chart`) {
 		[fishWins, `${fish} - ${fishWins} - ${fishes}`], 
 		[plantWins, `${plant} - ${plantWins} - ${plants}`], 
 		[reptileWins, `${reptile} - ${reptileWins} - ${reptiles}`], 
-		[rockWins, `${rock} - ${rockWins} - ${rocks}`]
+		[rockWins, `${rock} - ${rockWins} - ${rocks}`], 
+		[dragonWins, `${dragon} - ${dragonWins} - ${dragons}`], 
+		[spellcasterWins, `${spellcaster} - ${spellcasterWins} - ${spellcasters}`], 
+		[warriorWins, `${warrior} - ${warriorWins} - ${warriors}`]
 	]
 
 	return message.channel.send(
@@ -1648,7 +1685,7 @@ if (cmd === `!hist` || cmd === `!history`) {
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	const card_name = await findCard(query, fuzzyPrints)
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-	const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true
+	const count = print && (print.set_code === 'CH1' || print.set_code === 'TEB') ? await Inventory.findOne({ where: { printId: print.id } }) : true
 	if (!print || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 	const item = print.card_code
@@ -1986,7 +2023,7 @@ if(bindercom.includes(cmd)) {
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 		const card_name = await findCard(query, fuzzyPrints)
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-		const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true
+		const count = print && (print.set_code === 'CH1' || print.set_code === 'TEB') ? await Inventory.findOne({ where: { printId: print.id } }) : true
 		if (!print || !count) {
 			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 			continue
@@ -2058,7 +2095,7 @@ if(cmd === `!search`) {
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	const card_name = await findCard(query, fuzzyPrints)
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-	const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true
+	const count = print && (print.set_code === 'CH1' || print.set_code === 'TEB') ? await Inventory.findOne({ where: { printId: print.id } }) : true
 	if (!print || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 
@@ -2130,7 +2167,7 @@ if(wishlistcom.includes(cmd)) {
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 		const card_name = await findCard(query, fuzzyPrints)
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-		const count = print && print.set_code === 'CH1' ? await Inventory.findOne({ where: { printId: print.id } }) : true
+		const count = print && (print.set_code === 'CH1' || print.set_code === 'TEB') ? await Inventory.findOne({ where: { printId: print.id } }) : true
 		if (!print || !count) {
 			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 			continue
@@ -3040,7 +3077,10 @@ if (rankcom.includes(cmd)) {
 					{ fish_wins: { [Op.gt]: 0 } }, 
 					{ plant_wins: { [Op.gt]: 0 } }, 
 					{ reptile_wins: { [Op.gt]: 0 } }, 
-					{ rock_wins: { [Op.gt]: 0 } } 
+					{ rock_wins: { [Op.gt]: 0 } }, 
+					{ dragon_wins: { [Op.gt]: 0 } }, 
+					{ spellcaster_wins: { [Op.gt]: 0 } }, 
+					{ warrior_wins: { [Op.gt]: 0 } } 
 				]
 			},
 			include: Player,
@@ -3049,12 +3089,12 @@ if (rankcom.includes(cmd)) {
 	
 		const filtered_profiles = allProfiles.filter((profile) => memberIds.includes(profile.playerId))
 		if (x > filtered_profiles.length) return message.channel.send(`I need a smaller number. We only have ${filtered_profiles.length} Arena winners.`)
-		const transformed_profiles = filtered_profiles.map((p) => [p.player.name, p.beast_wins, p.dinosaur_wins, p.fish_wins, p.plant_wins, p.reptile_wins, p.rock_wins])
+		const transformed_profiles = filtered_profiles.map((p) => [p.player.name, p.beast_wins, p.dinosaur_wins, p.fish_wins, p.plant_wins, p.reptile_wins, p.rock_wins, p.dragon_wins, p.spellcaster_wins, p.warrior_wins])
 		transformed_profiles.sort((a, b) => (b[1] + b[2] + b[3] + b[4] + b[5] + b[6]) - (a[1] + a[2] + a[3] + a[4] + a[5] + a[6]))
 		const topProfiles = transformed_profiles.slice(0, x)
 		for (let i = 0; i < x; i++) {
 			const p = topProfiles[i]
-			result[i+1] = `${(i+1)}. ${p[1] + p[2] + p[3] + p[4] + p[5] + p[6]} W - ${p[0]} - ${p[1] ? `${beast} ` : ''}${p[2] ? `${dinosaur} ` : ''}${p[3] ? `${fish} ` : ''}${p[4] ? `${plant} ` : ''}${p[5] ? `${reptile} ` : ''}${p[6] ? `${rock} ` : ''}`
+			result[i+1] = `${(i+1)}. ${p[1] + p[2] + p[3] + p[4] + p[5] + p[6]} W - ${p[0]} - ${p[1] ? `${beast} ` : ''}${p[2] ? `${dinosaur} ` : ''}${p[3] ? `${fish} ` : ''}${p[4] ? `${plant} ` : ''}${p[5] ? `${reptile} ` : ''}${p[6] ? `${rock} ` : ''}${p[7] ? `${dragon} ` : ''}${p[8] ? `${spellcaster} ` : ''}${p[9] ? `${warrior} ` : ''}`
 		} 
 	} else if (game === 'Trivia') {
 		x === 1 ? result[0] = `${FiC} --- The Top Bookworm --- ${FiC}`
@@ -3999,7 +4039,7 @@ if(cmd === `!award`) {
 	if (!quantity || !query) return message.channel.send(`Please specify the query you wish to award.`)
 
 	let set_code = query.includes('chaospack') || query.includes('chaos pack') || query === 'ch1' ? 'CH1' :
-	query === 'pack' || query === 'packs' || query === 'doc' ? 'DOC' : null
+	query === 'pack' || query === 'packs' || query === 'teb' ? 'TEB' : null
 
 	if (set_code) {
 		const set = await Set.findOne({ where: { code: set_code } })
@@ -4289,7 +4329,7 @@ if(invcom.includes(cmd)) {
 	const card_name = query && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints) : null
 	const print = valid_card_code ? await Print.findOne({ where: { card_code } }) : card_name ? await selectPrint(message, maid, card_name) : null
 	if (card_name && !print) return
-	const count = print && print.set_code === 'CH1' ? await Inventory.count({ where: { printId: print.id } }) : true
+	const count = print && (print.set_code === 'CH1' || print.set_code === 'TEB') ? await Inventory.count({ where: { printId: print.id } }) : true
 
 	const inventory = !query.length ? await Inventory.findAll({ 
 		where: { 
@@ -4352,7 +4392,7 @@ if(invcom.includes(cmd)) {
 			console.log(err)
 		}
 
-		const count_2 = row.print.set_code === 'CH1' ? await Inventory.count({ where: { printId: row.printId } }) : true
+		const count_2 = (row.print.set_code === 'CH1' || row.print.set_code === 'TEB') ? await Inventory.count({ where: { printId: row.printId } }) : true
 		results.push(`${eval(row.print.rarity)}${row.card_code} - ${count_2 ? row.print.card_name : '???'} - ${row.quantity}`) 
 	}
 
@@ -4429,7 +4469,7 @@ if(checklistcom.includes(cmd)) {
 		}
 
 		const box_emoji = cards.includes(row.card_code) ? checkmark : emptybox
-		const count = code === 'CH1' ? await Inventory.count({ where: { printId: row.id } }) : true
+		const count = (code === 'CH1' || code === 'TEB') ? await Inventory.count({ where: { printId: row.id } }) : true
 		results.push(`${box_emoji} ${eval(row.rarity)}${row.card_code} - ${count ? row.card_name : '???'}`) 
 	}
 
@@ -4448,7 +4488,7 @@ if(checklistcom.includes(cmd)) {
 //PACK
 if(cmd === `!pack`) {
 	let num = 1
-	let code = 'ORF'
+	let code = 'TEB'
 	for (let i = 0; i < args.length; i++) {
 		if (isFinite(args[i])) {
 			num = parseInt(args[i])
@@ -4883,7 +4923,7 @@ if(cmd === `!spec` || cmd === `!se`) {
 
 //BOX
 if(cmd === `!box`) {
-	const code = args[0] || 'DOC'
+	const code = args[0] || 'TEB'
 	if (code.startsWith('SS')) return message.channel.send(`Sorry, Starter Series cards are not sold by the box.`)
 	const set = await Set.findOne({ where: { code: code.toUpperCase() }})
 	if (!set) return message.channel.send(`There is no set with the code "${code.toUpperCase()}".`)
@@ -5094,7 +5134,7 @@ if(cmd === `!box`) {
 //DUMP
 if(cmd === `!dump`) {
 	if (mcid !== botSpamChannelId) return message.channel.send(`Please use this command in <#${botSpamChannelId}>.`)
-	const set_code = args.length ? args[0].toUpperCase() : 'DOC'
+	const set_code = args.length ? args[0].toUpperCase() : 'TEB'
 	const set = await Set.findOne({where: { code: set_code }})
 	if (!set) return message.channel.send(`Sorry, I do not recognized the set code: "${set_code}".`)
 	const player = await Player.findOne({ where: { id: maid }, include: Wallet })

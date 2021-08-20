@@ -13,7 +13,7 @@ const { beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured,
 const awardPack = async (channel, playerId, set, num = 1, prize = false) => {
 	const member = channel.guild.members.cache.get(playerId)
 
-    if (!set) set = await Set.findOne({ where: { code: 'DOC' } })
+    if (!set) set = await Set.findOne({ where: { code: 'TEB' } })
     if (!set) return channel.send(`Could not find set.`)
 
 	const commons = await Print.findAll({ 

@@ -17,18 +17,22 @@ const getShopDeck = async (message, deck = '') => {
     if(deck.includes('plant')) return 'plant'
     if(deck.includes('fish')) return 'fish'
     if(deck.includes('rock')) return 'rock'
+    if(deck.includes('drag')) return 'dragon'
+    if(deck.includes('spell') || deck.includes('cast')) return 'spellcaster'
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`Please select a deck:\n(1) Dinosaur's Power\n(2) Plant's Harmony\n(3) Fish's Ire\n(4) Rock's Foundation`)
+	const msg = await message.channel.send(`Please select a deck:\n(1) Dragon's Inferno\n(2) Spellcaster's Art\n(3) Dinosaur's Power\n(4) Plant's Harmony\n(5) Fish's Ire\n(6) Rock's Foundation`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
 	}).then(collected => {
         let deck
 		const response = collected.first().content.toLowerCase()
-        if(response.includes('dino') || response.includes('1')) deck = 'dinosaur' 
-        else if(response.includes('plant') || response.includes('2')) deck = 'plant'
-        else if(response.includes('fish') || response.includes('3')) deck = 'fish'
-        else if(response.includes('rock') || response.includes('4')) deck = 'rock'
+        if(response.includes('drag') || response.includes('1')) deck = 'dragon' 
+        else if(response.includes('spell') || response.includes('cast') || response.includes('2')) deck = 'spellcaster'
+        else if(response.includes('dino') || response.includes('3')) deck = 'dinosaur' 
+        else if(response.includes('plant') || response.includes('4')) deck = 'plant'
+        else if(response.includes('fish') || response.includes('5')) deck = 'fish'
+        else if(response.includes('rock') || response.includes('6')) deck = 'rock'
         else message.channel.send(`Please specify a valid deck.`)
         return deck
 	}).catch(err => {

@@ -46,7 +46,13 @@ const convertCardsArrayToObject = (arr) => {
 
 //CREATE PROFILE
 const createProfile = async (playerId, starter) => {
-    const card = starter === 'fish' ? 'Rage of the Deep Sea' : starter === 'rock' ? 'Guardian Sphinx' : null
+    const card = starter === 'dragon' ? 'White-Horned Dragon' :
+        starter === 'spellcaster' ? 'Dark Red Enchanter' :
+        starter === 'dinosaur' ? 'Sauropod Brachion' :
+        starter === 'plant' ? 'Sylvan Guardioak' :
+        starter === 'fish' ? 'Rage of the Deep Sea' :
+        starter === 'rock' ? 'Guardian Sphinx' :
+        null
     const date = new Date()
     const month = `0${date.getMonth() + 1}`
     const day = `0${date.getDate()}`

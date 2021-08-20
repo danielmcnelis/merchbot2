@@ -3,7 +3,7 @@ const { Card, Player, Print, Set, Wallet, Diary, Info, Inventory, Auction, Statu
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { yescom } = require('../static/commands.json')
-const { starchips, stardust, mushroom, moai, rose, hook, egg, cactus, com, rar, sup, ult, scr } = require('../static/emojis.json')
+const { gem, orb, swords, starchips, stardust, mushroom, moai, rose, hook, egg, cactus, com, rar, sup, ult, scr } = require('../static/emojis.json')
 const { awardPacksToShop } = require('./packs')
 const adminId = '194147938786738176'
 const { client } = require('../static/clients.js')
@@ -308,6 +308,9 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
     if (query === 'moai' || query === 'moais' ) walletField = 'moai'
     if (query === 'mushroom' || query === 'mushrooms') walletField = 'mushroom'
     if (query === 'rose' || query === 'roses' ) walletField = 'rose'
+    if (query === 'gem' || query === 'gems' ) walletField = 'gem'
+    if (query === 'orb' || query === 'orbs' ) walletField = 'orb'
+    if (query === 'sword' || query === 'swords' ) walletField = 'swords'
 
     const print = valid_card_code && !walletField ? await Print.findOne({ where: { card_code: card_code }}) :
                 card_name && !walletField ? await selectPrint(message, sellerId, card_name) :

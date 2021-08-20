@@ -1,61 +1,85 @@
 {
     "decks": {
         "beast": {
-            "url":"https://www.duelingbook.com/deck?id=8405187",
-            "screenshot":"https://i.imgur.com/CZe1yYx.png"
+            "url":"https://www.duelingbook.com/deck?id=8813287",
+            "screenshot":"https://i.imgur.com/Gs2Yt86.png"
         },
         "dinosaur": {
-            "url":"https://www.duelingbook.com/deck?id=8405185",
-            "screenshot":"https://i.imgur.com/DyedObs.png"
+            "url":"https://www.duelingbook.com/deck?id=8813296",
+            "screenshot":"https://i.imgur.com/AteyPFu.png"
+        },
+        "dragon": {
+            "url":"https://www.duelingbook.com/deck?id=8810411",
+            "screenshot":"https://i.imgur.com/ZFREe4O.png"
         },
         "fish": {
-            "url":"https://www.duelingbook.com/deck?id=8405183",
-            "screenshot":"https://i.imgur.com/rnse1m5.png"
+            "url":"https://www.duelingbook.com/deck?id=8813309",
+            "screenshot":"https://i.imgur.com/Kv3jbzk.png"
         },
         "plant": {
-            "url":"https://www.duelingbook.com/deck?id=8405182",
-            "screenshot":"https://i.imgur.com/o7xE0LF.png"
+            "url":"https://www.duelingbook.com/deck?id=8813315",
+            "screenshot":"https://i.imgur.com/8MQWIoI.png"
         },
         "reptile": {
-            "url":"https://www.duelingbook.com/deck?id=8405181",
-            "screenshot":"https://i.imgur.com/aIbkUcy.png"
+            "url":"https://www.duelingbook.com/deck?id=8813339",
+            "screenshot":"https://i.imgur.com/pkvIcVW.png"
         },
         "rock": {
-            "url":"https://www.duelingbook.com/deck?id=8405179",
-            "screenshot":"https://i.imgur.com/LlphWyB.png"
+            "url":"https://www.duelingbook.com/deck?id=8813367",
+            "screenshot":"https://i.imgur.com/s0A5IoR.png"
+        },
+        "spellcaster": {
+            "url":"https://www.duelingbook.com/deck?id=8810412",
+            "screenshot":"https://i.imgur.com/WpKfP22.png"
+        },
+        "warrior": {
+            "url":"https://www.duelingbook.com/deck?id=8810410",
+            "screenshot":"https://i.imgur.com/o0cexxw.png"
         }
     },
     "vouchers": {
         "beast":"mushroom",
         "dinosaur":"egg",
+        "dragon":"gem",
         "fish":"hook",
         "plant":"rose",
         "reptile":"cactus",
-        "rock":"moai"
+        "rock":"moai",
+        "spellcaster":"orb",
+        "warrior":"swords"
     },
     "prizes": {
         "beast":"APC-001",
         "dinosaur":"APC-005",
+        "dragon":"APC-009",
         "fish":"APC-004",
         "plant":"APC-003",
         "reptile":"APC-006",
-        "rock":"APC-002"
+        "rock":"APC-002",
+        "spellcaster":"APC-008",
+        "warrior":"APC-007"
     },
     "victories": {
         "beast":"Today, you attacked your foes with the ferocity of a wolverine!",
         "dinosaur":"Today, you flattened your foes with the weight of a sauropod!",
+        "dragon":"Today, you scorched your foes with the flames of legends!",
         "fish":"Today, you rushed your foes with the speed of a marlin!",
         "plant":"Today, you astonished your foes with the beauty of a princess!",
         "reptile":"Today, you paralyzed your foes with the venom of a cobra!",
-        "rock":"Today, you rolled over your foes with the ease of a boulder!"
+        "rock":"Today, you rolled over your foes with the ease of a boulder!",
+        "spellcaster":"Today, you manipulated your foes with the trickery of a sorcerer!",
+        "warrior":"Today, you conquered your foes with the heart of a champion!"
     },
     "apcs": {
         "beast":"<:ult:845483716888887297>APC-001 - Desmanian Devil",
         "dinosaur":"<:ult:845483716888887297>APC-005 - Spacetime Transcendence",
+        "dragon":"<:ult:845483716888887297>APC-009 - Guardragon Cataclysm",
         "fish":"<:ult:845483716888887297>APC-004 - Moray of Greed",
         "plant":"<:ult:845483716888887297>APC-003 - Rose Lover",
         "reptile":"<:ult:845483716888887297>APC-006 - Viper's Rebirth",
-        "rock":"<:ult:845483716888887297>APC-002 - Koa'ki Meiru Guardian"
+        "rock":"<:ult:845483716888887297>APC-002 - Koa'ki Meiru Guardian",
+        "spellcaster":"<:ult:845483716888887297>APC-008 - Spellbook of Knowledge",
+        "warrior":"<:ult:845483716888887297>APC-007 - Sublimation Knight"
     },
     "verbs": [
         "absolutely deserved",

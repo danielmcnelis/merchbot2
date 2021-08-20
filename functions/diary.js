@@ -59,10 +59,13 @@ const check6TribesComplete = async (playerId, goal = 1) => {
     const profile = await Profile.findOne({ where: { playerId: playerId }})
     if (profile.beast_wins >= goal) score++
     if (profile.dinosaur_wins >= goal) score++
+    if (profile.dragon_wins >= goal) score++
     if (profile.fish_wins >= goal) score++
     if (profile.plant_wins >= goal) score++
     if (profile.reptile_wins >= goal) score++
     if (profile.rock_wins >= goal) score++
+    if (profile.spellcaster_wins >= goal) score++
+    if (profile.warrior_wins >= goal) score++
 
     if (score >= 6) return true
     else return false

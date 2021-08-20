@@ -3,7 +3,7 @@ const { Auction, Bid, Card, Match, Player, Tournament, Print, Set, Wallet, Diary
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { nocom, yescom } = require('../static/commands.json')
-const { beast, blue, bronze, cactus, cavebob, checkmark, closed, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, open, ORF, TEB, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
+const { gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, closed, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, open, ORF, TEB, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
 const { awardPacksToShop } = require('./packs')
 const adminId = '194147938786738176'
 const { client } = require('../static/clients.js')
@@ -288,6 +288,9 @@ const updateShop = async () => {
                 } else if (set.name === 'Starter Series 2') {
                     results.push(`${set.unit_price}${eval(set.currency)} - Dinosaur's Power ${eval(set.emoji)} - Deck`)
                     results.push(`${set.unit_price}${eval(set.currency)} - Plant's Harmony ${eval(set.alt_emoji)} - Deck`)
+                } else if (set.name === 'Starter Series 3') {
+                    results.push(`${set.unit_price}${eval(set.currency)} - Dragon's Inferno ${eval(set.emoji)} - Deck`)
+                    results.push(`${set.unit_price}${eval(set.currency)} - Spellcaster's Art ${eval(set.alt_emoji)} - Deck`)
                 }
             }
         }
@@ -368,6 +371,9 @@ const postBids = async () => {
                 } else if (set.name === 'Starter Series 2') {
                     results.push(`${set.unit_price}${eval(set.currency)} - Dinosaur's Power ${eval(set.emoji)} - Deck`)
                     results.push(`${set.unit_price}${eval(set.currency)} - Plant's Harmony ${eval(set.alt_emoji)} - Deck`)
+                } else if (set.name === 'Starter Series 3') {
+                    results.push(`${set.unit_price}${eval(set.currency)} - Dragon's Inferno ${eval(set.emoji)} - Deck`)
+                    results.push(`${set.unit_price}${eval(set.currency)} - Spellcaster's Art ${eval(set.alt_emoji)} - Deck`)
                 }
             }
         }
@@ -600,7 +606,10 @@ const getVoucher = async (message) => {
         `(3) Roses ${rose}`,
         `(4) Hooks ${hook}`,
         `(5) Eggs ${egg}`,
-        `(6) Cacti ${cactus}`
+        `(6) Cacti ${cactus}`,
+        `(7) Swords ${swords}`,
+        `(8) Orbs ${orb}`,
+        `(9) Gems ${gem}`
     ]
 
     const filter = m => m.author.id === message.member.user.id
@@ -623,6 +632,12 @@ const getVoucher = async (message) => {
             voucher = 'egg'
         } else if(response.includes('6') || response.includes('cact')) {
             voucher = 'cactus'
+        } else if(response.includes('7') || response.includes('sword')) {
+            voucher = 'swords'
+        } else if(response.includes('8') || response.includes('orb')) {
+            voucher = 'orb'
+        } else if(response.includes('9') || response.includes('gem')) {
+            voucher = 'gem'
         } else {
             message.channel.send(`You did not select a valid option.`)
             return false
@@ -652,7 +667,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
         },
         rose: {
             original: [10, 'APC-003', `(1) ${ult}APC-003 - Rose Lover - 10 ${rose}`],
-            unlocked: [30, 'DOC-178', `(2) ${ult}DOC-178 - Mardel, Generaider Boss of Light - 30 ${rose}`]
+            unlocked: [20, 'DOC-178', `(2) ${ult}DOC-178 - Mardel, Generaider Boss of Light - 30 ${rose}`]
         },
         hook: {
             original: [10, 'APC-004', `(1) ${ult}APC-004 - Moray of Greed - 10 ${hook}`],
@@ -660,11 +675,23 @@ const getBarterCard = async (message, voucher, medium_complete) => {
         },
         egg: {
             original: [10, 'APC-005', `(1) ${ult}APC-005 - Spacetime Transcendence - 10 ${egg}`],
-            unlocked: [40, 'DOC-176', `(2) ${ult}DOC-176 - Giant Rex - 40 ${egg}`]
+            unlocked: [20, 'DOC-176', `(2) ${ult}DOC-176 - Giant Rex - 40 ${egg}`]
         },
         cactus: {
             original: [10, 'APC-006', `(1) ${ult}APC-006 - Viper's Rebirth - 10 ${cactus}`],
-            unlocked: [30, 'DOC-177', `(2) ${ult}DOC-177 - Ipiria - 30 ${cactus}`]
+            unlocked: [20, 'DOC-177', `(2) ${ult}DOC-177 - Ipiria - 30 ${cactus}`]
+        },
+        swords: {
+            original: [10, 'APC-007', `(1) ${ult}APC-007 - Sublimation Knight - 10 ${swords}`],
+            unlocked: []
+        },
+        orb: {
+            original: [10, 'APC-008', `(1) ${ult}APC-008 - Spellbook of Knowledge - 10 ${orb}`],
+            unlocked: []
+        },
+        gem: {
+            original: [10, 'APC-009', `(1) ${ult}APC-009 - Guardragon Cataclysm - 10 ${gem}`],
+            unlocked: []
         }
     }
 
@@ -709,7 +736,10 @@ const getTradeInCard = async (message, medium_complete) => {
         [10, 'APC-003', `(3) ${ult}APC-003 - Rose Lover - 10 ${rose}`, 'rose'],
         [10, 'APC-004', `(4) ${ult}APC-004 - Moray of Greed - 10 ${hook}`, 'hook'],
         [10, 'APC-005', `(5) ${ult}APC-005 - Spacetime Transcendence - 10 ${egg}`, 'egg'],
-        [10, 'APC-006', `(6) ${ult}APC-006 - Viper's Rebirth - 10 ${cactus}`, 'cactus']
+        [10, 'APC-006', `(6) ${ult}APC-006 - Viper's Rebirth - 10 ${cactus}`, 'cactus'],
+        [10, 'APC-007', `(7) ${ult}APC-007 - Sublimation Knight - 10 ${swords}`, 'swords'],
+        [10, 'APC-008', `(8) ${ult}APC-008 - Spellbook of Knowledge - 10 ${orb}`, 'orb'],
+        [10, 'APC-009', `(9) ${ult}APC-009 - Guardragon Cataclysm - 10 ${gem}`, 'gem']
     ]
 
     const cards = options.map((o) => o[2])
@@ -734,6 +764,12 @@ const getTradeInCard = async (message, medium_complete) => {
             index = 4
         } else if(response.includes('6') || response.includes('APC-006') || response.includes('viper') || response.includes('rebirth')) {
             index = 5
+        } else if(response.includes('7') || response.includes('APC-007') || response.includes('sublim') || response.includes('knight')) {
+            index = 6
+        } else if(response.includes('8') || response.includes('APC-008') || response.includes('book') || response.includes('know')) {
+            index = 7
+        } else if(response.includes('9') || response.includes('APC-009') || response.includes('drag') || response.includes('cata')) {
+            index = 8
         } else {
             message.channel.send(`You did not select a valid option.`)
             return false

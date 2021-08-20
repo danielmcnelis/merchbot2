@@ -2,7 +2,7 @@
 const { Arena, Diary, Info, Player, Profile, Wallet, Match } = require('../db')
 const { Op } = require('sequelize')
 const { yescom, nocom } = require('../static/commands.json')
-const { beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
+const { beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, dragon, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
 const { arenaRole } = require('../static/roles.json')
 const { arenaChannelId } = require('../static/channels.json')
 const { client } = require('../static/clients.js')
@@ -15,12 +15,15 @@ const { decks, vouchers, prizes, victories, apcs, verbs, encouragements } = requ
 const getArenaSample = async (message, query) => {
     if (query && query.includes('bea')) return 'beast'
     if (query && query.includes('dino')) return 'dinosaur'
+    if (query && query.includes('drag')) return 'dragon'
     if (query && query.includes('fish')) return 'fish'
     if (query && query.includes('plant')) return 'plant'
     if (query && query.includes('rep')) return 'reptile'
     if (query && query.includes('rock')) return 'rock'
+    if (query && (query.includes('spell') || query.includes('cast'))) return 'spellcaster'
+    if (query && query.includes('war')) return 'warrior'
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`Please select a tribe:\n(1) Beast\n(2) Dinosaur\n(3) Fish\n(4) Plant\n(5) Reptile\n(6) Rock`)
+	const msg = await message.channel.send(`Please select a tribe:\n(1) Beast\n(2) Dinosaur\(3) Dragon\n(4) Fish\n(5) Plant\n(6) Reptile\n(7) Rock\n(8) Spellcaster\n(9) Warrior`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 10000
@@ -29,10 +32,13 @@ const getArenaSample = async (message, query) => {
 		const response = collected.first().content.toLowerCase()
         if(response.includes('bea') || response.includes('1')) tribe = 'beast' 
         else if(response.includes('dino') || response.includes('2')) tribe = 'dinosaur'
-        else if(response.includes('fish') || response.includes('3')) tribe = 'fish'
-        else if(response.includes('plant') || response.includes('4')) tribe = 'plant'
-        else if(response.includes('rep') || response.includes('5')) tribe = 'reptile'
-        else if(response.includes('rock') || response.includes('6')) tribe = 'rock'
+        else if(response.includes('drag') || response.includes('3')) tribe = 'dragon'
+        else if(response.includes('fish') || response.includes('4')) tribe = 'fish'
+        else if(response.includes('plant') || response.includes('5')) tribe = 'plant'
+        else if(response.includes('rep') || response.includes('6')) tribe = 'reptile'
+        else if(response.includes('rock') || response.includes('7')) tribe = 'rock'
+        else if(response.includes('spell') || response.includes('cast') || response.includes('8')) tribe = 'spellcaster'
+        else if(response.includes('war') || response.includes('9')) tribe = 'warrior'
         else message.channel.send(`Please specify a valid tribe.`)
         return tribe
 	}).catch(err => {
@@ -136,7 +142,7 @@ const getConfirmation = async (guild, arena_entry, contestant) => {
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
-	const msg = await member.send(`Please confirm your participation in the Arena by selecting a tribe:\n(1) Beast\n(2) Dinosaur\n(3) Fish\n(4) Plant\n(5) Reptile\n(6) Rock`)
+	const msg = await member.send(`Please confirm your participation in the Arena by selecting a tribe:\n(1) Beast\n(2) Dinosaur\n(3) Dragon\n(4) Fish\n(5) Plant\n(6) Reptile\n(7) Rock\n(8) Spellcaster\n(9) Warrior`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 60000
@@ -145,10 +151,13 @@ const getConfirmation = async (guild, arena_entry, contestant) => {
 		const response = collected.first().content.toLowerCase()
         if(response.includes('bea') || response.includes('1')) tribe = 'beast'
         else if(response.includes('dino') || response.includes('2')) tribe = 'dinosaur'
-        else if(response.includes('fish') || response.includes('3')) tribe = 'fish'
-        else if(response.includes('plant') || response.includes('4')) tribe = 'plant'
-        else if(response.includes('rep') || response.includes('5')) tribe = 'reptile'
-        else if(response.includes('rock') || response.includes('6')) tribe = 'rock'
+        else if(response.includes('drag') || response.includes('3')) tribe = 'dragon'
+        else if(response.includes('fish') || response.includes('4')) tribe = 'fish'
+        else if(response.includes('plant') || response.includes('5')) tribe = 'plant'
+        else if(response.includes('rep') || response.includes('6')) tribe = 'reptile'
+        else if(response.includes('rock') || response.includes('7')) tribe = 'rock'
+        else if(response.includes('spell') || response.includes('cast') || response.includes('8')) tribe = 'spellcaster'
+        else if(response.includes('war') || response.includes('9')) tribe = 'warrior'
         else member.send(`Please specify a valid tribe.`)
 
         const count = await Info.count({ where: {
@@ -327,7 +336,7 @@ const startRound = async (info, entries) => {
             info.round === 5 ? [[P1, P6], [P2, P3], [P4, P5]] : 
             null
     
-        const title = `------  Arena Round ${info.round}  ------\n${beast}   ${dinosaur}   ${fish}   ${plant}   ${reptile}   ${rock}` 
+        const title = `------  Arena Round ${info.round}  ------\n${beast}   ${dinosaur}   ${dragon}   ${fish}   ${plant}   ${reptile}   ${rock}   ${spellcaster}   ${warrior}` 
         const matches = pairings.map((pairing, index) => {
             if (pairing[0].active === false && pairing[1].active === false) {
                 setTimout(() => doubleForfeit(pairing[0].playerId, pairing[1].playerId), index * 1000 + 1000)

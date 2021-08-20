@@ -52,6 +52,21 @@ const Wallet = db.define('wallet', {
         type: Sequelize.INTEGER,  
         defaultValue: 0,           
         allowNull: false
+    },
+    gem: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
+    orb: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
+    swords: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
     }
 })
 

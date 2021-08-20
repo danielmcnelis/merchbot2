@@ -4,7 +4,7 @@
 const { Inventory, Player, Set, Trade, Print, Wallet } = require('../db')
 const { Op } = require('sequelize')
 const { yescom, nocom } = require('../static/commands.json')
-const { starchips, stardust, com, rar, sup, ult, scr, egg, cactus, hook, moai, mushroom, rose } = require('../static/emojis.json')
+const { starchips, stardust, com, rar, sup, ult, scr, egg, cactus, hook, moai, mushroom, rose, orb, gem, swords } = require('../static/emojis.json')
 const { findCard } = require('./search.js')
 const { selectPrint } = require('./print.js')
 const { capitalize } = require('./utility.js')
@@ -132,6 +132,9 @@ const getTradeSummary = async (message, inputs, player, fuzzyPrints) => {
 		if (query === 'moai' || query === 'moais' ) walletField = 'moai'
 		if (query === 'mushroom' || query === 'mushrooms') walletField = 'mushroom'
 		if (query === 'rose' || query === 'roses' ) walletField = 'rose'
+		if (query === 'sword' || query === 'swords' ) walletField = 'swords'
+		if (query === 'orb' || query === 'orbs' ) walletField = 'orb'
+		if (query === 'ge' || query === 'gems' ) walletField = 'gem'
 
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 		const card_name = await findCard(query, fuzzyPrints)

@@ -39,7 +39,7 @@ const { client, challongeClient } = require('./static/clients.js')
 const { aliuscom, bindercom, botcom, bracketcom, calccom, checklistcom, dbcom, deckcom, dropcom, h2hcom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, pfpcom, profcom, queuecom, rankcom, rolecom, startcom, statscom, undocom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
-const { beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, green, yes, ygocard } = require('./static/emojis.json')
+const { beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem } = require('./static/emojis.json')
 const muted = require('./static/muted.json')
 const nicknames = require('./static/nicknames.json')
 const prints = require('./static/prints.json')
@@ -1715,6 +1715,11 @@ if (cmd === `!hist` || cmd === `!history`) {
 			card_code: null,
 			rarity: 'egg'
 		},
+		gem: {
+			card_name: null,
+			card_code: null,
+			rarity: 'gem'
+		},
 		hook: {
 			card_name: null,
 			card_code: null,
@@ -1734,6 +1739,16 @@ if (cmd === `!hist` || cmd === `!history`) {
 			card_name: null,
 			card_code: null,
 			rarity: 'moai'
+		},
+		orb: {
+			card_name: null,
+			card_code: null,
+			rarity: 'orb'
+		},
+		swords: {
+			card_name: null,
+			card_code: null,
+			rarity: 'swords'
 		}
 	}
 
@@ -2225,6 +2240,9 @@ if(cmd === `!wallet`) {
 	if (wallet.hook) results.push(`Hooks: ${wallet.hook} ${hook}`)
 	if (wallet.egg) results.push(`Eggs: ${wallet.egg} ${egg}`)
 	if (wallet.cactus) results.push(`Cacti: ${wallet.cactus} ${cactus}`)
+	if (wallet.swords) results.push(`Swords: ${wallet.swords} ${swords}`)
+	if (wallet.orb) results.push(`Orbs: ${wallet.orb} ${orb}`)
+	if (wallet.gem) results.push(`Gems: ${wallet.gem} ${gem}`)
 
 	return message.channel.send(results.join('\n'))
 }
@@ -4068,6 +4086,9 @@ if(cmd === `!award`) {
 	if (query === 'moai' || query === 'moais' ) walletField = 'moai'
 	if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
 	if (query === 'rose' || query === 'roses' ) walletField = 'rose'
+	if (query === 'sword' || query === 'swords' ) walletField = 'swords'
+	if (query === 'orb' || query === 'orbs' ) walletField = 'orb'
+	if (query === 'gem' || query === 'gems' ) walletField = 'gem'
 
 	set_code = query.slice(0, 3).toUpperCase()
 	const valid_set_code = !!(!walletField && set_code.length === 3 && await Set.count({where: { code: set_code }}))
@@ -4152,6 +4173,9 @@ if(cmd === `!steal`) {
 	if (query === 'moai' || query === 'moais' ) walletField = 'moai'
 	if (query === 'mushroom' || query === 'mushrooms' || query === 'shroom' || query === 'shrooms') walletField = 'mushroom'
 	if (query === 'rose' || query === 'roses' ) walletField = 'rose'
+	if (query === 'sword' || query === 'swords' ) walletField = 'swords'
+	if (query === 'orb' || query === 'orbs' ) walletField = 'orb'
+	if (query === 'gem' || query === 'gems' ) walletField = 'gem'
 
 	const set_code = query.toUpperCase()
 	const valid_set_code = !!(!walletField && set_code.length === 3 && await Set.count({where: { code: set_code }}))

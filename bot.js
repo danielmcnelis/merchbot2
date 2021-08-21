@@ -2313,12 +2313,12 @@ if (statscom.includes(cmd)) {
 		const rank = index ? `#${index + 1} out of ${sorted_players.length}` : `N/A`
 
 		return message.channel.send(
-			`${shrine} --- Arena Player Stats --- ${shrine}`+
-			`\nName: ${player.name}`+
-			`\nRanking: ${rank}`+
-			`\nWins: ${player.arena_wins}, Losses: ${player.arena_losses}`+
-			`\nWin Rate: ${Math.round(100 * player.arena_wins / (player.arena_wins + player.arena_losses) ) / 100}%`
-			// player.profile.beast_wins ? `\nBeast Wins: ${player.profile.beast_wins} ${beast}` : '' +
+			`${shrine} --- Arena Player Stats --- ${shrine}` +
+			`\nName: ${player.name}` +
+			`\nRanking: ${rank}` +
+			`\nWins: ${player.arena_wins}, Losses: ${player.arena_losses}` +
+			`\nWin Rate: ${(100 * player.arena_wins / (player.arena_wins + player.arena_losses)).toFixed(2)}%` +
+			player.profile.beast_wins > 0 ? `\nBeast Wins: ${player.profile.beast_wins} ${beast}` : '' +
 			// player.profile.dinosaur_wins ? `\nDinosaur Wins: ${player.profile.beast_wins} ${dinosaur}` : '' +
 			// player.profile.dragon_wins ? `\nDragon Wins: ${player.profile.dragon_wins} ${dragon}` : `` +
 			// player.profile.fish_wins ? `\nFish Wins: ${player.profile.fish_wins} ${fish}` : `` +

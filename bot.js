@@ -363,7 +363,7 @@ if (cmd === `!fix_cards`) {
 if (cmd === `!pauper`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 
-	const matches = Match.findAll({
+	const matches = await Match.findAll({
 		where: {
 			game_mode: 'pauper'
 		}
@@ -373,8 +373,8 @@ if (cmd === `!pauper`) {
 	
 	for (let i = 0; i < matches.length; i++) {
 		const match = matches[i]
-		const winner = Player.findOne({ where: { id: match.winnerId }})
-		const loser = Player.findOne({ where: { id: match.loserId }})
+		const winner = await Player.findOne({ where: { id: match.winnerId }})
+		const loser = await Player.findOne({ where: { id: match.loserId }})
 		winner.pauper_wins++
 		await winner.save()
 		loser.pauper_losses++

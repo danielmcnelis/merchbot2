@@ -3203,7 +3203,7 @@ if (rankcom.includes(cmd)) {
 				]
 			},
 			include: Profile,
-			order: ['name', 'ASC']
+			order: [['name', 'ASC']]
 		})
 	
 		const filtered_players = players.filter((player) => memberIds.includes(player.id))

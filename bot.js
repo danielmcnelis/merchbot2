@@ -357,6 +357,33 @@ if (cmd === `!fix_cards`) {
 	return message.channel.send(`You fixed the ATK/DEF stats of ${updated} cards in the Format Library database.`)
 }
 
+
+
+//PAUPER 
+if (cmd === `!pauper`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+
+	const matches = Math.findAll({
+		where: {
+			game_mode: 'pauper'
+		}
+	})
+
+	message.channel.send(`Calculating data for ${matches.length} Pauper matches. Please wait.`)
+	
+	for (let i = 0; i < matches.length; i++) {
+		const match = matches[i]
+		const winner = Player.findOne({ where: { id: match.winnerId }})
+		const loser = Player.findOne({ where: { id: match.loserId }})
+		winner.pauper_wins++
+		await winner.save()
+		loser.pauper_losses++
+		await loser.save()
+	}
+
+	return message.channel.send(`Pauper stats have been calculated.`)
+}
+
 //NEW SET
 if (cmd === `!new_set`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
@@ -2313,20 +2340,20 @@ if (statscom.includes(cmd)) {
 		const rank = index ? `#${index + 1} out of ${sorted_players.length}` : `N/A`
 
 		return message.channel.send(
-			`${shrine} --- Arena Player Stats --- ${shrine}` +
-			`\nName: ${player.name}` +
-			`\nRanking: ${rank}` +
-			`\nWins: ${player.arena_wins}, Losses: ${player.arena_losses}` +
-			`\nWin Rate: ${(100 * player.arena_wins / (player.arena_wins + player.arena_losses)).toFixed(2)}%`
-			+ player.profile.beast_wins > 0 ? `\nBeast Wins: ${player.profile.beast_wins} ${beast}` : '' 
-			// player.profile.dinosaur_wins ? `\nDinosaur Wins: ${player.profile.beast_wins} ${dinosaur}` : '' +
-			// player.profile.dragon_wins ? `\nDragon Wins: ${player.profile.dragon_wins} ${dragon}` : `` +
-			// player.profile.fish_wins ? `\nFish Wins: ${player.profile.fish_wins} ${fish}` : `` +
-			// player.profile.plant_wins ? `\nPlant Wins: ${player.profile.plant_wins} ${plant}` : `` +
-			// player.profile.reptile_wins ? `\nReptile Wins: ${player.profile.reptile_wins} ${reptile}` : `` +
-			// player.profile.rock_wins ? `\nRock Wins: ${player.profile.rock_wins} ${rock}` : `` +
-			// player.profile.spellcaster_wins ? `\nSpellcaster Wins: ${player.profile.spellcaster_wins} ${spellcaster}` : `` +
-			// player.profile.warrior_wins ? `\nWarrior Wins: ${player.profile.warrior_wins} ${warrior}` : ``
+			`${shrine} --- Arena Player Stats --- ${shrine}`
+			+ `\nName: ${player.name}`
+			+ `\nRanking: ${rank}`
+			+ `\nWins: ${player.arena_wins}, Losses: ${player.arena_losses}`
+			+ `\nWin Rate: ${(100 * player.arena_wins / (player.arena_wins + player.arena_losses)).toFixed(2)}%`
+			+ `${player.profile.beast_wins ? `\nbeast Wins: ${player.profile.beast_wins} ${beast}` : ''}`
+			+ `${player.profile.dinosaur_wins ? `\nDinosaur Wins: ${player.profile.dinosaur_wins} ${dinosaur}` : ''}`
+			+ `${player.profile.dragon_wins ? `\nDragon Wins: ${player.profile.dragon_wins} ${dragon}` : ''}`
+			+ `${player.profile.fish_wins ? `\nFish Wins: ${player.profile.fish_wins} ${fish}` : ''}`
+			+ `${player.profile.plant_wins ? `\nPlant Wins: ${player.profile.plant_wins} ${plant}` : ''}`
+			+ `${player.profile.reptile_wins ? `\nReptile Wins: ${player.profile.reptile_wins} ${reptile}` : ''}`
+			+ `${player.profile.rock_wins ? `\nRock Wins: ${player.profile.rock_wins} ${rock}` : ''}`
+			+ `${player.profile.spellcaster_wins ? `\nSpellcaster Wins: ${player.profile.spellcaster_wins} ${spellcaster}` : ''}`
+			+ `${player.profile.warrior_wins ? `\nWarrior Wins: ${player.profile.warrior_wins} ${warrior}` : ''}`
 		)
 	} else if (game === 'Pauper') {
 		const filtered_players = active_players.filter((player) => player.pauper_wins || player.pauper_losses)
@@ -2344,7 +2371,7 @@ if (statscom.includes(cmd)) {
 			`\nName: ${player.name}`+
 			`\nRanking: ${rank}`+
 			`\nWins: ${player.pauper_wins}, Losses: ${player.pauper_losses}`+
-			`\nWin Rate: ${Math.round(100 * player.pauper_wins / (player.pauper_wins + player.pauper_losses) ) / 100}%`
+			`\nWin Rate: ${player.pauper_wins ? Math.round(10000 * player.pauper_wins / (player.pauper_wins + player.pauper_losses) ) / 100 : 'N/A'}%`
 		)
 	}
 }

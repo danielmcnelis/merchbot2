@@ -363,7 +363,7 @@ if (cmd === `!fix_cards`) {
 if (cmd === `!pauper`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 
-	const matches = Math.findAll({
+	const matches = Match.findAll({
 		where: {
 			game_mode: 'pauper'
 		}
@@ -2337,7 +2337,7 @@ if (statscom.includes(cmd)) {
 		})
 
 		const index = sorted_players.length ? sorted_players.findIndex((player) => player.id === playerId) : null
-		const rank = index ? `#${index + 1} out of ${sorted_players.length}` : `N/A`
+		const rank = index !== null ? `#${index + 1} out of ${sorted_players.length}` : `N/A`
 
 		return message.channel.send(
 			`${shrine} --- Arena Player Stats --- ${shrine}`

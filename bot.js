@@ -1071,7 +1071,7 @@ if(infocom.includes(cmd)) {
 		` However, only cards that were **originally printed** as commons ${com} are allowed in this format.`+
 		` This means cards such as Starter Deck copies of Bottomless Trap Hole cannot be played.`+
 		`\n\nPauper Format is played as single games, not matches.`+
-		` Winners receive 4${starchips}, losers receive 2${starchips}.`+
+		` Winners receive 3${starchips}, losers receive 1${starchips}.`+
 		` To report a loss, type **!loss @opponent**.`+
 		` These games do not affect your ranking for Tournaments, Diary tasks, etc.` +
 		`\n\nDo you have what it takes to become a master budget player? ${cavebob}`)
@@ -2260,39 +2260,93 @@ if(cmd === `!wallet`) {
 //STATS
 if (statscom.includes(cmd)) {
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
-	const player = await Player.findOne({ where: { id: playerId } })
-	const wallet = await Wallet.findOne({ where: { playerId } })
-
-	if (!wallet && maid === playerId) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
-	if (!wallet && maid !== playerId) return message.channel.send(`That user is not in the database.`)
-
-	const allRecords = await Player.findAll({ 
-		where: {
-			[Op.or]: [ { wins: { [Op.gt]: 0 } }, { losses: { [Op.gt]: 0 } } ]
-		},
-		order: [['stats', 'DESC']]
+	const player = await Player.findOne({ 
+		where: { id: playerId },
+		include: [Profile, Wallet] 
 	})
 
+	if (!player && maid === playerId) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!player && maid !== playerId) return message.channel.send(`That user is not in the database.`)
+
+	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
+	: message.channel === client.channels.cache.get(pauperChannelId) ? "Pauper"
+	//: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
+	//: message.channel === client.channels.cache.get(marketPlaceChannelId) ? "Market"
+	: "Ranked"
+
+	const allPlayers = await Player.findAll({
+		include: [Profile, Wallet]
+	})
 
 	const membersMap = await message.guild.members.fetch()
 	const memberIds = [...membersMap.keys()]
-	const filtered_records = allRecords.filter((record) => memberIds.includes(record.id))
-			
-	const index = filtered_records.length ? filtered_records.findIndex(record => record.dataValues.id === playerId) : -1
+	const active_players = allPlayers.filter((player) => memberIds.includes(player.id))
+	
+	if (game === 'Ranked') {
+		const filtered_players = active_players.filter((player) => player.wins || player.losses)
+		const sorted_players = filtered_players.sort((a, b) => b.stats - a.stats)
+		const index = sorted_players.length ? sorted_players.findIndex((player) => player.id === playerId) : null
+		const rank = index ? `#${index + 1} out of ${filtered_records.length}` : `N/A`
+		const medal = getMedal(player.stats, title = true)		
+		if (playerId === maid) completeTask(message.channel, maid, 'e4')
+		
+		return message.channel.send(
+			`${FiC} --- Forged Player Stats --- ${FiC}`+
+			`\nName: ${player.name}`+
+			`\nMedal: ${medal}`+
+			`\nStarchips: ${player.wallet.starchips}${starchips}`+
+			`\nStardust: ${player.wallet.stardust}${stardust}`+
+			`\nRanking: ${rank}`+
+			`\nWins: ${player.wins}, Losses: ${player.losses}`+
+			`\nElo Rating: ${player.stats.toFixed(2)}`
+		)
+	} else if (game === 'Arena') {
+		const filtered_players = active_players.filter((player) => player.arena_wins || player.arena_losses)
+		const sorted_players = filtered_players.sort((a, b) => {
+			const getArenaVictories = (p) => p.beast_wins + p.dinosaur_wins + p.dragon_wins + p.fish_wins + p.plant_wins + p.reptile_wins + p.rock_wins + p.spellcaster_wins + p.warrior_wins
+			const total_a = getArenaVictories(a.profile)
+			const total_b = getArenaVictories(b.profile)
+			return total_b - total_a
+		})
 
-	const rank = (index === -1 ? `N/A` : `#${index + 1} out of ${filtered_records.length}`)
-	const medal = getMedal(player.stats, true)
+		const index = sorted_players.length ? sorted_players.findIndex((player) => player.id === playerId) : null
+		const rank = index ? `#${index + 1} out of ${filtered_records.length}` : `N/A`
 
-	if (playerId === maid) completeTask(message.channel, maid, 'e4')
+		return message.channel.send(
+			`${shrine} --- Arena Player Stats --- ${shrine}`+
+			`\nName: ${player.name}`+
+			`\nRanking: ${rank}`+
+			`\nWins: ${player.arena_wins}, Losses: ${player.arena_losses}`+
+			`\nWin Rate: ${Math.round(100 * player.arena_wins / (player.arena_wins + player.arena_losses) ) / 100}%` +
+			player.profile.beast_wins ? `\nBeast Wins: ${player.profile.beast_wins} ${beast}` : `` +
+			player.profile.dinosaur_wins ? `\nDinosaur Wins: ${player.profile.beast_wins} ${dinosaur}` : `` +
+			player.profile.dragon_wins ? `\nDragon Wins: ${player.profile.dragon_wins} ${dragon}` : `` +
+			player.profile.fish_wins ? `\nFish Wins: ${player.profile.fish_wins} ${fish}` : `` +
+			player.profile.plant_wins ? `\nPlant Wins: ${player.profile.plant_wins} ${plant}` : `` +
+			player.profile.reptile_wins ? `\nReptile Wins: ${player.profile.reptile_wins} ${reptile}` : `` +
+			player.profile.rock_wins ? `\nRock Wins: ${player.profile.rock_wins} ${rock}` : `` +
+			player.profile.spellcaster_wins ? `\nSpellcaster Wins: ${player.profile.spellcaster_wins} ${spellcaster}` : `` +
+			player.profile.warrior_wins ? `\nWarrior Wins: ${player.profile.warrior_wins} ${warrior}` : ``
+		)
+	} else if (game === 'Pauper') {
+		const filtered_players = active_players.filter((player) => player.pauper_wins || player.pauper_losses)
+		const sorted_players = filtered_players.sort((a, b) => {
+			const rate_a = a.pauper_wins / (a.pauper_wins + a.pauper_losses)
+			const rate_b = b.pauper_wins / (b.pauper_wins + b.pauper_losses)
+			return rate_b - rate_a
+		})
 
-	return message.channel.send(`${FiC} --- Forged Player Stats --- ${FiC}`+
-	`\nName: ${player.name}`+
-	`\nMedal: ${medal}`+
-	`\nStarchips: ${wallet.starchips}${starchips}`+
-	`\nStardust: ${wallet.stardust}${stardust}`+
-	`\nRanking: ${rank}`+
-	`\nWins: ${player.wins}, Losses: ${player.losses}`+
-	`\nElo Rating: ${player.stats.toFixed(2)}`)
+		const index = sorted_players.length ? sorted_players.findIndex((player) => player.id === playerId) : null
+		const rank = index ? `#${index + 1} out of ${filtered_records.length}` : `N/A`
+
+		return message.channel.send(
+			`${com} --- Pauper Player Stats --- ${com}`+
+			`\nName: ${player.name}`+
+			`\nRanking: ${rank}`+
+			`\nWins: ${player.pauper_wins}, Losses: ${player.pauper_losses}`+
+			`\nWin Rate: ${Math.round(100 * player.pauper_wins / (player.pauper_wins + player.pauper_losses) ) / 100}%`
+		)
+	}
 }
 
 //LOSS
@@ -2549,8 +2603,14 @@ if (losscom.includes(cmd)) {
 	} else if (hasArenaRole && game !== 'Arena') {
 		return message.channel.send(`You have the Arena Players role. Please report your Arena loss in <#${arenaChannelId}>, or get a Moderator to help you.`)
 	} else if (!hasArenaRole && game === 'Pauper') {
+		winningPlayer.pauper_wins++
+		await winningPlayer.save()
+		
 		winningPlayer.wallet.starchips += 3
 		await winningPlayer.wallet.save()
+
+		losingPlayer.pauper_losses++
+		await losingPlayer.save()
 
 		losingPlayer.wallet.starchips += 1
 		await losingPlayer.wallet.save()
@@ -2745,8 +2805,14 @@ if (manualcom.includes(cmd)) {
 		message.channel.send(`A manual Arena loss by ${losingPlayer.name} (+2${starchips}) to ${winningPlayer.name} (+4${starchips}) has been recorded.`)
 		return checkArenaProgress(info)
 	} else if (game === 'Pauper') {
+		winningPlayer.pauper_wins++
+		await winningPlayer.save()
+
 		winningPlayer.wallet.starchips += 3
 		await winningPlayer.wallet.save()
+
+		losingPlayer.pauper_losses++
+		await losingPlayer.save()
 
 		losingPlayer.wallet.starchips += 1
 		await losingPlayer.wallet.save()
@@ -3002,8 +3068,14 @@ if (undocom.includes(cmd)) {
 		await lastMatch.destroy()
 		return message.channel.send(`The last Arena match in which ${winningPlayer.name} (-${lastMatch.chipsWinner}${starchips}) defeated ${losingPlayer.name} (-${lastMatch.chipsLoser}${starchips}) has been erased.`)
 	} if (game_mode === 'pauper') {
+		winningPlayer.arena_wins--
+		await winningPlayer.save()
+
 		winningPlayer.wallet.starchips -= lastMatch.chipsWinner
 		await winningPlayer.wallet.save()
+
+		losingPlayer.pauper_losses--
+		await losingPlayer.save()
 
 		losingPlayer.wallet.starchips -= lastMatch.chipsLoser
 		await losingPlayer.wallet.save()

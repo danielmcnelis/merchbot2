@@ -2,7 +2,7 @@
 const { Arena, Diary, Info, Player, Profile, Wallet, Match } = require('../db')
 const { Op } = require('sequelize')
 const { yescom, nocom } = require('../static/commands.json')
-const { shrine, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, dragon, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, spellcaster, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
+const { king, shrine, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, dragon, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, spellcaster, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
 const { arenaRole } = require('../static/roles.json')
 const { arenaChannelId } = require('../static/channels.json')
 const { client } = require('../static/clients.js')
@@ -336,7 +336,7 @@ const startRound = async (info, entries) => {
             info.round === 5 ? [[P1, P6], [P2, P3], [P4, P5]] : 
             null
     
-        const title = `${shrine}  -------  Arena Round ${info.round}  -------  ${shrine}\n${beast}  ${dinosaur}  ${dragon}  ${fish}  ${plant}  ${reptile}  ${rock}  ${spellcaster}  ${warrior}` 
+        const title = `${shrine}  ------  Arena Round ${info.round}  ------  ${shrine}\n${beast}  ${dinosaur}  ${dragon}  ${fish}  ${plant}  ${reptile}  ${rock}  ${spellcaster}  ${warrior}` 
         const matches = pairings.map((pairing, index) => {
             if (pairing[0].active === false && pairing[1].active === false) {
                 setTimout(() => doubleForfeit(pairing[0].playerId, pairing[1].playerId), index * 1000 + 1000)
@@ -405,7 +405,7 @@ const postStandings = async (info, entries) => {
         await entry.save()
     }
 
-    const title = `---  Arena Round ${info.round} Standings  ---`
+    const title = `${king}  ---  Arena Round ${info.round} Standings  ---  ${king} `
     const standings = entries.map((entry, index) => {
         return `${index + 1}. ${entry.player.name} ${eval(entry.tribe)} - ${entry.score} W`
     })

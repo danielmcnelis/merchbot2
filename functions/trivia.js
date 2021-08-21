@@ -170,7 +170,7 @@ const askQuestion = async (guild, channel, info, entries, questionsArr) => {
 	let fuzzyAnswers = FuzzySet([], false)
     answers.forEach((a) =>  fuzzyAnswers.add(a))
 
-    channel.send(`${megaphone} --- Question #${info.round} --- ${dummy}\n${question}\n\n`)
+    channel.send(`${megaphone}  ------  Question #${info.round}  ------  ${dummy}\n${question}\n\n`)
     
     getAnswer(guild, entries[0], question)
     getAnswer(guild, entries[1], question)
@@ -263,7 +263,7 @@ const checkKnowledge = async (playerId, questionNumber) => {
 
 const postTriviaStandings = async (guild, channel, info, entries, questions) => {
     entries.sort((a, b) => b.score - a.score)
-    const title = `${no}  ---  Trivia ${info.round < 10 ? `Round ${info.round}` : 'Final'} Standings  ---  ${yes}`
+    const title = `${no} --- Trivia ${info.round < 10 ? `Round ${info.round}` : 'Final'} Standings --- ${yes}`
     const standings = entries.map((entry, index) => {
         const score = entry.score
         let enthusiasm = ''

@@ -3218,7 +3218,7 @@ if (rankcom.includes(cmd)) {
 		const topProfiles = transformed_players.slice(0, x)
 		for (let i = 0; i < x; i++) {
 			const p = topProfiles[i]
-			result[i+1] = `${(i+1)}. ${p[3] + p[4] + p[5] + p[6] + p[7] + p[8] + p[9] + p[9] + p[11]} W - ${Math.round(10000 * a[1] / (a[1] + a[2])) / 100}% - ${p[0]} - ${p[3] ? `${beast} ` : ''}${p[4] ? `${dinosaur} ` : ''}${p[5] ? `${fish} ` : ''}${p[6] ? `${plant} ` : ''}${p[7] ? `${reptile} ` : ''}${p[8] ? `${rock} ` : ''}${p[9] ? `${dragon} ` : ''}${p[10] ? `${spellcaster} ` : ''}${p[11] ? `${warrior} ` : ''}`
+			result[i+1] = `${(i+1)}. ${p[3] + p[4] + p[5] + p[6] + p[7] + p[8] + p[9] + p[9] + p[11]} W - ${Math.round(10000 * p[1] / (p[1] + p[2])) / 100}% - ${p[0]} - ${p[3] ? `${beast} ` : ''}${p[4] ? `${dinosaur} ` : ''}${p[5] ? `${fish} ` : ''}${p[6] ? `${plant} ` : ''}${p[7] ? `${reptile} ` : ''}${p[8] ? `${rock} ` : ''}${p[9] ? `${dragon} ` : ''}${p[10] ? `${spellcaster} ` : ''}${p[11] ? `${warrior} ` : ''}`
 		} 
 	} else if (game === 'Pauper') {
 		x === 1 ? result[0] = `${com} --- The Champion of the People --- ${com}`

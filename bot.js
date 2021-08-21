@@ -3142,6 +3142,7 @@ if (rankcom.includes(cmd)) {
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
 	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
 	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
+	: message.channel === client.channels.cache.get(pauperChannelId) ? "Pauper"
 	: message.channel === client.channels.cache.get(marketPlaceChannelId) ? "Market"
 	: "Ranked"
 	
@@ -3168,8 +3169,8 @@ if (rankcom.includes(cmd)) {
 		const topPlayers = filtered_players.slice(0, x)
 		for (let i = 0; i < x; i++) result[i+1] = `${(i+1)}. ${getMedal(topPlayers[i].stats)} ${topPlayers[i].name}`
 	} else if (game === 'Market') {
-		x === 1 ? result[0] = `${FiC} --- The Wealthiest Player --- ${FiC}`
-		: result[0] = `${FiC} --- Top ${x} Richest Players --- ${FiC}`
+		x === 1 ? result[0] = `${king} --- The Wealthiest Player --- ${king}`
+		: result[0] = `${king} --- Top ${x} Richest Players --- ${king}`
 		
 		const allWallets = await Wallet.findAll({ where: { playerId: { [Op.not]: merchbotId } }, include: Player })
 		const filtered_wallets = allWallets.filter((wallet) => memberIds.includes(wallet.playerId))
@@ -3191,35 +3192,55 @@ if (rankcom.includes(cmd)) {
 		const topWallets = transformed_wallets.slice(0, x)
 		for (let i = 0; i < x; i++) result[i+1] = `${(i+1)}. ${(topWallets[i][1])}${starchips} - ${topWallets[i][0]}`
 	} else if (game === 'Arena') {
-		x === 1 ? result[0] = `${FiC} --- The Champion of the Arena --- ${FiC}`
-		: result[0] = `${FiC} --- Top ${x} Arena Players --- ${FiC}`
+		x === 1 ? result[0] = `${shrine} --- The Champion of the Arena --- ${shrine}`
+		: result[0] = `${shrine} --- Top ${x} Arena Players --- ${shrine}`
 		
-		const allProfiles = await Profile.findAll({ 
+		const players = await Player.findAll({ 
 			where: {
 				[Op.or]: [ 
-					{ beast_wins: { [Op.gt]: 0 } }, 
-					{ dinosaur_wins: { [Op.gt]: 0 } }, 
-					{ fish_wins: { [Op.gt]: 0 } }, 
-					{ plant_wins: { [Op.gt]: 0 } }, 
-					{ reptile_wins: { [Op.gt]: 0 } }, 
-					{ rock_wins: { [Op.gt]: 0 } }, 
-					{ dragon_wins: { [Op.gt]: 0 } }, 
-					{ spellcaster_wins: { [Op.gt]: 0 } }, 
-					{ warrior_wins: { [Op.gt]: 0 } } 
+					{ arena_wins: { [Op.gt]: 0 } }, 
+					{ arena_losses: { [Op.gt]: 0 } }
 				]
 			},
-			include: Player,
-			order: [[Player, 'name', 'ASC']]
+			include: Profile,
+			order: ['name', 'ASC']
 		})
 	
-		const filtered_profiles = allProfiles.filter((profile) => memberIds.includes(profile.playerId))
-		if (x > filtered_profiles.length) return message.channel.send(`I need a smaller number. We only have ${filtered_profiles.length} Arena winners.`)
-		const transformed_profiles = filtered_profiles.map((p) => [p.player.name, p.beast_wins, p.dinosaur_wins, p.fish_wins, p.plant_wins, p.reptile_wins, p.rock_wins, p.dragon_wins, p.spellcaster_wins, p.warrior_wins])
-		transformed_profiles.sort((a, b) => (b[1] + b[2] + b[3] + b[4] + b[5] + b[6]) - (a[1] + a[2] + a[3] + a[4] + a[5] + a[6]))
-		const topProfiles = transformed_profiles.slice(0, x)
+		const filtered_players = players.filter((player) => memberIds.includes(player.id))
+		if (x > filtered_players.length) return message.channel.send(`I need a smaller number. We only have ${filtered_players.length} Arena players.`)
+		const transformed_players = filtered_players.map((p) => [p.name, p.arena_wins, p.arena_losses, p.profile.beast_wins, p.profile.dinosaur_wins, p.profile.fish_wins, p.profile.plant_wins, p.profile.reptile_wins, p.profile.rock_wins, p.profile.dragon_wins, p.profile.spellcaster_wins, p.profile.warrior_wins])
+		transformed_players.sort((a, b) => {
+			const difference = (b[3] + b[4] + b[5] + b[6] + b[7] + b[8] + b[9] + b[10] + b[11]) - (a[3] + a[4] + a[5] + a[6] + a[7] + a[8] + a[9] + a[10] + a[11])
+			if (difference) return difference
+			else return (b[1] / (b[1] + b[2])) - (a[1] / (a[1] + a[2]))
+		}) 
+
+		const topProfiles = transformed_players.slice(0, x)
 		for (let i = 0; i < x; i++) {
 			const p = topProfiles[i]
-			result[i+1] = `${(i+1)}. ${p[1] + p[2] + p[3] + p[4] + p[5] + p[6]} W - ${p[0]} - ${p[1] ? `${beast} ` : ''}${p[2] ? `${dinosaur} ` : ''}${p[3] ? `${fish} ` : ''}${p[4] ? `${plant} ` : ''}${p[5] ? `${reptile} ` : ''}${p[6] ? `${rock} ` : ''}${p[7] ? `${dragon} ` : ''}${p[8] ? `${spellcaster} ` : ''}${p[9] ? `${warrior} ` : ''}`
+			result[i+1] = `${(i+1)}. ${p[3] + p[4] + p[5] + p[6] + p[7] + p[8] + p[9] + p[9] + p[11]} W - ${Math.round(10000 * a[1] / (a[1] + a[2])) / 100}% - ${p[0]} - ${p[3] ? `${beast} ` : ''}${p[4] ? `${dinosaur} ` : ''}${p[5] ? `${fish} ` : ''}${p[6] ? `${plant} ` : ''}${p[7] ? `${reptile} ` : ''}${p[8] ? `${rock} ` : ''}${p[9] ? `${dragon} ` : ''}${p[10] ? `${spellcaster} ` : ''}${p[11] ? `${warrior} ` : ''}`
+		} 
+	} else if (game === 'Pauper') {
+		x === 1 ? result[0] = `${com} --- The Champion of the People --- ${com}`
+		: result[0] = `${com} --- Top ${x} Pauper Players --- ${com}`
+		
+		const players = await Player.findAll({ 
+			where: {
+				[Op.or]: [ 
+					{ pauper_wins: { [Op.gt]: 0 } }, 
+					{ pauper_losses: { [Op.gt]: 0 } }
+				]
+			}
+		})
+	
+		const filtered_players = players.filter((player) => memberIds.includes(player.id))
+		if (x > filtered_players.length) return message.channel.send(`I need a smaller number. We only have ${filtered_players.length} Pauper players.`)
+		filtered_players.sort((a, b) => (b.pauper_wins / (b.pauper_wins + b.pauper_losses)) - (a.pauper_wins / (a.pauper_wins + a.pauper_losses)) ) 
+
+		const topProfiles = filtered_players.slice(0, x)
+		for (let i = 0; i < x; i++) {
+			const p = topProfiles[i]
+			result[i+1] = `${(i+1)}. ${p.pauper_wins} W - ${p.pauper_losses} L - ${Math.round(10000 * p.pauper_wins / (p.pauper_wins + p.pauper_losses)) / 100}% - ${p.name}`
 		} 
 	} else if (game === 'Trivia') {
 		x === 1 ? result[0] = `${FiC} --- The Top Bookworm --- ${FiC}`

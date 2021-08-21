@@ -2286,7 +2286,7 @@ if (statscom.includes(cmd)) {
 		const filtered_players = active_players.filter((player) => player.wins || player.losses)
 		const sorted_players = filtered_players.sort((a, b) => b.stats - a.stats)
 		const index = sorted_players.length ? sorted_players.findIndex((player) => player.id === playerId) : null
-		const rank = index ? `#${index + 1} out of ${filtered_records.length}` : `N/A`
+		const rank = index ? `#${index + 1} out of ${sorted_players.length}` : `N/A`
 		const medal = getMedal(player.stats, title = true)		
 		if (playerId === maid) completeTask(message.channel, maid, 'e4')
 		
@@ -2310,7 +2310,7 @@ if (statscom.includes(cmd)) {
 		})
 
 		const index = sorted_players.length ? sorted_players.findIndex((player) => player.id === playerId) : null
-		const rank = index ? `#${index + 1} out of ${filtered_records.length}` : `N/A`
+		const rank = index ? `#${index + 1} out of ${sorted_players.length}` : `N/A`
 
 		return message.channel.send(
 			`${shrine} --- Arena Player Stats --- ${shrine}`+
@@ -2337,7 +2337,7 @@ if (statscom.includes(cmd)) {
 		})
 
 		const index = sorted_players.length ? sorted_players.findIndex((player) => player.id === playerId) : null
-		const rank = index ? `#${index + 1} out of ${filtered_records.length}` : `N/A`
+		const rank = index ? `#${index + 1} out of ${sorted_players.length}` : `N/A`
 
 		return message.channel.send(
 			`${com} --- Pauper Player Stats --- ${com}`+

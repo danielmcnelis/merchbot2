@@ -2345,7 +2345,7 @@ if (statscom.includes(cmd)) {
 			+ `\nRanking: ${rank}`
 			+ `\nWins: ${player.arena_wins}, Losses: ${player.arena_losses}`
 			+ `\nWin Rate: ${(100 * player.arena_wins / (player.arena_wins + player.arena_losses)).toFixed(2)}%`
-			+ `${player.profile.beast_wins ? `\nbeast Wins: ${player.profile.beast_wins} ${beast}` : ''}`
+			+ `${player.profile.beast_wins ? `\nBeast Wins: ${player.profile.beast_wins} ${beast}` : ''}`
 			+ `${player.profile.dinosaur_wins ? `\nDinosaur Wins: ${player.profile.dinosaur_wins} ${dinosaur}` : ''}`
 			+ `${player.profile.dragon_wins ? `\nDragon Wins: ${player.profile.dragon_wins} ${dragon}` : ''}`
 			+ `${player.profile.fish_wins ? `\nFish Wins: ${player.profile.fish_wins} ${fish}` : ''}`

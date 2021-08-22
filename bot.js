@@ -4030,8 +4030,8 @@ if(cmd === `!wager`) {
 	}).then(async collected => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
 
-		wallet.stardust -= x
-		await wallet.save()
+		player.wallet.stardust -= x
+		await player.wallet.save()
 
 		let best = 1
 		const matrix = new Array(3600)

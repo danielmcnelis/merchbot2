@@ -4035,10 +4035,10 @@ if(cmd === `!wager`) {
 
 		let best = 1
 		const matrix = new Array(2160)
-		matrix.fill(1, 0, 2130)
-		matrix.fill(2, 2130, 2157)
-		matrix.fill(3, 2157, 2156)
-		matrix.fill(4, 2156, 2159)
+		matrix.fill(1, 0, 2075)
+		matrix.fill(2, 2075, 2139)
+		matrix.fill(3, 2139, 2155)
+		matrix.fill(4, 2155, 2159)
 		matrix.fill(5, 2159, 2160)
 
 		for (let i = 0; i < x; i++) {

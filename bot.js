@@ -157,21 +157,14 @@ if (!message.content.startsWith("!") && message.content.includes(`{`) && message
 
 //TEST
 if(cmd === `!test`) {
-	const specials = await Print.findAll({ 
-		where: {
-			rarity: "sup",
-			card_code: {
-				[Op.substring]: ['SE']
-			}
-		},
-		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	const matrix = new Array(60)
+	matrix.fill(1, 0, 47)
+	matrix.fill(2, 45, 53)
+	matrix.fill(3, 53, 57)
+	matrix.fill(4, 57, 59)
+	matrix.fill(5, 59, 60)
 
-
-	const your_spec_1 = getRandomElement(specials.slice(0, 2))
-	const your_spec_2 = getRandomElement(specials.slice(2, 4))
+	console.log('matrix', matrix)
 }
 
 // ASSIGN ROLES
@@ -4042,10 +4035,10 @@ if(cmd === `!wager`) {
 
 		let best = 1
 		const matrix = new Array(60)
-		matrix.fill(1, 0, 30)
-		matrix.fill(2, 30, 50)
-		matrix.fill(3, 50, 58)
-		matrix.fill(4, 58, 59)
+		matrix.fill(1, 0, 47)
+		matrix.fill(2, 45, 53)
+		matrix.fill(3, 53, 57)
+		matrix.fill(4, 57, 59)
 		matrix.fill(5, 59, 60)
 
 		console.log('matrix', matrix)

@@ -4041,7 +4041,7 @@ if(cmd === `!wager`) {
 		// await wallet.save()
 
 		let best = 1
-		const matrix = new Array(2160)
+		const matrix = new Array(60)
 		matrix.fill(1, 0, 30)
 		matrix.fill(2, 30, 50)
 		matrix.fill(3, 50, 58)

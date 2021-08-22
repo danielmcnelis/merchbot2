@@ -4016,7 +4016,7 @@ if(cmd === `!wager`) {
 	if (x < 10) return message.channel.send(`You cannot wager less than 10${stardust}.`)
 	if (x > 1000) return message.channel.send(`You cannot wager more than 1000${stardust}.`)
 	if (x % 1 !== 0) return message.channel.send(`You cannot wager partial ${stardust}.`)
-	if (x > player.wallet.stardust) message.channel.send(`You only have ${player.wallet.stardust}${stardust}.`)
+	//if (x > player.wallet.stardust) return message.channel.send(`You only have ${player.wallet.stardust}${stardust}.`)
 
 	const sets = await Set.findAll({ 
 		where: { 
@@ -4059,9 +4059,7 @@ if(cmd === `!wager`) {
 		best === 2 ? "rar" :
 		"com"
 
-		console.log('matrix', matrix)
-		console.log('wager:', x)
-		console.log('rarity:', rarity)
+		console.log('wager:', x, ', rarity:', rarity)
 
 		const prints = await Print.findAll({ 
 			where: {
@@ -4071,11 +4069,7 @@ if(cmd === `!wager`) {
 			order: [['card_slot', 'ASC']]
 		})
 
-		console.log('prints.length', prints.length)
-
 		const print = getRandomElement(prints)	
-		console.log('print.card_name', print.card_name)
-
 		const card = await Card.findOne({ where: { name: print.card_name }})
 	
 		const inv = await Inventory.findOne({ where: { 

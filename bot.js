@@ -2144,7 +2144,7 @@ if(cmd === `!search`) {
 	})
 	
 	filtered_wishlists.forEach(function(wishlist) {
-		for (let i = 0; i < 10; i++) {
+		for (let i = 0; i < 18; i++) {
 			if (wishlist[`slot_${(i + 1)}`] === print.card_code) wishlistResults.push(wishlist.player.name)
 		}
 	})

@@ -4053,15 +4053,15 @@ if(cmd === `!wager`) {
 			if (sample > best) best = sample
 		}
 
-		console.log('best', best)
-
 		const rarity = best === 5 ? "scr" :
 		best === 4 ? "ult" :
 		best === 3 ? "sup" :
 		best === 2 ? "rar" :
 		"com"
 
-		console.log('rarity', rarity)
+		console.log('matrix', matrix)
+		console.log('wager:', x)
+		console.log('rarity:', rarity)
 
 		const prints = await Print.findAll({ 
 			where: {

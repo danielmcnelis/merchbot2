@@ -4034,12 +4034,12 @@ if(cmd === `!wager`) {
 		// await wallet.save()
 
 		let best = 1
-		const matrix = new Array(5184)
-		matrix.fill(1, 0, 5028)
-		matrix.fill(2, 5028, 5153)
-		matrix.fill(3, 5153, 5178)
-		matrix.fill(4, 5178, 5183)
-		matrix.fill(5, 5183, 5184)
+		const matrix = new Array(3600)
+		matrix.fill(1, 0, 3463)
+		matrix.fill(2, 3463, 3559)
+		matrix.fill(3, 3559, 3591)
+		matrix.fill(4, 3591, 3599)
+		matrix.fill(5, 3599, 3600)
 
 		for (let i = 0; i < x; i++) {
 			const sample = getRandomElement(matrix)

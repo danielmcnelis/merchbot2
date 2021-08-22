@@ -4042,11 +4042,13 @@ if(cmd === `!wager`) {
 
 		let best = 1
 		const matrix = new Array(2160)
-		matrix.fill(1, 0, 2052)
-		matrix.fill(2, 2052, 2118)
-		matrix.fill(3, 2118, 2154)
-		matrix.fill(4, 2154, 2159)
-		matrix.fill(5, 2159, 2160)
+		matrix.fill(1, 0, 30)
+		matrix.fill(2, 30, 50)
+		matrix.fill(3, 50, 58)
+		matrix.fill(4, 58, 59)
+		matrix.fill(5, 59, 60)
+
+		console.log('matrix', matrix)
 
 		for (let i = 0; i < x; i++) {
 			const sample = getRandomElement(matrix)

@@ -4009,7 +4009,7 @@ if(cmd === `!wager`) {
 	if (x < 10) return message.channel.send(`You cannot wager less than 10${stardust}.`)
 	if (x > 1000) return message.channel.send(`You cannot wager more than 1000${stardust}.`)
 	if (x % 1 !== 0) return message.channel.send(`You cannot wager partial ${stardust}.`)
-	//if (x > player.wallet.stardust) return message.channel.send(`You only have ${player.wallet.stardust}${stardust}.`)
+	if (x > player.wallet.stardust) return message.channel.send(`You only have ${player.wallet.stardust}${stardust}.`)
 
 	const sets = await Set.findAll({ 
 		where: { 
@@ -4030,8 +4030,8 @@ if(cmd === `!wager`) {
 	}).then(async collected => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
 
-		// wallet.stardust -= x
-		// await wallet.save()
+		wallet.stardust -= x
+		await wallet.save()
 
 		let best = 1
 		const matrix = new Array(3600)
@@ -4052,8 +4052,6 @@ if(cmd === `!wager`) {
 		best === 2 ? "rar" :
 		"com"
 
-		console.log('wager:', x, ', rarity:', rarity)
-
 		const prints = await Print.findAll({ 
 			where: {
 				setId: set.id,
@@ -4071,22 +4069,22 @@ if(cmd === `!wager`) {
 			playerId: maid
 		}})
 	
-		// if (inv) {
-		// 	inv.quantity++
-		// 	await inv.save()
-		// } else {
-		// 	await Inventory.create({ 
-		// 		card_code: print.card_code,
-		// 		quantity: 1,
-		// 		printId: print.id,
-		// 		playerId: maid
-		// 	})
+		if (inv) {
+			inv.quantity++
+			await inv.save()
+		} else {
+			await Inventory.create({ 
+				card_code: print.card_code,
+				quantity: 1,
+				printId: print.id,
+				playerId: maid
+			})
 	
-		// 	if (print.rarity === 'scr') completeTask(message.channel, maid, 'm4', 4000)
-		// }
+			if (print.rarity === 'scr') completeTask(message.channel, maid, 'm4', 4000)
+		}
 
-		// player.daily.last_wager = date
-		// await player.daily.save()
+		player.daily.last_wager = date
+		await player.daily.save()
 
 		if (await checkCoreSetComplete(maid, 1)) completeTask(message.channel, maid, 'h4', 4000)
 		if (await checkCoreSetComplete(maid, 3)) completeTask(message.channel, maid, 'l3', 5000)
@@ -5185,11 +5183,16 @@ if(cmd === `!box`) {
 	if (!set.for_sale) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} are not available.`)
 	if (!set.packs_per_box) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} is experiencing a glitch in the database. Please get an Admin to help you.`)
 
-	const wallet = await Wallet.findOne( { where: { playerId: maid }, include: Player })
+	const player = await Player.findOne( { where: { id: maid }, include: [Daily, Wallet] })
 	const merchbot_wallet = await Wallet.findOne( { where: { playerId: merchbotId } })
-	if (!wallet || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
-	const money = wallet[set.currency]
-	if (money < set.box_price) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Boxes cost ${set.box_price}${eval(set.currency)}.`)
+	if (!player || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	const money = player.wallet[set.currency]
+	if (money < set.box_price) return message.channel.send(`Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Boxes cost ${set.box_price}${eval(set.currency)}.`)
+
+	const date = new Date()
+	const hoursLeftInDay = date.getMinutes() === 0 ? 24 - date.getHours() : 23 - date.getHours()
+	const minsLeftInHour = date.getMinutes() === 0 ? 0 : 60 - date.getMinutes()
+	if (player.daily.last_box && isSameDay(player.daily.last_box, date)) return message.channel.send(`You already purchased a Box today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
 
 	const commons = await Print.findAll({ 
 		where: {
@@ -5245,7 +5248,7 @@ if(cmd === `!box`) {
 	})
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`${wallet.player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.box_price}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`)
+	const msg = await message.channel.send(`${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.box_price}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
@@ -5364,8 +5367,8 @@ if(cmd === `!box`) {
 			message.author.send(results.join("\n"), attachment)
 		}
 
-		wallet[set.currency] -= set.box_price
-		await wallet.save()
+		player.wallet[set.currency] -= set.box_price
+		await player.wallet.save()
 
 		merchbot_wallet.stardust += set.currency === 'stardust' ? set.box_price : set.box_price * 10
 		await merchbot_wallet.save()
@@ -5373,6 +5376,9 @@ if(cmd === `!box`) {
 		set.unit_sales += 24
 		await set.save()
 
+		player.daily.last_box = date
+		await player.daily.save()
+		
 		completeTask(message.channel, maid, 'e6')
 		completeTask(message.channel, maid, 'm3', 3000)
 		completeTask(message.channel, maid, 'm4', 4000)

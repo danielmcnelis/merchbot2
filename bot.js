@@ -3218,7 +3218,7 @@ if (rankcom.includes(cmd)) {
 		const topProfiles = transformed_players.slice(0, x)
 		for (let i = 0; i < x; i++) {
 			const p = topProfiles[i]
-			result[i+1] = `${(i+1)}. ${p[3] + p[4] + p[5] + p[6] + p[7] + p[8] + p[9] + p[9] + p[11]} W - ${Math.round(10000 * p[1] / (p[1] + p[2])) / 100}% - ${p[0]} - ${p[3] ? `${beast} ` : ''}${p[4] ? `${dinosaur} ` : ''}${p[5] ? `${fish} ` : ''}${p[6] ? `${plant} ` : ''}${p[7] ? `${reptile} ` : ''}${p[8] ? `${rock} ` : ''}${p[9] ? `${dragon} ` : ''}${p[10] ? `${spellcaster} ` : ''}${p[11] ? `${warrior} ` : ''}`
+			result[i+1] = `${(i+1)}. ${p[3] + p[4] + p[5] + p[6] + p[7] + p[8] + p[9] + p[10] + p[11]} W - ${Math.round(10000 * p[1] / (p[1] + p[2])) / 100}% - ${p[0]} - ${p[3] ? `${beast} ` : ''}${p[4] ? `${dinosaur} ` : ''}${p[5] ? `${fish} ` : ''}${p[6] ? `${plant} ` : ''}${p[7] ? `${reptile} ` : ''}${p[8] ? `${rock} ` : ''}${p[9] ? `${dragon} ` : ''}${p[10] ? `${spellcaster} ` : ''}${p[11] ? `${warrior} ` : ''}`
 		} 
 	} else if (game === 'Pauper') {
 		x === 1 ? result[0] = `${com} --- The Champion of the People --- ${com}`
@@ -3998,6 +3998,130 @@ if(cmd === `!daily`) {
 	message.channel.send(`1... 2...`)
 	return setTimeout(() => message.channel.send(`${enthusiasm} ${daily.player.name} pulled ${eval(print.rarity)}${print.card_code} - ${print.card_name} from the grab bag! ${emoji}`, attachment), 2000)
 }
+
+
+//WAGER
+if(cmd === `!wager`) {
+	const player = await Player.findOne({ where: { id: maid }, include: [Daily, Wallet] })
+	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+
+	const date = new Date()
+	const hoursLeftInDay = date.getMinutes() === 0 ? 24 - date.getHours() : 23 - date.getHours()
+	const minsLeftInHour = date.getMinutes() === 0 ? 0 : 60 - date.getMinutes()
+
+	if (player.daily.last_wager && isSameDay(player.daily.last_wager, date)) return message.channel.send(`You already used **!wager** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
+
+	const x = parseInt(args[0])
+	if (!x || isNaN(x)) return message.channel.send(`Please specify the amount of ${stardust} you wish to wager.`)
+	if (x < 10) return message.channel.send(`You cannot wager less than 10${stardust}.`)
+	if (x > 1000) return message.channel.send(`You cannot wager more than 1000${stardust}.`)
+	if (x % 1 !== 0) return message.channel.send(`You cannot wager partial ${stardust}.`)
+	if (x > player.wallet.stardust) message.channel.send(`You only have ${player.wallet.stardust}${stardust}.`)
+
+	const sets = await Set.findAll({ 
+		where: { 
+			type: 'core',
+			for_sale: true
+		},
+		order: [['createdAt', 'DESC']]
+	})
+
+	const set = sets[0]
+	if (!set) return message.channel.send(`No core set found.`)
+
+	const filter = m => m.author.id === message.author.id
+	const msg = await message.channel.send(`Are you sure you want to wager ${x}${stardust} on a random ${set.code} ${eval(set.emoji)} card?`)
+	const collected = await msg.channel.awaitMessages(filter, {
+		max: 1,
+		time: 15000
+	}).then(async collected => {
+		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+
+		// wallet.stardust -= x
+		// await wallet.save()
+
+		let best = 1
+		const matrix = new Array(2160)
+		matrix.fill(1, 0, 2052)
+		matrix.fill(2, 2052, 2118)
+		matrix.fill(3, 2118, 2154)
+		matrix.fill(4, 2154, 2159)
+		matrix.fill(5, 2159, 2160)
+
+		for (let i = 0; i < x; i++) {
+			const sample = getRandomElement(matrix)
+			if (sample > best) best = sample
+		}
+
+		console.log('best', best)
+
+		const rarity = best === 5 ? "scr" :
+		best === 4 ? "ult" :
+		best === 3 ? "sup" :
+		best === 2 ? "rar" :
+		"com"
+
+		console.log('rarity', rarity)
+
+		const prints = await Print.findAll({ 
+			where: {
+				setId: set.id,
+				rarity: rarity
+			},
+			order: [['card_slot', 'ASC']]
+		})
+
+		console.log('prints.length', prints.length)
+
+		const print = getRandomElement(prints)	
+		console.log('print.card_name', print.card_name)
+
+		const card = await Card.findOne({ where: { name: print.card_name }})
+	
+		const inv = await Inventory.findOne({ where: { 
+			card_code: print.card_code,
+			printId: print.id,
+			playerId: maid
+		}})
+	
+		// if (inv) {
+		// 	inv.quantity++
+		// 	await inv.save()
+		// } else {
+		// 	await Inventory.create({ 
+		// 		card_code: print.card_code,
+		// 		quantity: 1,
+		// 		printId: print.id,
+		// 		playerId: maid
+		// 	})
+	
+		// 	if (print.rarity === 'scr') completeTask(message.channel, maid, 'm4', 4000)
+		// }
+
+		// player.daily.last_wager = date
+		// await player.daily.save()
+
+		if (await checkCoreSetComplete(maid, 1)) completeTask(message.channel, maid, 'h4', 4000)
+		if (await checkCoreSetComplete(maid, 3)) completeTask(message.channel, maid, 'l3', 5000)
+
+		const canvas = Canvas.createCanvas(105, 158)
+		const context = canvas.getContext('2d')
+		const background = fs.existsSync(`./public/card_images/${card.image}`) ? 
+							await Canvas.loadImage(`./public/card_images/${card.image}`) :
+							await Canvas.loadImage(`https://ygoprodeck.com/pics/${card.image}`)
+		if (background && canvas && context) context.drawImage(background, 0, 0, canvas.width, canvas.height)
+		const attachment = background && canvas && context ? new Discord.MessageAttachment(canvas.toBuffer(), `${card.name}.png`) : false
+		const enthusiasm = rarity === "com" ? `Ho-Hum.` : rarity === "rar" ? `Not bad.` : rarity === 'sup' ? `Cool beans!` : rarity === 'ult' ? `Now *that's* based!` : `Holy $#%t balls!`
+		const emoji = rarity === "com" ? cavebob : rarity === "rar" ? stoned : rarity === 'sup' ? blue : rarity === 'ult' ? wokeaf : koolaid
+	
+		message.channel.send(`1... 2...`)
+		return setTimeout(() => message.channel.send(`${enthusiasm} ${player.name} won ${eval(print.rarity)}${print.card_code} - ${print.card_name} off their wager! ${emoji}`, attachment), 2000)
+	}).catch(err => {
+		console.log(err)
+		return message.channel.send(`Sorry, time's up.`)
+	})
+}
+
 
 //ALCHEMY
 if(cmd === `!alc` ||cmd === `!alch` || cmd === `!alchemy`) {

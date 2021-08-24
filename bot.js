@@ -363,11 +363,11 @@ if (cmd === `!zero`) {
 		player.keeper_stats = 500.00
 		player.gauntlet_stats = 500.00
 		player.draft_stats = 500.00
-		player.arena_backup = 500.00
-		player.pauper_backup = 500.00
-		player.keeper_backup = 500.00
-		player.gauntlet_backup = 500.00
-		player.draft_backup = 500.00
+		player.arena_backup = 0.00
+		player.pauper_backup = 0.00
+		player.keeper_backup = 0.00
+		player.gauntlet_backup = 0.00
+		player.draft_backup = 0.00
 		await player.save()
 	}
 

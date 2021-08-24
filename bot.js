@@ -2411,7 +2411,7 @@ if (statscom.includes(cmd)) {
 			+ `\nMedal: ${medal}`
 			+ `\nWins: ${player.arena_wins}, Losses: ${player.arena_losses}`
 			+ `\nWin Rate: ${(100 * player.arena_wins / (player.arena_wins + player.arena_losses)).toFixed(2)}%`
-			+ `\nElo Rating: ${player.arena_stats.toFixed(2)}%`
+			+ `\nElo Rating: ${player.arena_stats.toFixed(2)}`
 			+ `${player.profile.beast_wins ? `\nBeast Wins: ${player.profile.beast_wins} ${beast}` : ''}`
 			+ `${player.profile.dinosaur_wins ? `\nDinosaur Wins: ${player.profile.dinosaur_wins} ${dinosaur}` : ''}`
 			+ `${player.profile.dragon_wins ? `\nDragon Wins: ${player.profile.dragon_wins} ${dragon}` : ''}`
@@ -2436,7 +2436,7 @@ if (statscom.includes(cmd)) {
 			+ `\nRanking: ${rank}`
 			+ `\nWins: ${player.pauper_wins}, Losses: ${player.pauper_losses}`
 			+ `\nWin Rate: ${player.pauper_wins ? Math.round(10000 * player.pauper_wins / (player.pauper_wins + player.pauper_losses) ) / 100 : 'N/A'}%`
-			+ `\nElo Rating: ${player.pauper_stats.toFixed(2)}%`
+			+ `\nElo Rating: ${player.pauper_stats.toFixed(2)}`
 
 		)
 	}
@@ -3285,7 +3285,7 @@ if (rankcom.includes(cmd)) {
 		for (let i = 0; i < x; i++) {
 			const p = topProfiles[i]
 			const medal = getMedal(p[1], title = false)
-			result[i+1] = `${(i+1)}. ${p[0]} ${medal} - ${p[3] + p[4] + p[5] + p[6] + p[7] + p[8] + p[9] + p[10] + p[11]} W - ${p[0]} - ${p[3] ? `${beast} ` : ''}${p[4] ? `${dinosaur} ` : ''}${p[5] ? `${fish} ` : ''}${p[6] ? `${plant} ` : ''}${p[7] ? `${reptile} ` : ''}${p[8] ? `${rock} ` : ''}${p[9] ? `${dragon} ` : ''}${p[10] ? `${spellcaster} ` : ''}${p[11] ? `${warrior} ` : ''}`
+			result[i+1] = `${(i+1)}. ${medal} ${p[0]} - ${p[2] + p[3] + p[4] + p[5] + p[6] + p[7] + p[8] + p[9] + p[10]} W - ${p[3] ? `${beast} ` : ''}${p[4] ? `${dinosaur} ` : ''}${p[5] ? `${fish} ` : ''}${p[6] ? `${plant} ` : ''}${p[7] ? `${reptile} ` : ''}${p[8] ? `${rock} ` : ''}${p[9] ? `${dragon} ` : ''}${p[10] ? `${spellcaster} ` : ''}${p[11] ? `${warrior} ` : ''}`
 		} 
 	} else if (game === 'Pauper') {
 		x === 1 ? result[0] = `${com} --- The Champion of the People --- ${com}`

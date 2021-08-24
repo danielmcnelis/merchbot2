@@ -62,6 +62,16 @@ const Player = db.define('player', {
         defaultValue: 0,     
         allowNull: false
     },
+    arena_stats: {
+        type: Sequelize.FLOAT,   
+        defaultValue: 500.00,             
+        allowNull: false
+    },
+    arena_backup: {
+        type: Sequelize.FLOAT,
+        defaultValue: 0.00,        
+        allowNull: true
+    },
     arena_wins: {
         type: Sequelize.INTEGER,
         defaultValue: 0,
@@ -71,6 +81,16 @@ const Player = db.define('player', {
         type: Sequelize.INTEGER,
         defaultValue: 0,
         allowNull: false
+    },
+    keeper_stats: {
+        type: Sequelize.FLOAT,   
+        defaultValue: 500.00,             
+        allowNull: false
+    },
+    keeper_backup: {
+        type: Sequelize.FLOAT,
+        defaultValue: 0.00,        
+        allowNull: true
     },
     keeper_wins: {
         type: Sequelize.INTEGER,
@@ -82,6 +102,16 @@ const Player = db.define('player', {
         defaultValue: 0,
         allowNull: false
     },
+    draft_stats: {
+        type: Sequelize.FLOAT,   
+        defaultValue: 500.00,             
+        allowNull: false
+    },
+    draft_backup: {
+        type: Sequelize.FLOAT,
+        defaultValue: 0.00,        
+        allowNull: true
+    },
     draft_wins: {
         type: Sequelize.INTEGER,
         defaultValue: 0,
@@ -91,6 +121,16 @@ const Player = db.define('player', {
         type: Sequelize.INTEGER,
         defaultValue: 0,
         allowNull: false
+    },
+    gauntlet_stats: {
+        type: Sequelize.FLOAT,   
+        defaultValue: 500.00,             
+        allowNull: false
+    },
+    gauntlet_backup: {
+        type: Sequelize.FLOAT,
+        defaultValue: 0.00,        
+        allowNull: true
     },
     gauntlet_wins: {
         type: Sequelize.INTEGER,
@@ -111,6 +151,16 @@ const Player = db.define('player', {
         type: Sequelize.INTEGER,
         defaultValue: 0,
         allowNull: false
+    },
+    pauper_stats: {
+        type: Sequelize.FLOAT,   
+        defaultValue: 500.00,             
+        allowNull: false
+    },
+    pauper_backup: {
+        type: Sequelize.FLOAT,
+        defaultValue: 0.00,        
+        allowNull: true
     }
 })
 

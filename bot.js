@@ -350,10 +350,32 @@ if (cmd === `!fix_cards`) {
 	return message.channel.send(`You fixed the ATK/DEF stats of ${updated} cards in the Format Library database.`)
 }
 
+//ZERO
+if (cmd === `!zero`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	
+	const players = await Player.findAll()
 
+	for (let i = 0; i < players.length; i++) {
+		const player = players[i]
+		player.arena_stats = 500.00
+		player.pauper_stats = 500.00
+		player.keeper_stats = 500.00
+		player.gauntlet_stats = 500.00
+		player.draft_stats = 500.00
+		player.arena_backup = 500.00
+		player.pauper_backup = 500.00
+		player.keeper_backup = 500.00
+		player.gauntlet_backup = 500.00
+		player.draft_backup = 500.00
+		await player.save()
+	}
+
+	return message.channel.send(`Zeroed out Arena/Pauper/Draft/Gauntlet/Keeper stats for ${players.length} players in the database.`)
+}
 
 //PAUPER 
-if (cmd === `!pauper`) {
+if (cmd === `!p`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 
 	const matches = await Match.findAll({
@@ -368,15 +390,61 @@ if (cmd === `!pauper`) {
 		const match = matches[i]
 		const winner = await Player.findOne({ where: { id: match.winnerId }})
 		const loser = await Player.findOne({ where: { id: match.loserId }})
-		winner.pauper_wins++
+		const orig_stats_winner = winner.pauper_stats
+		const orig_stats_loser = loser.pauper_stats
+		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((orig_stats_winner - orig_stats_loser) / 400))))))
+
+		winner.pauper_stats += delta
+		loser.pauper_stats -= delta
+
+		winner.pauper_backup = orig_stats_winner
+		loser.pauper_backup = orig_stats_loser
+
+		match.delta = delta
+
 		await winner.save()
-		loser.pauper_losses++
 		await loser.save()
+		await match.save()
 	}
 
 	return message.channel.send(`Pauper stats have been calculated.`)
 }
 
+//PAUPER 
+if (cmd === `!a`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+
+	const matches = await Match.findAll({
+		where: {
+			game_mode: 'arena'
+		}
+	})
+
+	message.channel.send(`Calculating data for ${matches.length} Arena matches. Please wait.`)
+	
+	for (let i = 0; i < matches.length; i++) {
+		const match = matches[i]
+		const winner = await Player.findOne({ where: { id: match.winnerId }})
+		const loser = await Player.findOne({ where: { id: match.loserId }})
+		const orig_stats_winner = winner.arena_stats
+		const orig_stats_loser = loser.arena_stats
+		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((orig_stats_winner - orig_stats_loser) / 400))))))
+
+		winner.arena_stats += delta
+		loser.arena_stats -= delta
+
+		winner.arena_backup = orig_stats_winner
+		loser.arena_backup = orig_stats_loser
+
+		match.delta = delta
+
+		await winner.save()
+		await loser.save()
+		await match.save()
+	}
+
+	return message.channel.send(`Arena stats have been calculated.`)
+}
 //NEW SET
 if (cmd === `!new_set`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)

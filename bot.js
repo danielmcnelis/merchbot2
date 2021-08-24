@@ -445,6 +445,8 @@ if (cmd === `!a`) {
 
 	return message.channel.send(`Arena stats have been calculated.`)
 }
+
+
 //NEW SET
 if (cmd === `!new_set`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
@@ -2379,14 +2381,15 @@ if (statscom.includes(cmd)) {
 		if (playerId === maid) completeTask(message.channel, maid, 'e4')
 		
 		return message.channel.send(
-			`${FiC} --- Forged Player Stats --- ${FiC}`+
-			`\nName: ${player.name}`+
-			`\nMedal: ${medal}`+
-			`\nStarchips: ${player.wallet.starchips}${starchips}`+
-			`\nStardust: ${player.wallet.stardust}${stardust}`+
-			`\nRanking: ${rank}`+
-			`\nWins: ${player.wins}, Losses: ${player.losses}`+
-			`\nElo Rating: ${player.stats.toFixed(2)}`
+			`${FiC} --- Forged Player Stats --- ${FiC}`
+			+ `\nName: ${player.name}`
+			+ `\nMedal: ${medal}`
+			+ `\nStarchips: ${player.wallet.starchips}${starchips}`
+			+ `\nStardust: ${player.wallet.stardust}${stardust}`
+			+ `\nRanking: ${rank}`
+			+ `\nWins: ${player.wins}, Losses: ${player.losses}`
+			+ `\nWin Rate: ${player.wins || player.losses ? Math.round(10000 * player.wins / (player.wins + player.losses) ) / 100 : 'N/A'}%`
+			+ `\nElo Rating: ${player.stats.toFixed(2)}`
 		)
 	} else if (game === 'Arena') {
 		const filtered_players = active_players.filter((player) => player.arena_wins || player.arena_losses)
@@ -2399,13 +2402,16 @@ if (statscom.includes(cmd)) {
 
 		const index = sorted_players.length ? sorted_players.findIndex((player) => player.id === playerId) : null
 		const rank = index !== null ? `#${index + 1} out of ${sorted_players.length}` : `N/A`
+		const medal = getMedal(player.arena_stats, title = true)
 
 		return message.channel.send(
 			`${shrine} --- Arena Player Stats --- ${shrine}`
 			+ `\nName: ${player.name}`
 			+ `\nRanking: ${rank}`
+			+ `\nMedal: ${medal}`
 			+ `\nWins: ${player.arena_wins}, Losses: ${player.arena_losses}`
 			+ `\nWin Rate: ${(100 * player.arena_wins / (player.arena_wins + player.arena_losses)).toFixed(2)}%`
+			+ `\nElo Rating: ${player.arena_stats.toFixed(2)}%`
 			+ `${player.profile.beast_wins ? `\nBeast Wins: ${player.profile.beast_wins} ${beast}` : ''}`
 			+ `${player.profile.dinosaur_wins ? `\nDinosaur Wins: ${player.profile.dinosaur_wins} ${dinosaur}` : ''}`
 			+ `${player.profile.dragon_wins ? `\nDragon Wins: ${player.profile.dragon_wins} ${dragon}` : ''}`
@@ -2418,21 +2424,20 @@ if (statscom.includes(cmd)) {
 		)
 	} else if (game === 'Pauper') {
 		const filtered_players = active_players.filter((player) => player.pauper_wins || player.pauper_losses)
-		const sorted_players = filtered_players.sort((a, b) => {
-			const rate_a = a.pauper_wins / (a.pauper_wins + a.pauper_losses)
-			const rate_b = b.pauper_wins / (b.pauper_wins + b.pauper_losses)
-			return rate_b - rate_a
-		})
-
+		const sorted_players = filtered_players.sort((a, b) => b.pauper_stats - a.pauper_stats)
 		const index = sorted_players.length ? sorted_players.findIndex((player) => player.id === playerId) : null
 		const rank = index !== null ? `#${index + 1} out of ${sorted_players.length}` : `N/A`
+		const medal = getMedal(player.pauper_stats, title = true)
 
 		return message.channel.send(
-			`${com} --- Pauper Player Stats --- ${com}`+
-			`\nName: ${player.name}`+
-			`\nRanking: ${rank}`+
-			`\nWins: ${player.pauper_wins}, Losses: ${player.pauper_losses}`+
-			`\nWin Rate: ${player.pauper_wins ? Math.round(10000 * player.pauper_wins / (player.pauper_wins + player.pauper_losses) ) / 100 : 'N/A'}%`
+			`${com} --- Pauper Player Stats --- ${com}`
+			+ `\nName: ${player.name}`
+			+ `\nMedal: ${medal}`
+			+ `\nRanking: ${rank}`
+			+ `\nWins: ${player.pauper_wins}, Losses: ${player.pauper_losses}`
+			+ `\nWin Rate: ${player.pauper_wins ? Math.round(10000 * player.pauper_wins / (player.pauper_wins + player.pauper_losses) ) / 100 : 'N/A'}%`
+			+ `\nElo Rating: ${player.pauper_stats.toFixed(2)}%`
+
 		)
 	}
 }
@@ -3269,17 +3274,18 @@ if (rankcom.includes(cmd)) {
 	
 		const filtered_players = players.filter((player) => memberIds.includes(player.id))
 		if (x > filtered_players.length) return message.channel.send(`I need a smaller number. We only have ${filtered_players.length} Arena players.`)
-		const transformed_players = filtered_players.map((p) => [p.name, p.arena_wins, p.arena_losses, p.profile.beast_wins, p.profile.dinosaur_wins, p.profile.fish_wins, p.profile.plant_wins, p.profile.reptile_wins, p.profile.rock_wins, p.profile.dragon_wins, p.profile.spellcaster_wins, p.profile.warrior_wins])
+		const transformed_players = filtered_players.map((p) => [p.name, p.arena_stats, p.profile.beast_wins, p.profile.dinosaur_wins, p.profile.fish_wins, p.profile.plant_wins, p.profile.reptile_wins, p.profile.rock_wins, p.profile.dragon_wins, p.profile.spellcaster_wins, p.profile.warrior_wins])
 		transformed_players.sort((a, b) => {
-			const difference = (b[3] + b[4] + b[5] + b[6] + b[7] + b[8] + b[9] + b[10] + b[11]) - (a[3] + a[4] + a[5] + a[6] + a[7] + a[8] + a[9] + a[10] + a[11])
+			const difference = (b[2] + b[3] + b[4] + b[5] + b[6] + b[7] + b[8] + b[9] + b[10]) - (a[3] + a[3] + a[4] + a[5] + a[6] + a[7] + a[8] + a[9] + a[10])
 			if (difference) return difference
-			else return (b[1] / (b[1] + b[2])) - (a[1] / (a[1] + a[2]))
+			else return b[1] - a[1]
 		}) 
 
 		const topProfiles = transformed_players.slice(0, x)
 		for (let i = 0; i < x; i++) {
 			const p = topProfiles[i]
-			result[i+1] = `${(i+1)}. ${p[3] + p[4] + p[5] + p[6] + p[7] + p[8] + p[9] + p[10] + p[11]} W - ${Math.round(10000 * p[1] / (p[1] + p[2])) / 100}% - ${p[0]} - ${p[3] ? `${beast} ` : ''}${p[4] ? `${dinosaur} ` : ''}${p[5] ? `${fish} ` : ''}${p[6] ? `${plant} ` : ''}${p[7] ? `${reptile} ` : ''}${p[8] ? `${rock} ` : ''}${p[9] ? `${dragon} ` : ''}${p[10] ? `${spellcaster} ` : ''}${p[11] ? `${warrior} ` : ''}`
+			const medal = getMedal(p[1], title = false)
+			result[i+1] = `${(i+1)}. ${p[0]} ${medal} - ${p[3] + p[4] + p[5] + p[6] + p[7] + p[8] + p[9] + p[10] + p[11]} W - ${p[0]} - ${p[3] ? `${beast} ` : ''}${p[4] ? `${dinosaur} ` : ''}${p[5] ? `${fish} ` : ''}${p[6] ? `${plant} ` : ''}${p[7] ? `${reptile} ` : ''}${p[8] ? `${rock} ` : ''}${p[9] ? `${dragon} ` : ''}${p[10] ? `${spellcaster} ` : ''}${p[11] ? `${warrior} ` : ''}`
 		} 
 	} else if (game === 'Pauper') {
 		x === 1 ? result[0] = `${com} --- The Champion of the People --- ${com}`
@@ -3296,12 +3302,13 @@ if (rankcom.includes(cmd)) {
 	
 		const filtered_players = players.filter((player) => memberIds.includes(player.id))
 		if (x > filtered_players.length) return message.channel.send(`I need a smaller number. We only have ${filtered_players.length} Pauper players.`)
-		filtered_players.sort((a, b) => (b.pauper_wins / (b.pauper_wins + b.pauper_losses)) - (a.pauper_wins / (a.pauper_wins + a.pauper_losses)) ) 
+		filtered_players.sort((a, b) => b.pauper_stats - a.pauper_stats) 
 
 		const topProfiles = filtered_players.slice(0, x)
 		for (let i = 0; i < x; i++) {
 			const p = topProfiles[i]
-			result[i+1] = `${(i+1)}. ${p.pauper_wins} W - ${p.pauper_losses} L - ${Math.round(10000 * p.pauper_wins / (p.pauper_wins + p.pauper_losses)) / 100}% - ${p.name}`
+			const medal = getMedal(p.pauper_stats, title = false)
+			result[i+1] = `${(i+1)}. ${medal} ${p.name}`
 		} 
 	} else if (game === 'Trivia') {
 		x === 1 ? result[0] = `${FiC} --- The Top Bookworm --- ${FiC}`

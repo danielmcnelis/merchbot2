@@ -3345,10 +3345,10 @@ if (rankcom.includes(cmd)) {
 		} 
 	}
 
-	message.channel.send(result.slice(0, 10))
-	if (result.length > 10) message.channel.send(result.slice(10, 40))
-	if (result.length > 40) message.channel.send(result.slice(40, 70))
-	if (result.length > 70) message.channel.send(result.slice(70))
+	message.channel.send(result.slice(0, 11))
+	if (result.length > 11) message.channel.send(result.slice(11, 41))
+	if (result.length > 41) message.channel.send(result.slice(41, 71))
+	if (result.length > 71) message.channel.send(result.slice(71))
 	return
 }
     

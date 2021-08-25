@@ -3287,8 +3287,7 @@ if (rankcom.includes(cmd)) {
 		for (let i = 0; i < x; i++) {
 			const player = top_players[i]
 			const profile = player.profile
-			const wins = getArenaVictories(profile)
-			result[i+1] = `${(i+1)}. ${player.name} - ${wins} W${wins ? ' - ' : ''}${profile.beast_wins ? `${beast} ` : ''}${profile.dinosaur_wins ? `${dinosaur} ` : ''}${profile.fish_wins ? `${fish} ` : ''}${profile.plant_wins ? `${plant} ` : ''}${profile.reptile_wins ? `${reptile} ` : ''}${profile.rock_wins ? `${rock} ` : ''}${profile.dragon_wins ? `${dragon} ` : ''}${profile.spellcaster_wins ? `${spellcaster} ` : ''}${profile.warrior_wins ? `${warrior} ` : ''}`
+			result[i+1] = `${(i+1)}. ${player.name} ${profile.beast_wins ? `${beast} ` : ''}${profile.dinosaur_wins ? `${dinosaur} ` : ''}${profile.fish_wins ? `${fish} ` : ''}${profile.plant_wins ? `${plant} ` : ''}${profile.reptile_wins ? `${reptile} ` : ''}${profile.rock_wins ? `${rock} ` : ''}${profile.dragon_wins ? `${dragon} ` : ''}${profile.spellcaster_wins ? `${spellcaster} ` : ''}${profile.warrior_wins ? `${warrior} ` : ''}`
 		}
 	} else if (game === 'Pauper') {
 		x === 1 ? result[0] = `${com} --- ${champion} The People's Champion ${champion} --- ${com}`

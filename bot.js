@@ -2411,15 +2411,15 @@ if (statscom.includes(cmd)) {
 			+ `\nName: ${player.name}`
 			+ `\nRanking: ${rank}`
 			+ `\nVictories: ${victories} ${champion}`
-			+ `${p.beast_wins ? `\nBeast Wins: ${p.beast_wins >= 3 ? `${beast} ${beast} ${beast}` : p.beast_wins >= 2 ? `${beast} ${beast}` : `${beast}`}` : ''}`
-			+ `${p.dinosaur_wins ? `\nDinosaur Wins: ${p.dinosaur_wins >= 3 ? `${dinosaur} ${dinosaur} ${dinosaur}` : p.dinosaur_wins >= 2 ? `${dinosaur} ${dinosaur}` : `${dinosaur}`}` : ''}`
-			+ `${p.dragon_wins ? `\nDragon Wins: ${p.dragon_wins >= 3 ? `${dragon} ${dragon} ${dragon}` : p.dragon_wins >= 2 ? `${dragon} ${dragon}` : `${dragon}`}` : ''}`
-			+ `${p.fish_wins ? `\nFish Wins: ${p.fish_wins >= 3 ? `${fish} ${fish} ${fish}` : p.fish_wins >= 2 ? `${fish} ${fish}` : `${fish}`}` : ''}`
-			+ `${p.plant_wins ? `\nPlant Wins: ${p.plant_wins >= 3 ? `${plant} ${plant} ${plant}` : p.plant_wins >= 2 ? `${plant} ${plant}` : `${plant}`}` : ''}`
-			+ `${p.reptile_wins ? `\nReptile Wins: ${p.reptile_wins >= 3 ? `${reptile} ${reptile} ${reptile}` : p.reptile_wins >= 2 ? `${reptile} ${reptile}` : `${reptile}`}` : ''}`
-			+ `${p.rock_wins ? `\nRock Wins: ${p.rock_wins >= 3 ? `${rock} ${rock} ${rock}` : p.rock_wins >= 2 ? `${rock} ${rock}` : `${rock}`}` : ''}`
-			+ `${p.spellcaster_wins ? `\nSpellcaster Wins: ${p.spellcaster_wins >= 3 ? `${spellcaster} ${spellcaster} ${spellcaster}` : p.spellcaster_wins >= 2 ? `${spellcaster} ${spellcaster}` : `${spellcaster}`}` : ''}`
-			+ `${p.warrior_wins ? `\nWarrior Wins: ${p.warrior_wins >= 3 ? `${warrior} ${warrior} ${warrior}` : p.warrior_wins >= 2 ? `${warrior} ${warrior}` : `${warrior}`}` : ''}`
+			+ `${p.beast_wins ? `\nBeast Wins: ${p.beast_wins} ${p.beast_wins >= 3 ? `${beast} ${beast} ${beast}` : p.beast_wins >= 2 ? `${beast} ${beast}` : `${beast}`}` : ''}`
+			+ `${p.dinosaur_wins ? `\nDinosaur Wins: ${p.dinosaur_wins} ${p.dinosaur_wins >= 3 ? `${dinosaur} ${dinosaur} ${dinosaur}` : p.dinosaur_wins >= 2 ? `${dinosaur} ${dinosaur}` : `${dinosaur}`}` : ''}`
+			+ `${p.dragon_wins ? `\nDragon Wins: ${p.dragon_wins} ${p.dragon_wins >= 3 ? `${dragon} ${dragon} ${dragon}` : p.dragon_wins >= 2 ? `${dragon} ${dragon}` : `${dragon}`}` : ''}`
+			+ `${p.fish_wins ? `\nFish Wins: ${p.fish_wins} ${p.fish_wins >= 3 ? `${fish} ${fish} ${fish}` : p.fish_wins >= 2 ? `${fish} ${fish}` : `${fish}`}` : ''}`
+			+ `${p.plant_wins ? `\nPlant Wins: ${p.plant_wins} ${p.plant_wins >= 3 ? `${plant} ${plant} ${plant}` : p.plant_wins >= 2 ? `${plant} ${plant}` : `${plant}`}` : ''}`
+			+ `${p.reptile_wins ? `\nReptile Wins: ${p.reptile_wins} ${p.reptile_wins >= 3 ? `${reptile} ${reptile} ${reptile}` : p.reptile_wins >= 2 ? `${reptile} ${reptile}` : `${reptile}`}` : ''}`
+			+ `${p.rock_wins ? `\nRock Wins: ${p.rock_wins} ${p.rock_wins >= 3 ? `${rock} ${rock} ${rock}` : p.rock_wins >= 2 ? `${rock} ${rock}` : `${rock}`}` : ''}`
+			+ `${p.spellcaster_wins ? `\nSpellcaster Wins: ${p.spellcaster_wins} ${p.spellcaster_wins >= 3 ? `${spellcaster} ${spellcaster} ${spellcaster}` : p.spellcaster_wins >= 2 ? `${spellcaster} ${spellcaster}` : `${spellcaster}`}` : ''}`
+			+ `${p.warrior_wins ? `\nWarrior Wins: ${p.warrior_wins} ${p.warrior_wins >= 3 ? `${warrior} ${warrior} ${warrior}` : p.warrior_wins >= 2 ? `${warrior} ${warrior}` : `${warrior}`}` : ''}`
 			+ `\nMedal: ${medal}`
 			+ `\nElo Rating: ${player.arena_stats.toFixed(2)}`
 			+ `\nWins: ${player.arena_wins}, Losses: ${player.arena_losses}`

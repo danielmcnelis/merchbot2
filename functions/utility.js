@@ -159,6 +159,9 @@ const hasProfile = async (playerId) => {
 //IS VOWEL?
 const isVowel = (char) => /^[aeiou]$/.test(char.toLowerCase())
 
+//GET ARENA VICTORIES
+const getArenaVictories = (p) => p.beast_wins + p.dinosaur_wins + p.dragon_wins + p.fish_wins + p.plant_wins + p.reptile_wins + p.rock_wins + p.spellcaster_wins + p.warrior_wins
+
 //GET MEDAL
 const getMedal = (stats, title = false) => {
     if (title) {
@@ -245,6 +248,7 @@ module.exports = {
     convertCardsArrayToObject,
     createPlayer,
     createProfile,
+    getArenaVictories,
     getMedal,
     getRandomElement,
     getRandomString,

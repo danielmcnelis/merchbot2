@@ -30,7 +30,7 @@ const { askForDBUsername, checkChallongePairing, findNextMatch, findNextOpponent
 const { processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
 const { getBuyerConfirmation, getInvoiceMerchBotPurchase, getInvoiceMerchBotSale, getInvoiceP2PSale, getSellerConfirmation, processMerchBotSale, processP2PSale } = require('./functions/transaction.js')
 const { askQuestion, resetTrivia, startTrivia } = require('./functions/trivia.js')
-const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isJazz, isMod, isTourPlayer, isVowel, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
+const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isJazz, isMod, isTourPlayer, isVowel, getArenaVictories, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
 
 // STATIC IMPORTS
 const arenas = require('./static/arenas.json')
@@ -2387,40 +2387,43 @@ if (statscom.includes(cmd)) {
 			+ `\nStarchips: ${player.wallet.starchips}${starchips}`
 			+ `\nStardust: ${player.wallet.stardust}${stardust}`
 			+ `\nRanking: ${rank}`
-			+ `\nWins: ${player.wins}, Losses: ${player.losses}`
-			+ `\nWin Rate: ${player.wins || player.losses ? Math.round(10000 * player.wins / (player.wins + player.losses) ) / 100 : 'N/A'}%`
 			+ `\nElo Rating: ${player.stats.toFixed(2)}`
+			+ `\nWins: ${player.wins}, Losses: ${player.losses}`
+			+ `\nWin Rate: ${player.wins || player.losses ? `${(100 * player.wins / (player.wins + player.losses)).toFixed(2)}%` : 'N/A'}`
 		)
 	} else if (game === 'Arena') {
 		const filtered_players = active_players.filter((player) => player.arena_wins || player.arena_losses)
 		const sorted_players = filtered_players.sort((a, b) => {
-			const getArenaVictories = (p) => p.beast_wins + p.dinosaur_wins + p.dragon_wins + p.fish_wins + p.plant_wins + p.reptile_wins + p.rock_wins + p.spellcaster_wins + p.warrior_wins
-			const total_a = getArenaVictories(a.profile)
-			const total_b = getArenaVictories(b.profile)
-			return total_b - total_a
+			const difference = getArenaVictories(b.profile) - getArenaVictories(a.profile)
+			if (difference) return difference
+			else return b.arena_stats - a.arena_stats
 		})
 
 		const index = sorted_players.length ? sorted_players.findIndex((player) => player.id === playerId) : null
 		const rank = index !== null ? `#${index + 1} out of ${sorted_players.length}` : `N/A`
 		const medal = getMedal(player.arena_stats, title = true)
 
+		const p = player.profile
+		const victories = getArenaVictories(p)
+
 		return message.channel.send(
 			`${shrine} --- Arena Player Stats --- ${shrine}`
 			+ `\nName: ${player.name}`
 			+ `\nRanking: ${rank}`
+			+ `\nVictories: ${victories} ${champion}`
+			+ `${p.beast_wins ? `\nBeast Wins: ${p.beast_wins >= 3 ? `${beast} ${beast} ${beast}` : p.beast_wins >= 2 ? `${beast} ${beast}` : `${beast}`}` : ''}`
+			+ `${p.dinosaur_wins ? `\nDinosaur Wins: ${p.dinosaur_wins >= 3 ? `${dinosaur} ${dinosaur} ${dinosaur}` : p.dinosaur_wins >= 2 ? `${dinosaur} ${dinosaur}` : `${dinosaur}`}` : ''}`
+			+ `${p.dragon_wins ? `\nDragon Wins: ${p.dragon_wins >= 3 ? `${dragon} ${dragon} ${dragon}` : p.dragon_wins >= 2 ? `${dragon} ${dragon}` : `${dragon}`}` : ''}`
+			+ `${p.fish_wins ? `\nFish Wins: ${p.fish_wins >= 3 ? `${fish} ${fish} ${fish}` : p.fish_wins >= 2 ? `${fish} ${fish}` : `${fish}`}` : ''}`
+			+ `${p.plant_wins ? `\nPlant Wins: ${p.plant_wins >= 3 ? `${plant} ${plant} ${plant}` : p.plant_wins >= 2 ? `${plant} ${plant}` : `${plant}`}` : ''}`
+			+ `${p.reptile_wins ? `\nReptile Wins: ${p.reptile_wins >= 3 ? `${reptile} ${reptile} ${reptile}` : p.reptile_wins >= 2 ? `${reptile} ${reptile}` : `${reptile}`}` : ''}`
+			+ `${p.rock_wins ? `\nRock Wins: ${p.rock_wins >= 3 ? `${rock} ${rock} ${rock}` : p.rock_wins >= 2 ? `${rock} ${rock}` : `${rock}`}` : ''}`
+			+ `${p.spellcaster_wins ? `\nSpellcaster Wins: ${p.spellcaster_wins >= 3 ? `${spellcaster} ${spellcaster} ${spellcaster}` : p.spellcaster_wins >= 2 ? `${spellcaster} ${spellcaster}` : `${spellcaster}`}` : ''}`
+			+ `${p.warrior_wins ? `\nWarrior Wins: ${p.warrior_wins >= 3 ? `${warrior} ${warrior} ${warrior}` : p.warrior_wins >= 2 ? `${warrior} ${warrior}` : `${warrior}`}` : ''}`
 			+ `\nMedal: ${medal}`
-			+ `\nWins: ${player.arena_wins}, Losses: ${player.arena_losses}`
-			+ `\nWin Rate: ${(100 * player.arena_wins / (player.arena_wins + player.arena_losses)).toFixed(2)}%`
 			+ `\nElo Rating: ${player.arena_stats.toFixed(2)}`
-			+ `${player.profile.beast_wins ? `\nBeast Wins: ${player.profile.beast_wins} ${beast}` : ''}`
-			+ `${player.profile.dinosaur_wins ? `\nDinosaur Wins: ${player.profile.dinosaur_wins} ${dinosaur}` : ''}`
-			+ `${player.profile.dragon_wins ? `\nDragon Wins: ${player.profile.dragon_wins} ${dragon}` : ''}`
-			+ `${player.profile.fish_wins ? `\nFish Wins: ${player.profile.fish_wins} ${fish}` : ''}`
-			+ `${player.profile.plant_wins ? `\nPlant Wins: ${player.profile.plant_wins} ${plant}` : ''}`
-			+ `${player.profile.reptile_wins ? `\nReptile Wins: ${player.profile.reptile_wins} ${reptile}` : ''}`
-			+ `${player.profile.rock_wins ? `\nRock Wins: ${player.profile.rock_wins} ${rock}` : ''}`
-			+ `${player.profile.spellcaster_wins ? `\nSpellcaster Wins: ${player.profile.spellcaster_wins} ${spellcaster}` : ''}`
-			+ `${player.profile.warrior_wins ? `\nWarrior Wins: ${player.profile.warrior_wins} ${warrior}` : ''}`
+			+ `\nWins: ${player.arena_wins}, Losses: ${player.arena_losses}`
+			+ `\nWin Rate: ${player.arena_wins || player.arena_losses ? `${(100 * player.arena_wins / (player.arena_wins + player.arena_losses)).toFixed(2)}%` : 'N/A'}`
 		)
 	} else if (game === 'Pauper') {
 		const filtered_players = active_players.filter((player) => player.pauper_wins || player.pauper_losses)
@@ -2434,10 +2437,9 @@ if (statscom.includes(cmd)) {
 			+ `\nName: ${player.name}`
 			+ `\nMedal: ${medal}`
 			+ `\nRanking: ${rank}`
-			+ `\nWins: ${player.pauper_wins}, Losses: ${player.pauper_losses}`
-			+ `\nWin Rate: ${player.pauper_wins ? Math.round(10000 * player.pauper_wins / (player.pauper_wins + player.pauper_losses) ) / 100 : 'N/A'}%`
 			+ `\nElo Rating: ${player.pauper_stats.toFixed(2)}`
-
+			+ `\nWins: ${player.pauper_wins}, Losses: ${player.pauper_losses}`
+			+ `\nWin Rate: ${player.pauper_wins || player.pauper_losses ? `${(100 * player.pauper_wins / (player.pauper_wins + player.pauper_losses)).toFixed(2)}%` : 'N/A'}`
 		)
 	}
 }
@@ -3220,7 +3222,7 @@ if (rankcom.includes(cmd)) {
 	const result = []
 	
 	if (game === 'Ranked') {
-		x === 1 ? result[0] = `${FiC} --- The Best Forged Player --- ${FiC}`
+		x === 1 ? result[0] = `${FiC} --- ${champion} The Best Forged Player ${champion} --- ${FiC}`
 		: result[0] = `${FiC} --- Top ${x} Forged Players --- ${FiC}`
 		
 		const allPlayers = await Player.findAll({ 
@@ -3235,7 +3237,7 @@ if (rankcom.includes(cmd)) {
 		const topPlayers = filtered_players.slice(0, x)
 		for (let i = 0; i < x; i++) result[i+1] = `${(i+1)}. ${getMedal(topPlayers[i].stats)} ${topPlayers[i].name}`
 	} else if (game === 'Market') {
-		x === 1 ? result[0] = `${king} --- The Wealthiest Player --- ${king}`
+		x === 1 ? result[0] = `${king} --- ${champion} The Wealthiest Player ${champion} --- ${king}`
 		: result[0] = `${king} --- Top ${x} Richest Players --- ${king}`
 		
 		const allWallets = await Wallet.findAll({ where: { playerId: { [Op.not]: merchbotId } }, include: Player })
@@ -3258,7 +3260,7 @@ if (rankcom.includes(cmd)) {
 		const topWallets = transformed_wallets.slice(0, x)
 		for (let i = 0; i < x; i++) result[i+1] = `${(i+1)}. ${(topWallets[i][1])}${starchips} - ${topWallets[i][0]}`
 	} else if (game === 'Arena') {
-		x === 1 ? result[0] = `${shrine} --- The Champion of the Arena --- ${shrine}`
+		x === 1 ? result[0] = `${shrine} --- ${champion} The Champion of the Arena ${champion} --- ${shrine}`
 		: result[0] = `${shrine} --- Top ${x} Arena Players --- ${shrine}`
 		
 		const players = await Player.findAll({ 
@@ -3274,24 +3276,25 @@ if (rankcom.includes(cmd)) {
 	
 		const filtered_players = players.filter((player) => memberIds.includes(player.id))
 		if (x > filtered_players.length) return message.channel.send(`I need a smaller number. We only have ${filtered_players.length} Arena players.`)
-		const transformed_players = filtered_players.map((p) => [p.name, p.arena_stats, p.profile.beast_wins, p.profile.dinosaur_wins, p.profile.fish_wins, p.profile.plant_wins, p.profile.reptile_wins, p.profile.rock_wins, p.profile.dragon_wins, p.profile.spellcaster_wins, p.profile.warrior_wins])
-		transformed_players.sort((a, b) => {
-			const difference = (b[2] + b[3] + b[4] + b[5] + b[6] + b[7] + b[8] + b[9] + b[10]) - (a[3] + a[3] + a[4] + a[5] + a[6] + a[7] + a[8] + a[9] + a[10])
+		
+		const sorted_players = filtered_players.sort((a, b) => {
+			const difference = getArenaVictories(b.profile) - getArenaVictories(a.profile)
 			if (difference) return difference
-			else return b[1] - a[1]
-		}) 
-
-		const topProfiles = transformed_players.slice(0, x)
+			else return b.arena_stats - a.arena_stats
+		})
+		
+		const top_players = sorted_players.slice(0, x)
 		for (let i = 0; i < x; i++) {
-			const p = topProfiles[i]
-			const medal = getMedal(p[1], title = false)
-			result[i+1] = `${(i+1)}. ${medal} ${p[0]} - ${p[2] + p[3] + p[4] + p[5] + p[6] + p[7] + p[8] + p[9] + p[10]} W - ${p[3] ? `${beast} ` : ''}${p[4] ? `${dinosaur} ` : ''}${p[5] ? `${fish} ` : ''}${p[6] ? `${plant} ` : ''}${p[7] ? `${reptile} ` : ''}${p[8] ? `${rock} ` : ''}${p[9] ? `${dragon} ` : ''}${p[10] ? `${spellcaster} ` : ''}${p[11] ? `${warrior} ` : ''}`
-		} 
+			const player = top_players[i]
+			const profile = player.profile
+			const wins = getArenaVictories(profile)
+			result[i+1] = `${(i+1)}. ${player.name} - ${wins} W${wins ? ' - ' : ''}${profile.beast_wins ? `${beast} ` : ''}${profile.dinosaur_wins ? `${dinosaur} ` : ''}${profile.fish_wins ? `${fish} ` : ''}${profile.plant_wins ? `${plant} ` : ''}${profile.reptile_wins ? `${reptile} ` : ''}${profile.rock_wins ? `${rock} ` : ''}${profile.dragon_wins ? `${dragon} ` : ''}${profile.spellcaster_wins ? `${spellcaster} ` : ''}${profile.warrior_wins ? `${warrior} ` : ''}`
+		}
 	} else if (game === 'Pauper') {
-		x === 1 ? result[0] = `${com} --- The Champion of the People --- ${com}`
+		x === 1 ? result[0] = `${com} --- ${champion} The People's Champion ${champion} --- ${com}`
 		: result[0] = `${com} --- Top ${x} Pauper Players --- ${com}`
 		
-		const players = await Player.findAll({ 
+		const players = await Player.findAll({
 			where: {
 				[Op.or]: [ 
 					{ pauper_wins: { [Op.gt]: 0 } }, 
@@ -3311,7 +3314,7 @@ if (rankcom.includes(cmd)) {
 			result[i+1] = `${(i+1)}. ${medal} ${p.name}`
 		} 
 	} else if (game === 'Trivia') {
-		x === 1 ? result[0] = `${FiC} --- The Top Bookworm --- ${FiC}`
+		x === 1 ? result[0] = `${FiC} --- ${champion} The Top Bookworm ${champion} --- ${FiC}`
 		: result[0] = `${FiC} --- Top ${x} Trivia Players --- ${FiC}`
 		
 		const allKnowledges = await Knowledge.findAll({ 
@@ -3342,10 +3345,10 @@ if (rankcom.includes(cmd)) {
 		} 
 	}
 
-	message.channel.send(result.slice(0,30))
-	if (result.length > 30) message.channel.send(result.slice(30,60))
-	if (result.length > 60) message.channel.send(result.slice(60,90))
-	if (result.length > 90) message.channel.send(result.slice(90))
+	message.channel.send(result.slice(0, 10))
+	if (result.length > 10) message.channel.send(result.slice(10, 40))
+	if (result.length > 40) message.channel.send(result.slice(40, 70))
+	if (result.length > 70) message.channel.send(result.slice(70))
 	return
 }
     

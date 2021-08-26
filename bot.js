@@ -359,7 +359,7 @@ if (cmd === `!update_cards`) {
 // AUCTION
 if (cmd === `!auc`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	const quantity = args[0]
+	const quantity = parseInt(args[0])
 	const card_code = args[1]
 	const print = await Print.findOne({ where: { card_code: card_code }})
 		

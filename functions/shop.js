@@ -272,7 +272,7 @@ const calcBoxPrice = async () => {
 
 		const avgPackPrice = avgBoxPrice / set.packs_per_box
 
-        set.unit_price = 100 * Math.round(1.1 * avgPackPrice / 100)
+        set.unit_price = 10 * Math.round(1.1 * avgPackPrice / 10)
         set.box_price = 100 * Math.round(21 * 1.1 * avgPackPrice / 100)
         await set.save()
     }

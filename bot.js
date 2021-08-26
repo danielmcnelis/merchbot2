@@ -1293,17 +1293,12 @@ if(calccom.includes(cmd)) {
 	const set = await Set.findOne({ where: { code: set_code } })
 	if(!set) return message.channel.send(`I do not recognize the set code: "${set_code}"`)	
 
-	const avgMarketPrice = (array) => { 
-		const total = array.reduce((a, b) => a + b)
-		return total / array.length
-	}
-
 	if (set.type === 'core' || set.type === 'mini' || set.type === 'tour') {
-		const commons = await Print.findAll({ where: { set_code: set_code, rarity: "com" } }).map((p) => parseInt(p.market_price))
-		const rares = await Print.findAll({ where: { set_code: set_code, rarity: "rar" } }).map((p) => parseInt(p.market_price))
-		const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup", card_slot: { [Op.lt]: 200 } } }).map((p) => parseInt(p.market_price))
-		const ultras = await Print.findAll({ where: { set_code: set_code, rarity: "ult" } }).map((p) => parseInt(p.market_price))
-		const secrets = await Print.findAll({ where: { set_code: set_code, rarity: "scr" } }).map((p) => parseInt(p.market_price))
+		const commons = await Print.findAll({ where: { set_code: set_code, rarity: "com" } }).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
+		const rares = await Print.findAll({ where: { set_code: set_code, rarity: "rar" } }).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
+		const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup", card_slot: { [Op.lt]: 200 } } }).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
+		const ultras = await Print.findAll({ where: { set_code: set_code, rarity: "ult" } }).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
+		const secrets = await Print.findAll({ where: { set_code: set_code, rarity: "scr" } }).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
 		const avgComPrice = commons.length ? commons.reduce((a, b) => a + b) / commons.length : 0
 		const avgRarPrice = rares.length ? rares.reduce((a, b) => a + b) / rares.length : 0
 		const avgSupPrice = supers.length ? supers.reduce((a, b) => a + b) / supers.length : 0
@@ -1315,20 +1310,12 @@ if(calccom.includes(cmd)) {
 			+ (avgUltPrice * set.ultras_per_box) 
 			+ (avgScrPrice * set.secrets_per_box) 
 
-		console.log('avgComPrice', avgComPrice)
-		console.log('avgRarPrice', avgRarPrice)
-		console.log('avgSupPrice', avgSupPrice)
-		console.log('avgUltPrice', avgUltPrice)
-		console.log('avgScrPrice', avgScrPrice)
-
 		const avgPackPrice = avgBoxPrice / set.packs_per_box
 
-		console.log('avgPackPrice', avgPackPrice)
-
 		if (set.type === 'core') {
-			return message.channel.send(`The average trade-in value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Pack is ${Math.round(avgPackPrice * 0.7 * 100) / 100}${stardust} and a Box is ${Math.round(avgBoxPrice * 0.7 * 100) / 100}${stardust}.`)
+			return message.channel.send(`The average trade-in value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Pack is ${avgPackPrice.toFixed(2)}${stardust} and a Box is ${avgBoxPrice.toFixed(2)}${stardust}.`)
 		} else {
-			return message.channel.send(`The average trade-in value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Pack is ${Math.round(avgPackPrice * 0.7 * 100) / 100}${stardust}.`)
+			return message.channel.send(`The average trade-in value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Pack is ${avgPackPrice.toFixed(2)}${stardust}.`)
 		}
 	} else if (set.type === 'starter_deck') {
 		const prints = await Print.findAll({ where: { set_code: set_code }})
@@ -1356,9 +1343,9 @@ if(calccom.includes(cmd)) {
 
 		return message.channel.send(`The trade-in value of ${decks[deck1].name} ${eval(set.emoji)} is ${Math.round(deck1Price * 100) / 100}${stardust} and ${decks[deck2].name} ${eval(set.alt_emoji)} is ${Math.round(deck2Price * 100) / 100}${stardust}.`)		
 	} else if (set.type === 'promo') {
-		const prints = await Print.findAll({ where: { set_code: set_code }})
-		const avgPrice = prints.length ? avgMarketPrice(prints) : 0
-		return message.channel.send(`The average trade-in value value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Promo is ${Math.round(avgPrice * 100) / 100}${stardust}.`)
+		const prints = await Print.findAll({ where: { set_code: set_code }}).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
+		const avgPrice = prints.length ? prints.reduce((a, b) => a + b) / prints.length : 0
+		return message.channel.send(`The average trade-in value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Promo is ${avgPrice.toFixed(2)}${stardust}.`)
 	}
 }
 

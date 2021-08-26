@@ -253,7 +253,7 @@ const calcBoxPrice = async () => {
 
     for (let i = 0; i < sets.length; i++) {
         const set = sets[i]
-        const set_code = set.set_code
+        const set_code = set.code
 		const commons = await Print.findAll({ where: { set_code: set_code, rarity: "com" } }).map((p) => Math.ceil(parseInt(p.market_price)))
 		const rares = await Print.findAll({ where: { set_code: set_code, rarity: "rar" } }).map((p) => Math.ceil(parseInt(p.market_price)))
 		const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup", card_slot: { [Op.lt]: 200 } } }).map((p) => Math.ceil(parseInt(p.market_price)))

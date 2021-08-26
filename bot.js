@@ -1304,11 +1304,11 @@ if(calccom.includes(cmd)) {
 		const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup", card_slot: { [Op.lt]: 200 } } }).map((p) => parseInt(p.market_price))
 		const ultras = await Print.findAll({ where: { set_code: set_code, rarity: "ult" } }).map((p) => parseInt(p.market_price))
 		const secrets = await Print.findAll({ where: { set_code: set_code, rarity: "scr" } }).map((p) => parseInt(p.market_price))
-		const avgComPrice = commons.length ? avgMarketPrice(commons) : 0
-		const avgRarPrice = rares.length ? avgMarketPrice(rares) : 0
-		const avgSupPrice = supers.length ? avgMarketPrice(supers) : 0
-		const avgUltPrice = ultras.length ? avgMarketPrice(ultras) : 0
-		const avgScrPrice = secrets.length ? avgMarketPrice(secrets) : 0
+		const avgComPrice = commons.length ? commons.reduce((a, b) => a + b) / commons.length : 0
+		const avgRarPrice = rares.length ? rares.reduce((a, b) => a + b) / rares.length : 0
+		const avgSupPrice = supers.length ? supers.reduce((a, b) => a + b) / supers.length : 0
+		const avgUltPrice = ultras.length ? ultras.reduce((a, b) => a + b) / ultras.length : 0
+		const avgScrPrice = secrets.length ? secrets.reduce((a, b) => a + b) / secrets.length : 0
 		const avgBoxPrice = (avgComPrice * set.commons_per_box) 
 			+ (avgRarPrice * set.rares_per_box) 
 			+ (avgSupPrice * set.supers_per_box) 
@@ -1323,10 +1323,12 @@ if(calccom.includes(cmd)) {
 
 		const avgPackPrice = avgBoxPrice / set.packs_per_box
 
+		console.log('avgPackPrice', avgPackPrice)
+
 		if (set.type === 'core') {
-			return message.channel.send(`The average market price of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Pack is ${Math.round(avgPackPrice * 100) / 100}${stardust} and a Box is ${Math.round(avgBoxPrice * 100) / 100}${stardust}.`)
+			return message.channel.send(`The average trade-in value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Pack is ${Math.round(avgPackPrice * 0.7 * 100) / 100}${stardust} and a Box is ${Math.round(avgBoxPrice * 0.7 * 100) / 100}${stardust}.`)
 		} else {
-			return message.channel.send(`The average market price of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Pack is ${Math.round(avgPackPrice * 100) / 100}${stardust}.`)
+			return message.channel.send(`The average trade-in value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Pack is ${Math.round(avgPackPrice * 0.7 * 100) / 100}${stardust}.`)
 		}
 	} else if (set.type === 'starter_deck') {
 		const prints = await Print.findAll({ where: { set_code: set_code }})
@@ -1352,11 +1354,11 @@ if(calccom.includes(cmd)) {
 			deck2Price += (d2quantity * Math.ceil(0.7 * market_price))
 		}
 
-		return message.channel.send(`The resale value of ${decks[deck1].name} ${eval(set.emoji)} is ${Math.round(deck1Price * 100) / 100}${stardust} and ${decks[deck2].name} ${eval(set.alt_emoji)} is ${Math.round(deck2Price * 100) / 100}${stardust}.`)		
+		return message.channel.send(`The trade-in value of ${decks[deck1].name} ${eval(set.emoji)} is ${Math.round(deck1Price * 100) / 100}${stardust} and ${decks[deck2].name} ${eval(set.alt_emoji)} is ${Math.round(deck2Price * 100) / 100}${stardust}.`)		
 	} else if (set.type === 'promo') {
 		const prints = await Print.findAll({ where: { set_code: set_code }})
 		const avgPrice = prints.length ? avgMarketPrice(prints) : 0
-		return message.channel.send(`The average resale value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Promo is ${Math.round(avgPrice * 100) / 100}${stardust}.`)
+		return message.channel.send(`The average trade-in value value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Promo is ${Math.round(avgPrice * 100) / 100}${stardust}.`)
 	}
 }
 

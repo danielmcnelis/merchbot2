@@ -195,7 +195,7 @@ if(cmd === `!test`) {
 	console.log(`Results from a trial of 10,000 wagers at ${x}sd:\n${rarities}`)
 
 	const expected_value = Math.round(results.reduce((a, b) => a + b) / results.length)
-	return message.channel.send(`In 10,000 random trials the average market value of a random TEB ${eval(TEB)} card from a ${x}${stardust} wager was ${expected_value}${stardust}.`)
+	return message.channel.send(`In 10,000 random trials the average market value of a random TEB ${TEB} card from a ${x}${stardust} wager was ${expected_value}${stardust}.`)
 }
 
 // ASSIGN ROLES

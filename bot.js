@@ -2780,14 +2780,22 @@ if (losscom.includes(cmd)) {
 	} else if (hasArenaRole && game !== 'Arena') {
 		return message.channel.send(`You have the Arena Players role. Please report your Arena loss in <#${arenaChannelId}>, or get a Moderator to help you.`)
 	} else if (!hasArenaRole && game === 'Pauper') {
+		const origStatsWinner = winningPlayer.stats
+		const origStatsLoser = losingPlayer.stats
+		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
+		
+		winningPlayer.pauper_stats += delta
+		winningPlayer.pauper_backup = origStatsWinner
 		winningPlayer.pauper_wins++
 		await winningPlayer.save()
 		
-		winningPlayer.wallet.starchips += 3
-		await winningPlayer.wallet.save()
-
+		losingPlayer.pauper_stats -= delta
+		losingPlayer.pauper_backup = origStatsLoser
 		losingPlayer.pauper_losses++
 		await losingPlayer.save()
+
+		winningPlayer.wallet.starchips += 3
+		await winningPlayer.wallet.save()
 
 		losingPlayer.wallet.starchips += 1
 		await losingPlayer.wallet.save()
@@ -2798,7 +2806,7 @@ if (losscom.includes(cmd)) {
 			winnerId: winningPlayer.id,
 			loser_name: losingPlayer.name,
 			loserId: losingPlayer.id,
-			delta: 0,
+			delta: delta,
 			chipsWinner: 3,
 			chipsLoser: 1
 		})

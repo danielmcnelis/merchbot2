@@ -356,6 +356,61 @@ if (cmd === `!update_cards`) {
 	return message.channel.send(`You added ${created} new cards from YGOPRODeck.com to the Format Library database.`)
 }
 
+// AUCTION
+if (cmd === `!auc`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	const quantity = args[0]
+	const card_code = args[1]
+	const print = await Print.findOne({ where: { card_code: card_code }})
+		
+	const buyerCount = await Inventory.count({ 
+		where: { 
+			card_code: card_code,
+			printId: print.id,
+			playerId: merchbotId
+		}
+	})
+
+	if (!buyerCount) {
+		await Inventory.create({ 
+			card_code: card_code,
+			printId: print.id,
+			playerId: merchbotId
+		})
+	}
+
+	const buyerInv = await Inventory.findOne({ 
+		where: { 
+			card_code: card_code,
+			printId: print.id,
+			playerId: merchbotId
+		}
+	})
+
+	if (!buyerInv) {
+		message.channel.send(`Database error: Could not find or create Buyer Inventory for: ${print.card_name}.`)
+	}
+
+    const auction = await Auction.findOne({ where: { printId: print.id }})
+
+	if (auction) {
+		auction.quantity += quantity
+		await auction.save()
+	} else {
+		await Auction.create({
+			card_code: card_code,
+			quantity: quantity,
+			printId: print.id
+		})
+	} 
+
+	buyerInv.quantity += quantity
+	await buyerInv.save()
+
+	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+    return message.channel.send(`You added ${quantity} ${card} to the auction pool.`)
+}
+
 
 //FIX CARDS 
 if (cmd === `!fix_cards`) {

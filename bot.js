@@ -188,7 +188,7 @@ if(cmd === `!test`) {
 		"commons"
 	
 		const print = getRandomElement(eval(rarity))
-		rarities.push(rarities)
+		rarities.push(rarity)
 		results.push(print.market_price)
 	}
 

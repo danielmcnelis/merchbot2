@@ -242,8 +242,46 @@ const restock = async () => {
     else return postBids()
 }
 
+// CALCULATE BOX PRICE
+const calcBoxPrice = async () => {
+	const sets = await Set.findAll({ where: {
+         code: set_code,
+         currency: 'stardust',
+         for_sale: true
+    } })
+
+	if(!sets.length) return console.log(`No sets are currently being sold for stardust.`)	
+
+    for (let i = 0; i < sets.length; i++) {
+        const set = sets[i]
+        const set_code = set.set_code
+		const commons = await Print.findAll({ where: { set_code: set_code, rarity: "com" } }).map((p) => Math.ceil(parseInt(p.market_price)))
+		const rares = await Print.findAll({ where: { set_code: set_code, rarity: "rar" } }).map((p) => Math.ceil(parseInt(p.market_price)))
+		const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup", card_slot: { [Op.lt]: 200 } } }).map((p) => Math.ceil(parseInt(p.market_price)))
+		const ultras = await Print.findAll({ where: { set_code: set_code, rarity: "ult" } }).map((p) => Math.ceil(parseInt(p.market_price)))
+		const secrets = await Print.findAll({ where: { set_code: set_code, rarity: "scr" } }).map((p) => Math.ceil(parseInt(p.market_price)))
+		const avgComPrice = commons.length ? commons.reduce((a, b) => a + b) / commons.length : 0
+		const avgRarPrice = rares.length ? rares.reduce((a, b) => a + b) / rares.length : 0
+		const avgSupPrice = supers.length ? supers.reduce((a, b) => a + b) / supers.length : 0
+		const avgUltPrice = ultras.length ? ultras.reduce((a, b) => a + b) / ultras.length : 0
+		const avgScrPrice = secrets.length ? secrets.reduce((a, b) => a + b) / secrets.length : 0
+		const avgBoxPrice = (avgComPrice * set.commons_per_box) 
+			+ (avgRarPrice * set.rares_per_box) 
+			+ (avgSupPrice * set.supers_per_box) 
+			+ (avgUltPrice * set.ultras_per_box) 
+			+ (avgScrPrice * set.secrets_per_box) 
+
+		const avgPackPrice = avgBoxPrice / set.packs_per_box
+
+        set.unit_price = 100 * Math.round(1.1 * avgPackPrice / 100)
+        set.box_price = 100 * Math.round(21 * 1.1 * avgPackPrice / 100)
+        await set.save()
+    }
+}
+
 // UPDATE SHOP
 const updateShop = async () => {
+    await calcBoxPrice()
     const shopChannel = client.channels.cache.get(shopChannelId)
     shopChannel.bulkDelete(100)
 

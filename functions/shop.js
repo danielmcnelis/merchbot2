@@ -12,7 +12,7 @@ const { announcementsChannelId, botSpamChannelId, shopChannelId, staffChannelId 
 const { completeTask } = require('./diary.js')
 const { findCard } = require('./search.js')
 const { selectPrint } = require('./print.js')
-const decks = require('./static/decks.json')
+const decks = require('../static/decks.json')
 
 // OPEN SHOP
 const openShop = async () => {

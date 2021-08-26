@@ -246,6 +246,7 @@ const restock = async () => {
 const calcBoxPrice = async () => {
 	const sets = await Set.findAll({ where: {
          currency: 'stardust',
+         type: 'core',
          for_sale: true
     } })
 
@@ -271,6 +272,9 @@ const calcBoxPrice = async () => {
 			+ (avgScrPrice * set.secrets_per_box) 
 
 		const avgPackPrice = avgBoxPrice / set.packs_per_box
+
+        console.log('10 * Math.round(1.1 * avgPackPrice / 10)', 10 * Math.round(1.1 * avgPackPrice / 10))
+        console.log('100 * Math.round(21 * 1.1 * avgPackPrice / 100)', 100 * Math.round(21 * 1.1 * avgPackPrice / 100))
 
         set.unit_price = 10 * Math.round(1.1 * avgPackPrice / 10)
         set.box_price = 100 * Math.round(21 * 1.1 * avgPackPrice / 100)

@@ -2743,15 +2743,23 @@ if (losscom.includes(cmd)) {
 
 		if (!correct_pairing) return message.channel.send(`That player is not your Arena opponent.`)
 
+		const origStatsWinner = winningPlayer.stats
+		const origStatsLoser = losingPlayer.stats
+		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
+		
+		winningPlayer.arena_stats += delta
+		winningPlayer.arena_backup = origStatsWinner
 		winningPlayer.arena_wins++
 		await winningPlayer.save()
 
-		winningPlayer.wallet.starchips += 4
-		await winningPlayer.wallet.save()
-
+		losingPlayer.arena_stats -= delta
+		losingPlayer.arena_backup = origStatsLoser
 		losingPlayer.arena_losses++
 		await losingPlayer.save()
 	
+		winningPlayer.wallet.starchips += 4
+		await winningPlayer.wallet.save()
+
 		losingPlayer.wallet.starchips += 2
 		await losingPlayer.wallet.save()
 
@@ -2768,7 +2776,7 @@ if (losscom.includes(cmd)) {
 			winnerId: winningPlayer.id,
 			loser_name: losingPlayer.name,
 			loserId: losingPlayer.id,
-			delta: 0,
+			delta: delta,
 			chipsWinner: 4,
 			chipsLoser: 2
 		})

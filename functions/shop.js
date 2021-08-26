@@ -245,7 +245,6 @@ const restock = async () => {
 // CALCULATE BOX PRICE
 const calcBoxPrice = async () => {
 	const sets = await Set.findAll({ where: {
-         code: set_code,
          currency: 'stardust',
          for_sale: true
     } })

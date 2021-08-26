@@ -167,7 +167,7 @@ if(cmd === `!test`) {
 	const ultras = await Print.findAll({ where: { set_code: 'TEB', rarity: 'ult' }})
 	const secrets = await Print.findAll({ where: { set_code: 'TEB', rarity: 'scr' }})
 
-	for (let i = 0; i < 100; i++) {
+	for (let i = 0; i < 10000; i++) {
 		let best = 1
 		const matrix = new Array(3600)
 		matrix.fill(1, 0, 3463)
@@ -192,10 +192,10 @@ if(cmd === `!test`) {
 		results.push(print.market_price)
 	}
 
-	console.log(`Results from a trial of 100 wagers at ${x}sd:\n${rarities}`)
+	console.log(`Results from a trial of 10,000 wagers at ${x}sd:\n${rarities}`)
 
 	const expected_value = Math.round(results.reduce((a, b) => a + b) / results.length)
-	return message.channel.send(`In 100 random trials the average market value of a random TEB ${'TEB'} card from a ${x}${stardust} wager was ${expected_value}${stardust}.`)
+	return message.channel.send(`In 10,000 random trials the average market value of a random TEB ${eval(TEB)} card from a ${x}${stardust} wager was ${expected_value}${stardust}.`)
 }
 
 // ASSIGN ROLES

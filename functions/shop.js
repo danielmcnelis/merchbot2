@@ -12,6 +12,7 @@ const { announcementsChannelId, botSpamChannelId, shopChannelId, staffChannelId 
 const { completeTask } = require('./diary.js')
 const { findCard } = require('./search.js')
 const { selectPrint } = require('./print.js')
+const decks = require('./static/decks.json')
 
 // OPEN SHOP
 const openShop = async () => {
@@ -246,7 +247,6 @@ const restock = async () => {
 const calcBoxPrice = async () => {
 	const sets = await Set.findAll({ where: {
          currency: 'stardust',
-         type: 'core',
          for_sale: true
     } })
 
@@ -255,30 +255,63 @@ const calcBoxPrice = async () => {
     for (let i = 0; i < sets.length; i++) {
         const set = sets[i]
         const set_code = set.code
-		const commons = await Print.findAll({ where: { set_code: set_code, rarity: "com" } }).map((p) => Math.ceil(parseInt(p.market_price)))
-		const rares = await Print.findAll({ where: { set_code: set_code, rarity: "rar" } }).map((p) => Math.ceil(parseInt(p.market_price)))
-		const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup", card_slot: { [Op.lt]: 200 } } }).map((p) => Math.ceil(parseInt(p.market_price)))
-		const ultras = await Print.findAll({ where: { set_code: set_code, rarity: "ult" } }).map((p) => Math.ceil(parseInt(p.market_price)))
-		const secrets = await Print.findAll({ where: { set_code: set_code, rarity: "scr" } }).map((p) => Math.ceil(parseInt(p.market_price)))
-		const avgComPrice = commons.length ? commons.reduce((a, b) => a + b) / commons.length : 0
-		const avgRarPrice = rares.length ? rares.reduce((a, b) => a + b) / rares.length : 0
-		const avgSupPrice = supers.length ? supers.reduce((a, b) => a + b) / supers.length : 0
-		const avgUltPrice = ultras.length ? ultras.reduce((a, b) => a + b) / ultras.length : 0
-		const avgScrPrice = secrets.length ? secrets.reduce((a, b) => a + b) / secrets.length : 0
-		const avgBoxPrice = (avgComPrice * set.commons_per_box) 
-			+ (avgRarPrice * set.rares_per_box) 
-			+ (avgSupPrice * set.supers_per_box) 
-			+ (avgUltPrice * set.ultras_per_box) 
-			+ (avgScrPrice * set.secrets_per_box) 
 
-		const avgPackPrice = avgBoxPrice / set.packs_per_box
+        if (set.type === 'core' || set.type === 'mini') {
+            const commons = await Print.findAll({ where: { set_code: set_code, rarity: "com" } }).map((p) => Math.ceil(parseInt(p.market_price)))
+            const rares = await Print.findAll({ where: { set_code: set_code, rarity: "rar" } }).map((p) => Math.ceil(parseInt(p.market_price)))
+            const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup", card_slot: { [Op.lt]: 200 } } }).map((p) => Math.ceil(parseInt(p.market_price)))
+            const ultras = await Print.findAll({ where: { set_code: set_code, rarity: "ult" } }).map((p) => Math.ceil(parseInt(p.market_price)))
+            const secrets = await Print.findAll({ where: { set_code: set_code, rarity: "scr" } }).map((p) => Math.ceil(parseInt(p.market_price)))
+            const avgComPrice = commons.length ? commons.reduce((a, b) => a + b) / commons.length : 0
+            const avgRarPrice = rares.length ? rares.reduce((a, b) => a + b) / rares.length : 0
+            const avgSupPrice = supers.length ? supers.reduce((a, b) => a + b) / supers.length : 0
+            const avgUltPrice = ultras.length ? ultras.reduce((a, b) => a + b) / ultras.length : 0
+            const avgScrPrice = secrets.length ? secrets.reduce((a, b) => a + b) / secrets.length : 0
+            const avgBoxPrice = (avgComPrice * set.commons_per_box) 
+                + (avgRarPrice * set.rares_per_box) 
+                + (avgSupPrice * set.supers_per_box) 
+                + (avgUltPrice * set.ultras_per_box) 
+                + (avgScrPrice * set.secrets_per_box) 
+    
+            const avgPackPrice = avgBoxPrice / set.packs_per_box
+    
+            console.log('10 * Math.round(1.1 * avgPackPrice / 10)', 10 * Math.round(1.1 * avgPackPrice / 10))
+            console.log('100 * Math.round(21 * 1.1 * avgPackPrice / 100)', 100 * Math.round(21 * 1.1 * avgPackPrice / 100))
+    
+            set.unit_price = 10 * Math.round(1.1 * avgPackPrice / 10)
+            set.box_price = 100 * Math.round(21 * 1.1 * avgPackPrice / 100)
+            await set.save()
+        } else if (set.type === 'starter_deck') {
+            const prints = await Print.findAll({ where: { set_code: set_code }})
+            let deck1Price = 0
+            let deck2Price = 0
+            let deck1
+            let deck2
 
-        console.log('10 * Math.round(1.1 * avgPackPrice / 10)', 10 * Math.round(1.1 * avgPackPrice / 10))
-        console.log('100 * Math.round(21 * 1.1 * avgPackPrice / 100)', 100 * Math.round(21 * 1.1 * avgPackPrice / 100))
+            const deck_names = Object.keys(decks)
+            deck_names.forEach((d) => {
+                if(decks[d].set_code === set_code) {
+                    if (!deck1) deck1 = d
+                    else deck2 = d
+                }
+            })
+            
+            for (let i = 0; i < prints.length; i++) {
+                const print = prints[i]
+                const market_price = print.market_price
+                const d1quantity = decks[deck1].cards[print.card_code] || 0
+                const d2quantity = decks[deck2].cards[print.card_code] || 0
+                deck1Price += (d1quantity * Math.ceil(market_price))
+                deck2Price += (d2quantity * Math.ceil(market_price))
+            }
 
-        set.unit_price = 10 * Math.round(1.1 * avgPackPrice / 10)
-        set.box_price = 100 * Math.round(21 * 1.1 * avgPackPrice / 100)
-        await set.save()
+            console.log('deck1Price', deck1Price)
+            console.log('deck2Price', deck2Price)
+
+            const avgDeckPrice = (deck1Price + deck2Price) / 2
+            set.unit_price = 10 * Math.round(1.1 * avgDeckPrice / 10)
+            await set.save()
+        }
     }
 }
 

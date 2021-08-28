@@ -1741,7 +1741,7 @@ if(cmd === `!count`) {
 				weightedCount += (set.unit_sales / 2)
 			}
 
-			results.push(`- ${set.unit_sales} ${set.unit_sales === 1 ? 'Pack' : 'Packs'} of ${set.code} ${eval(set.emoji)}`)
+			results.push(`- ${set.unit_sales} ${set.unit_sales === 1 ? 'Pack' : 'Packs'} of DOC ${DOC} and ${set.code} ${eval(set.emoji)}`)
 		} else if (set.type === 'starter_deck') {
 			if (set.currency === 'starchips') {
 				weightedCount += (set.unit_sales * 5)
@@ -2548,6 +2548,13 @@ if (losscom.includes(cmd)) {
 	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
 	: "Ranked"
 
+	const date = new Date()
+	date.setHours(0, 0, 0, 0)
+	const d = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
+	const m = (date.getMonth() + 1) < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1
+	const y = date.getFullYear()
+	const today = `${y}-${m}-${d}`
+
 	const hasArenaRole = isArenaPlayer(message.member)
 	const hasTourRole = isTourPlayer(message.member)
 
@@ -2590,13 +2597,8 @@ if (losscom.includes(cmd)) {
 		
 		const diary = winningPlayer.diary
 		const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
-		const bonus = easy_complete ? 1 : 0
-		const date = new Date()
-		date.setHours(0, 0, 0, 0)
-		const d = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
-		const m = (date.getMonth() + 1) < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1
-		const y = date.getFullYear()
-		const today = `${y}-${m}-${d}`
+		const diary_bonus = easy_complete ? 1 : 0
+		
 		const count = await Match.count({
 			where: {
 				winnerId: winningPlayer.id,
@@ -2608,12 +2610,13 @@ if (losscom.includes(cmd)) {
 				}
 			}
 		})
-		const bonus2 = count ? 0 : 3
+
+		const daily_bonus = count ? 0 : 3
 		const origStatsWinner = winningPlayer.stats
 		const origStatsLoser = losingPlayer.stats
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
-		const chipsWinner = Math.round((delta)) + bonus < 6 ? 6 : Math.round((delta)) > 20 ? 20 : Math.round((delta)) + bonus
-		const chipsLoser = (origStatsLoser - origStatsWinner) < 72 ? 3 : (origStatsLoser - origStatsWinner) >=150 ? 1 : 2
+		const chipsWinner = Math.round((delta)) + 5 < 9 ? 9 : Math.round((delta)) + 5 > 29 ? 29 : Math.round((delta)) + 5
+		const chipsLoser = (origStatsLoser - origStatsWinner) < 72 ? 5 : (origStatsLoser - origStatsWinner) >=150 ? 3 : 4
 
 		const previouslyDefeated = await Match.count({
 			where: {
@@ -2631,7 +2634,7 @@ if (losscom.includes(cmd)) {
 		if (winningPlayer.stats > winningPlayer.best_stats) winningPlayer.best_stats = winningPlayer.stats
 		await winningPlayer.save()
 
-		winningPlayer.wallet.starchips += (chipsWinner + bonus2)
+		winningPlayer.wallet.starchips += (chipsWinner + daily_bonus + diary_bonus)
 		await winningPlayer.wallet.save()
 
 		losingPlayer.stats -= delta
@@ -2660,7 +2663,7 @@ if (losscom.includes(cmd)) {
 			loser_name: losingPlayer.name,
 			loserId: losingPlayer.id,
 			delta: delta,
-			chipsWinner: (chipsWinner + bonus2),
+			chipsWinner: (chipsWinner + daily_bonus + diary_bonus),
 			chipsLoser: chipsLoser
 		})
 
@@ -2673,7 +2676,7 @@ if (losscom.includes(cmd)) {
 		if (winningPlayer.vanquished_foes >= 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
 		if (winningPlayer.current_streak >= 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
 		if (bonus2) setTimeout(() => message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned an additional +3${starchips} for your first ranked win of the day! ${legend}`), 2000)
-		message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your Tournament loss to ${winningPlayer.name} (+${chipsWinner}${starchips}) has been recorded.`)
+		message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your Tournament loss to ${winningPlayer.name} (+${chipsWinner + diary_bonus}${starchips}) has been recorded.`)
 		const updatedMatchesArr = await getMatches(tournamentId)
 		const winnersNextMatch = findNextMatch(updatedMatchesArr, matchId, winningEntry.participantId)
 		const winnersNextOpponent = winnersNextMatch ? await findNextOpponent(tournamentId, updatedMatchesArr, winnersNextMatch, winningEntry.participantId) : null
@@ -2757,10 +2760,10 @@ if (losscom.includes(cmd)) {
 		losingPlayer.arena_losses++
 		await losingPlayer.save()
 	
-		winningPlayer.wallet.starchips += 4
+		winningPlayer.wallet.starchips += 5
 		await winningPlayer.wallet.save()
 
-		losingPlayer.wallet.starchips += 2
+		losingPlayer.wallet.starchips += 3
 		await losingPlayer.wallet.save()
 
 		losingContestant.is_playing = false
@@ -2777,11 +2780,11 @@ if (losscom.includes(cmd)) {
 			loser_name: losingPlayer.name,
 			loserId: losingPlayer.id,
 			delta: delta,
-			chipsWinner: 4,
-			chipsLoser: 2
+			chipsWinner: 5,
+			chipsLoser: 3
 		})
 
-		message.channel.send(`${losingPlayer.name} (+2${starchips}), your Arena loss to ${winner.user.username} (+4${starchips}) has been recorded.`)
+		message.channel.send(`${losingPlayer.name} (+3${starchips}), your Arena loss to ${winner.user.username} (+$5${starchips}) has been recorded.`)
 		return checkArenaProgress(info)
 	} else if (!hasArenaRole && game === 'Arena') {
 		return message.channel.send(`You do not have the Arena Players role. Please report your loss in the appropriate channel.`)
@@ -2802,10 +2805,10 @@ if (losscom.includes(cmd)) {
 		losingPlayer.pauper_losses++
 		await losingPlayer.save()
 
-		winningPlayer.wallet.starchips += 3
+		winningPlayer.wallet.starchips += 4
 		await winningPlayer.wallet.save()
 
-		losingPlayer.wallet.starchips += 1
+		losingPlayer.wallet.starchips += 2
 		await losingPlayer.wallet.save()
 
 		await Match.create({
@@ -2815,15 +2818,15 @@ if (losscom.includes(cmd)) {
 			loser_name: losingPlayer.name,
 			loserId: losingPlayer.id,
 			delta: delta,
-			chipsWinner: 3,
-			chipsLoser: 1
+			chipsWinner: 4,
+			chipsLoser: 2
 		})
-		
-		return message.channel.send(`${losingPlayer.name} (+1${starchips}), your Pauper loss to ${winningPlayer.name} (+3${starchips}) has been recorded.`)
+
+		return message.channel.send(`${losingPlayer.name} (+2${starchips}), your Pauper loss to ${winningPlayer.name} (+4${starchips}) has been recorded.`)
 	} else if (!hasArenaRole && game === 'Ranked') {
 		const diary = winningPlayer.diary
 		const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
-		const bonus = easy_complete ? 1 : 0
+		const diary_bonus = easy_complete ? 1 : 0
 		const date = new Date()
 		date.setHours(0, 0, 0, 0)
 		const d = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
@@ -2841,12 +2844,12 @@ if (losscom.includes(cmd)) {
 				}
 			}
 		})
-		const bonus2 = count ? 0 : 3
+		const daily_bonus = count ? 0 : 3
 		const origStatsWinner = winningPlayer.stats
 		const origStatsLoser = losingPlayer.stats
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
-		const chipsWinner = Math.round((delta)) + bonus < 6 ? 6 : Math.round((delta)) > 20 ? 20 : Math.round((delta)) + bonus
-		const chipsLoser = (origStatsLoser - origStatsWinner) < 72 ? 3 : (origStatsLoser - origStatsWinner) >=150 ? 1 : 2
+		const chipsWinner = (Math.round((delta)) + 5) < 9 ? 10 : (Math.round((delta)) + 5) > 29 ? 29 : (Math.round((delta)) + 5)
+		const chipsLoser = (origStatsLoser - origStatsWinner) < 72 ? 5 : (origStatsLoser - origStatsWinner) >=150 ? 3 : 4
 
 		const previouslyDefeated = await Match.count({
 			where: {
@@ -2864,7 +2867,7 @@ if (losscom.includes(cmd)) {
 		if (winningPlayer.stats > winningPlayer.best_stats) winningPlayer.best_stats = winningPlayer.stats
 		await winningPlayer.save()
 
-		winningPlayer.wallet.starchips += (chipsWinner + bonus2)
+		winningPlayer.wallet.starchips += (chipsWinner + diary_bonus + daily_bonus)
 		await winningPlayer.wallet.save()
 
 		losingPlayer.stats -= delta
@@ -2873,7 +2876,7 @@ if (losscom.includes(cmd)) {
 		losingPlayer.current_streak = 0
 		await losingPlayer.save()
 
-		losingPlayer.wallet.starchips += chipsLoser
+		losingPlayer.wallet.starchips += chipsLoser 
 		await losingPlayer.wallet.save()
 
 		await Match.create({
@@ -2883,7 +2886,7 @@ if (losscom.includes(cmd)) {
 			loser_name: losingPlayer.name,
 			loserId: losingPlayer.id,
 			delta: delta,
-			chipsWinner: (chipsWinner + bonus2),
+			chipsWinner: (chipsWinner + diary_bonus + daily_bonus),
 			chipsLoser: chipsLoser
 		})
 
@@ -2905,7 +2908,7 @@ if (losscom.includes(cmd)) {
 		if (winningPlayer.vanquished_foes === 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
 		if (winningPlayer.current_streak === 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
 		if (bonus2) setTimeout(() => message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned an additional +3${starchips} for winning your 1st Ranked Match of the day! ${legend}`), 2000)
-		return message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your loss to ${winningPlayer.name} (+${chipsWinner}${starchips}) has been recorded.`)
+		return message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your loss to ${winningPlayer.name} (+${chipsWinner + diary_bonus}${starchips}) has been recorded.`)
 	}
 }
 

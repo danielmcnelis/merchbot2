@@ -2848,7 +2848,7 @@ if (losscom.includes(cmd)) {
 			}
 		})
 		const daily_bonus = count ? 0 : 3
-		const pack_bonus = count === 2
+		const pack_bonus = count === 1
 		console.log('pack_bonus', pack_bonus)
 		const origStatsWinner = winningPlayer.stats
 		const origStatsLoser = losingPlayer.stats

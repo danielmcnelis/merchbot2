@@ -2675,7 +2675,7 @@ if (losscom.includes(cmd)) {
 		if (winningPlayer.vanquished_foes >= 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
 		if (winningPlayer.current_streak >= 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
 		if (daily_bonus) setTimeout(() => message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned an additional +3${starchips} for your first ranked win of the day! ${legend}`), 2000)
-		if (pack_bonus) setTimeout(() => {
+		if (pack_bonus) setTimeout(async () => {
 			await awardPack(message.channel, winningPlayer.id)
 			message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned a bonus pack of DOC ${DOC} for your second ranked win of the day! ${god}`)
 		}, 2000)
@@ -2913,7 +2913,7 @@ if (losscom.includes(cmd)) {
 		if (winningPlayer.vanquished_foes === 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
 		if (winningPlayer.current_streak === 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
 		if (daily_bonus) setTimeout(() => message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned an additional +3${starchips} for winning your 1st Ranked Match of the day! ${legend}`), 2000)
-		if (pack_bonus) setTimeout(() => {
+		if (pack_bonus) setTimeout(async () => {
 			await awardPack(message.channel, winningPlayer.id)
 			message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned a bonus pack of DOC ${DOC} for your second ranked win of the day! ${god}`)
 		}, 2000)

@@ -87,7 +87,8 @@ client.on('ready', async () => {
 client.on('guildMemberAdd', async (member) => {
 	const userId = member.user.id
     const channel = client.channels.cache.get(welcomeChannelId)
-    if (muted.includes(userId)) member.roles.add(muteRole)
+	const player = await Player.findOne({ where: { id: userId }})
+    if (player && player.muted) member.roles.add(muteRole)
 
     if (await isNewUser(userId)) {
         createPlayer(userId, member.user.username, member.user.tag) 
@@ -964,18 +965,16 @@ if(cmd === `!mute`) {
 	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
 	const member = message.mentions.members.first()
 	if (!member) return message.channel.send(`Please tag the user you wish to mute.`)
-	const mutedPeople = JSON.parse(fs.readFileSync('./static/muted.json'))['mutedPeople']
+	const player = await Player.findOne({ where: { id: member.user.id }})
+	if (!player) await createPlayer(member.user.id, member.user.username, member.user.tag, muted = true)
 
 	if (!member.roles.cache.some(role => role.id === muteRole)) {
+		if (player) {
+			player.muted = true
+			await player.save()
+		}
+
 		member.roles.add(muteRole)
-
-		const newMutes = mutedPeople
-		newMutes.push(member.user.id)
-
-		muted['mutedPeople'] = newMutes
-		fs.writeFile("./static/muted.json", JSON.stringify(muted), (err) => { 
-			if (err) console.log(err)
-		})
 		return message.channel.send(`${member.user.username} now has the Mute role.`)
 	} else {
 		return message.channel.send(`That user is already muted.`)
@@ -986,18 +985,17 @@ if(cmd === `!mute`) {
 if(cmd === `!unmute`) {
 	if (!isAdmin(message.member)) return message.channel.send("You do not have permission to do that.")
 	const member = message.mentions.members.first()
-	if (!member) return message.channel.send(`Please tag the user you wish to unmute.`)
-	const mutedPeople = JSON.parse(fs.readFileSync('./static/muted.json'))['mutedPeople']
+	if (!member) return message.channel.send(`Please tag the user you wish to mute.`)
+	const player = await Player.findOne({ where: { id: member.user.id }})
+	if (!player) await createPlayer(member.user.id, member.user.username, member.user.tag, muted = false)
 
 	if (member.roles.cache.some(role => role.id === muteRole)) {
+		if (player) {
+			player.muted = false
+			await player.save()
+		}
+
 		member.roles.remove(muteRole)
-
-		const filteredMutes = mutedPeople.filter(id => id !== member.user.id)
-
-		muted['mutedPeople'] = filteredMutes
-		fs.writeFile("./static/muted.json", JSON.stringify(muted), (err) => { 
-			if (err) console.log(err)
-		})
 		return message.channel.send(`${member.user.username} no longer has the Mute role.`)
 	} else {
 		return message.channel.send(`That user was not muted.`)

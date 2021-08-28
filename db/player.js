@@ -22,6 +22,10 @@ const Player = db.define('player', {
         type: Sequelize.STRING,
         allowNull: true
     },
+    muted: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+    },
     stats: {
         type: Sequelize.FLOAT,   
         defaultValue: 500.00,             

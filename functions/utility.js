@@ -10,12 +10,13 @@ const merchbotId = '584215266586525696'
 const quotes = require('../static/quotes.json')
 
 //CREATE PLAYER
-const createPlayer = async (id, username = null, tag = null) => {
+const createPlayer = async (id, username = null, tag = null, muted = false) => {
     try {
         await Player.create({
-            id: `${id}`,
-            name: `${username}`,
-            tag: `${tag}`
+            id: id,
+            name: username,
+            tag: tag,
+            muted: muted
         })
     } catch (err) {
         console.log(err)

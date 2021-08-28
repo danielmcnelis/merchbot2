@@ -40,7 +40,6 @@ const { aliuscom, bindercom, botcom, bracketcom, calccom, checklistcom, dbcom, d
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
 const { king, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, shrine, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion } = require('./static/emojis.json')
-const muted = require('./static/muted.json')
 const nicknames = require('./static/nicknames.json')
 const prints = require('./static/prints.json')
 const { adminRole, arenaRole, botRole,expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
@@ -2610,6 +2609,8 @@ if (losscom.includes(cmd)) {
 		})
 
 		const daily_bonus = count ? 0 : 3
+		const pack_bonus = count === 1
+		console.log('pack_bonus', pack_bonus)
 		const origStatsWinner = winningPlayer.stats
 		const origStatsLoser = losingPlayer.stats
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
@@ -2674,6 +2675,10 @@ if (losscom.includes(cmd)) {
 		if (winningPlayer.vanquished_foes >= 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
 		if (winningPlayer.current_streak >= 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
 		if (daily_bonus) setTimeout(() => message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned an additional +3${starchips} for your first ranked win of the day! ${legend}`), 2000)
+		if (pack_bonus) setTimeout(() => {
+			await awardPack(message.channel, winningPlayer.id)
+			message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned a bonus pack of DOC ${DOC} for your second ranked win of the day! ${god}`)
+		}, 2000)
 		message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your Tournament loss to ${winningPlayer.name} (+${chipsWinner + diary_bonus}${starchips}) has been recorded.`)
 		const updatedMatchesArr = await getMatches(tournamentId)
 		const winnersNextMatch = findNextMatch(updatedMatchesArr, matchId, winningEntry.participantId)
@@ -2843,6 +2848,8 @@ if (losscom.includes(cmd)) {
 			}
 		})
 		const daily_bonus = count ? 0 : 3
+		const pack_bonus = count === 2
+		console.log('pack_bonus', pack_bonus)
 		const origStatsWinner = winningPlayer.stats
 		const origStatsLoser = losingPlayer.stats
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
@@ -2906,6 +2913,10 @@ if (losscom.includes(cmd)) {
 		if (winningPlayer.vanquished_foes === 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
 		if (winningPlayer.current_streak === 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
 		if (daily_bonus) setTimeout(() => message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned an additional +3${starchips} for winning your 1st Ranked Match of the day! ${legend}`), 2000)
+		if (pack_bonus) setTimeout(() => {
+			await awardPack(message.channel, winningPlayer.id)
+			message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned a bonus pack of DOC ${DOC} for your second ranked win of the day! ${god}`)
+		}, 2000)
 		return message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your loss to ${winningPlayer.name} (+${chipsWinner + diary_bonus}${starchips}) has been recorded.`)
 	}
 }

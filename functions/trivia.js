@@ -287,32 +287,25 @@ const endTrivia = async (guild, channel, info, entries) => {
     info.round = null
     await info.save()
 
-    const prizes = entries[0].score > entries[1].score && entries[1].score > entries[2].score ? [4, 2] :
-        entries[0].score > entries[1].score && entries[1].score === entries[2].score && entries[2].score > entries[3].score ? [4, 1, 1] :
-        entries[0].score > entries[1].score && entries[1].score === entries[2].score && entries[2].score === entries[3].score && entries[3].score > entries[4].score ? [4, 1, 1, 1] :
-        entries[0].score > entries[1].score && entries[1].score === entries[2].score && entries[2].score === entries[3].score && entries[3].score === entries[4].score ? [4, 1, 1, 1, 1] :
-        entries[0].score === entries[1].score && entries[1].score > entries[2].score ? [3, 3] :
-        entries[0].score === entries[1].score && entries[1].score === entries[2].score && entries[2].score > entries[3].score ? [2, 2, 2] :
-        entries[0].score === entries[1].score && entries[1].score === entries[2].score && entries[2].score === entries[3].score && entries[3] > entries[4].score ? [2, 2, 2, 2] :
-        entries[0].score === entries[1].score && entries[1].score === entries[2].score && entries[2].score === entries[3].score && entries[3].score === entries[4].score ? [2, 2, 2, 2, 2] :
-        []
-
     for (let i = 0; i < entries.length; i++) {
         const entry = entries[i]
         const score = entry.score
         const member = guild.members.cache.get(entry.playerId)
         member.roles.remove(triviaRole)
-        if (prizes[i]) {
+
+        if (score >= 3) {
             const wallet = await Wallet.findOne({ where: { playerId: entry.playerId }, include: Player })
-            wallet.starchips += prizes[i]
+            const reward = score - 2
+            wallet.starchips += reward
             await wallet.save()
-            setTimeout(() => channel.send(`<@${wallet.playerId}> was awarded ${prizes[i]}${starchips} for an impressive display of knowledge. Congratulations!`), i * 1000 + 1000)
-        } else if (score > 0) {
+            setTimeout(() => channel.send(`<@${wallet.playerId}> was awarded ${reward}${starchips} for an impressive display of knowledge. Congratulations!`), i * 1000 + 1000)
+        } else if (score < 3 && score > 0) {
             const wallet = await Wallet.findOne({ where: { playerId: entry.playerId }, include: Player })
-            wallet.stardust += (score * 3)
+            const reward = (score * 5)
+            wallet.stardust += reward
             await wallet.save()
-            setTimeout(() => channel.send(`<@${wallet.playerId}> was awarded ${score * 3}${stardust} for their effort. Not bad!`), i * 1000 + 1000)
-        }
+            setTimeout(() => channel.send(`<@${wallet.playerId}> was awarded ${reward}${stardust} for their effort. Thanks for playing!`), i * 1000 + 1000)
+        } 
 
         let correct_answers = 0
         const knowledge = await Knowledge.findOne({ where: { playerId: entry.playerId }})

@@ -2942,7 +2942,7 @@ if (manualcom.includes(cmd)) {
 	const winningPlayer = await Player.findOne({ where: { id: winnerId }, include: [Diary, Wallet] })
 	const losingPlayer = await Player.findOne({ where: { id: loserId }, include: [Diary, Wallet] })
 
-	if (winner.roles.cache.some(role => role.id === botRole) || loser.roles.cache.some(role => role.id === botRole)) return message.channel.send(`Sorry, Bots do not play Forged in Chaos... *yet*.`)
+	//if (winner.roles.cache.some(role => role.id === botRole) || loser.roles.cache.some(role => role.id === botRole)) return message.channel.send(`Sorry, Bots do not play Forged in Chaos... *yet*.`)
 	if (!losingPlayer) return message.channel.send(`Sorry, ${loser.user.username} is not in the database.`)
 	if (!winningPlayer) (`Sorry, ${winner.user.username} was not in the database.`)
 
@@ -2952,69 +2952,69 @@ if (manualcom.includes(cmd)) {
 	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
 	: "Ranked"
 
-	if (winner.roles.cache.some(role => role.id === arenaRole) || loser.roles.cache.some(role => role.id === arenaRole)) {
-		if (game !== "Arena") return message.channel.send(`Please report this loss in: <#${arenaChannelId}>`)
+	// if (winner.roles.cache.some(role => role.id === arenaRole) || loser.roles.cache.some(role => role.id === arenaRole)) {
+	// 	if (game !== "Arena") return message.channel.send(`Please report this loss in: <#${arenaChannelId}>`)
 		
-		const losingContestant = await Arena.findOne({ where: { playerId: loserId }})
-		if (!losingContestant) return message.channel.send(`You are not in the current Arena.`)
-		const winningContestant = await Arena.findOne({ where: { playerId: winnerId }})
-		if (!winningContestant) return message.channel.send(`That player is not your Arena opponent.`)
+	// 	const losingContestant = await Arena.findOne({ where: { playerId: loserId }})
+	// 	if (!losingContestant) return message.channel.send(`You are not in the current Arena.`)
+	// 	const winningContestant = await Arena.findOne({ where: { playerId: winnerId }})
+	// 	if (!winningContestant) return message.channel.send(`That player is not your Arena opponent.`)
 
-		const info = await Info.findOne({ where: { element: 'arena' } })
-		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
+	// 	const info = await Info.findOne({ where: { element: 'arena' } })
+	// 	if (!info) return message.channel.send(`Error: could not find game: "arena".`)
 
-		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"], ["P5", "P6"]] :
-            info.round === 2 ? [["P1", "P3"], ["P2", "P5"], ["P4", "P6"]] :
-            info.round === 3 ? [["P1", "P4"], ["P2", "P6"], ["P3", "P5"]] : 
-            info.round === 4 ? [["P1", "P5"], ["P2", "P4"], ["P3", "P6"]] : 
-            info.round === 5 ? [["P1", "P6"], ["P2", "P3"], ["P4", "P5"]] : 
-            null
+	// 	const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"], ["P5", "P6"]] :
+    //         info.round === 2 ? [["P1", "P3"], ["P2", "P5"], ["P4", "P6"]] :
+    //         info.round === 3 ? [["P1", "P4"], ["P2", "P6"], ["P3", "P5"]] : 
+    //         info.round === 4 ? [["P1", "P5"], ["P2", "P4"], ["P3", "P6"]] : 
+    //         info.round === 5 ? [["P1", "P6"], ["P2", "P3"], ["P4", "P5"]] : 
+    //         null
 	
-		if (pairings) {
-			let correct_pairing = false
-			for (let i = 0; i < 3; i++) {
-				if ((pairings[i][0] === losingContestant.contestant && 
-						pairings[i][1] === winningContestant.contestant) ||
-					(pairings[i][0] === winningContestant.contestant &&
-						pairings[i][1] === losingContestant.contestant)) correct_pairing = true
-			}
+	// 	if (pairings) {
+	// 		let correct_pairing = false
+	// 		for (let i = 0; i < 3; i++) {
+	// 			if ((pairings[i][0] === losingContestant.contestant && 
+	// 					pairings[i][1] === winningContestant.contestant) ||
+	// 				(pairings[i][0] === winningContestant.contestant &&
+	// 					pairings[i][1] === losingContestant.contestant)) correct_pairing = true
+	// 		}
 
-			if (!correct_pairing) return message.channel.send(`That player is not your Arena opponent.`)
-		}
+	// 		if (!correct_pairing) return message.channel.send(`That player is not your Arena opponent.`)
+	// 	}
 		
-		losingPlayer.arena_losses++
-		await losingPlayer.save()
+	// 	losingPlayer.arena_losses++
+	// 	await losingPlayer.save()
 
-		losingPlayer.wallet.starchips += 2
-		await losingPlayer.wallet.save()
+	// 	losingPlayer.wallet.starchips += 2
+	// 	await losingPlayer.wallet.save()
 	
-		losingContestant.is_playing = false
-		await losingContestant.save()
+	// 	losingContestant.is_playing = false
+	// 	await losingContestant.save()
 
-		winningPlayer.arena_wins++
-		await winningPlayer.save()
+	// 	winningPlayer.arena_wins++
+	// 	await winningPlayer.save()
 
-		winningPlayer.wallet.starchips += 4
-		await winningPlayer.wallet.save()
+	// 	winningPlayer.wallet.starchips += 4
+	// 	await winningPlayer.wallet.save()
 
-		winningContestant.score++
-		winningContestant.is_playing = false
-		await winningContestant.save()
+	// 	winningContestant.score++
+	// 	winningContestant.is_playing = false
+	// 	await winningContestant.save()
 
-		await Match.create({
-			game_mode: "arena",
-			winner_name: winningPlayer.name,
-			winnerId: winningPlayer.id,
-			loser_name: losingPlayer.name,
-			loserId: losingPlayer.id,
-			delta: 0,
-			chipsWinner: 4,
-			chipsLoser: 2
-		})
+	// 	await Match.create({
+	// 		game_mode: "arena",
+	// 		winner_name: winningPlayer.name,
+	// 		winnerId: winningPlayer.id,
+	// 		loser_name: losingPlayer.name,
+	// 		loserId: losingPlayer.id,
+	// 		delta: 0,
+	// 		chipsWinner: 4,
+	// 		chipsLoser: 2
+	// 	})
 
-		message.channel.send(`A manual Arena loss by ${losingPlayer.name} (+2${starchips}) to ${winningPlayer.name} (+4${starchips}) has been recorded.`)
-		return checkArenaProgress(info)
-	} else if (game === 'Pauper') {
+	// 	message.channel.send(`A manual Arena loss by ${losingPlayer.name} (+2${starchips}) to ${winningPlayer.name} (+4${starchips}) has been recorded.`)
+	// 	return checkArenaProgress(info)
+	 else if (game === 'Pauper') {
 		winningPlayer.pauper_wins++
 		await winningPlayer.save()
 

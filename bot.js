@@ -3014,7 +3014,7 @@ if (manualcom.includes(cmd)) {
 
 	// 	message.channel.send(`A manual Arena loss by ${losingPlayer.name} (+2${starchips}) to ${winningPlayer.name} (+4${starchips}) has been recorded.`)
 	// 	return checkArenaProgress(info)
-	 else if (game === 'Pauper') {
+	  if (game === 'Pauper') {
 		winningPlayer.pauper_wins++
 		await winningPlayer.save()
 

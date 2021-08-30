@@ -163,7 +163,7 @@ const getNewMarketPrice = async (message) => {
         time: 15000
     }).then(async collected => {
         const num = Math.round(parseInt(collected.first().content) * 100) / 100
-        if (isFinite(num)) return num
+        if (isFinite(num) && num > 0) return num
         else return false
     }).catch(err => {
         console.log(err)

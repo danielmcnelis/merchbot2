@@ -360,6 +360,7 @@ if (cmd === `!update_cards`) {
 if (cmd === `!auc`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const quantity = parseInt(args[0])
+	if (quantity < 1) return message.channel.send(`Sorry, ${quantity} is not a valid quantity.`)
 	const card_code = args[1]
 	const print = await Print.findOne({ where: { card_code: card_code }})
 		
@@ -2788,7 +2789,7 @@ if (losscom.includes(cmd)) {
 			chipsLoser: 3
 		})
 
-		message.channel.send(`${losingPlayer.name} (+3${starchips}), your Arena loss to ${winner.user.username} (+$5${starchips}) has been recorded.`)
+		message.channel.send(`${losingPlayer.name} (+3${starchips}), your Arena loss to ${winner.user.username} (+5${starchips}) has been recorded.`)
 		return checkArenaProgress(info)
 	} else if (!hasArenaRole && game === 'Arena') {
 		return message.channel.send(`You do not have the Arena Players role. Please report your loss in the appropriate channel.`)
@@ -3994,7 +3995,7 @@ if (cmd === `!destroy`) {
 if(cmd === `!grind`) {
 	const x = parseInt(args[0])
 	if (!x || isNaN(x)) return message.channel.send(`Please provide the number of ${starchips} that you wish to grind to ${stardust}.`)
-	if (x < 1) return message.channel.send(`You grind less than 1${starchips}.`)
+	if (x < 1) return message.channel.send(`You cannot grind less than 1${starchips}.`)
 	if (x % 1 !== 0) return message.channel.send(`You cannot grind part of a ${starchips}.`)
 
 	const wallet = await Wallet.findOne({ where: { playerId: maid } })
@@ -4480,11 +4481,12 @@ if(cmd === `!award`) {
 	if (!player) return message.channel.send(`That user is not in the database.`)
 
 	const quantity = parseInt(args[1]) ? parseInt(args[1]) : 1
+	if (quantity < 1) return message.channel.send(`Sorry, ${quantity} is not a valid quantity.`)
 	const query = parseInt(args[1]) ? args.slice(2).join(" ").toLowerCase() : args.slice(1).join(" ").toLowerCase()
 	if (!quantity || !query) return message.channel.send(`Please specify the query you wish to award.`)
 
 	let set_code = query.includes('chaospack') || query.includes('chaos pack') || query === 'ch1' ? 'CH1' :
-	query === 'pack' || query === 'packs' || query === 'teb' ? 'TEB' : null
+	query === 'pack' || query === 'packs' || query === 'teb' ? 'TEB' : query === 'doc' ? 'DOC' : null
 
 	if (set_code) {
 		const set = await Set.findOne({ where: { code: set_code } })
@@ -4590,6 +4592,7 @@ if(cmd === `!steal`) {
 	if (!player) return message.channel.send(`That user is not in the database.`)
 
 	const quantity = parseInt(args[1]) ? parseInt(args[1]) : 1
+	if (quantity < 1) return message.channel.send(`Sorry, ${quantity} is not a valid quantity.`)
 	const query = parseInt(args[1]) ? args.slice(2).join(" ") : args.slice(1).join(" ")	
 	if (!quantity || !query) return message.channel.send(`Please specify the item you wish to steal.`)
 
@@ -6051,7 +6054,7 @@ if(cmd === `!clear`) {
 
 //CLEAR
 if(cmd === `!clear_all`) {
-	if (!isAdmin(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isJazz(message.member)) return message.channel.send("You do not have permission to do that.")
     return setInterval(() => message.channel.bulkDelete(100), 5000) 
 }
 

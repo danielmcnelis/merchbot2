@@ -94,6 +94,11 @@ const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer, fuzzyP
         const quantity = isFinite(args[0]) ? parseInt(args[0]) : 1    
         const query = isFinite(args[0]) ? args.slice(1).join(' ') : args.slice(0).join(' ')	
 
+        if (quantity < 1) {
+            message.channel.send(`Sorry, ${quantity} is not a valid quantity.`)
+            return false
+        }
+    
 		if (!query) {
             message.channel.send(`Please specify the cards you wish to sell.`)
             return false
@@ -191,6 +196,11 @@ const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer, fuz
     const quantity = isFinite(args[0]) ? parseInt(args[0]) : 1    
     const query = isFinite(args[0]) ? args.slice(1).join(' ') : args.slice(0).join(' ')	
 
+    if (quantity < 1) {
+        message.channel.send(`Sorry, ${quantity} is not a valid quantity.`)
+        return false
+    }
+
     if (!query) {
         message.channel.send(`Please specify the card you wish to buy.`)
         return false
@@ -279,6 +289,11 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
     const quantity = isFinite(args[0]) ? parseInt(args[0]) : 1
     const total_price = parseInt(args[args.length - 1])
     let m4success
+
+    if (quantity < 1) {
+        message.channel.send(`Sorry, ${quantity} is not a valid quantity.`)
+        return false
+    }
 
     if (!total_price) {
         message.channel.send(`Please specify your ${authorIsSeller ? 'asking price' : 'offer price'} at the end of the command.`)

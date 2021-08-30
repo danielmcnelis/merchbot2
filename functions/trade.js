@@ -117,6 +117,10 @@ const getTradeSummary = async (message, inputs, player, fuzzyPrints) => {
 		const args = input.split(' ').filter((el) => el !== '')
 		if (!args.length) continue
 		const quantity = isFinite(args[0]) ? parseInt(args[0]) : 1
+		if (quantity < 1) {
+			message.channel.send(`Sorry, ${quantity} is not a valid quantity.`)
+			return false
+		} 
 		const query = isFinite(args[0]) ? args.slice(1).join(' ') : args.join(' ')
 
 		if (!query) {

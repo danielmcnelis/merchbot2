@@ -497,7 +497,7 @@ if (cmd === `!p`) {
 	return message.channel.send(`Pauper stats have been calculated.`)
 }
 
-//PAUPER 
+//ARENA 
 if (cmd === `!a`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 
@@ -2751,8 +2751,8 @@ if (losscom.includes(cmd)) {
 
 		if (!correct_pairing) return message.channel.send(`That player is not your Arena opponent.`)
 
-		const origStatsWinner = winningPlayer.stats
-		const origStatsLoser = losingPlayer.stats
+		const origStatsWinner = winningPlayer.arena_stats
+		const origStatsLoser = losingPlayer.arena_stats
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
 		
 		winningPlayer.arena_stats += delta
@@ -2796,8 +2796,8 @@ if (losscom.includes(cmd)) {
 	} else if (hasArenaRole && game !== 'Arena') {
 		return message.channel.send(`You have the Arena Players role. Please report your Arena loss in <#${arenaChannelId}>, or get a Moderator to help you.`)
 	} else if (!hasArenaRole && game === 'Pauper') {
-		const origStatsWinner = winningPlayer.stats
-		const origStatsLoser = losingPlayer.stats
+		const origStatsWinner = winningPlayer.pauper_stats
+		const origStatsLoser = losingPlayer.pauper_stats
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
 		
 		winningPlayer.pauper_stats += delta

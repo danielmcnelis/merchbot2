@@ -2933,7 +2933,7 @@ if (manualcom.includes(cmd)) {
 	const usersMap = message.mentions.users
 	const userIds = [...usersMap.keys()]	
 	const winnerId = message.mentions.users.first() ? message.mentions.users.first().id : null	
-	const loserId = userIds.length > 1 ? userIds[1] : null	
+	const loserId = userIds.length > 1 ? userIds[1] : '235602471798439938'	
 	if (!winnerId || !loserId) return message.channel.send(`Please specify 2 players.`)
 	if (winnerId === loserId) return message.channel.send(`Please specify 2 different players.`)
 

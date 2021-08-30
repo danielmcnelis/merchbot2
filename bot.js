@@ -2463,7 +2463,7 @@ if (statscom.includes(cmd)) {
 		if (playerId === maid) completeTask(message.channel, maid, 'e4')
 		
 		return message.channel.send(
-			`${FiC} --- Forged Player Stats --- ${FiC}`
+			`${FiC} --- Ranked Stats --- ${FiC}`
 			+ `\nName: ${player.name}`
 			+ `\nMedal: ${medal}`
 			+ `\nStarchips: ${player.wallet.starchips}${starchips}`
@@ -2489,7 +2489,7 @@ if (statscom.includes(cmd)) {
 		const victories = getArenaVictories(p)
 
 		return message.channel.send(
-			`${shrine} --- Arena Player Stats --- ${shrine}`
+			`${shrine} --- Arena Stats --- ${shrine}`
 			+ `\nName: ${player.name}`
 			+ `\nRanking: ${rank}`
 			+ `\nVictories: ${victories} ${champion}`
@@ -2515,7 +2515,7 @@ if (statscom.includes(cmd)) {
 		const medal = getMedal(player.pauper_stats, title = true)
 
 		return message.channel.send(
-			`${com} --- Pauper Player Stats --- ${com}`
+			`${com} --- Pauper Stats --- ${com}`
 			+ `\nName: ${player.name}`
 			+ `\nMedal: ${medal}`
 			+ `\nRanking: ${rank}`
@@ -3203,10 +3203,13 @@ if (noshowcom.includes(cmd)) {
 //H2H
 if (h2hcom.includes(cmd)) {
 	const game_mode = message.channel === client.channels.cache.get(arenaChannelId) ? 'arena' :
-		message.channel === client.channels.cache.get(keeperChannelId) ? 'keeper' :
-		message.channel === client.channels.cache.get(draftChannelId) ? 'draft' :
+		message.channel === client.channels.cache.get(pauperChannelId) ? 'pauper' :
 		'ranked'
 
+	const emoji = message.channel === client.channels.cache.get(arenaChannelId) ? 'shrine' :
+		message.channel === client.channels.cache.get(pauperChannelId) ? 'com' :
+		'FiC'
+	
 	const usersMap = message.mentions.users
 	const userIds = [...usersMap.keys()]
 	const player1Id = message.mentions.users.first() ? message.mentions.users.first().id : null	
@@ -3229,7 +3232,7 @@ if (h2hcom.includes(cmd)) {
 	const p2Wins = game_mode !== 'ranked' ? await Match.count({ where: { winnerId: player2Id, loserId: player1Id, game_mode: game_mode } }) :
 		await Match.count({ where: { winnerId: player2Id, loserId: player1Id, [Op.or]: [{ game_mode: 'ranked' }, { game_mode: 'tournament' }] } })
 	
-	return message.channel.send(`${FiC} --- H2H ${capitalize(game_mode)} Results --- ${FiC}`+
+	return message.channel.send(`${eval(emoji)} --- H2H ${capitalize(game_mode)} Results --- ${eval(emoji)}`+
 	`\n${player1.name} has won ${p1Wins}x`+
 	`\n${player2.name} has won ${p2Wins}x`)
 }

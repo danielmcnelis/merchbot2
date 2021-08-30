@@ -446,16 +446,14 @@ if (cmd === `!zero`) {
 	for (let i = 0; i < players.length; i++) {
 		const player = players[i]
 		player.arena_stats = 500.00
-		player.pauper_stats = 500.00
-		
 		player.arena_backup = 0.00
+		player.arena_wins = 0
+		player.pauper_losses = 0
+
+		player.pauper_stats = 500.00
 		player.pauper_backup = 0.00
-
-		player.arena_wins = 0.00
-		player.pauper_losses = 0.00
-
-		player.arena_wins = 0.00
-		player.pauper_losses = 0.00
+		player.pauper_wins = 0
+		player.arena_losses = 0
 
 		await player.save()
 	}

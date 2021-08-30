@@ -447,18 +447,20 @@ if (cmd === `!zero`) {
 		const player = players[i]
 		player.arena_stats = 500.00
 		player.pauper_stats = 500.00
-		player.keeper_stats = 500.00
-		player.gauntlet_stats = 500.00
-		player.draft_stats = 500.00
+		
 		player.arena_backup = 0.00
 		player.pauper_backup = 0.00
-		player.keeper_backup = 0.00
-		player.gauntlet_backup = 0.00
-		player.draft_backup = 0.00
+
+		player.arena_wins = 0.00
+		player.pauper_losses = 0.00
+
+		player.arena_wins = 0.00
+		player.pauper_losses = 0.00
+
 		await player.save()
 	}
 
-	return message.channel.send(`Zeroed out Arena/Pauper/Draft/Gauntlet/Keeper stats for ${players.length} players in the database.`)
+	return message.channel.send(`Zeroed out Arena and Pauper stats for ${players.length} players in the database.`)
 }
 
 //PAUPER 
@@ -482,15 +484,16 @@ if (cmd === `!p`) {
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((orig_stats_winner - orig_stats_loser) / 400))))))
 
 		winner.pauper_stats += delta
-		loser.pauper_stats -= delta
-
 		winner.pauper_backup = orig_stats_winner
+		winner.pauper_wins++
+		await winner.save()
+
+		loser.pauper_stats -= delta
 		loser.pauper_backup = orig_stats_loser
+		loser.pauper_losses++
+		await loser.save()
 
 		match.delta = delta
-
-		await winner.save()
-		await loser.save()
 		await match.save()
 	}
 
@@ -518,15 +521,16 @@ if (cmd === `!a`) {
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((orig_stats_winner - orig_stats_loser) / 400))))))
 
 		winner.arena_stats += delta
-		loser.arena_stats -= delta
-
 		winner.arena_backup = orig_stats_winner
+		winner.arena_wins++
+		await winner.save()
+
+		loser.arena_stats -= delta
 		loser.arena_backup = orig_stats_loser
+		loser.arena_losses++
+		await loser.save()
 
 		match.delta = delta
-
-		await winner.save()
-		await loser.save()
 		await match.save()
 	}
 

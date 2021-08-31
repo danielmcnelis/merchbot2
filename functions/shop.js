@@ -536,8 +536,7 @@ const getDumpQuantity = async (message, rarity) => {
         time: 15000
     }).then(async collected => {
 		const response = Math.round(parseInt(collected.first().content.toLowerCase()))
-        if (!Number.isInteger(response) || response < 1) {
-            message.channel.send(`Please provide a positive number.`)
+        if (!Number.isInteger(response) || response < 0) {
             return false
         } else {
             return response

@@ -305,11 +305,7 @@ const calcBoxPrice = async () => {
                 deck2Price += (d2quantity * Math.ceil(market_price))
             }
 
-            console.log('deck1Price', deck1Price)
-            console.log('deck2Price', deck2Price)
-
             const avgDeckPrice = (deck1Price + deck2Price) / 2
-            console.log('new set.unit_price', 10 * Math.round(1.1 * avgDeckPrice / 10))
             set.unit_price = 10 * Math.round(1.1 * avgDeckPrice / 10)
             await set.save()
         }

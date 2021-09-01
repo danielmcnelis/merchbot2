@@ -203,7 +203,7 @@ if(cmd === `!test`) {
 if(cmd === `!stimulus`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 
-	const players = await Player.findAll({ include: [Diary, Wallet], order: [['createdAt', 'ASC']] })
+	const players = await Player.findAll({ include: [Diary, Wallet], order: [['name', 'ASC']] })
 	const results = [`${legend} - Diary ${starchips} Bonuses - ${legend}`]
 
 	for (let i = 0; i < players.length; i++) {

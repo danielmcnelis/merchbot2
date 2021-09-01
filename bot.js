@@ -198,6 +198,67 @@ if(cmd === `!test`) {
 	return message.channel.send(`In 10,000 random trials the average market value of a random TEB ${TEB} card from a ${x}${stardust} wager was ${expected_value}${stardust}.`)
 }
 
+
+//TEST
+if(cmd === `!test2`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+
+	const players = await Player.findAll({ include: Diary })
+	const results = [`${legend} - Diary ${starchips} Bonuses - ${legend}`]
+
+	for (let i = 0; i < players.length; i++) {
+		const player = players[i]
+		const diary = player.diary
+		if (!diary) continue
+		let chips = 0
+		if (diary.e1) chips += 3
+		if (diary.e2) chips += 3
+		if (diary.e3) chips += 3
+		if (diary.e4) chips += 3
+		if (diary.e5) chips += 3
+		if (diary.e6) chips += 3
+		if (diary.e7) chips += 3
+		if (diary.e8) chips += 3
+		if (diary.e9) chips += 3
+		if (diary.e10) chips += 3
+		if (diary.e11) chips += 3
+		if (diary.e12) chips += 3
+		if (diary.m1) chips += 6
+		if (diary.m2) chips += 6
+		if (diary.m3) chips += 6
+		if (diary.m4) chips += 6
+		if (diary.m5) chips += 6
+		if (diary.m6) chips += 6
+		if (diary.m7) chips += 6
+		if (diary.m8) chips += 6
+		if (diary.m9) chips += 6
+		if (diary.m10) chips += 6
+		if (diary.h1) chips += 9
+		if (diary.h2) chips += 9
+		if (diary.h3) chips += 9
+		if (diary.h4) chips += 9
+		if (diary.h5) chips += 9
+		if (diary.h6) chips += 9
+		if (diary.h7) chips += 9
+		if (diary.h8) chips += 9
+		if (diary.l1) chips += 12
+		if (diary.l2) chips += 12
+		if (diary.l3) chips += 12
+		if (diary.l4) chips += 12
+		if (diary.l5) chips += 12
+		if (diary.l6) chips += 12
+		results.push(`${player.name}: +${chips}${starchips}`)
+	}
+
+	for (let i = 0; i < results.length; i += 40) {
+		message.channel.send(results.slice(i, i + 40).join('\n'))
+	}
+
+	return
+}
+
+
+
 // ASSIGN ROLES
 if (cmd === `!assign_roles`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)

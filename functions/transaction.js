@@ -300,6 +300,11 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
         return false
     }
 
+    if (total_price < 1) {
+        message.channel.send(`You cannot pay less than 1${stardust} for any items.`)
+        return false
+    }
+
 	if (buyingPlayer.wallet.stardust < total_price && buyerId !== merchbotId) {
         message.channel.send(`Sorry, ${authorIsSeller ? `${buyingPlayer.name} only has` : 'You only have'} ${buyingPlayer.wallet.stardust}${stardust}.`)
         return false

@@ -203,7 +203,7 @@ if(cmd === `!test`) {
 if(cmd === `!test2`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 
-	const players = await Player.findAll({ include: Diary })
+	const players = await Player.findAll({ include: Diary, order: [['createdAt', 'ASC']] })
 	const results = [`${legend} - Diary ${starchips} Bonuses - ${legend}`]
 
 	for (let i = 0; i < players.length; i++) {

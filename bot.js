@@ -199,17 +199,18 @@ if(cmd === `!test`) {
 }
 
 
-//TEST
-if(cmd === `!test2`) {
+//STIMULUS
+if(cmd === `!stimulus`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 
-	const players = await Player.findAll({ include: Diary, order: [['createdAt', 'ASC']] })
+	const players = await Player.findAll({ include: [Diary, Wallet], order: [['createdAt', 'ASC']] })
 	const results = [`${legend} - Diary ${starchips} Bonuses - ${legend}`]
 
 	for (let i = 0; i < players.length; i++) {
 		const player = players[i]
 		const diary = player.diary
-		if (!diary) continue
+		const wallet = player.diary
+		if (!diary || !wallet) continue
 		let chips = 0
 		if (diary.e1) chips += 3
 		if (diary.e2) chips += 3
@@ -247,14 +248,10 @@ if(cmd === `!test2`) {
 		if (diary.l4) chips += 12
 		if (diary.l5) chips += 12
 		if (diary.l6) chips += 12
-		results.push(`${player.name}: +${chips}${starchips}`)
+		wallet.starchips += chips
+		await wallet.save()
+		message.channel.send(`<@${player.id}> was awarded ${chips}${starchips} for previously completed Diary${leatherbound} Tasks!`)
 	}
-
-	for (let i = 0; i < results.length; i += 40) {
-		message.channel.send(results.slice(i, i + 40).join('\n'))
-	}
-
-	return
 }
 
 

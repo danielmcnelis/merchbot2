@@ -85,7 +85,8 @@ const completeTask = async (channel, playerId, task, milliseconds = 2000) => {
     if (count) return
 
     const diary = await Diary.findOne({ where: { playerId } })
-    if (!diary) return console.log(`Error: could not find player's Diary.`)
+    const wallet = await Wallet.findOne({ where: { playerId } })
+    if (!diary || !wallet) return console.log(`Error: could not find player's Diary.`)
     diary[task] = true
     await diary.save()
 
@@ -95,11 +96,20 @@ const completeTask = async (channel, playerId, task, milliseconds = 2000) => {
         task.startsWith('l') ? 'Elite' : 
         'Master'
     
+    const reward = difficulty === 'Easy' ? 3 :
+        difficulty === 'Medium' ? 6 :
+        difficulty === 'Hard' ? 9 :
+        difficulty === 'Elite' ? 12 :
+        15
+
+    wallet.starchips += reward
+    await wallet.save()
+
     return setTimeout(() => {
         const task_num = task.slice(1)
         const full_text = diaries[difficulty][task]
         const task_text_only = full_text.slice(full_text.indexOf(") ") + 2)
-        channel.send(`<@${playerId}>, Congrats! You completed Task #${task_num} in the ${difficulty} Diary${leatherbound}!` +
+        channel.send(`<@${playerId}>, Congrats! You earned ${reward}${starchips} for completing Task #${task_num} in the ${difficulty} Diary${leatherbound}!` +
             `\n${legend} ${task_text_only} ${legend}`
         )
         return checkDiaryComplete(channel, playerId, diary, difficulty)

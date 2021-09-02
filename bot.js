@@ -3998,12 +3998,12 @@ if (bracketcom.includes(cmd)) {
 	for (let i = 0; i < tournaments.length; i++) {
 		const tournament = tournaments[i]
 		results.push(`Name: ${tournament.name} ${FiC}` +
-			`\nType: ${tournament.type}` +
-			`\nBracket: https://challonge.com/${tournament.url}`
+			`\nType: ${tournament.tournament_type}` +
+			`\nBracket: <https://challonge.com/${tournament.url}>`
 		)
 	}
 
-	return message.channel.send(results.join('\n'))
+	return message.channel.send(results.join('\n\n'))
 }
 
 

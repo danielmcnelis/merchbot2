@@ -3998,7 +3998,7 @@ if (bracketcom.includes(cmd)) {
 	for (let i = 0; i < tournaments.length; i++) {
 		const tournament = tournaments[i]
 		results.push(`Name: ${tournament.name} ${FiC}` +
-			`\nType: ${tournament.tournament_type}` +
+			`\nType: ${capitalize(tournament.tournament_type)}` +
 			`\nBracket: <https://challonge.com/${tournament.url}>`
 		)
 	}

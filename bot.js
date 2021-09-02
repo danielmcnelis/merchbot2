@@ -3993,19 +3993,17 @@ if (cmd === `!create`) {
 //BRACKET
 if (bracketcom.includes(cmd)) {
 	const tournaments = await Tournament.findAll({ order: [['createdAt', 'ASC']]})
-	const tournament = await selectTournament(message, tournaments, maid)
-	if (!tournament) return message.channel.send('There is no active tournament.')
+	const results = []
 
-	challongeClient.tournaments.show({
-		id: tournament.id,
-		callback: (err) => {
-			if (err) {
-				return message.channel.send(`Error: "${tournament.name}" could not be found.`)
-			} else {
-				return message.channel.send(`Name: ${tournament.name} ${FiC}\nType: ${capitalize(tournament.tournament_type)}\nBracket: <https://challonge.com/${tournament.url}>`)
-			}
-		}
-	})  
+	for (let i = 0; i < tournaments.length; i++) {
+		const tournament = tournaments[i]
+		results.push(`Name: ${tournament.name} ${FiC}` +
+			`\nType: ${tournament.type}` +
+			`\nBracket: https://challonge.com/${tournament.url}`
+		)
+	}
+
+	return message.channel.send(results.join('\n'))
 }
 
 

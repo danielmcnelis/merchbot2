@@ -112,7 +112,7 @@ const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer, fuzzyP
                     card_name ? await selectPrint(message, sellerId, card_name) :
                     null
         
-        const count = print && (print.set_code === 'CH1' || print.set_code === 'HIDDEN') ? await Inventory.findOne({ where: { printId: print.id } }) : true
+        const count = print && (print.set_code === 'CH2' || print.set_code === 'HIDDEN') ? await Inventory.findOne({ where: { printId: print.id } }) : true
 
         if (!print || !count) {
             message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
@@ -214,7 +214,7 @@ const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer, fuz
                 card_name ? await selectPrint(message, buyerId, card_name) :
                 null
     
-    const count = print && (print.set_code === 'CH1' || print.set_code === 'HIDDEN') ? await Inventory.findOne({ where: { printId: print.id } }) : true
+    const count = print && (print.set_code === 'CH2' || print.set_code === 'HIDDEN') ? await Inventory.findOne({ where: { printId: print.id } }) : true
 
     if (!print || !count) {
         message.channel.send(`Sorry, I do not recognize the card: "${query}".`)

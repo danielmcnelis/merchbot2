@@ -2673,14 +2673,12 @@ if (losscom.includes(cmd)) {
 		const info = await Info.findOne({ where: { element: 'arena' } })
 		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
 		
-		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"], ["P5", "P6"]] :
-			info.round === 2 ? [["P1", "P3"], ["P2", "P5"], ["P4", "P6"]] :
-			info.round === 3 ? [["P1", "P4"], ["P2", "P6"], ["P3", "P5"]] : 
-			info.round === 4 ? [["P1", "P5"], ["P2", "P4"], ["P3", "P6"]] : 
-			info.round === 5 ? [["P1", "P6"], ["P2", "P3"], ["P4", "P5"]] : 
-			null
+		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"]] :
+            info.round === 2 ? [["P1", "P3"], ["P2", "P4"]] :
+            info.round === 3 ? [["P1", "P4"], ["P2", "P3"]] : 
+            null
 	
-		let correct_pairing = info.round === 6 ? true : false
+		let correct_pairing = info.round === 4 ? true : false
 		if (!correct_pairing) {
 			for (let i = 0; i < 3; i++) {
 				if ((pairings[i][0] === losingContestant.contestant && 
@@ -2901,30 +2899,28 @@ if (manualcom.includes(cmd)) {
 
 		const info = await Info.findOne({ where: { element: 'arena' } })
 		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
-
-		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"], ["P5", "P6"]] :
-            info.round === 2 ? [["P1", "P3"], ["P2", "P5"], ["P4", "P6"]] :
-            info.round === 3 ? [["P1", "P4"], ["P2", "P6"], ["P3", "P5"]] : 
-            info.round === 4 ? [["P1", "P5"], ["P2", "P4"], ["P3", "P6"]] : 
-            info.round === 5 ? [["P1", "P6"], ["P2", "P3"], ["P4", "P5"]] : 
-            null
 	
-		if (pairings) {
-			let correct_pairing = false
+		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"]] :
+            info.round === 2 ? [["P1", "P3"], ["P2", "P4"]] :
+            info.round === 3 ? [["P1", "P4"], ["P2", "P3"]] : 
+            null
+
+		let correct_pairing = info.round === 4 ? true : false
+		if (!correct_pairing) {
 			for (let i = 0; i < 3; i++) {
 				if ((pairings[i][0] === losingContestant.contestant && 
 						pairings[i][1] === winningContestant.contestant) ||
 					(pairings[i][0] === winningContestant.contestant &&
 						pairings[i][1] === losingContestant.contestant)) correct_pairing = true
 			}
-
-			if (!correct_pairing) return message.channel.send(`That player is not your Arena opponent.`)
 		}
+
+		if (!correct_pairing) return message.channel.send(`That player is not your Arena opponent.`)
 		
 		losingPlayer.arena_losses++
 		await losingPlayer.save()
 
-		losingPlayer.wallet.starchips += 2
+		losingPlayer.wallet.starchips += 3
 		await losingPlayer.wallet.save()
 	
 		losingContestant.is_playing = false
@@ -2933,7 +2929,7 @@ if (manualcom.includes(cmd)) {
 		winningPlayer.arena_wins++
 		await winningPlayer.save()
 
-		winningPlayer.wallet.starchips += 4
+		winningPlayer.wallet.starchips += 5
 		await winningPlayer.wallet.save()
 
 		winningContestant.score++
@@ -2947,23 +2943,23 @@ if (manualcom.includes(cmd)) {
 			loser_name: losingPlayer.name,
 			loserId: losingPlayer.id,
 			delta: 0,
-			chipsWinner: 4,
-			chipsLoser: 2
+			chipsWinner: 5,
+			chipsLoser: 3
 		})
 
-		message.channel.send(`A manual Arena loss by ${losingPlayer.name} (+2${starchips}) to ${winningPlayer.name} (+4${starchips}) has been recorded.`)
+		message.channel.send(`A manual Arena loss by ${losingPlayer.name} (+3${starchips}) to ${winningPlayer.name} (+5${starchips}) has been recorded.`)
 		return checkArenaProgress(info)
 	} else if (game === 'Pauper') {
 		winningPlayer.pauper_wins++
 		await winningPlayer.save()
 
-		winningPlayer.wallet.starchips += 3
+		winningPlayer.wallet.starchips += 4
 		await winningPlayer.wallet.save()
 
 		losingPlayer.pauper_losses++
 		await losingPlayer.save()
 
-		losingPlayer.wallet.starchips += 1
+		losingPlayer.wallet.starchips += 2
 		await losingPlayer.wallet.save()
 
 		await Match.create({
@@ -2973,8 +2969,8 @@ if (manualcom.includes(cmd)) {
 			loser_name: losingPlayer.name,
 			loserId: losingPlayer.id,
 			delta: 0,
-			chipsWinner: 3,
-			chipsLoser: 1
+			chipsWinner: 4,
+			chipsLoser: 2
 		})
 
 		return message.channel.send(`A manual Pauper loss by ${losingPlayer.name} (+1${starchips}) to ${winningPlayer.name} (+3${starchips}) has been recorded.`)
@@ -3097,26 +3093,26 @@ if (noshowcom.includes(cmd)) {
 		const info = await Info.findOne({ where: { element: 'arena' } })
 		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
 
-		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"], ["P5", "P6"]] :
-			info.round === 2 ? [["P1", "P3"], ["P2", "P5"], ["P4", "P6"]] :
-			info.round === 3 ? [["P1", "P4"], ["P2", "P6"], ["P3", "P5"]] : 
-			info.round === 4 ? [["P1", "P5"], ["P2", "P4"], ["P3", "P6"]] : 
-			info.round === 5 ? [["P1", "P6"], ["P2", "P3"], ["P4", "P5"]] : 
+		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"]] :
+			info.round === 2 ? [["P1", "P3"], ["P2", "P4"]] :
+			info.round === 3 ? [["P1", "P4"], ["P2", "P3"]] : 
 			null
 	
 		let PX = false
 
-		if (pairings) {
+		let correct_pairing = info.round === 4 ? true : false
+
+		if (!correct_pairing) {
 			for (let i = 0; i < 3; i++) {
 				if (pairings[i][0] === noShowContestant.contestant) PX = pairings[i][1]
 				if (PX) break
 				if (pairings[i][1] === noShowContestant.contestant) PX = pairings[i][0]
 				if (PX) break
 			}
-
-			if (!PX) return message.channel.send(`Could not find Arena opponent. Please try **!manual**.`)
 		}
-		
+
+		if (!PX) return message.channel.send(`Could not find Arena opponent. Please try **!manual**.`)
+			
 		const winningContestant = await Arena.findOne({ where: { contestant: PX }})
 		if (!winningContestant) return message.channel.send(`Could not find Arena opponent. Please try **!manual**.`)
 			
@@ -3126,14 +3122,14 @@ if (noshowcom.includes(cmd)) {
 		noShowContestant.is_playing = false
 		await noShowContestant.save()
 
-		winningPlayer.wallet.starchips += 4
+		winningPlayer.wallet.starchips += 5
 		await winningPlayer.wallet.save()
 
 		winningContestant.score++
 		winningContestant.is_playing = false
 		await winningContestant.save()
 
-		message.channel.send(`A no-show by ${noShowPlayer.name} (+0${starchips}) to ${winningPlayer.name} (+4${starchips}) has been recorded.`)
+		message.channel.send(`A no-show by ${noShowPlayer.name} (+0${starchips}) to ${winningPlayer.name} (+5${starchips}) has been recorded.`)
 		return checkArenaProgress(info)
 	}
 	
@@ -3530,7 +3526,7 @@ if(joincom.includes(cmd)) {
 		await eval(game).create({ playerId: maid })
 		message.channel.send(`You joined the ${game} queue.`)
 		
-		if (game === 'Arena' && count === 5) {
+		if (game === 'Arena' && count === 3) {
 			info.status = 'confirming'
 			await info.save()
 			return startArena(message.guild)
@@ -5319,7 +5315,8 @@ if(cmd === `!box`) {
 	const code = args[0] || 'TEB'
 	if (code.startsWith('SS')) return message.channel.send(`Sorry, Starter Series cards are not sold by the box.`)
 	const set = await Set.findOne({ where: { code: code.toUpperCase() }})
-	if (!set) return message.channel.send(`There is no set with the code "${code.toUpperCase()}".`)
+	if (!set) return message.channel.send(`There is no coreset with the code "${code.toUpperCase()}".`)
+	if (!set.box_price) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} is not sold by the box.`)
 	if (!set.for_sale) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} are not available.`)
 	if (!set.packs_per_box) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} is experiencing a glitch in the database. Please get an Admin to help you.`)
 
@@ -5774,7 +5771,7 @@ if(cmd === `!barter`) {
 	if (!direction) return
 	let voucher = direction === 'get_card' ? await getVoucher(message, direction) : null
 	const selected_option = direction === 'get_card' ? await getBarterCard(message, voucher, medium_complete) : await getTradeInCard(message, medium_complete)
-	if (!selected_option) return
+	if (!selected_option) return message.channel.send(`You did not select a valid option.`)
 	if (!voucher) voucher = selected_option[3]
 
 	const print = await Print.findOne({ where: { card_code: selected_option[1] } })

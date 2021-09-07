@@ -54,14 +54,12 @@ const startArena = async(guild) => {
     const arenaChannel = client.channels.cache.get(arenaChannelId)
     arenaChannel.send(`Arena players, please check your DMs!`)
     const allArenaEntries = await Arena.findAll({ include: Player })
-    const contestants = shuffleArray(["P1", "P2", "P3", "P4", "P5", "P6"])
+    const contestants = shuffleArray(["P1", "P2", "P3", "P4"])
 
     getConfirmation(guild, allArenaEntries[0], contestants[0])
     getConfirmation(guild, allArenaEntries[1], contestants[1])
     getConfirmation(guild, allArenaEntries[2], contestants[2])
     getConfirmation(guild, allArenaEntries[3], contestants[3])
-    getConfirmation(guild, allArenaEntries[4], contestants[4])
-    getConfirmation(guild, allArenaEntries[5], contestants[5])
 
     const info = await Info.findOne({ where: {
         element: 'arena'
@@ -78,7 +76,7 @@ const startArena = async(guild) => {
                 status: 'active'
             } })
 
-            if (count === 6 && !active) {
+            if (count === 4 && !active) {
                 info.round = 1
                 info.status = 'active'
                 await info.save()
@@ -103,7 +101,7 @@ const startArena = async(guild) => {
             status: 'active'
         } })
 
-        if (count !== 6 && !active) {
+        if (count !== 4 && !active) {
             const missingArenaEntries = await Arena.findAll({ 
                 where: { 
                     active: false
@@ -120,8 +118,8 @@ const startArena = async(guild) => {
                 await entry.destroy()
             }
             
-            return arenaChannel.send(`Unfortunately, The Arena cannot begin without 6 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`)
-        } else if (count === 6 && !active) {
+            return arenaChannel.send(`Unfortunately, The Arena cannot begin without 4 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`)
+        } else if (count === 4 && !active) {
             info.round = 1
             info.status = 'active'
             await info.save()
@@ -194,7 +192,7 @@ const startRound = async (info, entries) => {
     const arenaChannel = client.channels.cache.get(arenaChannelId)
     const guild = client.guilds.cache.get("842476300022054913")
 
-    if (info.round === 7) {
+    if (info.round === 5) {
         const voucher = vouchers[entries[1].tribe]
         const quantity = 5
         const wallet = await Wallet.findOne({ where: { playerId: entries[1].playerId }})
@@ -219,7 +217,7 @@ const startRound = async (info, entries) => {
         if (await check6TribesComplete(playerId, 1)) completeTask(arenaChannel, playerId, 'h8', 4000)
         if (await check6TribesComplete(playerId, 3)) completeTask(arenaChannel, playerId, 'l6', 5000)
         return endArena(arenaChannel, info, entries)
-    } else if (info.round === 6) {
+    } else if (info.round === 4) {
         if (entries[0].score > entries[1].score) {
         //1st place outright
             for (let i = 1; i < entries.length; i++) {
@@ -276,40 +274,12 @@ const startRound = async (info, entries) => {
             ` vs ${eval(entries[1].tribe)} <@${entries[1].playerId}> ${eval(entries[1].tribe)}`
 
             return arenaChannel.send(`${title}\n${match}`)
-        } else if (entries[0].score === entries[1].score && entries[1].score === entries[2].score && entries[2].score > entries[3].score) {
+        } else {
         //3 way tie
             for (let i = 0; i < entries.length; i++) {
                 const entry = entries[i]
                 const voucher = vouchers[entry.tribe]
                 const quantity = i < 3 ? entry.score + 4 : entry.score + 1
-                const wallet = await Wallet.findOne({ where: { playerId: entry.playerId }})
-                wallet[voucher] += quantity
-                await wallet.save()
-                arenaChannel.send(`<@${entry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`)
-            }
-
-            arenaChannel.send(`The shadows grew long over the battlefield, and the gladiators had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena.`)
-            return endArena( arenaChannel, info, entries)
-        } else if (entries[0].score === entries[1].score && entries[1].score === entries[2].score && entries[2].score  === entries[3].score && entries[3].score > entries[4].score) {
-        //4 way tie
-            for (let i = 0; i < entries.length; i++) {
-                const entry = entries[i]
-                const voucher = vouchers[entry.tribe]
-                const quantity = i < 4 ? entry.score + 3 : entry.score + 1
-                const wallet = await Wallet.findOne({ where: { playerId: entry.playerId }})
-                wallet[voucher] += quantity
-                await wallet.save()
-                arenaChannel.send(`<@${entry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`)
-            }
-
-            arenaChannel.send(`The shadows grew long over the battlefield, and the gladiators had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena.`)
-            return endArena( arenaChannel, info, entries)
-        } else {
-             //5 way tie
-             for (let i = 0; i < entries.length; i++) {
-                const entry = entries[i]
-                const voucher = vouchers[entry.tribe]
-                const quantity = i < 5 ? entry.score + 3 : entry.score + 1
                 const wallet = await Wallet.findOne({ where: { playerId: entry.playerId }})
                 wallet[voucher] += quantity
                 await wallet.save()
@@ -324,16 +294,12 @@ const startRound = async (info, entries) => {
         const P2 = await Arena.findOne({ where: { contestant: "P2" }, include: Player})
         const P3 = await Arena.findOne({ where: { contestant: "P3" }, include: Player})
         const P4 = await Arena.findOne({ where: { contestant: "P4" }, include: Player})
-        const P5 = await Arena.findOne({ where: { contestant: "P5" }, include: Player})
-        const P6 = await Arena.findOne({ where: { contestant: "P6" }, include: Player})
     
-        if (!P1 || !P2 || !P3 || !P4 || !P5 || !P6) return arenaChannel.send(`Critical error. Missing contestant in the database.`)
+        if (!P1 || !P2 || !P3 || !P4) return arenaChannel.send(`Critical error. Missing contestant in the database.`)
     
-        const pairings = info.round === 1 ? [[P1, P2], [P3, P4], [P5, P6]] :
-            info.round === 2 ? [[P1, P3], [P2, P5], [P4, P6]] :
-            info.round === 3 ? [[P1, P4], [P2, P6], [P3, P5]] : 
-            info.round === 4 ? [[P1, P5], [P2, P4], [P3, P6]] : 
-            info.round === 5 ? [[P1, P6], [P2, P3], [P4, P5]] : 
+        const pairings = info.round === 1 ? [[P1, P2], [P3, P4]] :
+            info.round === 2 ? [[P1, P3], [P2, P4]] :
+            info.round === 3 ? [[P1, P4], [P2, P3]] : 
             null
     
         const title = `${shrine}  ------  Arena Round ${info.round}  ------  ${shrine}\n${beast}  ${dinosaur}  ${dragon}  ${fish}  ${plant}  ${reptile}  ${rock}  ${spellcaster}  ${warrior}` 
@@ -456,8 +422,8 @@ const checkArenaProgress = async (info) => {
     const entries = await Arena.findAll({ include: Player, order: [["score", "DESC"]]})
     if (!entries) return arenaChannel.send(`Critical error. Missing entries in the database.`) 
 
-    if (info.round === 6) {
-        info.round = 7
+    if (info.round === 4) {
+        info.round = 5
         await info.save()
         return setTimeout(() => startRound(info, entries), 3000)
     }

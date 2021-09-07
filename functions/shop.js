@@ -793,10 +793,13 @@ const getBarterCard = async (message, voucher, medium_complete) => {
         }
     }
 
-    const options = medium_complete ? [wares[voucher].original, wares[voucher].unlocked] : [wares[voucher].original]
+    const options = medium_complete ? [wares[voucher].original, ...wares[voucher].unlocked] : [wares[voucher].original]
+    console.log('options', options)
     if (options.length === 1) return options[0]
-    const cards = options.map((o) => o[2])
 
+    const cards = options.map((o) => o[2])
+    console.log('cards', cards)
+    
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send(`Which card would you like to barter for?\n${cards.join("\n")}`)
     const collected = await msg.channel.awaitMessages(filter, {

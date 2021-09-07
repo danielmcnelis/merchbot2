@@ -814,7 +814,6 @@ const getBarterCard = async (message, voucher, medium_complete) => {
         } else if(response.includes('4')) {
             index = 3
         } else {
-            message.channel.send(`You did not select a valid option.`)
             return false
         }
 

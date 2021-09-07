@@ -728,67 +728,67 @@ const getVoucher = async (message) => {
 const getBarterCard = async (message, voucher, medium_complete) => {
     const wares = {
         mushroom: {
-            original: [10, 'APC-001', `(1) ${ult}APC-001 - Desmanian Devil - 10 ${mushroom}`],
+            original: [[10, 'APC-001', `(1) ${ult}APC-001 - Desmanian Devil - 10 ${mushroom}`]],
             unlocked: [
-                10, 'DOC-180', `(2) ${ult}DOC-180 - Peropero Cerperus - 10 ${mushroom}`,
-                10, 'TEB-135', `(3) ${ult}TEB-135 - Green Baboon, Defender of the Forest - 20 ${mushroom}`,
-                20, 'ORF-046', `(4) ${ult}ORF-046 - X-Saber Airbellum - 20 ${mushroom}`
+                [10, 'DOC-180', `(2) ${ult}DOC-180 - Peropero Cerperus - 10 ${mushroom}`],
+                [10, 'TEB-135', `(3) ${ult}TEB-135 - Green Baboon, Defender of the Forest - 20 ${mushroom}`],
+                [20, 'ORF-046', `(4) ${ult}ORF-046 - X-Saber Airbellum - 20 ${mushroom}`]
             ]
         },
         moai: {
-            original: [10, 'APC-002', `(1) ${ult}APC-002 - Koa'ki Meiru Guardian - 10 ${moai}`],
+            original: [[10, 'APC-002', `(1) ${ult}APC-002 - Koa'ki Meiru Guardian - 10 ${moai}`]],
             unlocked: [
-                10, 'DOC-174', `(2) ${ult}DOC-174 - Block Golem - 10 ${moai}`
+                [10, 'DOC-174', `(2) ${ult}DOC-174 - Block Golem - 10 ${moai}`]
             ]
         },
         rose: {
-            original: [10, 'APC-003', `(1) ${ult}APC-003 - Rose Lover - 10 ${rose}`],
+            original: [[10, 'APC-003', `(1) ${ult}APC-003 - Rose Lover - 10 ${rose}`]],
             unlocked: [
-                10, 'DOC-178', `(2) ${ult}DOC-178 - Mardel, Generaider Boss of Light - 10 ${rose}`,
-                10, 'TEB-134', `(3) ${ult}TEB-134 - Dandylion - 10 ${rose}`
+                [10, 'DOC-178', `(2) ${ult}DOC-178 - Mardel, Generaider Boss of Light - 10 ${rose}`],
+                [10, 'TEB-134', `(3) ${ult}TEB-134 - Dandylion - 10 ${rose}`]
             ]
         },
         hook: {
-            original: [10, 'APC-004', `(1) ${ult}APC-004 - Moray of Greed - 10 ${hook}`],
+            original: [[10, 'APC-004', `(1) ${ult}APC-004 - Moray of Greed - 10 ${hook}`]],
             unlocked: [
-                10, 'DOC-181', `(2) ${ult}DOC-181 - Sharkraken - 10 ${hook}`,
-                10, 'TEB-132', `(3) ${ult}TEB-132 - Citadel Whale - 10 ${hook}`
+                [10, 'DOC-181', `(2) ${ult}DOC-181 - Sharkraken - 10 ${hook}`],
+                [10, 'TEB-132', `(3) ${ult}TEB-132 - Citadel Whale - 10 ${hook}`]
             ]
         },
         egg: {
-            original: [10, 'APC-005', `(1) ${ult}APC-005 - Spacetime Transcendence - 10 ${egg}`],
+            original: [[10, 'APC-005', `(1) ${ult}APC-005 - Spacetime Transcendence - 10 ${egg}`]],
             unlocked: [
-                10, 'DOC-176', `(2) ${ult}DOC-176 - Giant Rex - 10 ${egg}`
+                [10, 'DOC-176', `(2) ${ult}DOC-176 - Giant Rex - 10 ${egg}`]
             ]
         },
         cactus: {
-            original: [10, 'APC-006', `(1) ${ult}APC-006 - Viper's Rebirth - 10 ${cactus}`],
+            original: [[10, 'APC-006', `(1) ${ult}APC-006 - Viper's Rebirth - 10 ${cactus}`]],
             unlocked: [
-                10, 'DOC-177', `(2) ${ult}DOC-177 - Ipiria - 10 ${cactus}`,
-                10, 'DOC-182', `(3) ${ult}DOC-182 - Sinister Serpent - 10 ${cactus}`,
-                10, 'DOC-185', `(4) ${ult}DOC-185 - Worm Xex - 10 ${cactus}`
+                [10, 'DOC-177', `(2) ${ult}DOC-177 - Ipiria - 10 ${cactus}`],
+                [10, 'DOC-182', `(3) ${ult}DOC-182 - Sinister Serpent - 10 ${cactus}`],
+                [10, 'DOC-185', `(4) ${ult}DOC-185 - Worm Xex - 10 ${cactus}`]
             ]
         },
         swords: {
-            original: [10, 'APC-007', `(1) ${ult}APC-007 - Sublimation Knight - 10 ${swords}`],
+            original: [[10, 'APC-007', `(1) ${ult}APC-007 - Sublimation Knight - 10 ${swords}`]],
             unlocked: [
-                20, 'ORF-047', `(2) ${ult}ORF-047 - Elemental HERO Nova Master - 20 ${swords}`,
-                30, 'DOC-188', `(3) ${ult}DOC-188 - Reinforcement of the Army - 30 ${swords}`,
-                40, 'TEB-136', `(4) ${ult}TEB-136 - Infernoble Knight - Roland - 40 ${swords}`
+                [20, 'ORF-047', `(2) ${ult}ORF-047 - Elemental HERO Nova Master - 20 ${swords}`],
+                [30, 'DOC-188', `(3) ${ult}DOC-188 - Reinforcement of the Army - 30 ${swords}`],
+                [40, 'TEB-136', `(4) ${ult}TEB-136 - Infernoble Knight - Roland - 40 ${swords}`]
             ]
         },
         orb: {
-            original: [10, 'APC-008', `(1) ${ult}APC-008 - Spellbook of Knowledge - 10 ${orb}`],
+            original: [[10, 'APC-008', `(1) ${ult}APC-008 - Spellbook of Knowledge - 10 ${orb}`]],
             unlocked: [
-                10, 'TEB-130', `(2) ${ult}TEB-130 - Altergeist Meluseek - 10 ${orb}`,
-                20, 'DOC-175', `(3) ${ult}DOC-175 - Breaker the Magical Warrior - 20 ${orb}`,
-                20, 'TEB-137', `(4) ${ult}TEB-137 - Shaddoll Dragon - 20 ${orb}`
+                [10, 'TEB-130', `(2) ${ult}TEB-130 - Altergeist Meluseek - 10 ${orb}`],
+                [20, 'DOC-175', `(3) ${ult}DOC-175 - Breaker the Magical Warrior - 20 ${orb}`],
+                [20, 'TEB-137', `(4) ${ult}TEB-137 - Shaddoll Dragon - 20 ${orb}`]
             ]
         },
         gem: {
-            original: [10, 'APC-009', `(1) ${ult}APC-009 - Guardragon Cataclysm - 10 ${gem}`],
-            unlocked: [,
-                10, 'TEB-141', `(2) ${ult}TEB-141 - Dragon Ravine - 10 ${gem}`
+            original: [[10, 'APC-009', `(1) ${ult}APC-009 - Guardragon Cataclysm - 10 ${gem}`]],
+            unlocked: [
+                [10, 'TEB-141', `(2) ${ult}TEB-141 - Dragon Ravine - 10 ${gem}`]
             ]
         }
     }

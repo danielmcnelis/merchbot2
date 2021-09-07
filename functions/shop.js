@@ -793,7 +793,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
         }
     }
 
-    const options = medium_complete ? [...wares[voucher].original, ...wares[voucher].unlocked] : [wares[voucher].original]
+    const options = medium_complete ? [...wares[voucher].original, ...wares[voucher].unlocked] : [...wares[voucher].original]
     console.log('options', options)
     if (options.length === 1) return options[0]
 

@@ -731,7 +731,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
             original: [[10, 'APC-001', `(1) ${ult}APC-001 - Desmanian Devil - 10 ${mushroom}`]],
             unlocked: [
                 [10, 'DOC-180', `(2) ${ult}DOC-180 - Peropero Cerperus - 10 ${mushroom}`],
-                [10, 'TEB-135', `(3) ${ult}TEB-135 - Green Baboon, Defender of the Forest - 20 ${mushroom}`],
+                [10, 'TEB-135', `(3) ${ult}TEB-135 - Green Baboon, Defender of the Forest - 10 ${mushroom}`],
                 [20, 'ORF-046', `(4) ${ult}ORF-046 - X-Saber Airbellum - 20 ${mushroom}`]
             ]
         },

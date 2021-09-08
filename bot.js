@@ -4704,9 +4704,9 @@ if(invcom.includes(cmd)) {
 			const inv = invs[i]
 			const print = inv.print
 			const count = print && (print.set_code === 'CH2') ? await Inventory.count({ where: { printId: print.id } }) : true
-			results.push(`${eval(print.rarity)}${print.card_code} - ${count ? print.card_name : '???'} - 0`)
+			results.push(`${eval(print.rarity)}${print.card_code} - ${count ? `${print.card_name} - ${inv.quantity}` : '??? - 0'}`)
 		}
-	} else if (prints.length) {
+	} else if (!query || prints.length) {
 		for (let i = 0; i < prints.length; i++) {
 			const print = prints[i]
 			const count = print && (print.set_code === 'CH2') ? await Inventory.count({ where: { printId: print.id } }) : true

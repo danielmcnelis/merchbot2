@@ -4677,13 +4677,13 @@ if(invcom.includes(cmd)) {
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	const card_name = query && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints) : null
-	const prints = valid_card_code ? await Print.findAll({ where: { card_code } }) : card_name ? await selectPrint(message, maid, card_name, private = false, inInv = true) : []
+	const prints = valid_card_code ? await Print.findAll({ where: { card_code } }) : card_name ? await Print.findAll({ where: { card_name } }) : []
 	
 	const results = [`${player.name}'s Inventory:`]
 
 	if (valid_set_code) {
-		const set = await Set.findOne({ where: { code } })
-		if (!set) return message.channel.send(`Could not find set: ${code}.`)
+		const set = await Set.findOne({ where: { code: { set_code } } })
+		if (!set) return message.channel.send(`Could not find set: ${set_code}.`)
 		results.push(`${eval(set.emoji)} --- ${set.name} --- ${eval(set.alt_emoji)}`)
 
 		const invs = await Inventory.findAll({

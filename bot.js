@@ -4682,7 +4682,7 @@ if(invcom.includes(cmd)) {
 	const results = [`${player.name}'s Inventory:`]
 
 	if (valid_set_code) {
-		const set = await Set.findOne({ where: { code: { set_code } } })
+		const set = await Set.findOne({ where: { code: set_code } })
 		if (!set) return message.channel.send(`Could not find set: ${set_code}.`)
 		results.push(`${eval(set.emoji)} --- ${set.name} --- ${eval(set.alt_emoji)}`)
 

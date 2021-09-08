@@ -2680,7 +2680,7 @@ if (losscom.includes(cmd)) {
 	
 		let correct_pairing = info.round === 4 ? true : false
 		if (!correct_pairing) {
-			for (let i = 0; i < 3; i++) {
+			for (let i = 0; i < 2; i++) {
 				if ((pairings[i][0] === losingContestant.contestant && 
 						pairings[i][1] === winningContestant.contestant) ||
 					(pairings[i][0] === winningContestant.contestant &&
@@ -2907,7 +2907,7 @@ if (manualcom.includes(cmd)) {
 
 		let correct_pairing = info.round === 4 ? true : false
 		if (!correct_pairing) {
-			for (let i = 0; i < 3; i++) {
+			for (let i = 0; i < 2; i++) {
 				if ((pairings[i][0] === losingContestant.contestant && 
 						pairings[i][1] === winningContestant.contestant) ||
 					(pairings[i][0] === winningContestant.contestant &&
@@ -3103,7 +3103,7 @@ if (noshowcom.includes(cmd)) {
 		let correct_pairing = info.round === 4 ? true : false
 
 		if (!correct_pairing) {
-			for (let i = 0; i < 3; i++) {
+			for (let i = 0; i < 2; i++) {
 				if (pairings[i][0] === noShowContestant.contestant) PX = pairings[i][1]
 				if (PX) break
 				if (pairings[i][1] === noShowContestant.contestant) PX = pairings[i][0]

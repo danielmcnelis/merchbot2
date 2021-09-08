@@ -192,64 +192,8 @@ if(cmd === `!test`) {
 		results.push(print.market_price)
 	}
 
-	console.log(`Results from a trial of 10,000 wagers at ${x}sd:\n${rarities}`)
-
 	const expected_value = Math.round(results.reduce((a, b) => a + b) / results.length)
 	return message.channel.send(`In 10,000 random trials the average market value of a random TEB ${TEB} card from a ${x}${stardust} wager was ${expected_value}${stardust}.`)
-}
-
-
-//STIMULUS
-if(cmd === `!stimulus`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	const players = await Player.findAll({ include: [Diary, Wallet], order: [['name', 'ASC']] })
-
-	for (let i = 0; i < players.length; i++) {
-		const player = players[i]
-		const diary = player.diary
-		const wallet = player.wallet
-		if (!diary || !wallet) continue
-		let chips = 0
-		if (diary.e1) chips += 3
-		if (diary.e2) chips += 3
-		if (diary.e3) chips += 3
-		if (diary.e4) chips += 3
-		if (diary.e5) chips += 3
-		if (diary.e6) chips += 3
-		if (diary.e7) chips += 3
-		if (diary.e8) chips += 3
-		if (diary.e9) chips += 3
-		if (diary.e10) chips += 3
-		if (diary.e11) chips += 3
-		if (diary.e12) chips += 3
-		if (diary.m1) chips += 6
-		if (diary.m2) chips += 6
-		if (diary.m3) chips += 6
-		if (diary.m4) chips += 6
-		if (diary.m5) chips += 6
-		if (diary.m6) chips += 6
-		if (diary.m7) chips += 6
-		if (diary.m8) chips += 6
-		if (diary.m9) chips += 6
-		if (diary.m10) chips += 6
-		if (diary.h1) chips += 9
-		if (diary.h2) chips += 9
-		if (diary.h3) chips += 9
-		if (diary.h4) chips += 9
-		if (diary.h5) chips += 9
-		if (diary.h6) chips += 9
-		if (diary.h7) chips += 9
-		if (diary.h8) chips += 9
-		if (diary.l1) chips += 12
-		if (diary.l2) chips += 12
-		if (diary.l3) chips += 12
-		if (diary.l4) chips += 12
-		if (diary.l5) chips += 12
-		if (diary.l6) chips += 12
-		wallet.starchips += chips
-		await wallet.save()
-		console.log(`<@${player.id}> was awarded ${chips}${starchips} for previously completed Diary${leatherbound} Tasks!`)
-	}
 }
 
 
@@ -294,13 +238,12 @@ if (cmd === `!import_images`) {
 
 	for (let i = 0; i <= allPrints.length; i++) {
 		const print = allPrints[i]
-		console.log(`trying ${print.card_name}`)
 		const card = await Card.findOne({ where: {
 			name: print.card_name
 		}})
 
 		if (!card) {
-			console.log(`failure for ${print.card_name}`)
+			console.log(`failure for ${print}`)
 			continue
 		} 
 
@@ -681,7 +624,7 @@ if (aliuscom.includes(cmd)) {
 	}
 }
 
-//NICKNAME 
+//NICKNAMES
 if (nicknamecom.includes(cmd)) {
 	const query = args.join(' ')
 	if (!query) return message.channel.send(`Please specify a card.`)
@@ -696,8 +639,6 @@ if (nicknamecom.includes(cmd)) {
 	
 	return message.channel.send(`Nicknames for ${card_name}:\n${names_only.sort().join("\n")}`)
 }
-
-
 
 
 //PRINT 
@@ -807,6 +748,7 @@ if (dbcom.includes(cmd)) {
 	}
 }
 
+
 //STARTER OR START
 if(startcom.includes(cmd)) {
 	if ( message.channel === client.channels.cache.get(tournamentChannelId) && isMod(message.member) ) {
@@ -836,12 +778,13 @@ if(startcom.includes(cmd)) {
                     await writeToSheet(spreadsheetId, 'Summary', 'RAW', sheet2Data)
                     //await uploadDeckFolder(name)
 					
-					if (entries.length > 8) {
-						message.channel.send(`Please wait while I open some pack(s)... ${blue}`)
-						for (let i = 0; i < entries.length; i++) {
-							const playerId = entries[i].playerId
-							await awardPack(message.channel, playerId, set, 1, false)
-						}
+					message.channel.send(`Please wait while I open some pack(s)... ${blue}`)
+					for (let i = 0; i < entries.length; i++) {
+						const player_id = entries[i].playerId
+						const wallet = await Wallet.findOne({ where: { player_id: player_id }})
+						wallet.stardust -= 50
+						await wallet.save()
+						await awardPack(message.channel, player_id, set, 1)
 					}
 
 					return message.channel.send(`Let's go! Your tournament is starting now: https://challonge.com/${url} ${FiC}`)
@@ -852,15 +795,11 @@ if(startcom.includes(cmd)) {
 		if(await isNewUser(maid)) await createPlayer(maid, message.author.username, message.author.tag)
 		if(await hasProfile(maid)) return message.channel.send("You already received your first Starter Deck.")
 	
-		const set1 = await Set.findOne({ where: {
-			code: 'DOC'
-		}})
-	
-		const set2 = await Set.findOne({ where: {
-			code: 'TEB'
-		}})
+		const set1 = await Set.findOne({ where: { code: 'DOC' }})
+		const set2 = await Set.findOne({ where: { code: 'ORF' }})
+		const set3 = await Set.findOne({ where: { code: 'TEB' }})
 
-		if (!set1 || !set2) return message.channel.send(`Could not find sets: "DOC" or "TEB".`)
+		if (!set1 || !set2 || !set3) return message.channel.send(`Could not find sets: "DOC", "ORF", or "TEB".`)
 	
 		const filter = m => m.author.id === maid
 		await message.channel.send(`Greetings, champ! Which deck would you like to start?\n- (1) Dragon\'s Inferno ${dragon}\n- (2) Spellcaster\'s Art ${spellcaster}`)
@@ -890,7 +829,8 @@ if(startcom.includes(cmd)) {
 			)
 	
 			await awardPack(message.channel, maid, set1, 24)
-			await awardPack(message.channel, maid, set2, 10)
+			await awardPack(message.channel, maid, set2, 24)
+			await awardPack(message.channel, maid, set3, 24)
 			await completeTask(message.channel, maid, 'e1')
 			await completeTask(message.channel, maid, 'm4', 4000)
 			return message.channel.send(`I wish you luck on your journey, new duelist! ${master}`)
@@ -962,6 +902,11 @@ if (botcom.includes(cmd)) {
 		isAmbassador(message.member) ? 1 :
 		null
 	
+	const position = rank >= 3 ? 'Admin' :
+		rank === 2 ? 'Mod' :
+		rank === 1 ? 'Ambassador' :
+		null
+
 	const botEmbed = new Discord.MessageEmbed()
 		.setColor('#8062cc')
 		.setTitle('MerchBot - User Manual')
@@ -1034,7 +979,7 @@ if (botcom.includes(cmd)) {
 		)
 		.addField('Misc. Commands',
 			`!bot - View the MerchBot User Manual.`
-			+ rank ? `\n!mod - View the ${rank} User Manual.` : ''
+			+ rank ? `\n!mod - View the ${position} User Manual.` : ''
 			+ `\n!info - Post information about a channel.`
 			+ `\n!ref (@user) - Send a referral bonus to another player.`
 		)
@@ -1049,6 +994,11 @@ if (cmd === `!mod`) {
 		isAdmin(message.member) ? 3 :
 		isMod(message.member) ? 2 :
 		isAmbassador(message.member) ? 1 :
+		null
+
+	const position = rank >= 3 ? 'Admin' :
+		rank === 2 ? 'Mod' :
+		rank === 1 ? 'Ambassador' :
 		null
 	
 	if (!rank) return message.channel.send("You do not have permission to do that.")
@@ -1102,7 +1052,7 @@ if (cmd === `!mod`) {
 	}
 		
 	message.author.send(botEmbed)
-	return message.channel.send(`I messaged you the ${rank} User Manual.`)
+	return message.channel.send(`I messaged you the ${position} User Manual.`)
 }
 
 //INFO
@@ -1118,7 +1068,8 @@ if(infocom.includes(cmd)) {
 		` You can check ratings with the **!stats** command.`+
 		`\n\nDisclaimer: Logs exist and admins can view inventories.`+
 		` Playing with cards you don't own will not be tolerated.`+
-		`\n\nIn addition, you must follow the Forbidden and Limited List.`, {files: ["https://i.imgur.com/R0TcKar.png"]})
+		`\n\nIn addition, you must follow the ${FiC} Forbidden and Limited List.`+
+		` Type **!banlist** to view it.`)
 	}
 
 	if (mcid == marketPlaceChannelId) { 
@@ -1140,7 +1091,8 @@ if(infocom.includes(cmd)) {
 		return message.channel.send(`${legend} --- Tournaments --- ${legend}`+ 
 		`\nTo sign up for a Tournament, simply come to the <#${tournamentChannelId}> and use the **!join** command.`+
 		` The Tournament Organizer will handle the rest, so keep an eye out for their instructions.`+
-		`\n\nAs a token of our appreciation, each tournament participant gets a Chaos Pack just for entering.`+
+		`\n\nThe tournament entry fee is 50${stardust}` +
+		` Each participant gets a Chaos Pack just for entering.`+
 		` If you do well, you can win additional Chaos Packs and other prizes.`)
 	}
 
@@ -1149,10 +1101,10 @@ if(infocom.includes(cmd)) {
 		`\nIn this channel, you get to test out the game's most powerful cards.`+
 		` Simply align yourself with a Tribe and wage war at their side.`+
 		`\n\nTo compete in the Arena, type **!join** in <#${arenaChannelId}>.`+
-		` It requires 6 players to launch.`+
-		` When it starts, you are loaned a 60-card deck, and you get 5 minutes to cut it down to no fewer than 40 cards.`+
+		` It requires 4 players to launch.`+
+		` When it starts, you are loaned a 75-card deck, and you get 5 minutes to cut it down to no fewer than 40 cards.`+
 		`\n\nThe Arena is a Round Robin, singles-games tournament.`+
-		` Winners receive 4${starchips}, losers receive 2${starchips}.`+
+		` Winners receive 5${starchips}, losers receive 3${starchips}.`+
 		` To report a loss, type **!loss @opponent**, then wait for the next round.`+
 		`\n\nThe Champion of the Arena walks away with an ${ult}Arena Prize Card according to their Tribe!`+
 		` Everyone else receives Vouchers for their wins.`+
@@ -1186,7 +1138,7 @@ if(infocom.includes(cmd)) {
 		` However, only cards that were **originally printed** as commons ${com} are allowed in this format.`+
 		` This means cards such as Starter Deck copies of Bottomless Trap Hole cannot be played.`+
 		`\n\nPauper Format is played as single games, not matches.`+
-		` Winners receive 3${starchips}, losers receive 1${starchips}.`+
+		` Winners receive 4${starchips}, losers receive 2${starchips}.`+
 		` To report a loss, type **!loss @opponent**.`+
 		` These games do not affect your ranking for Tournaments, Diary tasks, etc.` +
 		`\n\nDo you have what it takes to become a master budget player? ${cavebob}`)
@@ -1207,25 +1159,14 @@ if(infocom.includes(cmd)) {
 		`\n\nTo enter a Trivia contest, simply find 4 friends and get everyone to type **!join**.`+
 		` You will have 16 seconds to respond to each question via DM.`+
 		` Do **not** look up answers online -- doing so will get you banned from Trivia.` +
-		` After 10 rounds, the top 2 bookworms split 6 ${starchips} for their performance.`+
-		` Everyone else receives 3${stardust} for each question they answered correctly.`+
+		` After 10 rounds, players earn ${starchips} or ${stardust} for their performance.`+
 		`\n\nAs you play more Trivia, your Profile will keep a record of your acumen.`+
 		` There are 1000 total questions, so hit the books and then hit those keys! ${red}`)
 	}
 		
 	if (mcid == draftChannelId) { 
 		return message.channel.send(`${puzzle} --- Draft Room --- ${puzzle}`+ 
-		`\nIn this channel, you get to test out the game's most powerful cards.`+
-		` Simply align yourself with a Tribe and wage war at their side.`+
-		`\n\nTo compete in the Arena, type **!join** in <#${arenaChannelId}>.`+
-		` It requires 6 players to launch.`+
-		` When it starts, you are loaned a 60-card deck, and you get 5 minutes to cut up to 20 cards.`+
-		`\n\nThe Arena is a Round Robin, singles-games tournament.`+
-		` Winners receive 6${starchips}, losers receive 2${starchips}.`+
-		` To report a loss, type **!loss @opponent**, then wait for the next round.`+
-		`\n\nThe Champion of the Arena walks away with an ${ult}Arena-exclusive Prize Card according to their Tribe!`+
-		` Everyone else receives Vouchers for each game they won.`+
-		` You can use **!barter "card"** to exchange 8 Vouchers for a Tribal prize card.`)
+		`\nIn this channel,`)
 	}
 
 	return message.channel.send(`Use this command in channels such as <#${duelRequestsChannelId}>, <#${marketPlaceChannelId}>, <#${tournamentChannelId}>, <#${arenaChannelId}> and <#${triviaChannelId}> to learn how those parts of the game work.`)
@@ -1618,49 +1559,57 @@ if (cmd === `!pop` || cmd === `!population`) {
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const card_name = await findCard(query, fuzzyPrints)
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }, include: Set}) : card_name ? await selectPrint(message, maid, card_name) : null
-	const count = print && (print.set_code === 'CH2') ? await Inventory.count({ where: { printId: print.id }}) : true
-	if (!print || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
-	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
-	const set = await Set.findOne({ where: { id: print.setId }})
-	const invs = await Inventory.findAll({ where: {
-		printId: print.id,
-		quantity: { [Op.gt]: 0 }
-	}})
+	const prints = valid_card_code ? await Print.findAll({ where: { card_code: card_code }, order: [['createdAt', 'ASC']]}) : card_name ? await Print.findAll({ where: { card_name: card_name }, order: [['createdAt', 'ASC']]}) : null
+	const count = prints && prints.length === 1 && (prints[0].set_code === 'CH2') ? await Inventory.count({ where: { printId: prints[0].id }}) : true
+	if (!prints || !prints.length || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+	const results = []
 
-	const quants = invs.map((i) => i.quantity)
-	const total = quants.length ? quants.reduce((a, b) => a + b) : 0
-
-	const equivalentPrints = await Print.findAll({ where: {
-		set_code: print.set_code,
-		rarity: print.rarity
-	}})
-
-	let total_equivalents = 0
-	for (let i = 0; i < equivalentPrints.length; i++) {
-		const eq_print = equivalentPrints[i]
-		const eq_invs = await Inventory.findAll({ where: { 
-			printId: eq_print.id,
-			quantity: { [Op.gt]: 0 }  
+	for (let i = 0; i < prints.length; i++) {
+		const print = prints[i]
+		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+		const set = await Set.findOne({ where: { id: print.setId }})
+		const invs = await Inventory.findAll({ where: {
+			printId: print.id,
+			quantity: { [Op.gt]: 0 }
 		}})
 
-		if (!eq_invs.length) continue
-		const eq_quants = eq_invs.map((i) => i.quantity)
-		const subtotal = eq_quants.reduce((a, b) => a + b)
-		total_equivalents += subtotal
+		const quants = invs.map((i) => i.quantity)
+		const total = quants.length ? quants.reduce((a, b) => a + b) : 0
+
+		const equivalentPrints = await Print.findAll({ where: {
+			set_code: print.set_code,
+			rarity: print.rarity
+		}})
+
+		let total_equivalents = 0
+		for (let i = 0; i < equivalentPrints.length; i++) {
+			const eq_print = equivalentPrints[i]
+			const eq_invs = await Inventory.findAll({ where: { 
+				printId: eq_print.id,
+				quantity: { [Op.gt]: 0 }  
+			}})
+
+			if (!eq_invs.length) continue
+			const eq_quants = eq_invs.map((i) => i.quantity)
+			const subtotal = eq_quants.reduce((a, b) => a + b)
+			total_equivalents += subtotal
+		}
+
+		const avg_eq_pop = Math.round(10 * total_equivalents / equivalentPrints.length) / 10
+
+		const merchbotinv = await Inventory.findOne({ where: {
+			printId: print.id,
+			quantity: { [Op.gt]: 0 },
+			playerId: merchbotId
+		}})
+
+		const shop_pop = merchbotinv ? merchbotinv.quantity : 0
+		const shop_percent = total ? `${Math.round(1000 * shop_pop / total) / 10}%` : 'N/A'
+
+		results.push(`${ygocard} --- Population Stats --- ${ygocard}\n${card}\nTotal Population: ${total}\nAvg ${eval(print.rarity)} ${print.set_code} ${eval(set.emoji)} Pop: ${avg_eq_pop}\nShop Inventory: ${shop_percent}`)
 	}
-
-	const avg_eq_pop = Math.round(10 * total_equivalents / equivalentPrints.length) / 10
-
-	const merchbotinv = await Inventory.findOne({ where: {
-		printId: print.id,
-		quantity: { [Op.gt]: 0 },
-		playerId: merchbotId
-	}})
-
-	const shop_pop = merchbotinv ? merchbotinv.quantity : 0
-	const shop_percent = total ? `${Math.round(1000 * shop_pop / total) / 10}%` : 'N/A'
-	return message.channel.send(`${ygocard} --- Population Stats --- ${ygocard}\n${card}\nTotal Population: ${total}\nAvg ${eval(print.rarity)} ${print.set_code} ${eval(set.emoji)} Pop: ${avg_eq_pop}\nShop Inventory: ${shop_percent}`)
+	
+	return message.channel.send(results.join('\n\n'))
 }
 
 //COUNT
@@ -1709,6 +1658,7 @@ if(cmd === `!count`) {
 	results.push(`\nIf The Shop closed now, we'd open ${most_recent === 'mini' ? `${mini_count} ${mini_count === 1 ? 'Pack' : 'Packs'} of ORF ${ORF} and ` : ''}${core_count} ${core_count === 1 ? 'Pack' : 'Packs'} of TEB ${TEB} to restock our inventory.`)
 	return message.channel.send(results.join("\n"))
 }
+
 
 //CHART
 if(cmd === `!chart`) {
@@ -1788,6 +1738,7 @@ if(cmd === `!chart`) {
 		arr.sort((a, b) => b[0] - a[0]).map((el) => el[1]).join("\n")
 	)
 }
+
 
 //HISTORY
 if (cmd === `!hist` || cmd === `!history`) {
@@ -1956,7 +1907,7 @@ if(cmd === `!trades`) {
 //RNG
 if(cmd === `!rng`) {
 	const num = parseInt(args[0])
-	if(isNaN(num)) return message.channel.send(`Please specify an upper limit.`)
+	if(isNaN(num) || num < 1) return message.channel.send(`Please specify an upper limit.`)
 	const result = Math.floor((Math.random() * num) + 1)
 	return message.channel.send(`You rolled a **${result}** with a ${num}-sided die.`)
 }
@@ -1978,6 +1929,10 @@ if(cmd === `!dairy`) return message.channel.send('🐮')
 
 //SHIP
 if(cmd === `!ship`) return message.channel.send('🚢')
+
+//WALL-E
+if(cmd === `!walley` || cmd === `!walle`) return message.channel.send('🤖')
+
 
 //DIARY
 if(cmd === `!diary`) {
@@ -2148,7 +2103,7 @@ if(bindercom.includes(cmd)) {
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 		const card_name = await findCard(query, fuzzyPrints)
-		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
+		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name, inInv = true) : null
 		const count = print && (print.set_code === 'CH2') ? await Inventory.findOne({ where: { printId: print.id } }) : true
 		if (!print || !count) {
 			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
@@ -2344,7 +2299,7 @@ if(wishlistcom.includes(cmd)) {
 }
 
 //WALLET
-if(cmd === `!wallet`) {
+if(cmd === `!wallet` || cmd === `!w`) {
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const wallet = await Wallet.findOne({ where: { playerId }, include: Player})
 	if (!wallet && playerId === maid) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
@@ -4293,7 +4248,7 @@ if(cmd === `!alc` ||cmd === `!alch` || cmd === `!alchemy`) {
 	const card_name = await findCard(query, fuzzyPrints)
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 
-	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
+	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name, inInv = true) : null
 	if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 	if (print.set_code === 'FPC') return message.channel.send(`You cannot use alchemy on FPCs.`)
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`

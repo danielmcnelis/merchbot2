@@ -11,7 +11,6 @@ const { fpRole } = require('../static/roles.json')
 const { announcementsChannelId, botSpamChannelId, shopChannelId, staffChannelId } = require('../static/channels.json')
 const { completeTask } = require('./diary.js')
 const { findCard } = require('./search.js')
-const { selectPrint } = require('./print.js')
 const decks = require('../static/decks.json')
 
 // OPEN SHOP
@@ -615,7 +614,7 @@ const getExcludedPrintIds = async (message, rarity, set, exclusions, fuzzyPrints
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) :
-                    card_name ? await selectPrint(message, playerId, card_name) :
+                    card_name ? await Print.findOne({ where: { card_name: card_name, set_code: set.code }}) :
                     null
 		
         if (!print) {

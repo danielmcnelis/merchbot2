@@ -109,7 +109,7 @@ const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer, fuzzyP
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) :
-                    card_name ? await selectPrint(message, sellerId, card_name) :
+                    card_name ? await selectPrint(message, sellerId, card_name, inInv = true) :
                     null
         
         const count = print && (print.set_code === 'CH2' || print.set_code === 'HIDDEN') ? await Inventory.findOne({ where: { printId: print.id } }) : true
@@ -333,7 +333,7 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
     if (query === 'sword' || query === 'swords' ) walletField = 'swords'
 
     const print = valid_card_code && !walletField ? await Print.findOne({ where: { card_code: card_code }}) :
-                card_name && !walletField ? await selectPrint(message, sellerId, card_name) :
+                card_name && !walletField ? await selectPrint(message, sellerId, card_name, inInv = true) :
                 null
     
     const count = print && (print.set_code === 'CH1' || print.set_code === 'TEB') ? await Inventory.findOne({ where: { printId: print.id } }) : true

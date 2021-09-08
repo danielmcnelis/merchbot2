@@ -2,7 +2,7 @@
 //PRINT FUNCTIONS
 const { com, rar, sup, ult, scr, stardust } = require('../static/emojis.json')
 const { yescom } = require('../static/commands.json')
-const { Info, Print, Set } = require('../db/index.js')
+const { Auction, Info, Inventory, Print, Set } = require('../db/index.js')
 
 const askForSetToPrint = async (message) => {
     const filter = m => m.author.id === message.member.user.id
@@ -105,8 +105,21 @@ const collectNicknames = async (message, card_name) => {
     return collected
 }
 
-const selectPrint = async (message, playerId, card_name, private = false) => {
-    const prints = await Print.findAll({ 
+//SELECT PRINT
+const selectPrint = async (message, playerId, card_name, private = false, inInv = false, inAuc = false) => {
+    const prints = inInv ? await Print.findAll({ 
+        where: { card_name: card_name },
+        order: [['createdAt', 'ASC']]
+    }).filter(async (p) => {
+        const count = await Inventory.count({ where: { card_code: p.card_code }})
+        if (count) return p
+    }) : inAuc ? await Print.findAll({ 
+        where: { card_name: card_name },
+        order: [['createdAt', 'ASC']]
+    }).filter(async (p) => {
+        const count = await Auction.count({ where: { card_code: p.card_code }})
+        if (count) return p
+    }) : await Print.findAll({ 
         where: { card_name: card_name },
         order: [['createdAt', 'ASC']]
     })
@@ -136,6 +149,7 @@ const selectPrint = async (message, playerId, card_name, private = false) => {
 
     return collected
 }
+
 
 const askForAdjustConfirmation = async (message, card, market_price) => {
     const filter = m => m.author.id === message.member.user.id

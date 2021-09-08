@@ -2,6 +2,7 @@
 //PRINT FUNCTIONS
 const { com, rar, sup, ult, scr, stardust } = require('../static/emojis.json')
 const { yescom } = require('../static/commands.json')
+const { Op } = require('sequelize')
 const { Auction, Info, Inventory, Print, Set } = require('../db/index.js')
 
 const askForSetToPrint = async (message) => {

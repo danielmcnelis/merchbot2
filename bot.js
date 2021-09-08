@@ -4706,21 +4706,12 @@ if(invcom.includes(cmd)) {
 			const count = print && (print.set_code === 'CH2') ? await Inventory.count({ where: { printId: print.id } }) : true
 			results.push(`${eval(print.rarity)}${print.card_code} - ${count ? `${print.card_name} - ${inv.quantity}` : '??? - 0'}`)
 		}
-	} else if (!query || prints.length) {
+	} else if (prints.length) {
 		for (let i = 0; i < prints.length; i++) {
 			const print = prints[i]
 			const count = print && (print.set_code === 'CH2') ? await Inventory.count({ where: { printId: print.id } }) : true
 	
-			const invs = !query ? await Inventory.findAll({ 
-				where: { 
-					playerId,
-					quantity: {
-						[Op.gte]: 1
-					}
-				 },
-				include: Print,
-				order: [['card_code', 'ASC']]
-			}) : valid_card_code ? await Inventory.findAll({ 
+			const invs = valid_card_code ? await Inventory.findAll({ 
 				where: { 
 					playerId,
 					card_code: card_code,
@@ -4759,6 +4750,35 @@ if(invcom.includes(cmd)) {
 		
 				if (row.print.set_code !== 'HIDDEN') results.push(`${eval(row.print.rarity)}${row.card_code} - ${row.print.card_name} - ${row.quantity}`) 
 			}
+		}
+	} else if (!query) {
+		const invs = await Inventory.findAll({ 
+			where: { 
+				playerId,
+				quantity: {
+					[Op.gte]: 1
+				}
+			 },
+			include: Print,
+			order: [['card_code', 'ASC']]
+		})
+		
+		const codes = []
+		for (let i = 0; i < invs.length; i++) {
+			const row = invs[i]
+			const code = row.card_code.slice(0,3)
+	
+			try {
+				if (!codes.includes(code) && !card_name) {
+					codes.push(code)
+					const set = await Set.findOne({ where: { code } })
+					if (set) results.push(`${codes.length > 1 ? '\n' : ''}${eval(set.emoji)} --- ${set.name} --- ${eval(set.alt_emoji)}`) 
+				}
+			} catch (err) {
+				console.log(err)
+			}
+	
+			if (row.print.set_code !== 'HIDDEN') results.push(`${eval(row.print.rarity)}${row.card_code} - ${row.print.card_name} - ${row.quantity}`) 
 		}
 	} else {
 		return message.channel.send(`Sorry, I do not recognize: "${query}".`)

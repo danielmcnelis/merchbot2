@@ -144,7 +144,7 @@ const getTradeSummary = async (message, inputs, player, fuzzyPrints) => {
 		const card_name = await findCard(query, fuzzyPrints)
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 		const print = valid_card_code && !walletField ? await Print.findOne({ where: { card_code: card_code }}) :
-		card_name && !walletField ? await selectPrint(message, player.id, card_name, inInv = true) :
+		card_name && !walletField ? await selectPrint(message, player.id, card_name, private = false, inInv = true) :
 		null
 
 		if ((!print && !walletField) || (print && print.set_code === 'HIDDEN')) {

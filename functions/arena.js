@@ -432,7 +432,7 @@ const checkArenaProgress = async (info) => {
     const progress_report = entries.map((entry) => entry.is_playing)
     const sum = scores.reduce((a, b) => a + b)
 
-    if (sum % 3 === 0 && !progress_report.includes(true)) return setTimeout(() => postStandings(info, entries), 3000)
+    if (sum % 2 === 0 && !progress_report.includes(true)) return setTimeout(() => postStandings(info, entries), 3000)
 }
 
 module.exports = {

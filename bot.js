@@ -1,12 +1,15 @@
 
+// PACKAGES
 const axios = require('axios')
 const Canvas = require('canvas')
 const Discord = require('discord.js')
 const fs = require('fs')
 const FuzzySet = require('fuzzyset')
-const merchbotId = '584215266586525696'
+
+// USEFUL CONSTANTS
 const fuzzyCards = FuzzySet([], false)
 const fuzzyPrints = FuzzySet([], false)
+const merchbotId = '584215266586525696'
 
 // DATABASE IMPORTS
 const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Nickname, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
@@ -36,15 +39,12 @@ const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createP
 const arenas = require('./static/arenas.json')
 const { arenaChannelId, botSpamChannelId, bugreportsChannelId, discussionChannelId, draftChannelId, duelRequestsChannelId, pauperChannelId, gauntletChannelId, generalChannelId, gutterChannelId, introChannelId, keeperChannelId, marketPlaceChannelId, replaysChannelId, rulesChannelId, rulingsChannelId, shopChannelId, staffChannelId, suggestionsChannelId, tournamentChannelId, triviaChannelId, welcomeChannelId } = require('./static/channels.json')
 const { client, challongeClient } = require('./static/clients.js')
-const { aliuscom, bindercom, botcom, bracketcom, calccom, checklistcom, dbcom, deckcom, dropcom, h2hcom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, pfpcom, profcom, queuecom, rankcom, rolecom, startcom, statscom, undocom, wishlistcom, yescom } = require('./static/commands.json')
+const { alchemycom, aliuscom, bindercom, botcom, boxcom, bracketcom, calccom, checklistcom, dailycom, dbcom, deckcom, dicecom, dropcom, flipcom, h2hcom, historycom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, packcom, pfpcom, populationcom, profcom, queuecom, rankcom, referralcom, rolecom, specialcom, startcom, statscom, undocom, walletcom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
 const { king, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, shrine, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion } = require('./static/emojis.json')
-const nicknames = require('./static/nicknames.json')
-const prints = require('./static/prints.json')
 const { adminRole, arenaRole, botRole,expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
-const statuses = require('./static/statuses.json')
 const trivia = require('./trivia.json')
 const ygoprodeck = require('./static/ygoprodeck.json')
 
@@ -153,50 +153,84 @@ if (!message.content.startsWith("!") && message.content.includes(`{`) && message
 }
 
 //PING 
-    if (cmd === `!ping`) return message.channel.send('pong')
+if (cmd === `!ping`) return message.channel.send('🏓')
+
+//TEST
+// if(cmd === `!test`) return message.channel.send('🧪')
 
 //TEST
 if(cmd === `!test`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	const x = args[0] || 1000
-	const results = []
-	const rarities = []
-	const commons = await Print.findAll({ where: { set_code: 'TEB', rarity: 'com' }})
-	const rares = await Print.findAll({ where: { set_code: 'TEB', rarity: 'rar' }})
-	const supers = await Print.findAll({ where: { set_code: 'TEB', rarity: 'sup' }})
-	const ultras = await Print.findAll({ where: { set_code: 'TEB', rarity: 'ult' }})
-	const secrets = await Print.findAll({ where: { set_code: 'TEB', rarity: 'scr' }})
+	const card_code = args[0]
+	const print = await Print.findOne({ where: { card_code: card_code }})
+	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 
-	for (let i = 0; i < 10000; i++) {
-		let best = 1
-		const matrix = new Array(3600)
-		matrix.fill(1, 0, 3463)
-		matrix.fill(2, 3463, 3559)
-		matrix.fill(3, 3559, 3591)
-		matrix.fill(4, 3591, 3599)
-		matrix.fill(5, 3599, 3600)
-	
-		for (let i = 0; i < x; i++) {
-			const sample = getRandomElement(matrix)
-			if (sample > best) best = sample
+	const invs = await Inventory.findAll({ where: {
+		printId: print.id,
+		quantity: { [Op.gt]: 0 }
+	}})
+
+	const quants = invs.map((i) => i.quantity)
+	const total = quants.length ? quants.reduce((a, b) => a + b) : 0
+
+	// const equivalentPrints = await Print.findAll({ where: {
+	// 	set_code: print.set_code,
+	// 	rarity: print.rarity
+	// }})
+
+	// let total_equivalents = 0
+	// for (let i = 0; i < equivalentPrints.length; i++) {
+	// 	const eq_print = equivalentPrints[i]
+	// 	const eq_invs = await Inventory.findAll({ where: { 
+	// 		printId: eq_print.id,
+	// 		quantity: { [Op.gt]: 0 }  
+	// 	}})
+
+	// 	if (!eq_invs.length) continue
+	// 	const eq_quants = eq_invs.map((i) => i.quantity)
+	// 	const subtotal = eq_quants.reduce((a, b) => a + b)
+	// 	total_equivalents += subtotal
+	// }
+
+	//const avg_eq_pop = Math.round(10 * total_equivalents / equivalentPrints.length) / 10
+
+	const merchbotinv = await Inventory.findOne({ where: {
+		printId: print.id,
+		quantity: { [Op.gt]: 0 },
+		playerId: merchbotId
+	}})
+
+	const shop_pop = merchbotinv ? merchbotinv.quantity : 0
+	const shop_percent = total ? shop_pop / total : 0
+
+	let current_price = print.market_price
+	const results = [`Estimated Decay - ${card}:`, `Day 0 - ${current_price}${stardust}`]
+
+	if (shop_percent < 0.05) {
+		const z_diff = ( 0.05 - shop_percent ) / 0.05
+
+		for (let i = 0; i < 30; i++) {
+			current_price += 0.1 * current_price * z_diff 
+			results.push(`Day ${i+1} - ${current_price}${stardust}`)
 		}
-	
-		const rarity = best === 5 ? "secrets" :
-		best === 4 ? "ultras" :
-		best === 3 ? "supers" :
-		best === 2 ? "rares" :
-		"commons"
-	
-		const print = getRandomElement(eval(rarity))
-		rarities.push(rarity)
-		results.push(print.market_price)
+	} else if (shop_percent > 0.2) {
+		const z_diff = ( shop_percent - 0.2 ) / 0.8
+
+		for (let i = 0; i < 30; i++) {
+			current_price -= 0.1 * current_price * z_diff 
+			results.push(`Day ${i+1} - ${current_price}${stardust}`)
+		}
+	} else {
+		const z_diff = ( 0.2 - shop_percent ) / 0.15
+
+		for (let i = 0; i < 30; i++) {
+			current_price += 0.025 * current_price * z_diff 
+			results.push(`Day ${i+1} - ${current_price}${stardust}`)
+		}
 	}
 
-	const expected_value = Math.round(results.reduce((a, b) => a + b) / results.length)
-	return message.channel.send(`In 10,000 random trials the average market value of a random TEB ${TEB} card from a ${x}${stardust} wager was ${expected_value}${stardust}.`)
+	return message.channel.send(results.join('\n\n'))	
 }
-
-
 
 // ASSIGN ROLES
 if (cmd === `!assign_roles`) {
@@ -219,7 +253,6 @@ if (cmd === `!assign_roles`) {
 	}
 }
 
-
 //IMPORT_DATA
 if (cmd === `!import_data`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
@@ -231,8 +264,8 @@ if (cmd === `!import_data`) {
 	return message.channel.send(`Successfully imported the latest data from ygoprodeck.com.`)
 }
 
-//IMPORT_IMAGES
-if (cmd === `!import_images`) {
+//IMPORT_PRINT_IMAGES
+if (cmd === `!import_print_images`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const allPrints = await Print.findAll({ order: [["card_name", "ASC"]] })
 
@@ -264,8 +297,8 @@ if (cmd === `!import_images`) {
 	return message.channel.send(`Successfully imported high quality images for Forged in Chaos cards from YGOPRODeck.`)
 }
 
-//IMPORT_IMAGES
-if (cmd === `!import_missing_images`) {
+//IMPORT_ALL_IMAGES
+if (cmd === `!import_all_images`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const file_names = fs.readdirSync('./public/card_images')
 	const all_cards = await Card.findAll()
@@ -551,35 +584,7 @@ if (cmd === `!init`) {
 	await Set.create(DOC)
 	await Set.create(APC)
 
-	for (let i = 0; i < prints.length; i++) {
-		await Print.create({
-			"card_name": prints[i].card_name,
-			"card_id": prints[i].card_id,
-			"set_code": prints[i].set_code,
-			"card_slot": prints[i].card_slot,
-			"card_code": prints[i].card_code,
-			"rarity": prints[i].rarity,
-			"market_price": prints[i].market_price,
-			"setId": prints[i].setId
-		})
-	}
-
-	for (let i = 0; i < nicknames.length; i++) {
-		await Nickname.create({
-			"card_name": nicknames[i].card_name,
-			"alius": nicknames[i].alius
-		})
-	}
-
-	for (let i = 0; i < statuses.length; i++) {
-		await Status.create({
-			"name": statuses[i].name,
-			"konami_code": statuses[i].konami_code,
-			"current": statuses[i].current
-		})
-	}
-
-	message.channel.send(`I created 3 sets (SS1, DOC, APC), ${prints.length} prints, ${nicknames.length} nicknames, and ${statuses.length} statuses. Please reset the bot for these changes to take full effect.`)
+	message.channel.send(`I created 3 sets (SS1, DOC, APC). Please reset the bot for these changes to take full effect.`)
 
 	if (!(await isNewUser(merchbotId))) return message.channel.send(`The Shop has already been initiated.`)
 	await createPlayer(merchbotId, 'MerchBot', 'MerchBot#1002')
@@ -697,7 +702,6 @@ if (cmd === `!print`) {
 	const market_price = rarity === 'com' ? 9 :
 		rarity === 'rar' ? 40 :
 		rarity === 'sup' ? 64 :
-		rarity === 'ult' && set.code.startsWith("SS") ? 109 :
 		rarity === 'ult' && set.code === "APC" ? 360 :
 		rarity === 'ult' ? 184 :
 		rarity === 'scr' ? 256 :
@@ -1431,7 +1435,7 @@ if(profcom.includes(cmd)) {
 }
 
 //REFERRAL
-if(cmd === `!ref` || cmd === `!refer` || cmd === `!referral`) {
+if(referralcom.includes(cmd)) {
 	const playerProfile = await Profile.findOne({ where: { playerId: maid }})
 	const diary = await Diary.findOne({ where: { playerId: maid }})
 	if (!playerProfile || !diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
@@ -1553,7 +1557,7 @@ if (cmd === `!shop`) {
 
 
 //POPULATION
-if (cmd === `!pop` || cmd === `!population`) {
+if (populationcom.includes(cmd)) {
 	if (!args.length) return message.channel.send(`Please specify a card.`)
 	const query = args.join(' ')
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
@@ -1741,7 +1745,7 @@ if(cmd === `!chart`) {
 
 
 //HISTORY
-if (cmd === `!hist` || cmd === `!history`) {
+if (historycom.includes(cmd)) {
 	const query = args.join(' ')
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
@@ -1904,7 +1908,7 @@ if(cmd === `!trades`) {
 	return message.author.send(`You have traded with ${partnerNames.length} players:\n${partnerNames.join("\n")}`)
 }
 
-//RNG
+// RNG
 if(cmd === `!rng`) {
 	const num = parseInt(args[0])
 	if(isNaN(num) || num < 1) return message.channel.send(`Please specify an upper limit.`)
@@ -1912,14 +1916,14 @@ if(cmd === `!rng`) {
 	return message.channel.send(`You rolled a **${result}** with a ${num}-sided die.`)
 }
 
-//ROLL
-if(cmd === `!roll` || cmd === `!die` || cmd === `!dice`) {
+// DICE
+if(dicecom.includes(cmd)) {
 	const result = Math.floor((Math.random() * 6) + 1)
 	return message.channel.send(`You rolled a **${result}** with a 6-sided die.`)
 }
 
-//FLIP
-if(cmd === `!flip` || cmd === `!coin`) {
+// FLIP
+if(flipcom.includes(cmd)) {
 	 const coin = Math.floor((Math.random() * 2)) === 0 ? 'Heads' : 'Tails'
 	 return message.channel.send(`Your coin flip landed on: **${coin}**!`)
 }
@@ -2306,7 +2310,7 @@ if(wishlistcom.includes(cmd)) {
 }
 
 //WALLET
-if(cmd === `!wallet` || cmd === `!w`) {
+if(walletcom.includes(cmd)) {
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const wallet = await Wallet.findOne({ where: { playerId }, include: Player})
 	if (!wallet && playerId === maid) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
@@ -3923,7 +3927,7 @@ if(cmd === `!grind`) {
 }
 
 //DAILY
-if(cmd === `!daily`) {
+if(dailycom.includes(cmd)) {
 	const daily = await Daily.findOne({ where: { playerId: maid }, include: Player })
 	const diary = await Diary.findOne({ where: { playerId: maid } })
 	if (!daily || !diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
@@ -4200,7 +4204,7 @@ if(cmd === `!wager`) {
 
 
 //ALCHEMY
-if(cmd === `!alc` ||cmd === `!alch` || cmd === `!alchemy`) {
+if(alchemycom.includes(cmd)) {
 	const wallet = await Wallet.findOne({ 
 		where: { playerId: maid },
 		include: Player
@@ -4762,7 +4766,7 @@ if(invcom.includes(cmd)) {
 			include: Print,
 			order: [['card_code', 'ASC']]
 		})
-		
+
 		const codes = []
 		for (let i = 0; i < invs.length; i++) {
 			const row = invs[i]
@@ -4874,7 +4878,7 @@ if(checklistcom.includes(cmd)) {
 }
 
 //PACK
-if(cmd === `!pack`) {
+if(packcom.includes(cmd)) {
 	let num = 1
 	let code = 'TEB'
 	for (let i = 0; i < args.length; i++) {
@@ -5063,7 +5067,7 @@ if(cmd === `!pack`) {
 
 
 //SPECIAL EDITION
-if(cmd === `!spec` || cmd === `!se`) {
+if(specialcom.includes(cmd)) {
 	let code = args[0] || 'DOC'
 	const set = await Set.findOne({ where: { code: code }})
 	if (!set) return message.channel.send(`Could not find set code: ${code}.`)
@@ -5312,7 +5316,7 @@ if(cmd === `!spec` || cmd === `!se`) {
 }
 
 //BOX
-if(cmd === `!box`) {
+if(boxcom.includes(cmd)) {
 	const code = args[0] || 'TEB'
 	if (code.startsWith('SS')) return message.channel.send(`Sorry, Starter Series cards are not sold by the box.`)
 	const set = await Set.findOne({ where: { code: code.toUpperCase() }})

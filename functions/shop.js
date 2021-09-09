@@ -731,7 +731,8 @@ const getBarterCard = async (message, voucher, medium_complete) => {
             unlocked: [
                 [10, 'DOC-180', `(2) ${ult}DOC-180 - Peropero Cerperus - 10 ${mushroom}`],
                 [10, 'TEB-135', `(3) ${ult}TEB-135 - Green Baboon, Defender of the Forest - 10 ${mushroom}`],
-                [20, 'ORF-046', `(4) ${ult}ORF-046 - X-Saber Airbellum - 20 ${mushroom}`]
+                [20, 'ORF-046', `(4) ${ult}ORF-046 - X-Saber Airbellum - 20 ${mushroom}`],
+                [40, 'DOC-196', `(5) ${scr}DOC-196 - Rescue Cat - 40 ${mushroom}`]
             ]
         },
         moai: {
@@ -751,7 +752,8 @@ const getBarterCard = async (message, voucher, medium_complete) => {
             original: [[10, 'APC-004', `(1) ${ult}APC-004 - Moray of Greed - 10 ${hook}`]],
             unlocked: [
                 [10, 'DOC-181', `(2) ${ult}DOC-181 - Sharkraken - 10 ${hook}`],
-                [10, 'TEB-132', `(3) ${ult}TEB-132 - Citadel Whale - 10 ${hook}`]
+                [10, 'TEB-132', `(3) ${ult}TEB-132 - Citadel Whale - 10 ${hook}`],
+                [30, 'DOC-194', `(4) ${scr}DOC-194 - Lifeless Leaffish - 30 ${hook}`]
             ]
         },
         egg: {
@@ -779,25 +781,25 @@ const getBarterCard = async (message, voucher, medium_complete) => {
         orb: {
             original: [[10, 'APC-008', `(1) ${ult}APC-008 - Spellbook of Knowledge - 10 ${orb}`]],
             unlocked: [
-                [10, 'TEB-130', `(2) ${ult}TEB-130 - Altergeist Meluseek - 10 ${orb}`],
-                [20, 'DOC-175', `(3) ${ult}DOC-175 - Breaker the Magical Warrior - 20 ${orb}`],
-                [20, 'TEB-137', `(4) ${ult}TEB-137 - Shaddoll Dragon - 20 ${orb}`]
+                [20, 'DOC-175', `(2) ${ult}DOC-175 - Breaker the Magical Warrior - 20 ${orb}`],
+                [20, 'TEB-137', `(3) ${ult}TEB-137 - Shaddoll Dragon - 20 ${orb}`],
+                [60, 'DOC-000', `(4) ${scr}DOC-000 - Chaos Sorcerer - 60 ${orb}`],
+                [100, 'TEB-000', `(5) ${scr}TEB-000 - Thousand-Eyes Restrict - 100 ${orb}`]
             ]
         },
         gem: {
             original: [[10, 'APC-009', `(1) ${ult}APC-009 - Guardragon Cataclysm - 10 ${gem}`]],
             unlocked: [
-                [10, 'TEB-141', `(2) ${ult}TEB-141 - Dragon Ravine - 10 ${gem}`]
+                [10, 'TEB-141', `(2) ${ult}TEB-141 - Dragon Ravine - 10 ${gem}`],
+                [30, 'DOC-197', `(3) ${scr}DOC-197 - Card of Safe Return - 30 ${gem}`],
+                [30, 'TEB-149', `(4) ${scr}TEB-149 - Tempest, Dragon Ruler of Storms - 30 ${gem}`]
             ]
         }
     }
 
     const options = medium_complete ? [...wares[voucher].original, ...wares[voucher].unlocked] : [...wares[voucher].original]
-    console.log('options', options)
     if (options.length === 1) return options[0]
-
     const cards = options.map((o) => o[2])
-    console.log('cards', cards)
     
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send(`Which card would you like to barter for?\n${cards.join("\n")}`)

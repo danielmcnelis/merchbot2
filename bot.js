@@ -206,18 +206,18 @@ if(cmd === `!test`) {
 	let current_price = print.market_price
 	const results = [`Estimated Decay - ${card}:`, `Day 0 - ${Math.round(current_price)}${stardust}`]
 
-	if (shop_percent < 0.2) {
-		const z_diff = ( 0.2 - shop_percent ) / 0.2
+	if (shop_percent < 0.15) {
+		const z_diff = ( 0.15 - shop_percent ) / 0.15
 
 		for (let i = 0; i < 30; i++) {
-			current_price += 0.01 * current_price * z_diff 
+			current_price += 0.02 * current_price * z_diff 
 			results.push(`Day ${i+1} - ${Math.round(current_price)}${stardust}`)
 		}
-	} else if (shop_percent >= 0.2) {
-		const z_diff = ( shop_percent - 0.2 ) / 0.8
+	} else if (shop_percent >= 0.15) {
+		const z_diff = ( shop_percent - 0.15 ) / 0.85
 
 		for (let i = 0; i < 30; i++) {
-			current_price -= 0.04 * current_price * z_diff 
+			current_price -= 0.06 * current_price * z_diff 
 			results.push(`Day ${i+1} - ${Math.round(current_price)}${stardust}`)
 		}
 	}

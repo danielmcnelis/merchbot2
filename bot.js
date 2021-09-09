@@ -160,7 +160,7 @@ if (cmd === `!ping`) return message.channel.send('🏓')
 
 //TEST
 if(cmd === `!test`) {
-	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isAmbassador(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const card_code = args[0].toUpperCase()
 	const print = await Print.findOne({ where: { card_code: card_code }})
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`

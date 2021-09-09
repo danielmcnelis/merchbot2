@@ -160,7 +160,7 @@ if (cmd === `!ping`) return message.channel.send('🏓')
 
 //TEST
 if(cmd === `!test`) {
-	if (!isAmbassador(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const card_code = args[0].toUpperCase()
 	const print = await Print.findOne({ where: { card_code: card_code }})
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
@@ -206,25 +206,18 @@ if(cmd === `!test`) {
 	let current_price = print.market_price
 	const results = [`Estimated Decay - ${card}:`, `Day 0 - ${Math.round(current_price)}${stardust}`]
 
-	if (shop_percent < 0.05) {
-		const z_diff = ( 0.05 - shop_percent ) / 0.05
+	if (shop_percent < 0.15) {
+		const z_diff = ( 0.15 - shop_percent ) / 0.15
 
 		for (let i = 0; i < 30; i++) {
-			current_price += 0.02 * current_price * z_diff 
+			current_price += 0.05 * current_price * z_diff 
 			results.push(`Day ${i+1} - ${Math.round(current_price)}${stardust}`)
 		}
-	} else if (shop_percent > 0.2) {
-		const z_diff = ( shop_percent - 0.2 ) / 0.8
+	} else if (shop_percent >= 0.15) {
+		const z_diff = ( shop_percent - 0.15 ) / 0.85
 
 		for (let i = 0; i < 30; i++) {
-			current_price -= 0.04 * current_price * z_diff 
-			results.push(`Day ${i+1} - ${Math.round(current_price)}${stardust}`)
-		}
-	} else {
-		const z_diff = ( 0.2 - shop_percent ) / 0.15
-
-		for (let i = 0; i < 30; i++) {
-			current_price += 0.01 * current_price * z_diff 
+			current_price -= 0.05 * current_price * z_diff 
 			results.push(`Day ${i+1} - ${Math.round(current_price)}${stardust}`)
 		}
 	}
@@ -2943,12 +2936,32 @@ if (manualcom.includes(cmd)) {
 	} else {
 		const diary = winningPlayer.diary
 		const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
-		const bonus = easy_complete ? 1 : 0
+		const diary_bonus = easy_complete ? 1 : 0
+		const date = new Date()
+		date.setHours(0, 0, 0, 0)
+		const d = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
+		const m = (date.getMonth() + 1) < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1
+		const y = date.getFullYear()
+		const today = `${y}-${m}-${d}`
+		const count = await Match.count({
+			where: {
+				winnerId: winningPlayer.id,
+				game_mode: {
+					[Op.or]: ['ranked', 'tournament']
+				},
+				createdAt: {
+					[Op.gte]: today
+				}
+			}
+		})
+		const daily_bonus = count ? 0 : 3
+		const pack_bonus = count === 1
+		console.log('pack_bonus', pack_bonus)
 		const origStatsWinner = winningPlayer.stats
 		const origStatsLoser = losingPlayer.stats
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
-		const chipsWinner = Math.round((delta)) + bonus < 6 ? 6 : Math.round((delta)) > 20 ? 20 : Math.round((delta)) + bonus
-		const chipsLoser = (origStatsLoser - origStatsWinner) < 72 ? 3 : (origStatsLoser - origStatsWinner) >=150 ? 1 : 2
+		const chipsWinner = (Math.round((delta)) + 5) < 9 ? 10 : (Math.round((delta)) + 5) > 29 ? 29 : (Math.round((delta)) + 5)
+		const chipsLoser = (origStatsLoser - origStatsWinner) < 72 ? 5 : (origStatsLoser - origStatsWinner) >=150 ? 3 : 4
 
 		const previouslyDefeated = await Match.count({
 			where: {
@@ -2965,19 +2978,30 @@ if (manualcom.includes(cmd)) {
 		if (winningPlayer.current_streak > winningPlayer.longest_streak) winningPlayer.longest_streak = winningPlayer.current_streak
 		if (winningPlayer.stats > winningPlayer.best_stats) winningPlayer.best_stats = winningPlayer.stats
 		await winningPlayer.save()
-		
+
+		winningPlayer.wallet.starchips += (chipsWinner + diary_bonus + daily_bonus)
+		await winningPlayer.wallet.save()
+
 		losingPlayer.stats -= delta
 		losingPlayer.backup = origStatsLoser
 		losingPlayer.losses++
 		losingPlayer.current_streak = 0
 		await losingPlayer.save()
-	
-		winningPlayer.wallet.starchips += chipsWinner
-		await winningPlayer.wallet.save()
-	
-		losingPlayer.wallet.starchips += chipsLoser
+
+		losingPlayer.wallet.starchips += chipsLoser 
 		await losingPlayer.wallet.save()
-	
+
+		await Match.create({
+			game_mode: "ranked",
+			winner_name: winningPlayer.name,
+			winnerId: winningPlayer.id,
+			loser_name: losingPlayer.name,
+			loserId: losingPlayer.id,
+			delta: delta,
+			chipsWinner: (chipsWinner + diary_bonus + daily_bonus),
+			chipsLoser: chipsLoser
+		})
+
 		if (winningPlayer.stats >= 530 && !winner.roles.cache.some(role => role.id === expertRole)) {
 			winner.roles.add(expertRole)
 			winner.roles.remove(noviceRole)
@@ -2988,17 +3012,6 @@ if (manualcom.includes(cmd)) {
 			loser.roles.remove(expertRole)
 		}
 
-		await Match.create({ 
-			game: "ranked",
-			winner_name: winningPlayer.name,
-			winnerId: winningPlayer.id,
-			loser_name: losingPlayer.name,
-			loserId: losingPlayer.id,
-			delta: delta,
-			chipsWinner: chipsWinner,
-			chipsLoser: chipsLoser
-		})
-
 		completeTask(message.channel, winningPlayer.id, 'e3')
 		if (winningPlayer.stats >= 530) completeTask(message.channel, winningPlayer.id, 'm1', 3000)
 		if (winningPlayer.stats >= 590) completeTask(message.channel, winningPlayer.id, 'h1', 3000)
@@ -3006,7 +3019,13 @@ if (manualcom.includes(cmd)) {
 		if (winningPlayer.current_streak === 3) completeTask(message.channel, winningPlayer.id, 'm2', 5000) 
 		if (winningPlayer.vanquished_foes === 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
 		if (winningPlayer.current_streak === 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
-		return message.channel.send(`A manual loss by ${losingPlayer.name} (+${chipsLoser}${starchips}) to ${winningPlayer.name} (+${chipsWinner}${starchips}) has been recorded.`)
+		if (daily_bonus) setTimeout(() => message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned an additional +3${starchips} for winning your 1st Ranked Match of the day! ${legend}`), 2000)
+		if (pack_bonus) setTimeout(async () => {
+			const set = await Set.findOne({ where: { code: 'DOC' }})
+			await awardPack(message.channel, winningPlayer.id, set)
+			message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned a bonus pack of ${set.code} ${eval(set.code)} for your second ranked win of the day! ${god}`)
+		}, 2000)
+		return message.channel.send(`A manual loss by ${losingPlayer.name} (+${chipsLoser}${starchips}) to ${winningPlayer.name} (+${chipsWinner + diary_bonus}${starchips}) has been recorded.`)		
 	}
 }
 

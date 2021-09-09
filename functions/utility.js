@@ -3,7 +3,6 @@
 
 const { adminRole, ambassadorRole, arenaRole, modRole, tourRole } = require('../static/roles.json')
 const { mad, sad, rocks, bronze, silver, gold, platinum, diamond, master, legend, god } = require('../static/emojis.json')
-const Names = require('../static/names.json')
 const { Op } = require('sequelize')
 const { Arena, Binder, Card, Daily, Diary, Draft, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist  } = require('../db/index.js')
 const merchbotId = '584215266586525696'

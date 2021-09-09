@@ -8,8 +8,6 @@ const { Arena, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Invento
 const { client, challongeClient } = require('../static/clients.js')
 const { saveYDK, saveAllYDK } = require('./decks.js')
 const { capitalize, shuffleArray } = require('./utility.js')
-const types = require('../static/types.json')
-
 
 //ASK FOR DB USERNAME
 const askForDBUsername = async (member, player, error = false, attempt = 1) => {

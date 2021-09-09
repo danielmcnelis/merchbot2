@@ -204,28 +204,28 @@ if(cmd === `!test`) {
 	const shop_percent = total ? shop_pop / total : 0
 
 	let current_price = print.market_price
-	const results = [`Estimated Decay - ${card}:`, `Day 0 - ${current_price}${stardust}`]
+	const results = [`Estimated Decay - ${card}:`, `Day 0 - ${Math.round(current_price)}${stardust}`]
 
 	if (shop_percent < 0.05) {
 		const z_diff = ( 0.05 - shop_percent ) / 0.05
 
 		for (let i = 0; i < 30; i++) {
 			current_price += 0.1 * current_price * z_diff 
-			results.push(`Day ${i+1} - ${current_price}${stardust}`)
+			results.push(`Day ${i+1} - ${Math.round(current_price)}${stardust}`)
 		}
 	} else if (shop_percent > 0.2) {
 		const z_diff = ( shop_percent - 0.2 ) / 0.8
 
 		for (let i = 0; i < 30; i++) {
 			current_price -= 0.1 * current_price * z_diff 
-			results.push(`Day ${i+1} - ${current_price}${stardust}`)
+			results.push(`Day ${i+1} - ${Math.round(current_price)}${stardust}`)
 		}
 	} else {
 		const z_diff = ( 0.2 - shop_percent ) / 0.15
 
 		for (let i = 0; i < 30; i++) {
 			current_price += 0.025 * current_price * z_diff 
-			results.push(`Day ${i+1} - ${current_price}${stardust}`)
+			results.push(`Day ${i+1} - ${Math.round(current_price)}${stardust}`)
 		}
 	}
 

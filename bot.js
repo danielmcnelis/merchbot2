@@ -160,7 +160,7 @@ if (cmd === `!ping`) return message.channel.send('🏓')
 
 //TEST
 if(cmd === `!test`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isAmbassador(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const card_code = args[0].toUpperCase()
 	const print = await Print.findOne({ where: { card_code: card_code }})
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
@@ -217,7 +217,7 @@ if(cmd === `!test`) {
 		const z_diff = ( shop_percent - 0.2 ) / 0.8
 
 		for (let i = 0; i < 30; i++) {
-			current_price -= 0.02 * current_price * z_diff 
+			current_price -= 0.04 * current_price * z_diff 
 			results.push(`Day ${i+1} - ${Math.round(current_price)}${stardust}`)
 		}
 	} else {

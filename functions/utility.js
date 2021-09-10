@@ -4,7 +4,7 @@
 const { adminRole, ambassadorRole, arenaRole, modRole, tourRole } = require('../static/roles.json')
 const { mad, sad, rocks, bronze, silver, gold, platinum, diamond, master, legend, god } = require('../static/emojis.json')
 const { Op } = require('sequelize')
-const { Arena, Binder, Card, Daily, Diary, Draft, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist  } = require('../db/index.js')
+const { Arena, Binder, Card, Daily, Diary, Draft, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Reset, Set, Tournament, Trade, Trivia, Wallet, Wishlist  } = require('../db/index.js')
 const merchbotId = '584215266586525696'
 const quotes = require('../static/quotes.json')
 
@@ -24,6 +24,11 @@ const createPlayer = async (id, username = null, tag = null, muted = false) => {
 
 // RESET PLAYER
 const resetPlayer = async (player) => {
+    const date = new Date()
+    await Reset.create({ 
+        date: date,
+        playerId: player.id
+    })
     return console.log('RESET!')
 }
 

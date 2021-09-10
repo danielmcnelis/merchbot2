@@ -4365,7 +4365,7 @@ if(reducecom.includes(cmd)) {
 	if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 	if (print.set_code === 'FPC') return message.channel.send(`You cannot use reduce on FPCs.`)
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
-	const value = print.rarity === 'com' ? 1 : print.rarity === 'rar' ? 2 : print.rarity === 'sup' ? 4 : print.rarity === 'ult' ? 6 : 8 
+	const value = print.rarity === 'com' ? 1 : print.rarity === 'rar' ? 2 : print.rarity === 'sup' ? 4 : print.rarity === 'ult' ? 8 : 16 
 
 	const inv = await Inventory.findOne({ 
 		where: { 

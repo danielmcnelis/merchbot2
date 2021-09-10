@@ -3561,7 +3561,7 @@ if (cmd === `!reset`) {
 		const date = new Date()
 		const player = await Player.findOne({ where: { id: maid }})
 		const time_diff = player.last_reset ? date.getTime() - player.last_reset.getTime() : 0	
-		const days = Math.ceil(time_diff / (24 * 60 * 60 * 1000))
+		const days = Math.floor(time_diff / (24 * 60 * 60 * 1000))
 		if (player.last_reset && days < 30) {
 			return message.channel.send(`Sorry, you cannot reset your account for another ${days === 29 ? 'day' : `${30 - days} days` }.`)
 		} else {

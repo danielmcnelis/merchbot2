@@ -4365,7 +4365,7 @@ if(reducecom.includes(cmd)) {
 	if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 	if (print.set_code === 'FPC') return message.channel.send(`You cannot use reduce on FPCs.`)
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
-	const value = print.rarity === 'com' ? 1 : print.rarity === 'rar' ? 2 : print.rarity === 'sup' ? 3 : print.rarity === 'ult' ? 4 : 5 
+	const value = print.rarity === 'com' ? 1 : print.rarity === 'rar' ? 2 : print.rarity === 'sup' ? 4 : print.rarity === 'ult' ? 6 : 8 
 
 	const inv = await Inventory.findOne({ 
 		where: { 
@@ -4509,6 +4509,7 @@ if(cmd === `!award`) {
 	let walletField
 	if (query === 'c' || query === 'sc' || query === 'starchip' || query === 'starchips' || query === 'chip' || query === 'chips') walletEmoji = starchips, walletField = 'starchips'
 	if (query === 'd' || query === 'sd' || query === 'stardust' || query === 'dust') walletField = 'stardust'
+	if (query === 'f' || query === 'fs' || query === 'forgestone' || query === 'forgestones' || query === 'stone' || query === 'stones') walletField = 'forgestone'
 	if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
 	if (query === 'egg' || query === 'eggs') walletField = 'egg'
 	if (query === 'hook' || query === 'hooks') walletField = 'hook'
@@ -4597,6 +4598,7 @@ if(cmd === `!steal`) {
 	let walletField
 	if (query === 'sc' || query === 'starchip' || query === 'starchips' || query === 'chip' || query === 'chips') walletField = 'starchips'
 	if (query === 'sd' ||query === 'stardust' || query === 'dust') walletField = 'stardust'
+	if (query === 'f' || query === 'fs' || query === 'forgestone' || query === 'forgestones' || query === 'stone' || query === 'stones') walletField = 'forgestone'
 	if (query === 'cactus' || query === 'cactuses' || query === 'cacti' || query === 'cactis' ) walletField = 'cactus'
 	if (query === 'egg' || query === 'eggs') walletField = 'egg'
 	if (query === 'hook' || query === 'hooks') walletField = 'hook'
@@ -5885,7 +5887,7 @@ if(cmd === `!barter`) {
 			print.set_code.startsWith('CH')
 		) return message.channel.send(`You cannot barter for ${print.set_code} cards.`)
 
-		price = print.rarity === 'com' ? 1 : print.rarity === 'rar' ? 3 : print.rarity === 'sup' ? 6 : print.rarity === 'ult' ? 12 : 24
+		price = print.rarity === 'com' ? 2 : print.rarity === 'rar' ? 4 : print.rarity === 'sup' ? 8 : print.rarity === 'ult' ? 16 : 48
 	} else {
 		const selected_option = direction === 'get_card' ? await getBarterCard(message, voucher, medium_complete) : await getTradeInCard(message, medium_complete)
 		if (!selected_option) return message.channel.send(`You did not select a valid option.`)

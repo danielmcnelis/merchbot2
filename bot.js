@@ -27,7 +27,7 @@ const { askForAdjustConfirmation, collectNicknames, getNewMarketPrice, askForSet
 const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard } = require('./functions/profile.js')
 const { fetchAllCardNames, fetchAllUniquePrintNames, findCard, search } = require('./functions/search.js')
 const { addSheet, makeSheet, writeToSheet } = require('./functions/sheets.js')
-const { getBarterCard, getVoucher, getTradeInCard, getBarterDirection, askForBarterConfirmation, checkShopShouldBe, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
+const { applyPriceDecay, getBarterCard, getVoucher, getTradeInCard, getBarterDirection, askForBarterConfirmation, checkShopShouldBe, getDecayCountdown, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
 const { getNewStatus } = require('./functions/status.js')
 const { askForDBUsername, checkChallongePairing, findNextMatch, findNextOpponent, findOtherPreReqMatch, generateSheetData, getDeckListTournament, getDeckNameTournament, getMatches, getTournamentType, putMatchResult, removeParticipant, seed, selectTournament } = require('./functions/tournament.js')
 const { processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
@@ -56,6 +56,9 @@ client.on('ready', async () => {
 	const allUniquePrints = await fetchAllUniquePrintNames()
     allUniquePrints.forEach((card) => fuzzyPrints.add(card))
 
+	const decayCountdown = getDecayCountdown()
+	setTimeout(() => applyPriceDecay(), decayCountdown)
+	
 	const shopShouldBe = checkShopShouldBe()
 	const shopCountdown = getShopCountdown()
 	const shopOpen = await checkShopOpen()
@@ -65,6 +68,11 @@ client.on('ready', async () => {
 	} else {
 		postBids()
 	}
+
+	setInterval(async () =>  {
+		const shopOpen = await checkShopOpen()
+		if (shopOpen) updateShop()
+	}, 1000 * 60 * 10)
 
 	setInterval(async () =>  {
 		const shopOpen = await checkShopOpen()
@@ -172,27 +180,6 @@ if(cmd === `!test`) {
 
 	const quants = invs.map((i) => i.quantity)
 	const total = quants.length ? quants.reduce((a, b) => a + b) : 0
-
-	// const equivalentPrints = await Print.findAll({ where: {
-	// 	set_code: print.set_code,
-	// 	rarity: print.rarity
-	// }})
-
-	// let total_equivalents = 0
-	// for (let i = 0; i < equivalentPrints.length; i++) {
-	// 	const eq_print = equivalentPrints[i]
-	// 	const eq_invs = await Inventory.findAll({ where: { 
-	// 		printId: eq_print.id,
-	// 		quantity: { [Op.gt]: 0 }  
-	// 	}})
-
-	// 	if (!eq_invs.length) continue
-	// 	const eq_quants = eq_invs.map((i) => i.quantity)
-	// 	const subtotal = eq_quants.reduce((a, b) => a + b)
-	// 	total_equivalents += subtotal
-	// }
-
-	//const avg_eq_pop = Math.round(10 * total_equivalents / equivalentPrints.length) / 10
 
 	const merchbotinv = await Inventory.findOne({ where: {
 		printId: print.id,

@@ -54,6 +54,46 @@ const closeShop = async () => {
 	} 
 }
 
+// APPLY PRICE DECAY
+const applyPriceDecay = async () => {
+	const prints = await Print.findAll()
+
+    for (let i = 0; i < prints.length; i++) {
+        const print = prints[i]
+        const invs = await Inventory.findAll({ where: {
+            printId: print.id,
+            quantity: { [Op.gt]: 0 }
+        }})
+    
+        const quants = invs.map((i) => i.quantity)
+        const total = quants.length ? quants.reduce((a, b) => a + b) : 0
+    
+        const merchbotinv = await Inventory.findOne({ where: {
+            printId: print.id,
+            quantity: { [Op.gt]: 0 },
+            playerId: merchbotId
+        }})
+    
+        const shop_pop = merchbotinv ? merchbotinv.quantity : 0
+        const shop_percent = total ? shop_pop / total : 0
+    
+        const current_price = print.market_price
+    
+        if (shop_percent < 0.15) {
+            const z_diff = ( 0.15 - shop_percent ) / 0.15
+            print.market_price += 0.02 * current_price * z_diff
+            await print.save()
+            console.log(`${print.card_code} - ${print.card_name} decayed UP (z_diff: ${z_diff}) from ${current_price} to ${print.market_price}`)
+        } else if (shop_percent >= 0.15) {
+            const z_diff = ( shop_percent - 0.15 ) / 0.85
+            print.market_price -= 0.06 * current_price * z_diff 
+            await print.save()
+            console.log(`${print.card_code} - ${print.card_name} decayed DOWN (z_diff: ${z_diff}) from ${current_price} to ${print.market_price}`)
+        }
+    }
+
+}
+
 // CHECK SHOP OPEN
 const checkShopOpen = async () => {
     const shopIsOpen = await Info.count({ where: {
@@ -97,6 +137,20 @@ const getShopCountdown = () => {
 
     const shopCountdown = ( hoursLeftInPeriod * 60 + minsLeftInPeriod ) * 60 * 1000
     return shopCountdown
+}
+
+
+// GET DECAY COUNTDOWN
+const getDecayCountdown = () => {
+	const date = new Date()
+	const hours = date.getHours()
+	const mins = date.getMinutes()
+	const minsLeftInPeriod = 60 - mins
+	const hoursLeftInPeriod = 23 - hours
+
+    const decayCountdown = ( hoursLeftInPeriod * 60 + minsLeftInPeriod ) * 60 * 1000
+    console.log('decayCountdown', decayCountdown)
+    return decayCountdown
 }
 
 //CHECK SHOP SHOULD BE
@@ -920,6 +974,7 @@ const askForBarterConfirmation = async (message, voucher, card, price, direction
 
 
 module.exports = {
+    applyPriceDecay,
     askForBarterConfirmation,
     askForDumpConfirmation,
     askForExclusions,
@@ -933,6 +988,7 @@ module.exports = {
     getExclusions,
     getExcludedPrintIds,
     getTradeInCard,
+    getDecayCountdown,
     getShopCountdown,
     getVoucher,
     openShop,

@@ -2299,6 +2299,7 @@ if(walletcom.includes(cmd)) {
 	const results = [`${FiC} --- ${wallet.player.name}'s Wallet --- ${FiC}`]
 	results.push(`Starchips: ${wallet.starchips}${starchips}`)
 	results.push(`Stardust: ${wallet.stardust}${stardust}`)
+	results.push(`Forgestones: ${wallet.forgestone}${forgestone}`)
 	if (wallet.tickets) results.push(`Tickets: ${wallet.tickets} ${tix}`)
 	if (wallet.credits) results.push(`Credits: ${wallet.credits} ${credits}`)
 	if (wallet.mushroom) results.push(`Mushrooms: ${wallet.mushroom} ${mushroom}`)

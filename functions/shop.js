@@ -92,6 +92,8 @@ const applyPriceDecay = async () => {
         }
     }
 
+    return setTimeout(async () => applyPriceDecay(), 24 * 60 * 60 * 1000)
+
 }
 
 // CHECK SHOP OPEN

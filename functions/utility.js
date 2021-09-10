@@ -22,6 +22,11 @@ const createPlayer = async (id, username = null, tag = null, muted = false) => {
     }
 }
 
+// RESET PLAYER
+const resetPlayer = async (player) => {
+    return console.log('RESET!')
+}
+
 //GET RANDOM STRING
 const getRandomString = (length, chars) => {
     let result = '';
@@ -265,5 +270,6 @@ module.exports = {
     isVowel,
     isWithinXHours,
     recalculate,
+    resetPlayer,
     shuffleArray
 }

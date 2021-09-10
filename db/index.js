@@ -18,6 +18,7 @@ const Nickname = require('./nickname')
 const Player = require('./player')
 const Print = require('./print')
 const Profile = require('./profile')
+const Reset = require('./reset')
 const Set = require('./set')
 const Status = require('./status')
 const Tournament = require('./tournament')
@@ -46,6 +47,9 @@ Bid.belongsTo(Auction)
 
 Player.hasMany(Inventory)
 Inventory.belongsTo(Player)
+
+Player.hasMany(Reset)
+Reset.belongsTo(Player)
 
 // Card.hasMany(Nickname)
 // Nickname.belongsTo(Card)

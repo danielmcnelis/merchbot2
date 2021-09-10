@@ -51,6 +51,10 @@ const Daily = db.define('daily', {
     last_wager: {
         type: Sequelize.DATE,
         allowNull: true
+    },
+    last_reduce: {
+        type: Sequelize.DATE,
+        allowNull: true
     }
 })
 

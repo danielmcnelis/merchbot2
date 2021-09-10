@@ -165,6 +165,10 @@ const Player = db.define('player', {
         type: Sequelize.FLOAT,
         defaultValue: 0.00,        
         allowNull: true
+    },
+    last_reset : {
+        type: Sequelize.DATE,
+        allowNull: true
     }
 })
 

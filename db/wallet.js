@@ -13,6 +13,11 @@ const Wallet = db.define('wallet', {
         defaultValue: 0,           
         allowNull: false
     },
+    forgestone: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
     tickets: {
         type: Sequelize.INTEGER,  
         defaultValue: 0,           

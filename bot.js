@@ -27,22 +27,22 @@ const { askForAdjustConfirmation, collectNicknames, getNewMarketPrice, askForSet
 const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard } = require('./functions/profile.js')
 const { fetchAllCardNames, fetchAllUniquePrintNames, findCard, search } = require('./functions/search.js')
 const { addSheet, makeSheet, writeToSheet } = require('./functions/sheets.js')
-const { applyPriceDecay, getBarterCard, getVoucher, getTradeInCard, getBarterDirection, askForBarterConfirmation, checkShopShouldBe, getDecayCountdown, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
+const { applyPriceDecay, getBarterCard, getBarterQuery, getVoucher, getTradeInCard, getBarterDirection, askForBarterConfirmation, checkShopShouldBe, getDecayCountdown, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
 const { getNewStatus } = require('./functions/status.js')
 const { askForDBUsername, checkChallongePairing, findNextMatch, findNextOpponent, findOtherPreReqMatch, generateSheetData, getDeckListTournament, getDeckNameTournament, getMatches, getTournamentType, putMatchResult, removeParticipant, seed, selectTournament } = require('./functions/tournament.js')
 const { processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
 const { getBuyerConfirmation, getInvoiceMerchBotPurchase, getInvoiceMerchBotSale, getInvoiceP2PSale, getSellerConfirmation, processMerchBotSale, processP2PSale } = require('./functions/transaction.js')
 const { askQuestion, resetTrivia, startTrivia } = require('./functions/trivia.js')
-const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isJazz, isMod, isTourPlayer, isVowel, getArenaVictories, getMedal, getRandomElement, getRandomSubset } = require('./functions/utility.js')
+const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isJazz, isMod, isTourPlayer, isVowel, getArenaVictories, getMedal, getRandomElement, getRandomSubset, resetPlayer } = require('./functions/utility.js')
 
 // STATIC IMPORTS
 const arenas = require('./static/arenas.json')
 const { arenaChannelId, botSpamChannelId, bugreportsChannelId, discussionChannelId, draftChannelId, duelRequestsChannelId, pauperChannelId, gauntletChannelId, generalChannelId, gutterChannelId, introChannelId, keeperChannelId, marketPlaceChannelId, replaysChannelId, rulesChannelId, rulingsChannelId, shopChannelId, staffChannelId, suggestionsChannelId, tournamentChannelId, triviaChannelId, welcomeChannelId } = require('./static/channels.json')
 const { client, challongeClient } = require('./static/clients.js')
-const { alchemycom, aliuscom, bindercom, botcom, boxcom, bracketcom, calccom, checklistcom, dailycom, dbcom, deckcom, dicecom, dropcom, flipcom, h2hcom, historycom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, packcom, pfpcom, populationcom, profcom, queuecom, rankcom, referralcom, rolecom, specialcom, startcom, statscom, undocom, walletcom, wishlistcom, yescom } = require('./static/commands.json')
+const { alchemycom, aliuscom, bindercom, botcom, boxcom, bracketcom, calccom, checklistcom, dailycom, dbcom, deckcom, dicecom, dropcom, flipcom, h2hcom, historycom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, packcom, pfpcom, populationcom, profcom, queuecom, rankcom, reducecom, referralcom, rolecom, specialcom, startcom, statscom, undocom, walletcom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
-const { king, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, shrine, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion } = require('./static/emojis.json')
+const { king, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, shrine, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion } = require('./static/emojis.json')
 const { adminRole, arenaRole, botRole,expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')
@@ -3551,27 +3551,38 @@ if(cmd === '!resubmit') {
 
 //RESET
 if (cmd === `!reset`) {
-	if (!isAmbassador(message.member) ) return message.channel.send('You do not have permission to do that.')
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
-	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
 	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
+	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
 	: null
 
-	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannelId}> or <#${triviaChannelId}>.`)
+	if (!game) {
+		const date = new Date()
+		const time_diff = date.getTime() - player.last_reset.getTime()		
+		const days = Math.ceil(time_diff / (24 * 60 * 60 * 1000))
+		const player = await Player.findOne({ where: { id: maid }})
+		if (player.last_reset && days < 30) {
+			return message.channel.send(`Sorry, you cannot reset your account for another ${days === 1 ? 'day' : `${days} days` }.`)
+		} else {
+			await resetPlayer(player) 
+		}
+	} else {
+		if (!isAmbassador(message.member) ) return message.channel.send('You do not have permission to do that.')
+
+		const info = await Info.findOne({ where: { element: game.toLowerCase() }})
+		if (!info) return message.channel.send(`Could not find game-mode: "${game}".`)
 	
-	const info = await Info.findOne({ where: { element: game.toLowerCase() }})
-	if (!info) return message.channel.send(`Could not find game-mode: "${game}".`)
-
-	const entries = await eval(game).findAll()
-	if (!entries) return message.channel.send(`Could not find any entries for: "${game}".`)
-
-	if (game === 'Arena') {
-		resetArena(info, entries)
-	} else if (game === 'Trivia') {
-		resetTrivia(message.guild, info, entries)
+		const entries = await eval(game).findAll()
+		if (!entries) return message.channel.send(`Could not find any entries for: "${game}".`)
+	
+		if (game === 'Arena') {
+			resetArena(info, entries)
+		} else if (game === 'Trivia') {
+			resetTrivia(message.guild, info, entries)
+		}
+	
+		return message.channel.send(`${game === 'Trivia' ? 'Trivia' : `The ${game}`} has been reset.`)
 	}
-
-	return message.channel.send(`${game === 'Trivia' ? 'Trivia' : `The ${game}`} has been reset.`)
 }
 
 //RESUME
@@ -4317,6 +4328,78 @@ if(alchemycom.includes(cmd)) {
 		return message.channel.send(`Sorry, time's up.`)
 	})
 }
+
+
+
+//REDUCE
+if(reducecom.includes(cmd)) {
+	const wallet = await Wallet.findOne({ 
+		where: { playerId: maid },
+		include: Player
+	})
+
+	const daily = await Daily.findOne({ 
+		where: { playerId: maid },
+		include: Player
+	})
+
+	if (!wallet || !daily) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	
+	const date = new Date()
+	const hoursLeftInDay = date.getMinutes() === 0 ? 24 - date.getHours() : 23 - date.getHours()
+	const minsLeftInHour = date.getMinutes() === 0 ? 0 : 60 - date.getMinutes()
+
+	if (daily.last_reduce && isSameDay(daily.last_reduce, date)) return message.channel.send(`You exhausted your reductive powers for the day. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
+
+	const query = args.join(" ")
+	
+	if (!args[0]) return message.channel.send(`Please specify the card you wish to break down into ${forgestone}.`)
+	
+	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
+	const card_name = await findCard(query, fuzzyPrints)
+	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
+
+	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name, private = false, inInv = true) : null
+	if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+	if (print.set_code === 'FPC') return message.channel.send(`You cannot use reduce on FPCs.`)
+	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+	const value = print.rarity === 'com' ? 1 : print.rarity === 'rar' ? 2 : print.rarity === 'sup' ? 3 : print.rarity === 'ult' ? 4 : 5 
+
+	const inv = await Inventory.findOne({ 
+		where: { 
+			printId: print.id,
+			playerId: maid,
+			quantity: { [Op.gt]: 0 }
+		}
+	})
+
+	if (!inv) return message.channel.send(`You do not have any copies of ${card}.`)
+
+	const filter = m => m.author.id === message.author.id
+	const msg = await message.channel.send(`Are you sure you want to reduce ${card} into ${value}${forgestone}?`)
+	const collected = await msg.channel.awaitMessages(filter, {
+		max: 1,
+		time: 15000
+	}).then(async collected => {
+		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+		
+		inv.quantity--
+		await inv.save()
+
+		wallet.forgestones += value
+		await wallet.save()
+	
+		daily.last_reduce = date
+		await daily.save()
+
+		return message.channel.send(`You broke down ${card} into ${value}${forgestone}!`)
+	}).catch(err => {
+		console.log(err)
+		return message.channel.send(`Sorry, time's up.`)
+	})
+}
+
+
 
 
 //WRITE
@@ -5781,15 +5864,38 @@ if(cmd === `!barter`) {
 	const direction = await getBarterDirection(message)
 	if (!direction) return
 	let voucher = direction === 'get_card' ? await getVoucher(message, direction) : null
-	const selected_option = direction === 'get_card' ? await getBarterCard(message, voucher, medium_complete) : await getTradeInCard(message, medium_complete)
-	if (!selected_option) return message.channel.send(`You did not select a valid option.`)
-	if (!voucher) voucher = selected_option[3]
 
-	const print = await Print.findOne({ where: { card_code: selected_option[1] } })
+	let print
+	let price
+
+	if (voucher === 'forgestone') {
+		const query = await getBarterQuery(message)
+		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
+		const card_name = await findCard(query, fuzzyPrints)
+		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
+	
+		print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
+		if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+		if (
+			print.set_code === 'APC' || 
+			print.set_code === 'FPC' || 
+			print.set_code.startsWith('SS') || 
+			print.set_code.startsWith('CH')
+		) return message.channel.send(`You cannot barter for ${print.set_code} cards.`)
+
+		price = print.rarity === 'com' ? 1 : print.rarity === 'rar' ? 3 : print.rarity === 'sup' ? 6 : print.rarity === 'ult' ? 12 : 24
+	} else {
+		const selected_option = direction === 'get_card' ? await getBarterCard(message, voucher, medium_complete) : await getTradeInCard(message, medium_complete)
+		if (!selected_option) return message.channel.send(`You did not select a valid option.`)
+		if (!voucher) voucher = selected_option[3]
+	
+		price = selected_option[0]
+		print = await Print.findOne({ where: { card_code: selected_option[1] } })
+		if (!print) return message.channel.send(`Could not find card: "${selected_option[1]}".`)
+	}
+
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
-	if (!print) return message.channel.send(`Could not find card: "${selected_option[1]}".`)
 
-	const price = selected_option[0]
 	if (direction === 'get_card' && wallet[voucher] < price) return message.channel.send(`Sorry, you only have ${wallet[voucher]} ${eval(voucher)} and ${card} costs ${price} ${eval(voucher)}.`)
 
 	const inv = await Inventory.findOne({ where: {
@@ -5829,7 +5935,6 @@ if(cmd === `!barter`) {
 		return message.channel.send(`Something went wrong. You do not appear to have any copies of ${card}.`)
 	}
 
-	
 	if (direction === 'get_card' && print.set_code === 'APC' && inv && inv.quantity >= 3 ) completeTask(message.channel, maid, 'h5')
 	if (direction === 'get_card' && print.set_code !== 'APC' && await checkCoreSetComplete(maid, 1)) completeTask(message.channel, maid, 'h4')
 	if (direction === 'get_card' && print.set_code !== 'APC' && await checkCoreSetComplete(maid, 3)) completeTask(message.channel, maid, 'l3', 3000)

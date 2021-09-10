@@ -726,15 +726,16 @@ const getBarterDirection = async (message) => {
 // GET VOUCHER
 const getVoucher = async (message) => {
     const options = [
-        `(1) Mushrooms ${mushroom}`,
-        `(2) Moai ${moai}`,
-        `(3) Roses ${rose}`,
-        `(4) Hooks ${hook}`,
-        `(5) Eggs ${egg}`,
-        `(6) Cacti ${cactus}`,
-        `(7) Swords ${swords}`,
-        `(8) Orbs ${orb}`,
-        `(9) Gems ${gem}`
+        `(1) Forgestones ${forgestone}`,
+        `(2) Mushrooms ${mushroom}`,
+        `(3) Moai ${moai}`,
+        `(4) Roses ${rose}`,
+        `(5) Hooks ${hook}`,
+        `(6) Eggs ${egg}`,
+        `(7) Cacti ${cactus}`,
+        `(8) Swords ${swords}`,
+        `(9) Orbs ${orb}`,
+        `(10) Gems ${gem}`
     ]
 
     const filter = m => m.author.id === message.member.user.id
@@ -745,23 +746,25 @@ const getVoucher = async (message) => {
     }).then(async collected => {
 		const response = collected.first().content.toLowerCase()
         let voucher
-        if(response.includes('1') || response.includes('mush') || response.includes('shroom')) {
+        if((response.includes('1') && !response.includes('0')) || response.includes('forge') || response.includes('stone')) {
+            voucher = 'forgestone'
+        } else if(response.includes('2') || response.includes('mush') || response.includes('shroom')) {
             voucher = 'mushroom'
-        } else if(response.includes('2') || response.includes('moai')) {
+        }else if(response.includes('3') || response.includes('moai')) {
             voucher = 'moai'
-        } else if(response.includes('3') || response.includes('rose')) {
+        } else if(response.includes('4') || response.includes('rose')) {
             voucher = 'rose'
-        } else if(response.includes('4') || response.includes('hook')) {
+        } else if(response.includes('5') || response.includes('hook')) {
             voucher = 'hook'
-        } else if(response.includes('5') || response.includes('egg')) {
+        } else if(response.includes('6') || response.includes('egg')) {
             voucher = 'egg'
-        } else if(response.includes('6') || response.includes('cact')) {
+        } else if(response.includes('7') || response.includes('cact')) {
             voucher = 'cactus'
-        } else if(response.includes('7') || response.includes('sword')) {
+        } else if(response.includes('8') || response.includes('sword')) {
             voucher = 'swords'
-        } else if(response.includes('8') || response.includes('orb')) {
+        } else if(response.includes('9') || response.includes('orb')) {
             voucher = 'orb'
-        } else if(response.includes('9') || response.includes('gem')) {
+        } else if(response.includes('10') || response.includes('gem')) {
             voucher = 'gem'
         } else {
             message.channel.send(`You did not select a valid option.`)
@@ -787,8 +790,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
             unlocked: [
                 [10, 'DOC-180', `(2) ${ult}DOC-180 - Peropero Cerperus - 10 ${mushroom}`],
                 [10, 'TEB-135', `(3) ${ult}TEB-135 - Green Baboon, Defender of the Forest - 10 ${mushroom}`],
-                [20, 'ORF-046', `(4) ${ult}ORF-046 - X-Saber Airbellum - 20 ${mushroom}`],
-                [40, 'DOC-196', `(5) ${scr}DOC-196 - Rescue Cat - 40 ${mushroom}`]
+                [15, 'ORF-046', `(4) ${ult}ORF-046 - X-Saber Airbellum - 15 ${mushroom}`]
             ]
         },
         moai: {
@@ -808,8 +810,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
             original: [[10, 'APC-004', `(1) ${ult}APC-004 - Moray of Greed - 10 ${hook}`]],
             unlocked: [
                 [10, 'DOC-181', `(2) ${ult}DOC-181 - Sharkraken - 10 ${hook}`],
-                [10, 'TEB-132', `(3) ${ult}TEB-132 - Citadel Whale - 10 ${hook}`],
-                [30, 'DOC-194', `(4) ${scr}DOC-194 - Lifeless Leaffish - 30 ${hook}`]
+                [10, 'TEB-132', `(3) ${ult}TEB-132 - Citadel Whale - 10 ${hook}`]
             ]
         },
         egg: {
@@ -829,7 +830,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
         swords: {
             original: [[10, 'APC-007', `(1) ${ult}APC-007 - Sublimation Knight - 10 ${swords}`]],
             unlocked: [
-                [20, 'ORF-047', `(2) ${ult}ORF-047 - Elemental HERO Nova Master - 20 ${swords}`],
+                [15, 'ORF-047', `(2) ${ult}ORF-047 - Elemental HERO Nova Master - 15 ${swords}`],
                 [30, 'DOC-188', `(3) ${ult}DOC-188 - Reinforcement of the Army - 30 ${swords}`],
                 [40, 'TEB-136', `(4) ${ult}TEB-136 - Infernoble Knight - Roland - 40 ${swords}`]
             ]
@@ -837,18 +838,15 @@ const getBarterCard = async (message, voucher, medium_complete) => {
         orb: {
             original: [[10, 'APC-008', `(1) ${ult}APC-008 - Spellbook of Knowledge - 10 ${orb}`]],
             unlocked: [
-                [20, 'DOC-175', `(2) ${ult}DOC-175 - Breaker the Magical Warrior - 20 ${orb}`],
-                [20, 'TEB-137', `(3) ${ult}TEB-137 - Shaddoll Dragon - 20 ${orb}`],
-                [60, 'DOC-000', `(4) ${scr}DOC-000 - Chaos Sorcerer - 60 ${orb}`],
-                [100, 'TEB-000', `(5) ${scr}TEB-000 - Thousand-Eyes Restrict - 100 ${orb}`]
+                [10, 'TEB-130', `(2) ${ult}TEB-130 - Altergeist Meluseek - 10 ${orb}`],
+                [10, 'TEB-137', `(3) ${ult}TEB-137 - Shaddoll Dragon - 10 ${orb}`],
+                [20, 'DOC-175', `(4) ${ult}DOC-175 - Breaker the Magical Warrior - 20 ${orb}`]
             ]
         },
         gem: {
             original: [[10, 'APC-009', `(1) ${ult}APC-009 - Guardragon Cataclysm - 10 ${gem}`]],
             unlocked: [
-                [10, 'TEB-141', `(2) ${ult}TEB-141 - Dragon Ravine - 10 ${gem}`],
-                [30, 'DOC-197', `(3) ${scr}DOC-197 - Card of Safe Return - 30 ${gem}`],
-                [30, 'TEB-149', `(4) ${scr}TEB-149 - Tempest, Dragon Ruler of Storms - 30 ${gem}`]
+                [10, 'TEB-141', `(2) ${ult}TEB-141 - Dragon Ravine - 10 ${gem}`]
             ]
         }
     }
@@ -879,6 +877,27 @@ const getBarterCard = async (message, voucher, medium_complete) => {
 
         const selected_option = options[index]
         return selected_option
+    }).catch(err => {
+		console.log(err)
+        message.channel.send(`Sorry, time's up.`)
+        return false
+	})
+
+    return collected
+}
+
+
+
+// GET BARTER QUERY
+const getBarterQuery = async (message) => {
+    const filter = m => m.author.id === message.member.user.id
+	const msg = await message.channel.send(`Which card would you like to exchange ${forgestone} for?`)
+    const collected = await msg.channel.awaitMessages(filter, {
+		max: 1,
+        time: 15000
+    }).then(async collected => {
+		const response = collected.first().content.toLowerCase()
+        return response
     }).catch(err => {
 		console.log(err)
         message.channel.send(`Sorry, time's up.`)
@@ -984,6 +1003,7 @@ module.exports = {
     checkShopShouldBe,
     closeShop,
     getBarterCard,
+    getBarterQuery,
     getBarterDirection,
     getDumpRarity,
     getDumpQuantity,

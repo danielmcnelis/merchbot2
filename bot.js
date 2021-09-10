@@ -3566,6 +3566,7 @@ if (cmd === `!reset`) {
 			return message.channel.send(`Sorry, you cannot reset your account for another ${days === 29 ? 'day' : `${30 - days} days` }.`)
 		} else {
 			await resetPlayer(player) 
+			return message.channel.send(`RESET!`)
 		}
 	} else {
 		if (!isAmbassador(message.member) ) return message.channel.send('You do not have permission to do that.')

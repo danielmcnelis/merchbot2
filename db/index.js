@@ -51,9 +51,6 @@ Inventory.belongsTo(Player)
 Player.hasMany(Reset)
 Reset.belongsTo(Player)
 
-// Card.hasMany(Nickname)
-// Nickname.belongsTo(Card)
-
 Print.hasMany(Inventory)
 Inventory.belongsTo(Print)
 
@@ -111,6 +108,7 @@ module.exports = {
   Player,
   Print,
   Profile,
+  Reset,
   Set,
   Status,
   Tournament,

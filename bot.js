@@ -4386,7 +4386,7 @@ if(reducecom.includes(cmd)) {
 		inv.quantity--
 		await inv.save()
 
-		wallet.forgestones += value
+		wallet.forgestone += value
 		await wallet.save()
 	
 		daily.last_reduce = date

@@ -29,6 +29,10 @@ const resetPlayer = async (player) => {
         date: date,
         playerId: player.id
     })
+
+    player.last_reset = date
+    await player.save()
+
     return console.log('RESET!')
 }
 

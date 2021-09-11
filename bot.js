@@ -768,7 +768,7 @@ if(startcom.includes(cmd)) {
 						const wallet = await Wallet.findOne({ where: { playerId: playerId }})
 						wallet.stardust -= 50
 						await wallet.save()
-						await awardPack(message.channel, player_id, set, 1)
+						await awardPack(message.channel, playerId, set, 1)
 					}
 
 					return message.channel.send(`Let's go! Your tournament is starting now: https://challonge.com/${url} ${FiC}`)

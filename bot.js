@@ -24,7 +24,7 @@ const { checkCoreSetComplete, completeTask } = require('./functions/diary.js')
 const { askForGrindAllConfirmation } = require('./functions/mod.js')
 const { awardPack } = require('./functions/packs.js')
 const { askForAdjustConfirmation, collectNicknames, getNewMarketPrice, askForSetToPrint, selectPrint, askForRarity } = require('./functions/print.js')
-const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard } = require('./functions/profile.js')
+const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard, getResetConfirmation } = require('./functions/profile.js')
 const { fetchAllCardNames, fetchAllUniquePrintNames, findCard, search } = require('./functions/search.js')
 const { addSheet, makeSheet, writeToSheet } = require('./functions/sheets.js')
 const { applyPriceDecay, getBarterCard, getBarterQuery, getVoucher, getTradeInCard, getBarterDirection, askForBarterConfirmation, checkShopShouldBe, getDecayCountdown, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
@@ -3567,8 +3567,13 @@ if (cmd === `!reset`) {
 		if (player.last_reset && days < 30) {
 			return message.channel.send(`Sorry, you cannot reset your account for another ${days === 29 ? 'day' : `${30 - days} days` }.`)
 		} else {
-			await resetPlayer(player) 
-			return message.channel.send(`RESET!`)
+			const confirmation1 = await getResetConfirmation(message, attempt = 1)
+			if (!confirmation1) return
+			const confirmation2 = await getResetConfirmation(message, attempt = 2)
+			if (!confirmation2) return
+			const confirmation3 = await getResetConfirmation(message, attempt = 3)
+			if (!confirmation3) return
+			return resetPlayer(message, player) 
 		}
 	} else {
 		if (!isAmbassador(message.member) ) return message.channel.send('You do not have permission to do that.')

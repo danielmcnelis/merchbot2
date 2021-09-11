@@ -23,17 +23,98 @@ const createPlayer = async (id, username = null, tag = null, muted = false) => {
 }
 
 // RESET PLAYER
-const resetPlayer = async (player) => {
+const resetPlayer = async (message, player) => {
+    const invs = await Inventory.findAll({ where: { playerId: player.id }, order: card_code })
+
+    for (let i = 0; i < invs.length; i++) {
+        const inv = invs[i]
+        const quantity = inv.quantity
+        const printId = inv.printId
+        const card_code = inv.card_code
+
+        const merchbot_inv = await Inventory.findOne({ where: { playerId: merchbotId, printId: printId } })
+        if (merchbot_inv) {
+            console.log(`Donating ${quantity} ${card_code} to MerchBot.`)
+            merchbot_inv.quantity += quantity
+            await merchbot_inv.save()
+        } else {
+            console.log(`Creating ${quantity} ${card_code} for MerchBot.`)
+            await Inventory.create({
+                card_code: card_code,
+                quantity: quantity,
+                printId: printId,
+                playerId: merchbotId
+            })
+        }
+
+        console.log(`Destroying ${player.name}'s ${card_code} Inventory.`)
+        await inv.destroy()
+    }
+
+    console.log('RESETING ALL PLAYER STATS NOW!')
+    player.stats = 500
+    player.backup = 0
+    player.wins = 0
+    player.losses = 0
+    player.vanquished_foes = 0
+    player.best_stats = 500
+    player.current_streak = 0
+    player.longest_streak = 0
+    player.arena_wins = 0
+    player.arena_losses = 0
+    player.arena_stats = 500
+    player.arena_backup = 0
+    player.keeper_wins = 0
+    player.keeper_losses = 0
+    player.keeper_stats = 500
+    player.keeper_backup = 0
+    player.draft_wins = 0
+    player.draft_losses = 0
+    player.draft_stats = 500
+    player.draft_backup = 0
+    player.gauntlet_wins = 0
+    player.gauntlet_losses = 0
+    player.gauntlet_stats = 500
+    player.gauntlet_backup = 0
+    player.pauper_wins = 0
+    player.pauper_losses = 0
+    player.pauper_stats = 500
+    player.pauper_backup = 0
+    await player.save()
+
+    console.log('DELETING ALL PLAYER PROFILE FIELDS NOW!')
+    const binder = await Binder.findOne({ where: { playerId: player.id }})
+    await binder.destroy()
+
+    const daily = await Daily.findOne({ where: { playerId: player.id }})
+    await daily.destroy()
+
+    const diary = await Diary.findOne({ where: { playerId: player.id }})
+    await diary.destroy()
+
+    const knowledge = await Knowledge.findOne({ where: { playerId: player.id }})
+    await knowledge.destroy()
+
+    const profile = await Profile.findOne({ where: { playerId: player.id }})
+    await profile.destroy()
+
+    const wallet = await Wallet.findOne({ where: { playerId: player.id }})
+    await wallet.destroy()
+
+    const wishlist = await Wishlist.findOne({ where: { playerId: player.id }})
+    await wishlist.destroy()
+
+    console.log('SAVING RESET DATE!')
     const date = new Date()
     await Reset.create({ 
         date: date,
         playerId: player.id
     })
-
+    
     player.last_reset = date
     await player.save()
 
-    return console.log('RESET!')
+    return message.channel.send(`Your account has been successfully reset. All your cards and progress have been wiped.`)
 }
 
 //GET RANDOM STRING

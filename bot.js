@@ -764,8 +764,8 @@ if(startcom.includes(cmd)) {
 					
 					message.channel.send(`Please wait while I open some pack(s)... ${blue}`)
 					for (let i = 0; i < entries.length; i++) {
-						const player_id = entries[i].playerId
-						const wallet = await Wallet.findOne({ where: { player_id: player_id }})
+						const playerId = entries[i].playerId
+						const wallet = await Wallet.findOne({ where: { playerId: playerId }})
 						wallet.stardust -= 50
 						await wallet.save()
 						await awardPack(message.channel, player_id, set, 1)

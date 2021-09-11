@@ -2,7 +2,7 @@
 //PROFILE FUNCTIONS
 const { Inventory, Print } = require('../db')
 const { yescom, nocom } = require('../static/commands.json')
-const { com, rar, sup, ult, scr, blue, champion, FiC, leatherbound, legend, megaphone, sherthonk, stoned, yellow } = require('../static/emojis.json')
+const { com, rar, sup, ult, scr, blue, champion, FiC, leatherbound, legend, megaphone, sherthonk, stoned, yellow, wtf } = require('../static/emojis.json')
 const { findCard } = require('./search.js')
 
 const askToChangeProfile = async (message, field) => {
@@ -120,9 +120,9 @@ const getFavoriteCard = async (message, fuzzyPrints) => {
 
 // GET RESET CONFIRMATION
 const getResetConfirmation = async (message, attempt = 1) => {
-	const prompt = attempt === 1 ? `You are allowed to do a clean reset of your ${FiC} account every 30 days. Are you sure you want to reset? ${sherthonk}` :
-		attempt === 2 ? `Seriously. This cannot be undone. ${stoned} All your cards ${com} ${rar} ${sup} ${ult} ${scr} will be donated to The Shop. Your achievements ${legend} ${champion} ${leatherbound} will be erased. Are you sure you want to reset your ${FiC} acccount? ${yellow}` :
-		`${megaphone} HOMIE, THIS IS YOUR **FINAL CHANCE** TO BACK OUT. ARE YOU **COMPLETELY 100%** SURE ABOUT THIS? ${blue}`
+	const prompt = attempt === 1 ? `You are allowed to do a clean reset of your ${FiC} account every 30 days. Are you sure you want to do a reset? ${sherthonk}` :
+		attempt === 2 ? `Seriously. This cannot ${stoned} be undone. All your cards ${com} ${rar} ${sup} ${ult} ${scr} will be donated to The Shop. Your achievements ${legend} ${champion} ${leatherbound} will be erased. Are you sure you want to reset your ${FiC} acccount? ${yellow}` :
+		`${wtf} HOMIE, THIS IS YOUR ${megaphone} **FINAL CHANCE** ${megaphone} TO BACK OUT. ARE YOU **COMPLETELY** 💯 ABOUT THIS? ${blue}`
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send(prompt)
@@ -132,9 +132,9 @@ const getResetConfirmation = async (message, attempt = 1) => {
 	}).then(async collected => {
 		const response = collected.first().content.toLowerCase()
 		if (!yescom.includes(response)) {
-			return message.channel.send(`No problem. Have a nice day.`)
+			message.channel.send(`No problem. Have a nice day.`)
+			return false
 		} else {
-			message.channel.send(`I'm resetting your account. Please wait...`)
 			return true
 		}
 	}).catch(err => {

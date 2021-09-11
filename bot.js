@@ -3573,6 +3573,7 @@ if (cmd === `!reset`) {
 			if (!confirmation2) return
 			const confirmation3 = await getResetConfirmation(message, attempt = 3)
 			if (!confirmation3) return
+			message.channel.send(`Resetting account. Please wait...`)
 			return resetPlayer(message, player) 
 		}
 	} else {

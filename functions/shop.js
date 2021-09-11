@@ -151,7 +151,6 @@ const getDecayCountdown = () => {
 	const hoursLeftInPeriod = 23 - hours
 
     const decayCountdown = ( hoursLeftInPeriod * 60 + minsLeftInPeriod ) * 60 * 1000
-    console.log('decayCountdown', decayCountdown)
     return decayCountdown
 }
 

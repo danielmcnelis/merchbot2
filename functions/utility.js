@@ -24,7 +24,7 @@ const createPlayer = async (id, username = null, tag = null, muted = false) => {
 
 // RESET PLAYER
 const resetPlayer = async (message, player) => {
-    const invs = await Inventory.findAll({ where: { playerId: player.id }, order: card_code })
+    const invs = await Inventory.findAll({ where: { playerId: player.id }, order: [["card_code", "ASC"]] })
 
     for (let i = 0; i < invs.length; i++) {
         const inv = invs[i]

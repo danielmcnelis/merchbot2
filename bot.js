@@ -119,6 +119,8 @@ client.on('message', async (message) => {
 		!message.guild || 
 		//no commands from bots
 		message.author.bot || 
+		//do not allow users to parrot @everyone with the bot
+		message.content.includes('@everyone') ||
 		//only allow commands starting with !, { or [
 		(!message.content.startsWith("!") && !message.content.includes("{") && !message.content.includes("[")) ||
 		//only allow !start and !bot in welcome

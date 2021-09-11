@@ -3567,6 +3567,8 @@ if (cmd === `!reset`) {
 		if (player.last_reset && days < 30) {
 			return message.channel.send(`Sorry, you cannot reset your account for another ${days === 29 ? 'day' : `${30 - days} days` }.`)
 		} else {
+			const info = await Info.findOne({ where: { element: 'shop'} })
+			if (info.status === 'closed') return message.channel.send(`Sorry, you cannot reset your account while The Shop is closed.`)
 			const confirmation1 = await getResetConfirmation(message, attempt = 1)
 			if (!confirmation1) return
 			const confirmation2 = await getResetConfirmation(message, attempt = 2)
@@ -5638,6 +5640,8 @@ if(boxcom.includes(cmd)) {
 //DUMP
 if(cmd === `!dump`) {
 	if (mcid !== botSpamChannelId) return message.channel.send(`Please use this command in <#${botSpamChannelId}>.`)
+	const info = await Info.findOne({ where: { element: 'shop'} })
+	if (info.status === 'closed') return message.channel.send(`Sorry, you cannot dump cards while The Shop is closed.`)
 	const set_code = args.length ? args[0].toUpperCase() : 'TEB'
 	const set = await Set.findOne({where: { code: set_code }})
 	if (!set) return message.channel.send(`Sorry, I do not recognized the set code: "${set_code}".`)
@@ -5816,7 +5820,6 @@ if(cmd === `!buy`) {
 	if (buyerId === sellerId) return message.channel.send(`You cannot buy cards from yourself.`)
 	const shopSale = !!(sellerId === merchbotId)
 	const info = await Info.findOne({ where: { element: 'shop'} })
-	if (shopSale && info.status === 'closed') return message.channel.send(`Sorry, The Shop is closed.`)
 
 	const sellingPlayer = await Player.findOne({ 
 		where: { id: sellerId },

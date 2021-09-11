@@ -185,6 +185,8 @@ const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer, fuzzyP
 
 // GET INVOICE MERCHBOT PURCHASE
 const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer, fuzzyPrints) => {
+    const info = await Info.findOne({ where: { element: 'shop' }})
+    const shopIsClosed = info.status === 'closed'
     const buyerId = buyingPlayer.id
     let total_price = 0
     const cards = []
@@ -192,7 +194,7 @@ const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer, fuz
     const quantities = []
     const prints = []
     let m4success
-
+    
     const line_item = line_items[0]
     const args = line_item.split(' ').filter((el) => el !== '')
     const quantity = isFinite(args[0]) ? parseInt(args[0]) : 1    
@@ -227,7 +229,7 @@ const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer, fuz
     const auction = await Auction.findOne({ where: { printId: print.id }})
 
     if (auction) {
-        message.channel.send(`Sorry, ${card} will not be available until the next auction.`)
+        message.channel.send(`Sorry, ${card} will not be available until the ${shopIsClosed ? 'current auction is over' : 'next auction'}.`)
         return false
     }
 

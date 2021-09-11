@@ -139,7 +139,8 @@ const getResetConfirmation = async (message, attempt = 1) => {
 		}
 	}).catch(err => {
 		console.log(err)
-		return message.channel.send(`Sorry, time's up.`)
+		message.channel.send(`Sorry, time's up.`)
+		return false
 	})
 
 	return collected

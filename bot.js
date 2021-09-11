@@ -4768,7 +4768,7 @@ if(invcom.includes(cmd)) {
 	const player = await Player.findOne({ where: { id: playerId }})
 	if (!player) return message.channel.send(playerId === maid ? `You are not in the database. Type **!start** to begin the game.` : `That person is not in the database.`)
 
-	const query = playerId === maid ? args.join(' ') : args.length > 1 ? args.slice(1).join(' ') : null
+	const query = playerId === maid ? args.join(' ') : args.length > 1 ? args.slice(1).join(' ') : ''
 	const set_code = query.toUpperCase()
 	const valid_set_code = !!(set_code.length === 3 && await Set.count({where: { code: set_code }}))
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
@@ -4848,7 +4848,7 @@ if(invcom.includes(cmd)) {
 				if (row.print.set_code !== 'HIDDEN') results.push(`${eval(row.print.rarity)}${row.card_code} - ${row.print.card_name} - ${row.quantity}`) 
 			}
 		}
-	} else if (!query) {
+	} else if (!query.length) {
 		const invs = await Inventory.findAll({ 
 			where: { 
 				playerId,

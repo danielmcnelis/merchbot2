@@ -119,7 +119,7 @@ const getFavoriteCard = async (message, fuzzyPrints) => {
 }
 
 // GET RESET CONFIRMATION
-const getResetConfirmation = (message, attempt = 1) => {
+const getResetConfirmation = async (message, attempt = 1) => {
 	const prompt = attempt === 1 ? `You are allowed to do a clean reset of your ${FiC} account every 30 days. Are you sure you want to reset? ${sherthonk}` :
 		attempt === 2 ? `Seriously. This cannot be undone. ${stoned} All your cards ${com} ${rar} ${sup} ${ult} ${scr} will be donated to The Shop. Your achievements ${legend} ${champion} ${leatherbound} will be erased. Are you sure you want to reset your ${FiC} acccount? ${yellow}` :
 		`${megaphone} HOMIE, THIS IS YOUR **FINAL CHANCE** TO BACK OUT. ARE YOU **COMPLETELY 100%** SURE ABOUT THIS? ${blue}`

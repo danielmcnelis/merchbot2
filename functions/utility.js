@@ -4,7 +4,7 @@
 const { adminRole, ambassadorRole, arenaRole, modRole, tourRole } = require('../static/roles.json')
 const { mad, sad, rocks, bronze, silver, gold, platinum, diamond, master, legend, god } = require('../static/emojis.json')
 const { Op } = require('sequelize')
-const { Arena, Binder, Card, Daily, Diary, Draft, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Reset, Set, Tournament, Trade, Trivia, Wallet, Wishlist  } = require('../db/index.js')
+const { Arena, Auction, Binder, Card, Daily, Diary, Draft, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Reset, Set, Tournament, Trade, Trivia, Wallet, Wishlist  } = require('../db/index.js')
 const merchbotId = '584215266586525696'
 const quotes = require('../static/quotes.json')
 
@@ -33,6 +33,7 @@ const resetPlayer = async (message, player) => {
         const card_code = inv.card_code
 
         const merchbot_inv = await Inventory.findOne({ where: { playerId: merchbotId, printId: printId } })
+
         if (merchbot_inv) {
             console.log(`Donating ${quantity} ${card_code} to MerchBot.`)
             merchbot_inv.quantity += quantity
@@ -45,6 +46,20 @@ const resetPlayer = async (message, player) => {
                 printId: printId,
                 playerId: merchbotId
             })
+
+            const auction = await Auction.findOne({ where: { card_code: card_code }})
+            if (!auction) {
+                console.log(`Creation Auction for ${card_code}.`)
+                await Auction.create({
+                    card_code: card_code,
+                    quantity: quantity,
+                    printId: printId
+                })
+            } else {
+                console.log(`Adding ${quantity} ${card_code} to the Auction.`)
+                auction.quantity += quantity
+                await auction.save()
+            }
         }
 
         console.log(`Destroying ${player.name}'s ${card_code} Inventory.`)

@@ -32,24 +32,35 @@ const resetPlayer = async (message, player) => {
         const printId = inv.printId
         const card_code = inv.card_code
 
-        const merchbot_inv = await Inventory.findOne({ where: { playerId: merchbotId, printId: printId } })
+        const count = await Inventory.count({ 
+			where: { 
+				printId: printId,
+				playerId: merchbotId
+			}
+		})
 
-        if (merchbot_inv) {
-            console.log(`Donating ${quantity} ${card_code} to MerchBot.`)
-            merchbot_inv.quantity += quantity
-            await merchbot_inv.save()
-        } else {
-            console.log(`Creating ${quantity} ${card_code} for MerchBot.`)
-            await Inventory.create({
+        if (!count) {
+            console.log(`Creating ${card_code} Inventory for MerchBot.`)
+            await Inventory.create({ 
                 card_code: card_code,
-                quantity: quantity,
                 printId: printId,
                 playerId: merchbotId
             })
+        }
 
-            const auction = await Auction.findOne({ where: { card_code: card_code }})
+		const merchbot_inv = await Inventory.findOne({ 
+			where: { 
+				printId: printId,
+				playerId: merchbotId
+			}
+		})
+
+        if (!merchbot_inv) return message.channel.send(`Database error: Could not find or create MerchBot Inventory for: ${card_code}.`)
+
+        if (merchbot_inv.quantity <= 0) {
+            const auction = await Auction.findOne({ where: { card_code: card_code, printId: printId }})
             if (!auction) {
-                console.log(`Creation Auction for ${card_code}.`)
+                console.log(`Create Auction for ${card_code}.`)
                 await Auction.create({
                     card_code: card_code,
                     quantity: quantity,
@@ -61,6 +72,10 @@ const resetPlayer = async (message, player) => {
                 await auction.save()
             }
         }
+
+        console.log(`Donating ${quantity} ${card_code} to MerchBot.`)
+        merchbot_inv.quantity += quantity
+        await merchbot_inv.save()
 
         console.log(`Destroying ${player.name}'s ${card_code} Inventory.`)
         await inv.destroy()

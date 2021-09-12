@@ -380,6 +380,14 @@ const updateShop = async () => {
         shopChannel.bulkDelete(100)
     }, 4000)
 
+    setTimeout(() => {
+        shopChannel.bulkDelete(100)
+    }, 6000)
+
+    setTimeout(() => {
+        shopChannel.bulkDelete(100)
+    }, 8000)
+
     setTimeout(async () => {
         const results = [
             `Good day, The Shop ${merchant} is open. ${open}`,
@@ -447,7 +455,7 @@ const updateShop = async () => {
         }
     
         for (let i = 0; i < results.length; i += 10) shopChannel.send(results.slice(i, i+10))
-    }, 5000)
+    }, 9000)
 }
 
 // POST BIDS

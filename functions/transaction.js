@@ -113,7 +113,7 @@ const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer, fuzzyP
                     null
         
         if (!print && card_name) {
-            message.channel.send(`You do not have any copies of ${card}.`)
+            message.channel.send(`You do not have any copies of ${card_name}.`)
             return false
         } 
 

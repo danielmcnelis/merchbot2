@@ -112,7 +112,10 @@ const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer, fuzzyP
                     card_name ? await selectPrint(message, sellerId, card_name, private = false, inInv = true) :
                     null
         
-        if (!print && card_name) return false
+        if (!print && card_name) {
+            message.channel.send(`You do not have any copies of ${card}.`)
+            return false
+        } 
 
         const count = print && (print.set_code === 'CH2' || print.set_code === 'HIDDEN') ? await Inventory.findOne({ where: { printId: print.id } }) : true
 

@@ -117,7 +117,7 @@ const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer, fuzzyP
             return false
         } 
 
-        const count = print && (print.set_code === 'CH2' || print.set_code === 'HIDDEN') ? await Inventory.findOne({ where: { printId: print.id } }) : true
+        const count = print && (print.set_code === 'CH2' || print.set_code === 'HIDDEN') ? await Inventory.findOne({ where: { printId: print.id } }) : false
 
         if (!count) {
             message.channel.send(`Sorry, I do not recognize the card: "${query}".`)

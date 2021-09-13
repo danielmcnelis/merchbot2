@@ -111,15 +111,11 @@ const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer, fuzzyP
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) :
                     card_name ? await selectPrint(message, sellerId, card_name, private = false, inInv = true) :
                     null
-        
-        if (!print && card_name) {
+
+        if (card_name && !print) {
             message.channel.send(`You do not have any copies of ${card_name}.`)
             return false
-        } 
-
-        const count = print && (print.set_code === 'CH2' || print.set_code === 'HIDDEN') ? await Inventory.findOne({ where: { printId: print.id } }) : false
-
-        if (!count) {
+        } else if (!print) {
             message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
             return false
         }
@@ -221,9 +217,10 @@ const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer, fuz
                 card_name ? await selectPrint(message, buyerId, card_name) :
                 null
     
-    const count = print && (print.set_code === 'CH2' || print.set_code === 'HIDDEN') ? await Inventory.findOne({ where: { printId: print.id } }) : true
-
-    if (!print || !count) {
+    if (card_name && !print) {
+        message.channel.send(`You do not have any copies of ${card_name}.`)
+        return false
+    } else if (!print) {
         message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
         return false
     }
@@ -343,9 +340,10 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
                 card_name && !walletField ? await selectPrint(message, sellerId, card_name, private = false, inInv = true) :
                 null
     
-    const count = print && (print.set_code === 'CH1' || print.set_code === 'TEB') ? await Inventory.findOne({ where: { printId: print.id } }) : true
-
-    if ((!print || !count) && !walletField) {
+    if (card_name && !print) {
+        message.channel.send(`You do not have any copies of ${card_name}.`)
+        return false
+    } else if (!print && !walletField) {
         message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
         return false
     }

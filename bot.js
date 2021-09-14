@@ -3652,7 +3652,7 @@ if(dropcom.includes(cmd)) {
 		const entry = await Entry.findOne({ where: { playerId: maid }, include: Player})
 		if (!entry) return message.channel.send(`You are not in the tournament.`)
 
-		return removeParticipant(message, entry, tournament, drop = true)
+		return removeParticipant(message, message.member, entry, tournament, drop = true)
 	}
 
 	const entry = await eval(game).findOne({ where: { playerId: maid} })

@@ -1451,7 +1451,7 @@ if (cmd === `!shop`) {
 		if ((day === 6 && hours >= 14) || day === 0 || day === 1 || (day === 2 && hours < 16)) {
 			shopStatus = 'open'
 			shopEmoji = open
-			nextAction = 'closes'
+			nextAction = 'close'
 			nextEmoji = closed
 			dayShopReverts = 'Tuesday'
 			hourShopReverts = '4pm'
@@ -1463,7 +1463,7 @@ if (cmd === `!shop`) {
 		} else if ((day === 2 && hours >= 16) || (day === 3 && hours < 8)) {
 			shopStatus = 'closed'
 			shopEmoji = closed
-			nextAction = 'opens'
+			nextAction = 'open'
 			nextEmoji = open
 			dayShopReverts = 'Wednesday'
 			hourShopReverts = '8am'
@@ -1473,7 +1473,7 @@ if (cmd === `!shop`) {
 		} else if ((day === 3 && hours >= 8) || day === 4 || (day === 5 && hours < 22)) {
 			shopStatus = 'open'
 			shopEmoji = open
-			nextAction = 'closes'
+			nextAction = 'close'
 			nextEmoji = closed
 			dayShopReverts = 'Friday'
 			hourShopReverts = '10pm'
@@ -1484,7 +1484,7 @@ if (cmd === `!shop`) {
 		} else if ((day === 5 && hours >= 22) || (day === 6 && hours < 14)) {
 			shopStatus = 'closed'
 			shopEmoji = closed
-			nextAction = 'opens'
+			nextAction = 'open'
 			nextEmoji = open
 			dayShopReverts = 'Saturday'
 			hourShopReverts = '2pm'
@@ -1493,7 +1493,7 @@ if (cmd === `!shop`) {
 				null
 		}
 	
-		return message.channel.send(`The Shop ${merchant} is ${shopStatus} ${shopEmoji}. It ${nextAction} in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes, on ${dayShopReverts} at ${hourShopReverts} ET. ${eval(nextEmoji)}`)
+		return message.channel.send(`The Shop ${merchant} is ${shopStatus} ${shopEmoji}. It will ${nextAction} in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes, on ${dayShopReverts} at ${hourShopReverts} ET. ${nextEmoji}`)
 	} else {
 		const query = args.join(' ')
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`

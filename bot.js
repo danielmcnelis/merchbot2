@@ -1189,10 +1189,10 @@ if(deckcom.includes(cmd)) {
 		if (!set) return message.channel.send(`Could not find set with code "${decks[deck].set_code}".`)
 		if (!set.for_sale) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} ${eval(set.alt_emoji)} is not available.`)
 		const money = wallet[set.currency]
-		if (money < set.unit_price * discount) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${money}${eval(set.currency)} and ${decks[deck].name} ${eval(deck)} costs ${set.unit_price * discount}${eval(set.currency)}.`)
+		if (money < set.unit_price * discount) return message.channel.send(`Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${decks[deck].name} ${eval(deck)} costs ${set.unit_price * discount}${eval(set.currency)}.`)
 
 		const filter = m => m.author.id === message.author.id
-		const msg = await message.channel.send(`${wallet.player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.unit_price * discount}${eval(set.currency)} on a copy of ${decks[deck].name} ${eval(deck)}?`)
+		const msg = await message.channel.send(`${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.unit_price * discount}${eval(set.currency)} on a copy of ${decks[deck].name} ${eval(deck)}?`)
 		const collected = await msg.channel.awaitMessages(filter, {
 			max: 1,
 			time: 15000
@@ -5071,10 +5071,10 @@ if(packcom.includes(cmd)) {
 	const merchbot_wallet = await Wallet.findOne( { where: { playerId: merchbotId } })
 	if (!wallet || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	const money = wallet[set.currency]
-	if (money < (set.unit_price * discount * num)) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${money}${eval(set.currency)} and ${num > 1 ? `${num} ` : ''}${set.name} ${eval(set.emoji)} Packs cost ${num * discount * set.unit_price}${eval(set.currency)}.`)
+	if (money < (set.unit_price * discount * num)) return message.channel.send(`Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${num > 1 ? `${num} ` : ''}${set.name} ${eval(set.emoji)} Packs cost ${num * discount * set.unit_price}${eval(set.currency)}.`)
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`${wallet.player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${num * discount * set.unit_price}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`)
+	const msg = await message.channel.send(`${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${num * discount * set.unit_price}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000

@@ -286,7 +286,7 @@ const putMatchResult = async (tournamentId, matchId, winnerId, scores) => {
 //PUT PARTICIPANT
 const putParticipant = async (tournament, player) => {
     try {
-        const { data } = await axios({
+        const success = await axios({
             method: 'put',
             url: `https://formatlibrary:${challongeAPIKey}@api.challonge.com/v1/tournaments/${tournament.id}/participants.json`,
             data: {
@@ -295,7 +295,7 @@ const putParticipant = async (tournament, player) => {
                 }
             }
         })
-        return data
+        return !!success
     } catch (err) {
         console.log(err)
     }   

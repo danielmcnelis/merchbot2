@@ -1168,7 +1168,7 @@ if(deckcom.includes(cmd)) {
 
 		return message.channel.send(`Arena ${capitalize(deck)} ${eval(deck)} Deck (staples in the side):\n<${arenas.decks[deck].url}>\n${arenas.decks[deck].screenshot}`)
 	} else {
-		const player = await Player.findOne( { where: { playerId: maid }, include: [Diary, Wallet] })
+		const player = await Player.findOne( { where: { id: maid }, include: [Diary, Wallet] })
 		const wallet = player.diary
 		const diary = player.diary
 		const hard_complete = diary.h1 && diary.h2 && diary.h3 && diary.h4 && diary.h5 && diary.h6 && diary.h7 && diary.h8

@@ -444,8 +444,8 @@ const updateShop = async () => {
             const print = inv.print
             const excluded = !!auction_printIds.includes(print.id)
             const market_price = print.market_price
-            const selling_price = Math.ceil(market_price * 1.1) > 1 ? Math.ceil(market_price * 1.1) : 2
             const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
+            const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
             results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(print.rarity)}${inv.card_code} - ${print.card_name} - ${inv.quantity}${excluded ? ` - ${no}` : ''}`) 
         }
     

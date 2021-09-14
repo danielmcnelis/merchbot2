@@ -1,4 +1,5 @@
 const { Binder, Inventory, Player } = require('../db')
+const { Op } = require('sequelize')
 
 const updateBinder = async (player) => {
     if (!player) return

@@ -193,7 +193,11 @@ const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer, fuz
     const quantities = []
     const prints = []
     let m4success
-    
+
+    const diary = buyingPlayer.diary
+    const hard_complete = diary.h1 && diary.h2 && diary.h3 && diary.h4 && diary.h5 && diary.h6 && diary.h7 && diary.h8
+    const discount = hard_complete ? (1 / 1.1) : 1
+
     const line_item = line_items[0]
     const args = line_item.split(' ').filter((el) => el !== '')
     const quantity = isFinite(args[0]) ? parseInt(args[0]) : 1    
@@ -266,7 +270,7 @@ const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer, fuz
 
     if (!!(print.rarity === 'scr')) m4success = true
 
-    total_price += Math.ceil(print.market_price * 1.1) * quantity 
+    total_price += Math.ceil(print.market_price * 1.1 * discount) * quantity 
     quantities.push(quantity)
     prints.push(print)
     sellerInvs.push(merchbotInv)

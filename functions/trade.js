@@ -147,7 +147,10 @@ const getTradeSummary = async (message, inputs, player, fuzzyPrints) => {
 		card_name && !walletField ? await selectPrint(message, player.id, card_name, private = false, inInv = true) :
 		null
 
-		if ((!print && !walletField) || (print && print.set_code === 'HIDDEN')) {
+		if (card_name && !print) {
+			message.channel.send(`You do not have any copies of ${card_name}.`)
+			return false
+		} else if (!print && !walletField) {
 			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 			return false
 		}

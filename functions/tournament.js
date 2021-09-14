@@ -207,36 +207,42 @@ const selectTournament = async (message, tournaments, playerId) => {
 
 
 //REMOVE PARTICIPANT
-const removeParticipant = async (message, member, participants, participantId, tournamentId, drop = false) => {    
-    let participantID
-    let keys = Object.keys(participants)
+const removeParticipant = async (message, member, entry, tournament, drop = false) => {    
+    
+    try {
+        const success = await axios({
+            method: 'delete',
+            url: `https://formatlibrary:${challongeAPIKey}@api.challonge.com/v1/tournaments/${tournament.id}/participants/${entry.participantId}`,
+        })
 
-    keys.forEach(function(key) {
-        if (participants[key].participant.name === member.user.username) {
-            participantID = participants[key].participant.id
-        }
-    })
-
-    return challongeClient.participants.destroy({
-        id: tournamentId,
-        participantID: participantID,
-        callback: async (err) => {
-            if (err) {
-                if (drop) {
-                    return message.channel.send(`Hmm... I don't see you in the participants list.`)
-                } else {
-                    return message.channel.send(`I could not find ${member.user.username} in the participants list.`)
-                }
+        if (success) {
+            await entry.destroy()
+            member.roles.remove(tourRole)
+        
+            if (drop) {
+                return message.channel.send(`I removed you from the tournament. Better luck next time!`)
             } else {
-                const entry = await Entry.findOne({ where: { playerId: member.user.id } })
-                await entry.destroy()
-                member.roles.remove(tourRole)
-
-                if (drop) return message.channel.send(`I removed you from the tournament. Better luck next time!`)
-                else return message.channel.send(`${member.user.username} has been removed from the tournament.`)
+                return message.channel.send(`${member.user.username} has been removed from the tournament.`)
             }
+        } else if (!success && drop) {
+            console.log(1)
+            return message.channel.send(`Hmm... I don't see you in the participants list.`)
+        } else if (!success && !drop) {
+            console.log(1)
+            return message.channel.send(`I could not find ${member.user.username} in the participants list.`)
         }
-    })
+
+    } catch (err) {
+        console.log(err)
+        if (drop) {
+            console.log(2)
+            return message.channel.send(`Hmm... I don't see you in the participants list.`)
+        } else {
+            console.log(2)
+            return message.channel.send(`I could not find ${member.user.username} in the participants list.`)
+        }
+    }   
+
 }
 
 //GET TOURNAMENT
@@ -283,8 +289,8 @@ const putMatchResult = async (tournamentId, matchId, winnerId, scores) => {
 }
 
 
-//PUT PARTICIPANT
-const putParticipant = async (tournament, player) => {
+//POST PARTICIPANT
+const postParticipant = async (tournament, player) => {
     try {
         const { data } = await axios({
             method: 'post',
@@ -471,7 +477,7 @@ module.exports = {
     getMatches,
     getTournament,
     putMatchResult,
-    putParticipant,
+    postParticipant,
     removeParticipant,
     seed,
     selectTournament

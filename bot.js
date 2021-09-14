@@ -30,7 +30,7 @@ const { fetchAllCardNames, fetchAllUniquePrintNames, findCard, search } = requir
 const { addSheet, makeSheet, writeToSheet } = require('./functions/sheets.js')
 const { applyPriceDecay, getBarterCard, getBarterQuery, getVoucher, getTradeInCard, getBarterDirection, askForBarterConfirmation, checkShopShouldBe, getDecayCountdown, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
 const { getNewStatus } = require('./functions/status.js')
-const { askForDBUsername, checkChallongePairing, findNextMatch, findNextOpponent, findOtherPreReqMatch, generateSheetData, getDeckListTournament, getDeckNameTournament, getMatches, getTournament, getTournamentType, putMatchResult, putParticipant, removeParticipant, seed, selectTournament } = require('./functions/tournament.js')
+const { askForDBUsername, checkChallongePairing, findNextMatch, findNextOpponent, findOtherPreReqMatch, generateSheetData, getDeckListTournament, getDeckNameTournament, getMatches, getTournament, getTournamentType, putMatchResult, postParticipant, removeParticipant, seed, selectTournament } = require('./functions/tournament.js')
 const { processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
 const { getBuyerConfirmation, getInvoiceMerchBotPurchase, getInvoiceMerchBotSale, getInvoiceP2PSale, getSellerConfirmation, processMerchBotSale, processP2PSale } = require('./functions/transaction.js')
 const { askQuestion, resetTrivia, startTrivia } = require('./functions/trivia.js')
@@ -3410,7 +3410,7 @@ if(joincom.includes(cmd)) {
 		const deckName = await getDeckNameTournament(member, player)
 		if (!deckName) return
 											
-		const { participant } = await putParticipant(tournament, player)
+		const { participant } = await postParticipant(tournament, player)
 		if (!participant) return message.channel.send(`Could not access tournament: ${tournament.name}`)
 
 		await Entry.create({
@@ -3471,28 +3471,25 @@ if(cmd === '!resubmit') {
 	const entry = entries.filter((e) => e.tournament.state === 'pending')[0]
 	if (!entry) return message.channel.send(`Sorry, the tournament already started.`)
 	
-	return challongeClient.tournaments.show({
-		id: entry.tournament.id,
-		callback: async (err, data) => {
-			if (err) {
-				return message.channel.send(`Could not find tournament: "${tournament.name}".`)
-			} else {
-				message.channel.send(`Please check your DMs.`)
-				const deckListUrl = await getDeckListTournament(member, player, resubmission = true)
-				if (!deckListUrl) return
-				const deckName = await getDeckNameTournament(member, player)
-				if (!deckName) return
+	const tournaments = await Tournament.findAll({ where: { state: 'pending' }, order: [['createdAt', 'ASC']] })
+	const count = await Tournament.count({ where: { state: 'underway' } })
+	const tournament = await selectTournament(message, tournaments, maid)
+	if (!tournament && count) return message.channel.send(`Sorry, the tournament already started.`)
+	if (!tournament && !count) return message.channel.send(`There is no active tournament.`)
+	
+	message.channel.send(`Please check your DMs.`)
+	const deckListUrl = await getDeckListTournament(member, player, resubmission = true)
+	if (!deckListUrl) return
+	const deckName = await getDeckNameTournament(member, player)
+	if (!deckName) return
 
-				await entry.update({
-					url: deckListUrl,
-					name: deckName,
-					type: deckName
-				})
-
-				return message.author.send(`Thanks! I have your updated deck list for the tournament.`)
-			}	
-		}
+	await entry.update({
+		url: deckListUrl,
+		name: deckName,
+		type: deckName
 	})
+
+	return message.author.send(`Thanks! I have your updated deck list for the tournament.`)
 }
 
 //RESET
@@ -3655,16 +3652,7 @@ if(dropcom.includes(cmd)) {
 		const entry = await Entry.findOne({ where: { playerId: maid }, include: Player})
 		if (!entry) return message.channel.send(`You are not in the tournament.`)
 
-		return challongeClient.participants.index({
-			id: tournament.id,
-			callback: async (err, data) => {
-				if (err) {
-					return message.channel.send(`Could not find tournament: "${tournament.name}".`)
-				} else {
-					return removeParticipant(message, message.member, data, entry.participantId, tournament.id, true)
-				}
-			}
-		})
+		return removeParticipant(message, entry, tournament, drop = true)
 	}
 
 	const entry = await eval(game).findOne({ where: { playerId: maid} })
@@ -3710,16 +3698,7 @@ if (cmd.toLowerCase() === `!remove`) {
 		const entry = await Entry.findOne({ where: { playerId }, include: Player})
 		if (!entry) return message.channel.send(`That user is not in the tournament.`)
 
-		return challongeClient.participants.index({
-			id: tournament.id,
-			callback: (err, data) => {
-				if (err) {
-					return message.channel.send(`Could not find tournament: "${tournament.name}".`)
-				} else {
-					return removeParticipant(message, member, data, entry.participantId, tournament.id)
-				}
-			}
-		})
+		return removeParticipant(message, member, entry, tournament, drop = false)
 	}
 
 	const entry = await eval(game).findOne({ where: { playerId } })

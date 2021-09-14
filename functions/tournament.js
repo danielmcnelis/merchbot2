@@ -5,7 +5,7 @@ const { registrationChannelId } = require('../static/channels.json')
 const { tourRole } = require('../static/roles.json')
 const { soldier, FiC } = require('../static/emojis.json')
 const { Arena, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist } = require('../db')
-const { client, challongeClient } = require('../static/clients.js')
+const { client } = require('../static/clients.js')
 const { saveYDK, saveAllYDK } = require('./decks.js')
 const { capitalize, shuffleArray } = require('./utility.js')
 
@@ -400,19 +400,25 @@ const findNextOpponent = async (tournamentId, matchesArr, matchId, participantId
 //CHECK CHALLONGE PAIRING
 const checkChallongePairing = (match, p1, p2) => (match.player1_id === p1 && match.player2_id === p2) || (match.player1_id === p2 && match.player2_id === p1)
 
+//FIND NO SHOW OPPONENT
+const findNoShowOpponent = (match, noShowParticipantId) => {
+    if (match.player1_id === noShowParticipantId) return match.player2_id
+    if (match.player2_id === noShowParticipantId) return match.player1_id
+    else return false
+}
 
 // GET TOURNAMENT TYPE
 const getTournamentType = async (message) => {
     let tournamentType
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`What type of tournament is this?\n(1) Double Elimination\n(2) Single Elimination\n(3) Swiss\n(4) Round Robin`)
+	const msg = await message.channel.send(`What type of tournament is this?\n(1) Single Elimination\n(2) Double Elimination\n(3) Swiss\n(4) Round Robin`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 30000
 	}).then(collected => {
 		const response = collected.first().content.toLowerCase()
-        if (response.includes(1) || response.startsWith('double')) tournamentType = 'double elimination'
-        else if (response.includes(2) || response.startsWith('single')) tournamentType = 'single elimination'
+        if (response.includes(1) || response.startsWith('single')) tournamentType = 'single elimination'
+        else if (response.includes(2) || response.startsWith('double')) tournamentType = 'single elimination'
         else if (response.includes(3) || response.startsWith('swiss')) tournamentType = 'swiss'
         else if (response.includes(4) || response.startsWith('round')) tournamentType = 'round robin'
         else return 
@@ -468,6 +474,7 @@ module.exports = {
     findOtherPreReqMatch,
     findNextMatch,
     findNextOpponent,
+    findNoShowOpponent,
     generateSheetData,
     getDeckListTournament,
     getDeckNameTournament,

@@ -39,11 +39,11 @@ const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createP
 // STATIC IMPORTS
 const arenas = require('./static/arenas.json')
 const { arenaChannelId, botSpamChannelId, bugreportsChannelId, discussionChannelId, draftChannelId, duelRequestsChannelId, pauperChannelId, gauntletChannelId, generalChannelId, gutterChannelId, introChannelId, keeperChannelId, marketPlaceChannelId, replaysChannelId, rulesChannelId, rulingsChannelId, shopChannelId, staffChannelId, suggestionsChannelId, tournamentChannelId, triviaChannelId, welcomeChannelId } = require('./static/channels.json')
-const { client, challongeClient } = require('./static/clients.js')
+const { client } = require('./static/clients.js')
 const { alchemycom, aliuscom, bindercom, botcom, boxcom, bracketcom, calccom, checklistcom, dailycom, dbcom, deckcom, dicecom, dropcom, flipcom, h2hcom, historycom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, packcom, pfpcom, populationcom, profcom, queuecom, rankcom, reducecom, referralcom, rolecom, specialcom, startcom, statscom, undocom, walletcom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
-const { king, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, shrine, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion } = require('./static/emojis.json')
+const { king, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, shrine, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion, open, closed } = require('./static/emojis.json')
 const { adminRole, arenaRole, botRole,expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')
@@ -722,32 +722,32 @@ if(startcom.includes(cmd)) {
 		const success = await seed(message, id)
 		if (!success) return message.channel.send(`Error seeding tournament. Please try again or start it manually.`)
 
-        await challongeClient.tournaments.start({
-            id: id,
-            callback: async (err) => {
-                if (err) {
-                    return message.channel.send(`Error: ${name} could not be initialized.`)
-                } else {
-                    tournament.state = 'underway'
-					await tournament.save()
-                    const spreadsheetId = await makeSheet(`${name} Deck Lists`, sheet1Data)
-                    await addSheet(spreadsheetId, 'Summary')
-                    await writeToSheet(spreadsheetId, 'Summary', 'RAW', sheet2Data)
-                    //await uploadDeckFolder(name)
-					
-					message.channel.send(`Please wait while I open some pack(s)... ${blue}`)
-					for (let i = 0; i < entries.length; i++) {
-						const playerId = entries[i].playerId
-						const wallet = await Wallet.findOne({ where: { playerId: playerId }})
-						wallet.stardust -= 50
-						await wallet.save()
-						await awardPack(message.channel, playerId, set, 1)
-					}
+		const { status } = await axios({
+			method: 'post',
+			url: `https://formatlibrary:${challongeAPIKey}@api.challonge.com/v1/tournaments/${tournament.id}/start.json`
+		})
 
-					return message.channel.send(`Let's go! Your tournament is starting now: https://challonge.com/${url} ${FiC}`)
-                }
-            }
-        })
+		if (status === 200) { 
+			tournament.state = 'underway'
+			await tournament.save()
+			const spreadsheetId = await makeSheet(`${name} Deck Lists`, sheet1Data)
+			await addSheet(spreadsheetId, 'Summary')
+			await writeToSheet(spreadsheetId, 'Summary', 'RAW', sheet2Data)
+			//await uploadDeckFolder(name)
+			
+			// message.channel.send(`Please wait while I open some pack(s)... ${blue}`)
+			// for (let i = 0; i < entries.length; i++) {
+			// 	const playerId = entries[i].playerId
+			// 	const wallet = await Wallet.findOne({ where: { playerId: playerId }})
+			// 	wallet.stardust -= 50
+			// 	await wallet.save()
+			// 	await awardPack(message.channel, playerId, set, 1)
+			// }
+	
+			return message.channel.send(`Let's go! Your tournament is starting now: https://challonge.com/${url} ${FiC}`)
+		} else {
+			return message.channel.send(`Error: could not access Challonge.com.`)
+		}
 	} else {
 		if(await isNewUser(maid)) await createPlayer(maid, message.author.username, message.author.tag)
 		if(await hasProfile(maid)) return message.channel.send("You already received your first Starter Deck.")
@@ -2540,9 +2540,9 @@ if (losscom.includes(cmd)) {
 		}, 2000)
 		message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your Tournament loss to ${winningPlayer.name} (+${chipsWinner + diary_bonus}${starchips}) has been recorded.`)
 		const updatedMatchesArr = await getMatches(tournamentId)
-		const winnersNextMatch = findNextMatch(updatedMatchesArr, matchId, winningEntry.participantId)
-		const winnersNextOpponent = winnersNextMatch ? await findNextOpponent(tournamentId, updatedMatchesArr, winnersNextMatch, winningEntry.participantId) : null
-		const winnerMatchWaitingOn = winnersNextOpponent ? null : findOtherPreReqMatch(updatedMatchesArr, winnersNextMatch, matchId) 
+		const winnerNextMatch = findNextMatch(updatedMatchesArr, matchId, winningEntry.participantId)
+		const winnerNextOpponent = winnerNextMatch ? await findNextOpponent(tournamentId, updatedMatchesArr, winnerNextMatch, winningEntry.participantId) : null
+		const winnerMatchWaitingOn = winnerNextOpponent ? null : findOtherPreReqMatch(updatedMatchesArr, winnerNextMatch, matchId) 
 		const winnerWaitingOnP1 = winnerMatchWaitingOn && winnerMatchWaitingOn.p1 && winnerMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: winnerMatchWaitingOn.p1 } }) : null
 		const winnerWaitingOnP2 = winnerMatchWaitingOn && winnerMatchWaitingOn.p1 && winnerMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: winnerMatchWaitingOn.p2 } }) : null
 
@@ -2555,15 +2555,15 @@ if (losscom.includes(cmd)) {
 			await losingEntry.destroy()
 		}
 
-		const losersNextMatch = loserEliminated ? null : findNextMatch(updatedMatchesArr, matchId, losingEntry.participantId)
-		const losersNextOpponent = losersNextMatch ? await findNextOpponent(tournamentId, updatedMatchesArr, losersNextMatch, winningEntry.participantId) : null
-		const loserMatchWaitingOn = losersNextOpponent ? null : findOtherPreReqMatch(updatedMatchesArr, losersNextMatch, matchId) 
+		const loserNextMatch = loserEliminated ? null : findNextMatch(updatedMatchesArr, matchId, losingEntry.participantId)
+		const loserNextOpponent = loserNextMatch ? await findNextOpponent(tournamentId, updatedMatchesArr, loserNextMatch, losingEntry.participantId) : null
+		const loserMatchWaitingOn = loserNextOpponent ? null : findOtherPreReqMatch(updatedMatchesArr, loserNextMatch, matchId) 
 		const loserWaitingOnP1 = loserMatchWaitingOn && loserMatchWaitingOn.p1 && loserMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: loserMatchWaitingOn.p1 }, include: Player }) : null
 		const loserWaitingOnP2 = loserMatchWaitingOn && loserMatchWaitingOn.p1 && loserMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: loserMatchWaitingOn.p2 }, include: Player }) : null
 
 		setTimeout(() => {
 			if (loserEliminated) return message.channel.send(`${losingPlayer.name}, You are eliminated from the tournament. Better luck next time!`)
-			else if (losersNextOpponent) return message.channel.send(`New Match: <@${losingPlayer.id}> vs. <@${losersNextOpponent.playerId}>. Good luck to both duelists.`)
+			else if (loserNextOpponent) return message.channel.send(`New Match: <@${losingPlayer.id}> vs. <@${loserNextOpponent.playerId}>. Good luck to both duelists.`)
 			else if (loserMatchWaitingOn && loserWaitingOnP1 && loserWaitingOnP2) {
 				return message.channel.send(`${losingPlayer.name}, You are waiting for the result of ${loserWaitingOnP1.name} vs ${loserWaitingOnP2.name}.`)
 			}
@@ -2571,9 +2571,9 @@ if (losscom.includes(cmd)) {
 		}, 2000)
 
 		setTimeout(() => {
-			if (!winnersNextMatch) return message.channel.send(`<@${winningPlayer.id}>, You won the tournament! Congratulations on your stellar performance! ${FiC}`)
-			else if (winnersNextOpponent) return message.channel.send(`New Match: <@${winningPlayer.id}> vs. <@${winnersNextOpponent.playerId}>. Good luck to both duelists.`)
-			else if (loserMatchWaitingOn && winnerWaitingOnP1 && winnerWaitingOnP2) {
+			if (!winnerNextMatch) return message.channel.send(`<@${winningPlayer.id}>, You won the tournament! Congratulations on your stellar performance! ${FiC}`)
+			else if (winnerNextOpponent) return message.channel.send(`New Match: <@${winningPlayer.id}> vs. <@${winnerNextOpponent.playerId}>. Good luck to both duelists.`)
+			else if (winnerMatchWaitingOn && winnerWaitingOnP1 && winnerWaitingOnP2) {
 				return message.channel.send(`${winningPlayer.name}, You are waiting for the result of ${winnerWaitingOnP1.name} vs ${winnerWaitingOnP2.name}.`)
 			}
 			else return message.channel.send(`${winningPlayer.name}, You are waiting for multiple matches to finish. Grab a snack and stay hydrated.`)
@@ -3005,28 +3005,80 @@ if (noshowcom.includes(cmd)) {
 	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannelId}>.`)
 	
 	if (game === 'Tournament') {
-		const noShowEntry = await Entry.findOne({ where: { playerId: noShowId }, include: Player })
+		const noShowEntry = await Entry.findOne({ where: { playerId: noShowId }, include: [Player, Tournament] })
 	
-		if (!noShowEntry || !noShow.roles.cache.some(role => role.id === tourRole)) return message.channel.send(
-			`Sorry, ${noShow.user.username} is not in the tournament.`
-			)
+		if (!noShowEntry || !noShow.roles.cache.some(role => role.id === tourRole)) {
+			return message.channel.send(`Sorry, ${noShow.user.username} is not in the tournament.`)
+		} 
 	
-		const tournaments = await Tournament.findAll({ order: [['createdAt', 'ASC']] })
-		if (!tournaments.length) return message.channel.send(`There is no active tournament.`)
-	
-		const tournament = await selectTournament(message, tournaments, maid)
-		if (!tournament) return message.channel.send(`Please select a valid tournament.`)
+		const tournament = noShowEntry.tournament
+		if (tournament.state === 'pending') return message.channel.send(`Sorry, ${tournament.name} has not started yet.`)
+		if (tournament.state !== 'underway') return message.channel.send(`Sorry, ${tournament.name} is not underway.`)
 		
-		return challongeClient.matches.index({
-			id: tournament.id,
-			callback: (err, data) => {
-				if (err) {
-					return message.channel.send(`Could not find tournament: "${tournament.name}".`)
-				} else {
-					return findOpponent(message, data, noShow, noShowEntry)
-				}
+		const matchesArr = await getMatches(tournamentId)
+		let matchId = false
+		let winnerParticipantId = false
+		let scores = "0-0"
+		for (let i = 0; i < matchesArr.length; i++) {
+			const match = matchesArr[i].match
+			if (match.state !== 'open') continue
+			winnerParticipantId = findNoShowOpponent(match, noShowEntry.participantId)
+			if (winnerParticipantId) {
+				matchId = match.id
+				break
 			}
-		}) 
+		}
+
+		const winningEntry = await Entry.findOne({ where: { participantId: winnerParticipantId, tournamentId: tournament.id }, include: Player })
+		if (!winningEntry) return message.channel.send(`Error: could not find opponent.`)
+
+		const success = await putMatchResult(tournamentId, matchId, winningEntry.participantId, scores)
+		if (!success) return message.channel.send(`Error: could not update bracket for ${tournament.name}.`)
+
+		noShowEntry.losses++
+		await noShowEntry.save()
+		
+		message.channel.send(`${noShowEntry.player.name} (+0${starchips}), your Tournament loss to ${winningEntry.player.name} (+0${starchips}) has been recorded.`)
+		
+		const updatedMatchesArr = await getMatches(tournamentId)
+		const winnerNextMatch = findNextMatch(updatedMatchesArr, matchId, winningEntry.participantId)
+		const winnerNextOpponent = winnerNextMatch ? await findNextOpponent(tournamentId, updatedMatchesArr, winnerNextMatch, winningEntry.participantId) : null
+		const winnerMatchWaitingOn = winnerNextOpponent ? null : findOtherPreReqMatch(updatedMatchesArr, winnerNextMatch, matchId) 
+		const winnerWaitingOnP1 = winnerMatchWaitingOn && winnerMatchWaitingOn.p1 && winnerMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: winnerMatchWaitingOn.p1 } }) : null
+		const winnerWaitingOnP2 = winnerMatchWaitingOn && winnerMatchWaitingOn.p1 && winnerMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: winnerMatchWaitingOn.p2 } }) : null
+
+		const noShowEliminated = tournament.tournament_type === 'single elimination' ? true :
+			tournament.tournament_type === 'double elimination' && noShowEntry.losses >= 2 ? true :
+			false
+
+		if (noShowEliminated) {
+			noShowMember.roles.remove(tourRole)
+			await noShowEntry.destroy()
+		}
+
+		const noShowNextMatch = noShowEliminated ? null : findNextMatch(updatedMatchesArr, matchId, noShowEntry.participantId)
+		const noShowNextOpponent = noShowNextMatch ? await findNextOpponent(tournamentId, updatedMatchesArr, noShowNextMatch, noShowEntry.participantId) : null
+		const noShowMatchWaitingOn = noShowNextOpponent ? null : findOtherPreReqMatch(updatedMatchesArr, noShowNextMatch, matchId) 
+		const noShowWaitingOnP1 = noShowMatchWaitingOn && noShowMatchWaitingOn.p1 && noShowMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: noShowMatchWaitingOn.p1 }, include: Player }) : null
+		const noShowWaitingOnP2 = noShowMatchWaitingOn && noShowMatchWaitingOn.p1 && noShowMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: noShowMatchWaitingOn.p2 }, include: Player }) : null
+
+		setTimeout(() => {
+			if (noShowEliminated) return message.channel.send(`${noShowPlayer.name}, You are eliminated from the tournament. Better luck next time!`)
+			else if (noShowNextOpponent) return message.channel.send(`New Match: <@${noShowPlayer.id}> vs. <@${noShowNextOpponent.playerId}>. Good luck to both duelists.`)
+			else if (noShowMatchWaitingOn && noShowWaitingOnP1 && noShowWaitingOnP2) {
+				return message.channel.send(`${noShowPlayer.name}, You are waiting for the result of ${noShowWaitingOnP1.name} vs ${noShowWaitingOnP2.name}.`)
+			}
+			else return message.channel.send(`${noShowPlayer.name}, You are waiting for multiple matches to finish. Grab a snack and stay hydrated.`)
+		}, 2000)
+
+		setTimeout(() => {
+			if (!winnerNextMatch) return message.channel.send(`<@${winningEntry.playerId}>, You won the tournament! Congratulations on your stellar performance! ${FiC}`)
+			else if (winnerNextOpponent) return message.channel.send(`New Match: <@${winningEntry.playerId}> vs. <@${winnerNextOpponent.playerId}>. Good luck to both duelists.`)
+			else if (winnerMatchWaitingOn && winnerWaitingOnP1 && winnerWaitingOnP2) {
+				return message.channel.send(`${winningEntry.player.name}, You are waiting for the result of ${winnerWaitingOnP1.name} vs ${winnerWaitingOnP2.name}.`)
+			}
+			else return message.channel.send(`${winningEntry.player.name}, You are waiting for multiple matches to finish. Grab a snack and stay hydrated.`)
+		}, 4000)
 	} else if (game === 'Arena') {
 		if (!noShowMember.roles.cache.some(role => role.id === arenaRole)) return message.channel.send(`${noShowPlayer.name} does not appear to have the Arena Players role.`)
 			
@@ -3735,44 +3787,53 @@ if (cmd === `!create`) {
 				url: data.tournament.url
 			})
 		
-			return message.channel.send(`You created a new tournament:\nName: ${data.tournament.name} ${FiC}\nType: ${capitalize(data.tournament.tournament_type)}\nBracket: https://challonge.com/${data.tournament.url}`)
-		} else {
-			return message.channel.send(`Unable to create tournament on Challonge.com.`)
-		}
+			return message.channel.send(
+				`You created a new tournament:` + 
+				`\nName: ${data.tournament.name} ${FiC}` + 
+				`\nType: ${capitalize(data.tournament.tournament_type)}` +
+				`\nBracket: https://challonge.com/${data.tournament.url}`
+			)
+		} 
 	} catch (err) {
-		try {
-			const { status, data } = await axios({
-				method: 'post',
-				url: 'https://api.challonge.com/v1/tournaments.json',
-				data: {
-					api_key: challongeAPIKey,
-					tournament: {
-						name: name,
-						url: str,
-						tournament_type: tournament_type,
-						gameName: 'Yu-Gi-Oh!',
-					}
-				}
-			})
-			
-			if (status === 200) {
-				await Tournament.create({ 
-					id: data.tournament.id,
-					name: data.tournament.name,
-					state: data.tournament.state,
-					swiss_rounds: data.tournament.swiss_rounds, 
-					tournament_type: data.tournament.tournament_type,
-					url: data.tournament.url
-				})
-			
-				return message.channel.send(`You created a new tournament:\nName: ${data.tournament.name} ${FiC}\nType: ${capitalize(data.tournament.tournament_type)}\nBracket: https://challonge.com/${data.tournament.url}`)
-			} else {
-				return message.channel.send(`Unable to create tournament on Challonge.com.`)
-			}
-		} catch (err) {
-			return message.channel.send(`Error: Unable to create tournament on Challonge.com.`)
-		}
+		console.log(err)
 	}
+	
+	try {
+		const { status, data } = await axios({
+			method: 'post',
+			url: 'https://api.challonge.com/v1/tournaments.json',
+			data: {
+				api_key: challongeAPIKey,
+				tournament: {
+					name: name,
+					url: str,
+					tournament_type: tournament_type,
+					gameName: 'Yu-Gi-Oh!',
+				}
+			}
+		})
+		
+		if (status === 200) {
+			await Tournament.create({ 
+				id: data.tournament.id,
+				name: data.tournament.name,
+				state: data.tournament.state,
+				swiss_rounds: data.tournament.swiss_rounds, 
+				tournament_type: data.tournament.tournament_type,
+				url: data.tournament.url
+			})
+		
+			return message.channel.send(
+				`You created a new tournament:` + 
+				`\nName: ${data.tournament.name} ${FiC}` + 
+				`\nType: ${capitalize(data.tournament.tournament_type)}` +
+				`\nBracket: https://challonge.com/${data.tournament.url}`
+			)
+		} 
+	} catch (err) {
+		console.log(err)
+		return message.channel.send(`Unable to connect to Challonge.com.`)
+	}		
 }
 
 //BRACKET

@@ -1171,8 +1171,6 @@ if(deckcom.includes(cmd)) {
 		const player = await Player.findOne( { where: { id: maid }, include: [Diary, Wallet] })
 		const wallet = player.wallet
 		const diary = player.diary
-		const hard_complete = diary.h1 && diary.h2 && diary.h3 && diary.h4 && diary.h5 && diary.h6 && diary.h7 && diary.h8
-		const discount = hard_complete && set.currency === 'stardust' ? (1 / 1.1) : 1
 		
 		const merchbot_wallet = await Wallet.findOne( { where: { playerId: merchbotId } })
 		if (!wallet || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
@@ -1185,6 +1183,9 @@ if(deckcom.includes(cmd)) {
 		const set = await Set.findOne({ where: { 
 			code: decks[deck].set_code
 		}})
+
+		const hard_complete = diary.h1 && diary.h2 && diary.h3 && diary.h4 && diary.h5 && diary.h6 && diary.h7 && diary.h8
+		const discount = hard_complete && set.currency === 'stardust' ? (1 / 1.1) : 1
 
 		if (!set) return message.channel.send(`Could not find set with code "${decks[deck].set_code}".`)
 		if (!set.for_sale) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} ${eval(set.alt_emoji)} is not available.`)

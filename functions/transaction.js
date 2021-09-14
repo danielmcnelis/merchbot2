@@ -4,6 +4,7 @@ const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { yescom } = require('../static/commands.json')
 const { gem, orb, swords, starchips, stardust, mushroom, moai, rose, hook, egg, cactus, com, rar, sup, ult, scr } = require('../static/emojis.json')
+const { updateBinder } = require('./binder.js')
 const { awardPacksToShop } = require('./packs')
 const adminId = '194147938786738176'
 const { client } = require('../static/clients.js')
@@ -503,6 +504,8 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
 
         sellerInv.quantity -= quantity
 		await sellerInv.save()
+
+        if (authorIsSeller) await updateBinder(sellingPlayer)
 	}
 
     buyingPlayer.wallet.stardust -= total_price
@@ -600,6 +603,8 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
 
         sellerInv.quantity -= quantity
         await sellerInv.save()
+
+        await updateBinder(sellingPlayer)
 
         if (print.rarity === 'scr') completeTask(message.channel, buyerId, 'm4')
         if (print.set_code === 'APC' && buyerInv && buyerInv.quantity >= 3) completeTask(message.channel, buyerId, 'h5')

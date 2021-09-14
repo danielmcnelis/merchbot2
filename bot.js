@@ -18,6 +18,7 @@ const { Op } = require('sequelize')
 // FUNCTION IMPORTS
 const { checkArenaProgress, endArena , getArenaSample, resetArena, startArena, startRound } = require('./functions/arena.js')
 const { askForBidCancellation, askForBidPlacement, manageBidding } = require('./functions/bids.js')
+const { updateBinder } = require('./functions/binder.js')
 const { awardStarterDeck, getShopDeck } = require('./functions/decks.js')
 const { checkCoreSetComplete, completeTask } = require('./functions/diary.js')
 //const { uploadDeckFolder } = require('./functions/drive.js')
@@ -167,6 +168,19 @@ if (cmd === `!ping`) return message.channel.send('🏓')
 
 //TEST
 if(cmd === `!test`) return message.channel.send('🧪')
+
+//PURE
+if(cmd === `!purge`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	const players = await Player.findAll()
+	for (let i = 0; i < players.length; i++) {
+		const player = players[i]
+		await updateBinder(player)
+	}
+
+	return message.channel.send(`Updated Binders for ${players.length} players.`)
+}
+
 
 //TEST
 //if(cmd === `!test`) {}
@@ -1999,20 +2013,17 @@ if(bindercom.includes(cmd)) {
 	if (!binder && playerId === maid) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	if (!binder && playerId !== maid) return message.channel.send(`That user is not in the database.`)
 
-	const binder_prints = []
-	const binder_card_names = []
-		
-	for (let i = 0; i < 18; i++) {
-		const card_code = binder[`slot_${i + 1}`]
-		if (!card_code) continue
-		const print = await Print.findOne({ where: { card_code }})
-		binder_prints.push(print)
-		binder_card_names.push(print.card_name)
-	}
-
 	if (!args.length || playerId !== maid) {
-		binder_prints.sort((a, b) => b.market_price - a.market_price)
-		const results = binder_prints.map((print) => `${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+		const prints = []
+		for (let i = 0; i < 18; i++) {
+			const card_code = binder[`slot_${i + 1}`]
+			if (!card_code) continue
+			const print = await Print.findOne({ where: { card_code }})
+			prints.push(print)
+		}
+
+		prints.sort((a, b) => b.market_price - a.market_price)
+		const results = prints.map((print) => `${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
 
 		if (!results.length) return message.channel.send(`${playerId === maid ? 'Your' : `${binder.player.name}'s`} binder is empty.`)
 		else return message.channel.send(`**${binder.player.name}'s Binder**\n${results.join('\n')}`)
@@ -2051,7 +2062,7 @@ if(bindercom.includes(cmd)) {
 		const card_name = await findCard(query, fuzzyPrints)
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name, private = false, inInv = true) : null
 		
-		if (!print && !card_name && !binder_card_names.includes(card_name)) {
+		if (!print && !card_name) {
 			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 			continue
 		}
@@ -4191,20 +4202,10 @@ if(cmd === `!wager`) {
 
 //ALCHEMY
 if(alchemycom.includes(cmd)) {
-	const wallet = await Wallet.findOne({ 
-		where: { playerId: maid },
-		include: Player
-	})
-
-	const daily = await Daily.findOne({ 
-		where: { playerId: maid },
-		include: Player
-	})
-
-	const diary = await Diary.findOne({ 
-		where: { playerId: maid },
-		include: Player
-	})
+	const player = await Player.findOne({ where: { id: maid }, include: [Daily, Diary, Wallet]})
+	const wallet = player.wallet
+	const daily = player.daily
+	const diary = player.diary
 
 	const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
 	const medium_complete = diary.m1 && diary.m2 && diary.m3 && diary.m4 && diary.m5 && diary.m6 && diary.m7 && diary.m8 && diary.m9 && diary.m10
@@ -4212,7 +4213,7 @@ if(alchemycom.includes(cmd)) {
 	const elite_complete = diary.l1 && diary.l2 && diary.l3 && diary.l4 && diary.l5 && diary.l6
 	//const master_complete = diary.s1 && diary.s2 && diary.s3 && diary.s4
 
-	if (!wallet || !daily || !diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	
 	const date = new Date()
 	const hoursLeftInDay = date.getMinutes() === 0 ? 24 - date.getHours() : 23 - date.getHours()
@@ -4272,6 +4273,8 @@ if(alchemycom.includes(cmd)) {
 		inv.quantity--
 		await inv.save()
 
+		await updateBinder(player)
+
 		wallet.starchips += value
 		await wallet.save()
 	
@@ -4302,17 +4305,11 @@ if(alchemycom.includes(cmd)) {
 
 //REDUCE
 if(reducecom.includes(cmd)) {
-	const wallet = await Wallet.findOne({ 
-		where: { playerId: maid },
-		include: Player
-	})
+	const player = await Player.findOne({ where: { id: maid }, include: [Daily, Wallet]})
+	const wallet = player.wallet
+	const daily = player.daily
 
-	const daily = await Daily.findOne({ 
-		where: { playerId: maid },
-		include: Player
-	})
-
-	if (!wallet || !daily) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	
 	const date = new Date()
 	const hoursLeftInDay = date.getMinutes() === 0 ? 24 - date.getHours() : 23 - date.getHours()
@@ -4354,6 +4351,8 @@ if(reducecom.includes(cmd)) {
 		
 		inv.quantity--
 		await inv.save()
+
+		await updateBinder(player)
 
 		wallet.forgestone += value
 		await wallet.save()

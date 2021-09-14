@@ -6,6 +6,7 @@ const { Op } = require('sequelize')
 const { yescom, nocom } = require('../static/commands.json')
 const { starchips, stardust, com, rar, sup, ult, scr, egg, cactus, hook, moai, mushroom, rose, orb, gem, swords } = require('../static/emojis.json')
 const { findCard } = require('./search.js')
+const { updateBinder } = require('./binder.js')
 const { selectPrint } = require('./print.js')
 const { capitalize } = require('./utility.js')
 const { completeTask } = require('./diary')
@@ -241,6 +242,8 @@ const processTrade = async (message, transaction_id, initiatorSummary, receiverS
 
 		inv.quantity -= quantity
 		await inv.save()
+
+		await updateBinder(initiatingPlayer)
 	
 		const mirror_inv = await Inventory.findOne({ 
 			where: { 
@@ -308,6 +311,8 @@ const processTrade = async (message, transaction_id, initiatorSummary, receiverS
 		inv.quantity -= quantity
 		await inv.save()
 	
+		await updateBinder(receivingPlayer)
+
 		const mirror_inv = await Inventory.findOne({ 
 			where: { 
 				card_code: print.card_code,

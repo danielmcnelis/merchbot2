@@ -1440,6 +1440,9 @@ if (cmd === `!shop`) {
 		const mins = date.getMinutes()
 	
 		let shopStatus
+		let shopEmoji
+		let nextAction
+		let nextEmoji
 		let dayShopReverts
 		let hourShopReverts
 		let hoursLeftInPeriod
@@ -1447,6 +1450,9 @@ if (cmd === `!shop`) {
 	
 		if ((day === 6 && hours >= 14) || day === 0 || day === 1 || (day === 2 && hours < 16)) {
 			shopStatus = 'open'
+			shopEmoji = open
+			nextAction = 'closes'
+			nextEmoji = closed
 			dayShopReverts = 'Tuesday'
 			hourShopReverts = '4pm'
 			hoursLeftInPeriod = day === 6 ? 23 - hours + 24 * 2 + 16 :
@@ -1456,6 +1462,9 @@ if (cmd === `!shop`) {
 				null
 		} else if ((day === 2 && hours >= 16) || (day === 3 && hours < 8)) {
 			shopStatus = 'closed'
+			shopEmoji = closed
+			nextAction = 'opens'
+			nextEmoji = open
 			dayShopReverts = 'Wednesday'
 			hourShopReverts = '8am'
 			hoursLeftInPeriod = day === 2 ? 23 - hours + 8 :
@@ -1463,6 +1472,9 @@ if (cmd === `!shop`) {
 				null
 		} else if ((day === 3 && hours >= 8) || day === 4 || (day === 5 && hours < 22)) {
 			shopStatus = 'open'
+			shopEmoji = open
+			nextAction = 'closes'
+			nextEmoji = closed
 			dayShopReverts = 'Friday'
 			hourShopReverts = '10pm'
 			hoursLeftInPeriod = day === 3 ? 23 - hours + 24 + 22 :
@@ -1471,6 +1483,9 @@ if (cmd === `!shop`) {
 				null
 		} else if ((day === 5 && hours >= 22) || (day === 6 && hours < 14)) {
 			shopStatus = 'closed'
+			shopEmoji = closed
+			nextAction = 'opens'
+			nextEmoji = open
 			dayShopReverts = 'Saturday'
 			hourShopReverts = '2pm'
 			hoursLeftInPeriod = day === 5 ? 23 - hours + 14 :
@@ -1478,7 +1493,7 @@ if (cmd === `!shop`) {
 				null
 		}
 	
-		return message.channel.send(`The Shop will ${shopStatus === 'open' ? 'close' : 'open'} ${eval(shopStatus)} in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes, on ${dayShopReverts} at ${hourShopReverts} EST.`)
+		return message.channel.send(`The Shop ${merchant} is ${shopStatus} ${shopEmoji}. It ${nextAction} in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes, on ${dayShopReverts} at ${hourShopReverts} ET. ${eval(nextEmoji)}`)
 	} else {
 		const query = args.join(' ')
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
@@ -3038,7 +3053,7 @@ if (noshowcom.includes(cmd)) {
 		noShowEntry.losses++
 		await noShowEntry.save()
 		
-		message.channel.send(`${noShowEntry.player.name} (+0${starchips}), your Tournament loss to ${winningEntry.player.name} (+0${starchips}) has been recorded.`)
+		message.channel.send(`${noShowEntry.player.name}, your Tournament loss to ${winningEntry.player.name} has been recorded as a no-show.`)
 		
 		const updatedMatchesArr = await getMatches(tournament.id)
 		const winnerNextMatch = findNextMatch(updatedMatchesArr, matchId, winningEntry.participantId)

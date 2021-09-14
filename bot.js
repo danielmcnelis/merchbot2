@@ -166,118 +166,10 @@ if (!message.content.startsWith("!") && message.content.includes(`{`) && message
 if (cmd === `!ping`) return message.channel.send('🏓')
 
 //TEST
-// if(cmd === `!test`) return message.channel.send('🧪')
+if(cmd === `!test`) return message.channel.send('🧪')
 
 //TEST
-if(cmd === `!test`) {
-
-	let num = 1
-	let code = 'TEB'
-	for (let i = 0; i < args.length; i++) {
-		if (isFinite(args[i])) {
-			num = parseInt(args[i])
-			break
-		} 
-	}
-
-	if (num < 1) return message.channel.send(`You cannot test less than 1 Pack.`)
-	if (num > 2400) return message.channel.send(`You cannot test more than 2400 Packs.`)
-
-	for (let i = 0; i < args.length; i++) {
-		if (!isFinite(args[i])) {
-			code = args[i].toUpperCase()
-			break
-		} 
-	}
-
-	const results = {
-		supers: 0,
-		ultras: 0,
-		secrets: 0
-	}
-
-	const set = await Set.findOne({ where: { code: code }})
-	if (!set) return message.channel.send(`Could not find set code: ${code}.`)
-	if (!set.for_sale) return message.channel.send(`Sorry, ${code} ${eval(set.emoji)} Packs are not available.`)
-
-	const commons = await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "com"
-		},
-		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
-
-	const rares = await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "rar"
-		},
-		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
-
-	const supers = await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "sup",
-			card_slot: {
-				[Op.lt]: 200
-			}
-		},
-		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
-
-	const ultras = await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "ult"
-		},
-		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
-
-	const secrets = await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "scr"
-		},
-		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
-
-		for (let j = 0; j < num; j++) {
-			const yourCommons = set.commons_per_pack > 1 ? getRandomSubset(commons, set.commons_per_pack) : set.secrets_per_pack === 1 ? [getRandomElement(commons)] : []
-			const yourRares = set.rares_per_pack > 1 ? getRandomSubset(rares, set.rares_per_pack) : set.rares_per_pack === 1 ? [getRandomElement(rares)] : []
-			const yourSupers = set.supers_per_pack > 1 ? getRandomSubset(supers, set.supers_per_pack) : set.supers_per_pack === 1 ? [getRandomElement(supers)] : []
-			const yourUltras = set.ultras_per_pack > 1 ? getRandomSubset(ultras, set.ultras_per_pack) : set.ultras_per_pack === 1 ? [getRandomElement(ultras)] : []
-			const yourSecrets = set.secrets_per_pack > 1 ? getRandomSubset(secrets, set.secrets_per_pack) : set.secrets_per_pack === 1 ? [getRandomElement(secrets)] :  []
-
-			const odds = []
-			if (!yourCommons.length) for (let i = 0; i < set.commons_per_box; i++) odds.push("commons")
-			if (!yourRares.length) for (let i = 0; i < set.rares_per_box; i++) odds.push("rares")
-			if (!yourSupers.length) for (let i = 0; i < set.supers_per_box; i++) odds.push("supers")
-			if (!yourUltras.length) for (let i = 0; i < set.ultras_per_box; i++) odds.push("ultras")
-			if (!yourSecrets.length) for (let i = 0; i < set.secrets_per_box; i++) odds.push("secrets")
-
-			const luck = getRandomElement(odds)
-			results[luck]++
-		}
-
-	return message.channel.send(
-		`Simulation of ${num} ${set.code} ${eval(set.code)} Packs:`
-		+ `\n${sup} Supers: ${results.supers} `
-		+ `\n${ult} Ultras: ${results.ultras} `
-		+ `\n${scr} Secrets: ${results.secrets} `
-	)
-}
+//if(cmd === `!test`) {}
 
 // ASSIGN ROLES
 if (cmd === `!assign_roles`) {
@@ -1572,15 +1464,14 @@ if (cmd === `!shop`) {
 				null
 		}
 	
-		return message.channel.send(`The Shop will ${shopStatus === 'open' ? 'close' : 'open'} in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes, on ${dayShopReverts} at ${hourShopReverts} EST.`)
+		return message.channel.send(`The Shop will ${shopStatus === 'open' ? 'close' : 'open'} ${eval(shopStatus)} in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes, on ${dayShopReverts} at ${hourShopReverts} EST.`)
 	} else {
 		const query = args.join(' ')
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 		const card_name = await findCard(query, fuzzyPrints)
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 		const prints = valid_card_code ? await Print.findAll({ where: { card_code: card_code }, order: [['createdAt', 'ASC']]}) : card_name ? await Print.findAll({ where: { card_name: card_name }, order: [['createdAt', 'ASC']]}) : null
-		const count = prints && prints.length === 1 && (prints[0].set_code === 'CH2') ? await Inventory.count({ where: { printId: prints[0].id }}) : true
-		if (!prints || !prints.length || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+		if (!prints || !prints.length) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 		const results = []
 
 		for (let i = 0; i < prints.length; i++) {
@@ -1617,8 +1508,7 @@ if (populationcom.includes(cmd)) {
 	const card_name = await findCard(query, fuzzyPrints)
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	const prints = valid_card_code ? await Print.findAll({ where: { card_code: card_code }, order: [['createdAt', 'ASC']]}) : card_name ? await Print.findAll({ where: { card_name: card_name }, order: [['createdAt', 'ASC']]}) : null
-	const count = prints && prints.length === 1 && (prints[0].set_code === 'CH2') ? await Inventory.count({ where: { printId: prints[0].id }}) : true
-	if (!prints || !prints.length || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+	if (!prints || !prints.length) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 	const results = []
 
 	for (let i = 0; i < prints.length; i++) {
@@ -1804,8 +1694,7 @@ if (historycom.includes(cmd)) {
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	const card_name = await findCard(query, fuzzyPrints)
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-	const count = print && (print.set_code === 'CH2') ? await Inventory.findOne({ where: { printId: print.id } }) : true
-	if (!print || !count) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+	if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 	const item = print.card_code
 
@@ -2112,18 +2001,20 @@ if(bindercom.includes(cmd)) {
 	if (!binder && playerId === maid) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	if (!binder && playerId !== maid) return message.channel.send(`That user is not in the database.`)
 
-	if (!args.length || playerId !== maid) {
-		const prints = []
+	const binder_prints = []
+	const binder_card_names = []
 		
-		for (let i = 0; i < 18; i++) {
-			const card_code = binder[`slot_${i + 1}`]
-			if (!card_code) continue
-			const print = await Print.findOne({ where: { card_code }})
-			prints.push(print)
-		}
+	for (let i = 0; i < 18; i++) {
+		const card_code = binder[`slot_${i + 1}`]
+		if (!card_code) continue
+		const print = await Print.findOne({ where: { card_code }})
+		binder_prints.push(print)
+		binder_card_names.push(print.card_name)
+	}
 
-		prints.sort((a, b) => b.market_price - a.market_price)
-		const results = prints.map((print) => `${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+	if (!args.length || playerId !== maid) {
+		binder_prints.sort((a, b) => b.market_price - a.market_price)
+		const results = binder_prints.map((print) => `${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
 
 		if (!results.length) return message.channel.send(`${playerId === maid ? 'Your' : `${binder.player.name}'s`} binder is empty.`)
 		else return message.channel.send(`**${binder.player.name}'s Binder**\n${results.join('\n')}`)
@@ -2162,7 +2053,7 @@ if(bindercom.includes(cmd)) {
 		const card_name = await findCard(query, fuzzyPrints)
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name, private = false, inInv = true) : null
 		
-		if (!print && !card_name) {
+		if (!print && !card_name && !binder_card_names.includes(card_name)) {
 			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 			continue
 		}

@@ -162,7 +162,8 @@ const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer, fuzzyP
 	
 		if (!!(print.rarity !== 'com' && quantity >= 5)) m6success = true
 
-        total_price += Math.ceil(print.market_price * 0.7) * quantity
+        const unit_price = Math.ceil(print.market_price * 0.7) > 0 ? Math.ceil(print.market_price * 0.7) : 1
+        total_price += unit_price * quantity
 		card_codes.push(card_code)
 		quantities.push(quantity)
 		prints.push(print)
@@ -270,7 +271,8 @@ const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer, fuz
 
     if (!!(print.rarity === 'scr')) m4success = true
 
-    total_price += Math.ceil(print.market_price * 1.1 * discount) * quantity 
+    const unit_price = Math.ceil(print.market_price * 1.1 * discount) > 1 ? Math.ceil(print.market_price * 1.1 * discount) : 2
+    total_price += unit_price * quantity 
     quantities.push(quantity)
     prints.push(print)
     sellerInvs.push(merchbotInv)

@@ -240,10 +240,10 @@ const removeParticipant = async (message, member, participants, participantId, t
 }
 
 //GET TOURNAMENT
-const getTournament = async (tournamentId) => {
+const getTournament = async (tournament) => {
     try {
         const { data } = await axios.get(
-            `https://formatlibrary:${challongeAPIKey}@api.challonge.com/v1/tournaments/${tournamentId}.json`
+            `https://formatlibrary:${challongeAPIKey}@api.challonge.com/v1/tournaments/${tournament.id}.json`
         )
         return data
     } catch (err) {

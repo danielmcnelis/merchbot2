@@ -3402,7 +3402,7 @@ if(joincom.includes(cmd)) {
 		if (!tournament && count) return message.channel.send(`Sorry, the tournament already started.`)
 		if (!tournament && !count) return message.channel.send(`There is no active tournament.`)
 		
-		const data = await getTournamentType(tournament.id)
+		const data = await getTournament(tournament.id)
 		if (!data) return message.channel.send(`Could not access tournament: ${tournament.name}`)
 		message.channel.send(`Please check your DMs.`)
 		const dbName = player.duelingBook ? player.duelingBook : await askForDBUsername(member, player)

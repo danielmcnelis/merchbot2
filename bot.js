@@ -346,29 +346,6 @@ if (cmd === `!fix_cards`) {
 			await card.save() 
 			updated++
 		}
-
-		if (ygoprodeckCards[i].type === 'Link Monster') {
-			const card = await Card.findOne({ where: { name: ygoprodeckCards[i].name }})
-			if (!card) {
-				continue
-			}
-			const rating = ygoprodeckCards[i].linkval
-			card.level = rating
-			await card.save() 
-			updated++
-		}
-
-		if (ygoprodeckCards[i].type.includes('Pendulum')) {
-			const card = await Card.findOne({ where: { name: ygoprodeckCards[i].name }})
-			if (!card) {
-				continue
-			}
-			const description = ygoprodeckCards[i].desc
-			card.description = description
-			await card.save() 
-			updated++
-		}
-
 	}
 
 	return message.channel.send(`You fixed the ATK/DEF stats of ${updated} cards in the Format Library database.`)
@@ -571,21 +548,21 @@ if (aliuscom.includes(cmd)) {
 	for (let i = 0; i < values.length; i++) {
 		const alius = values[i].content.toLowerCase()
 		const old_nick = await Nickname.findOne({ where: { alius } })
-		if (old_nick) {
-			message.channel.send(`Error: "${alius}" is already being used for ${old_nick.card_name}.`)
-			continue
-		} else {
-			const new_nick = await Nickname.create({
-				alius,
-				card_name
-			})
+		if (old_nick && old_nick.card_name === card_name) {
+			message.channel.send(`"${alius}" was previously used for ${old_nick.card_name}.`)
+			await old_nick.destroy()
+		} 
+		
+		const new_nick = await Nickname.create({
+			alius,
+			card_name
+		})
 
-			if (!new_nick) {
-				message.channel.send(`Error: "${alius}" is already being used for ${old_nick.card_name}.`)
-			} else {
-				message.channel.send(`Created an alius for ${card_name}: ${alius}`)
-			} 
-		}
+		if (!new_nick) {
+			message.channel.send(`"${alius}" was already being used for ${card_name}.`)
+		} else {
+			message.channel.send(`Created an alius for ${card_name}: ${alius}`)
+		} 
 
 	}
 }

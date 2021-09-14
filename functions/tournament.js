@@ -208,11 +208,10 @@ const selectTournament = async (message, tournaments, playerId) => {
 
 //REMOVE PARTICIPANT
 const removeParticipant = async (message, member, entry, tournament, drop = false) => {    
-    
     try {
         const success = await axios({
             method: 'delete',
-            url: `https://formatlibrary:${challongeAPIKey}@api.challonge.com/v1/tournaments/${tournament.id}/participants/${entry.participantId}`,
+            url: `https://formatlibrary:${challongeAPIKey}@api.challonge.com/v1/tournaments/${tournament.id}/participants/${entry.participantId}.json`,
         })
 
         if (success) {

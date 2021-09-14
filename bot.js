@@ -5072,10 +5072,10 @@ if(packcom.includes(cmd)) {
 	const merchbot_wallet = await Wallet.findOne( { where: { playerId: merchbotId } })
 	if (!wallet || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	const money = wallet[set.currency]
-	if (money < (set.unit_price * discount * num)) return message.channel.send(`Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${num > 1 ? `${num} ` : ''}${set.name} ${eval(set.emoji)} Packs cost ${num * discount * set.unit_price}${eval(set.currency)}.`)
+	if (money < (Math.round(set.unit_price * discount) * num)) return message.channel.send(`Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${num > 1 ? `${num} ` : ''}${set.name} ${eval(set.emoji)} Packs cost ${Math.round(set.unit_price * discount) * num}${eval(set.currency)}.`)
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${num * discount * set.unit_price}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`)
+	const msg = await message.channel.send(`${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.unit_price * discount) * num}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
@@ -5158,7 +5158,7 @@ if(packcom.includes(cmd)) {
 			message.author.send(results.join("\n"), attachment)
 		}
 
-		wallet[set.currency] -= (set.unit_price * discount * num)
+		wallet[set.currency] -= (Math.round(set.unit_price * discount) * num)
 		await wallet.save()
 
 		merchbot_wallet.stardust += set.currency === 'stardust' ? set.unit_price * discount * num : set.unit_price * num * 10
@@ -5447,7 +5447,7 @@ if(boxcom.includes(cmd)) {
 	const merchbot_wallet = await Wallet.findOne( { where: { playerId: merchbotId } })
 	if (!player || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	const money = player.wallet[set.currency]
-	if (money < set.box_price) return message.channel.send(`Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Boxes cost ${set.box_price * discount}${eval(set.currency)}.`)
+	if (money < Math.round(set.box_price * discount)) return message.channel.send(`Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Boxes cost ${Math.round(set.box_price * discount)}${eval(set.currency)}.`)
 	
 
 	const date = new Date()
@@ -5509,7 +5509,7 @@ if(boxcom.includes(cmd)) {
 	})
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.box_price * discount}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`)
+	const msg = await message.channel.send(`${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.box_price * discount)}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
@@ -5628,7 +5628,7 @@ if(boxcom.includes(cmd)) {
 			message.author.send(results.join("\n"), attachment)
 		}
 
-		player.wallet[set.currency] -= (set.box_price * discount)
+		player.wallet[set.currency] -= (Math.round(set.box_price * discount))
 		await player.wallet.save()
 
 		merchbot_wallet.stardust += set.currency === 'stardust' ? (set.box_price * discount) : set.box_price * 10

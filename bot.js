@@ -3015,7 +3015,7 @@ if (noshowcom.includes(cmd)) {
 		if (tournament.state === 'pending') return message.channel.send(`Sorry, ${tournament.name} has not started yet.`)
 		if (tournament.state !== 'underway') return message.channel.send(`Sorry, ${tournament.name} is not underway.`)
 		
-		const matchesArr = await getMatches(tournamentId)
+		const matchesArr = await getMatches(tournament.id)
 		let matchId = false
 		let winnerParticipantId = false
 		let scores = "0-0"
@@ -3032,7 +3032,7 @@ if (noshowcom.includes(cmd)) {
 		const winningEntry = await Entry.findOne({ where: { participantId: winnerParticipantId, tournamentId: tournament.id }, include: Player })
 		if (!winningEntry) return message.channel.send(`Error: could not find opponent.`)
 
-		const success = await putMatchResult(tournamentId, matchId, winningEntry.participantId, scores)
+		const success = await putMatchResult(tournament.id, matchId, winningEntry.participantId, scores)
 		if (!success) return message.channel.send(`Error: could not update bracket for ${tournament.name}.`)
 
 		noShowEntry.losses++
@@ -3040,12 +3040,12 @@ if (noshowcom.includes(cmd)) {
 		
 		message.channel.send(`${noShowEntry.player.name} (+0${starchips}), your Tournament loss to ${winningEntry.player.name} (+0${starchips}) has been recorded.`)
 		
-		const updatedMatchesArr = await getMatches(tournamentId)
+		const updatedMatchesArr = await getMatches(tournament.id)
 		const winnerNextMatch = findNextMatch(updatedMatchesArr, matchId, winningEntry.participantId)
-		const winnerNextOpponent = winnerNextMatch ? await findNextOpponent(tournamentId, updatedMatchesArr, winnerNextMatch, winningEntry.participantId) : null
+		const winnerNextOpponent = winnerNextMatch ? await findNextOpponent(tournament.id, updatedMatchesArr, winnerNextMatch, winningEntry.participantId) : null
 		const winnerMatchWaitingOn = winnerNextOpponent ? null : findOtherPreReqMatch(updatedMatchesArr, winnerNextMatch, matchId) 
-		const winnerWaitingOnP1 = winnerMatchWaitingOn && winnerMatchWaitingOn.p1 && winnerMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: winnerMatchWaitingOn.p1 } }) : null
-		const winnerWaitingOnP2 = winnerMatchWaitingOn && winnerMatchWaitingOn.p1 && winnerMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: winnerMatchWaitingOn.p2 } }) : null
+		const winnerWaitingOnP1 = winnerMatchWaitingOn && winnerMatchWaitingOn.p1 && winnerMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournament.id, participantId: winnerMatchWaitingOn.p1 } }) : null
+		const winnerWaitingOnP2 = winnerMatchWaitingOn && winnerMatchWaitingOn.p1 && winnerMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournament.id, participantId: winnerMatchWaitingOn.p2 } }) : null
 
 		const noShowEliminated = tournament.tournament_type === 'single elimination' ? true :
 			tournament.tournament_type === 'double elimination' && noShowEntry.losses >= 2 ? true :
@@ -3057,10 +3057,10 @@ if (noshowcom.includes(cmd)) {
 		}
 
 		const noShowNextMatch = noShowEliminated ? null : findNextMatch(updatedMatchesArr, matchId, noShowEntry.participantId)
-		const noShowNextOpponent = noShowNextMatch ? await findNextOpponent(tournamentId, updatedMatchesArr, noShowNextMatch, noShowEntry.participantId) : null
+		const noShowNextOpponent = noShowNextMatch ? await findNextOpponent(tournament.id, updatedMatchesArr, noShowNextMatch, noShowEntry.participantId) : null
 		const noShowMatchWaitingOn = noShowNextOpponent ? null : findOtherPreReqMatch(updatedMatchesArr, noShowNextMatch, matchId) 
-		const noShowWaitingOnP1 = noShowMatchWaitingOn && noShowMatchWaitingOn.p1 && noShowMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: noShowMatchWaitingOn.p1 }, include: Player }) : null
-		const noShowWaitingOnP2 = noShowMatchWaitingOn && noShowMatchWaitingOn.p1 && noShowMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: noShowMatchWaitingOn.p2 }, include: Player }) : null
+		const noShowWaitingOnP1 = noShowMatchWaitingOn && noShowMatchWaitingOn.p1 && noShowMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournament.id, participantId: noShowMatchWaitingOn.p1 }, include: Player }) : null
+		const noShowWaitingOnP2 = noShowMatchWaitingOn && noShowMatchWaitingOn.p1 && noShowMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournament.id, participantId: noShowMatchWaitingOn.p2 }, include: Player }) : null
 
 		setTimeout(() => {
 			if (noShowEliminated) return message.channel.send(`${noShowPlayer.name}, You are eliminated from the tournament. Better luck next time!`)

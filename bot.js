@@ -325,6 +325,56 @@ if (cmd === `!update_cards`) {
 	return message.channel.send(`You added ${created} new cards from YGOPRODeck.com to the Format Library database.`)
 }
 
+
+
+//FIX CARDS 
+if (cmd === `!fix_cards`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	const ygoprodeckCards = ygoprodeck.data
+	let updated = 0
+
+	for (let i = 0; i < ygoprodeckCards.length; i++) {
+		if (ygoprodeckCards[i].atk === 0 || ygoprodeckCards[i].def === 0) {
+			const card = await Card.findOne({ where: { name: ygoprodeckCards[i].name }})
+			if (!card) {
+				continue
+			}
+			const atk = ygoprodeckCards[i].atk === 0 ? 0 : null
+			const def = ygoprodeckCards[i].def === 0 ? 0 : null
+			card.atk = atk
+			card.def = def
+			await card.save() 
+			updated++
+		}
+
+		if (ygoprodeckCards[i].type === 'Link Monster') {
+			const card = await Card.findOne({ where: { name: ygoprodeckCards[i].name }})
+			if (!card) {
+				continue
+			}
+			const rating = ygoprodeckCards[i].linkval
+			card.level = rating
+			await card.save() 
+			updated++
+		}
+
+		if (ygoprodeckCards[i].type.includes('Pendulum')) {
+			const card = await Card.findOne({ where: { name: ygoprodeckCards[i].name }})
+			if (!card) {
+				continue
+			}
+			const description = ygoprodeckCards[i].desc
+			card.description = description
+			await card.save() 
+			updated++
+		}
+
+	}
+
+	return message.channel.send(`You fixed the ATK/DEF stats of ${updated} cards in the Format Library database.`)
+}
+
+
 // AUCTION
 if (cmd === `!auc`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
@@ -380,55 +430,6 @@ if (cmd === `!auc`) {
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
     return message.channel.send(`You added ${quantity} ${card} to the auction pool.`)
 }
-
-
-//FIX CARDS 
-if (cmd === `!fix_cards`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	const ygoprodeckCards = ygoprodeck.data
-	let updated = 0
-
-	for (let i = 0; i < ygoprodeckCards.length; i++) {
-		if (ygoprodeckCards[i].atk === 0 || ygoprodeckCards[i].def === 0) {
-			const card = await Card.findOne({ where: { name: ygoprodeckCards[i].name }})
-			if (!card) {
-				continue
-			}
-			const atk = ygoprodeckCards[i].atk === 0 ? 0 : null
-			const def = ygoprodeckCards[i].def === 0 ? 0 : null
-			card.atk = atk
-			card.def = def
-			await card.save() 
-			updated++
-		}
-
-		if (ygoprodeckCards[i].type === 'Link Monster') {
-			const card = await Card.findOne({ where: { name: ygoprodeckCards[i].name }})
-			if (!card) {
-				continue
-			}
-			const rating = ygoprodeckCards[i].linkval
-			card.level = rating
-			await card.save() 
-			updated++
-		}
-
-		if (ygoprodeckCards[i].type.includes('Pendulum')) {
-			const card = await Card.findOne({ where: { name: ygoprodeckCards[i].name }})
-			if (!card) {
-				continue
-			}
-			const description = ygoprodeckCards[i].desc
-			card.description = description
-			await card.save() 
-			updated++
-		}
-
-	}
-
-	return message.channel.send(`You fixed the ATK/DEF stats of ${updated} cards in the Format Library database.`)
-}
-
 
 //NEW SET
 if (cmd === `!new_set`) {

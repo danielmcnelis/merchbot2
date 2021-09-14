@@ -180,7 +180,8 @@ if(cmd === `!test`) {
 		} 
 	}
 
-	if (num < 1) return message.channel.send(`You cannot buy less than 1 Pack.`)
+	if (num < 1) return message.channel.send(`You cannot test less than 1 Pack.`)
+	if (num > 2400) return message.channel.send(`You cannot test more than 2400 Packs.`)
 
 	for (let i = 0; i < args.length; i++) {
 		if (!isFinite(args[i])) {
@@ -251,7 +252,7 @@ if(cmd === `!test`) {
 	}).map(function(print) {
 		return print.card_code
 	})
-	
+
 		for (let j = 0; j < num; j++) {
 			const yourCommons = set.commons_per_pack > 1 ? getRandomSubset(commons, set.commons_per_pack) : set.secrets_per_pack === 1 ? [getRandomElement(commons)] : []
 			const yourRares = set.rares_per_pack > 1 ? getRandomSubset(rares, set.rares_per_pack) : set.rares_per_pack === 1 ? [getRandomElement(rares)] : []

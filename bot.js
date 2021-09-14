@@ -3007,7 +3007,7 @@ if (noshowcom.includes(cmd)) {
 	if (game === 'Tournament') {
 		const noShowEntry = await Entry.findOne({ where: { playerId: noShowId }, include: [Player, Tournament] })
 	
-		if (!noShowEntry || !noShow.roles.cache.some(role => role.id === tourRole)) {
+		if (!noShowEntry || !noShowMember.roles.cache.some(role => role.id === tourRole)) {
 			return message.channel.send(`Sorry, ${noShow.user.username} is not in the tournament.`)
 		} 
 	

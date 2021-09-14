@@ -199,6 +199,59 @@ if(cmd === `!test`) {
 	if (!set) return message.channel.send(`Could not find set code: ${code}.`)
 	if (!set.for_sale) return message.channel.send(`Sorry, ${code} ${eval(set.emoji)} Packs are not available.`)
 
+	const commons = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "com"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map(function(print) {
+		return print.card_code
+	})
+
+	const rares = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "rar"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map(function(print) {
+		return print.card_code
+	})
+
+	const supers = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "sup",
+			card_slot: {
+				[Op.lt]: 200
+			}
+		},
+		order: [['card_slot', 'ASC']]
+	}).map(function(print) {
+		return print.card_code
+	})
+
+	const ultras = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "ult"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map(function(print) {
+		return print.card_code
+	})
+
+	const secrets = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "scr"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map(function(print) {
+		return print.card_code
+	})
+	
 		for (let j = 0; j < num; j++) {
 			const yourCommons = set.commons_per_pack > 1 ? getRandomSubset(commons, set.commons_per_pack) : set.secrets_per_pack === 1 ? [getRandomElement(commons)] : []
 			const yourRares = set.rares_per_pack > 1 ? getRandomSubset(rares, set.rares_per_pack) : set.rares_per_pack === 1 ? [getRandomElement(rares)] : []

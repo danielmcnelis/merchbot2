@@ -3643,15 +3643,9 @@ if(dropcom.includes(cmd)) {
 		)
 	
 	if (game === 'Tournament') {
-		const tournaments = await Tournament.findAll({ order: [['createdAt', 'ASC']] })
-		if (!tournaments.length) return message.channel.send(`There is no active tournament.`)
-
-		const tournament = await selectTournament(message, tournaments, maid)
-		if (!tournament) return message.channel.send(`Please select a valid tournament.`)
-		
-		const entry = await Entry.findOne({ where: { playerId: maid }, include: Player})
-		if (!entry) return message.channel.send(`You are not in the tournament.`)
-
+		const entry = await Entry.findOne({ where: { playerId: maid }, include: [Player, Tournament]})
+		if (!entry) return message.channel.send(`You are not in any tournaments.`)
+		const tournament = entry.tournament
 		return removeParticipant(message, message.member, entry, tournament, drop = true)
 	}
 
@@ -3689,14 +3683,9 @@ if (cmd.toLowerCase() === `!remove`) {
 	if (!playerId) return message.channel.send(`Please specify the player you wish to remove from ${game !== 'Trivia' ? 'the' : ''} ${game}.`)
 
 	if (game === 'Tournament') {
-		const tournaments = await Tournament.findAll({ order: [['createdAt', 'ASC']] })
-		if (!tournaments.length) return message.channel.send(`There is no active tournament.`)
-
-		const tournament = await selectTournament(message, tournaments, maid)
-		if (!tournament) return message.channel.send(`Please select a valid tournament.`)
-		
-		const entry = await Entry.findOne({ where: { playerId }, include: Player})
-		if (!entry) return message.channel.send(`That user is not in the tournament.`)
+		const entry = await Entry.findOne({ where: { playerId }, include: [Player, Tournament]})
+		if (!entry) return message.channel.send(`That user is not in a tournament.`)
+		const tournament = entry.tournament
 
 		return removeParticipant(message, member, entry, tournament, drop = false)
 	}

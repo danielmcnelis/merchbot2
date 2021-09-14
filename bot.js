@@ -3402,8 +3402,6 @@ if(joincom.includes(cmd)) {
 		if (!tournament && count) return message.channel.send(`Sorry, the tournament already started.`)
 		if (!tournament && !count) return message.channel.send(`There is no active tournament.`)
 		
-		const data = await getTournament(tournament.id)
-		if (!data) return message.channel.send(`Could not access tournament: ${tournament.name}`)
 		message.channel.send(`Please check your DMs.`)
 		const dbName = player.duelingBook ? player.duelingBook : await askForDBUsername(member, player)
 		if (!dbName) return
@@ -3412,7 +3410,7 @@ if(joincom.includes(cmd)) {
 		const deckName = await getDeckNameTournament(member, player)
 		if (!deckName) return
 											
-		const participant = await putParticipant(tournament, player)
+		const { participant } = await putParticipant(tournament, player)
 		if (!participant) return message.channel.send(`Could not access tournament: ${tournament.name}`)
 
 		await Entry.create({

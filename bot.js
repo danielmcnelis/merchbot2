@@ -30,7 +30,7 @@ const { fetchAllCardNames, fetchAllUniquePrintNames, findCard, search } = requir
 const { addSheet, makeSheet, writeToSheet } = require('./functions/sheets.js')
 const { applyPriceDecay, getBarterCard, getBarterQuery, getVoucher, getTradeInCard, getBarterDirection, askForBarterConfirmation, checkShopShouldBe, getDecayCountdown, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
 const { getNewStatus } = require('./functions/status.js')
-const { askForDBUsername, checkChallongePairing, findNextMatch, findNextOpponent, findOtherPreReqMatch, generateSheetData, getDeckListTournament, getDeckNameTournament, getMatches, getTournamentType, putMatchResult, removeParticipant, seed, selectTournament } = require('./functions/tournament.js')
+const { askForDBUsername, checkChallongePairing, findNextMatch, findNextOpponent, findOtherPreReqMatch, generateSheetData, getDeckListTournament, getDeckNameTournament, getMatches, getTournament, getTournamentType, putMatchResult, putParticipant, removeParticipant, seed, selectTournament } = require('./functions/tournament.js')
 const { processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
 const { getBuyerConfirmation, getInvoiceMerchBotPurchase, getInvoiceMerchBotSale, getInvoiceP2PSale, getSellerConfirmation, processMerchBotSale, processP2PSale } = require('./functions/transaction.js')
 const { askQuestion, resetTrivia, startTrivia } = require('./functions/trivia.js')
@@ -3401,58 +3401,35 @@ if(joincom.includes(cmd)) {
 		const tournament = await selectTournament(message, tournaments, maid)
 		if (!tournament && count) return message.channel.send(`Sorry, the tournament already started.`)
 		if (!tournament && !count) return message.channel.send(`There is no active tournament.`)
-
-		// const info = await Info.findOne({ where: {
-		// 	element: 'registration',
-		// 	status: 'waiting'
-		// }})
-
-		// if (!info) return message.channel.send(`Someone else is signing up for a tournament. Please wait.`)
 		
-		return challongeClient.tournaments.show({
-			id: tournament.id,
-			callback: async (err, data) => {
-				if (err) {
-					return message.channel.send(`Could not find tournament: "${tournament.name}".`)
-				} else {
-					message.channel.send(`Please check your DMs.`)
-					const dbName = player.duelingBook ? player.duelingBook : await askForDBUsername(member, player)
-					if (!dbName) return
-					const deckListUrl = await getDeckListTournament(member, player, resubmission = false)
-					if (!deckListUrl) return
-					const deckName = await getDeckNameTournament(member, player)
-					if (!deckName) return
+		const data = await getTournamentType(tournament.id)
+		if (!data) return message.channel.send(`Could not access tournament: ${tournament.name}`)
+		message.channel.send(`Please check your DMs.`)
+		const dbName = player.duelingBook ? player.duelingBook : await askForDBUsername(member, player)
+		if (!dbName) return
+		const deckListUrl = await getDeckListTournament(member, player, resubmission = false)
+		if (!deckListUrl) return
+		const deckName = await getDeckNameTournament(member, player)
+		if (!deckName) return
+											
+		const participant = await putParticipant(tournament, player)
+		if (!participant) return message.channel.send(`Could not access tournament: ${tournament.name}`)
 
-					challongeClient.participants.create({
-						id: tournament.id,
-						participant: {
-							name: member.user.username
-						},
-						callback: async (err, data) => {
-							if (err) {
-								console.log(err)
-								return message.author.send(`Error: "${tournament.name}" could not be accessed.`)
-							} else {												
-								member.roles.add(tourRole)
-								await Entry.create({
-									pilot: player.name,
-									url: deckListUrl,
-									name: deckName,
-									type: deckName,
-									category: 'Other',
-									participantId: data.participant.id,
-									playerId: player.id,
-									tournamentId: tournament.id
-								})
-
-								message.author.send(`Thanks! I have all the information we need from you. Good luck in the tournament!`)
-								return client.channels.cache.get(tournamentChannelId).send(`<@${player.id}> is now registered for the tournament!`)
-							}
-						}
-					})	
-				}
-			}
+		await Entry.create({
+			pilot: player.name,
+			url: deckListUrl,
+			name: deckName,
+			type: deckName,
+			category: 'Other',
+			participantId: participant.id,
+			playerId: player.id,
+			tournamentId: tournament.id
 		})
+
+		member.roles.add(tourRole)
+		
+		message.author.send(`Thanks! I have all the information we need from you. Good luck in the tournament!`)
+		return client.channels.cache.get(tournamentChannelId).send(`<@${player.id}> is now registered for the tournament!`)
 	}
 
 	const alreadyIn = await eval(game).count({ where: { playerId: maid} })

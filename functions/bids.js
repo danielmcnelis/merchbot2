@@ -88,7 +88,7 @@ const askForBidPlacement = async (message, player, fuzzyPrints) => {
         message.author.send(`Thanks! You placed a ${amount}${stardust} bid on ${eval(print.rarity)}${print.card_code} - ${print.card_name}.`)
         const updatedPlayer = await Player.findOne({ where: { id: player.id }, include: [Bid, Wallet], order: [[Bid, 'amount', 'DESC']]})
         if (!updatedPlayer || player.bids.length >= 3) return
-        else return setTimeout(() => manageBidding(message, updatedPlayer, fuzzyPrints), 2000)
+        else return setTimeout(async () => manageBidding(message, updatedPlayer, fuzzyPrints), 2000)
     }).catch(err => {
         console.log(err)
         return message.author.send(`Sorry, time's up.`)
@@ -154,8 +154,8 @@ const askForBidCancellation = async (message, player, fuzzyPrints) => {
             message.author.send(`You canceled your bid on ${bidSummary[index].slice(4)}.`)
             const updatedPlayer = await Player.findOne({ where: { id: player.id }, include: [Bid, Wallet], order: [[Bid, 'amount', 'DESC']]})
             if (!updatedPlayer) return
-            if (updatedPlayer.bids.length === 0) return setTimeout(() => askForBidPlacement(message, updatedPlayer, fuzzyPrints), 2000)
-            else return setTimeout(() => manageBidding(message, updatedPlayer, fuzzyPrints), 2000)
+            if (updatedPlayer.bids.length === 0) return setTimeout(async () => askForBidPlacement(message, updatedPlayer, fuzzyPrints), 2000)
+            else return setTimeout(async () => manageBidding(message, updatedPlayer, fuzzyPrints), 2000)
         }
     }).catch(err => {
         console.log(err)

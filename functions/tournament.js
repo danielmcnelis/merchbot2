@@ -239,6 +239,18 @@ const removeParticipant = async (message, member, participants, participantId, t
     })
 }
 
+//GET TOURNAMENT
+const getTournament = async (tournamentId) => {
+    try {
+        const { data } = await axios.get(
+            `https://formatlibrary:${challongeAPIKey}@api.challonge.com/v1/tournaments/${tournamentId}.json`
+        )
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
 //GET MATCHES
 const getMatches = async (tournamentId) => {
     try {
@@ -263,6 +275,24 @@ const putMatchResult = async (tournamentId, matchId, winnerId, scores) => {
             }}
         })
         return !!success
+    } catch (err) {
+        console.log(err)
+    }   
+}
+
+
+//PUT PARTICIPANT
+const putParticipant = async (tournament, player) => {
+    try {
+        const { participant } = await axios({
+            method: 'put',
+            url: `https://formatlibrary:${challongeAPIKey}@api.challonge.com/v1/tournaments/${tournament.id}/participants.json`,
+            data: {
+                participant: {
+                name: player.name
+            }}
+        })
+        return participant
     } catch (err) {
         console.log(err)
     }   
@@ -436,7 +466,9 @@ module.exports = {
     getPairing,
     getTournamentType,
     getMatches,
+    getTournament,
     putMatchResult,
+    putParticipant,
     removeParticipant,
     seed,
     selectTournament

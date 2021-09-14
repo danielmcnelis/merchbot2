@@ -3410,9 +3410,8 @@ if(joincom.includes(cmd)) {
 		const deckName = await getDeckNameTournament(member, player)
 		if (!deckName) return
 											
-		const participant = await putParticipant(tournament, player)
+		const { participant } = await putParticipant(tournament, player)
 		if (!participant) return message.channel.send(`Could not access tournament: ${tournament.name}`)
-		else return message.channel.send(`Success?`)
 
 		await Entry.create({
 			pilot: player.name,

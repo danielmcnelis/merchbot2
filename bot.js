@@ -169,22 +169,6 @@ if (cmd === `!ping`) return message.channel.send('🏓')
 //TEST
 if(cmd === `!test`) return message.channel.send('🧪')
 
-//PURE
-if(cmd === `!purge`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	const players = await Player.findAll()
-	for (let i = 0; i < players.length; i++) {
-		const player = players[i]
-		await updateBinder(player)
-	}
-
-	return message.channel.send(`Updated Binders for ${players.length} players.`)
-}
-
-
-//TEST
-//if(cmd === `!test`) {}
-
 // ASSIGN ROLES
 if (cmd === `!assign_roles`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
@@ -207,7 +191,7 @@ if (cmd === `!assign_roles`) {
 }
 
 //IMPORT_DATA
-if (cmd === `!import_data`) {
+if (cmd === `!import_card_data`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const { data } = await axios.get('https://db.ygoprodeck.com/api/v7/cardinfo.php?misc=Yes')
 	fs.writeFile("./static/ygoprodeck.json", JSON.stringify(data), (err) => { 
@@ -417,6 +401,29 @@ if (cmd === `!fix_cards`) {
 			await card.save() 
 			updated++
 		}
+
+		if (ygoprodeckCards[i].type === 'Link Monster') {
+			const card = await Card.findOne({ where: { name: ygoprodeckCards[i].name }})
+			if (!card) {
+				continue
+			}
+			const rating = ygoprodeckCards[i].linkval
+			card.level = rating
+			await card.save() 
+			updated++
+		}
+
+		if (ygoprodeckCards[i].type.includes('Pendulum')) {
+			const card = await Card.findOne({ where: { name: ygoprodeckCards[i].name }})
+			if (!card) {
+				continue
+			}
+			const description = ygoprodeckCards[i].desc
+			card.description = description
+			await card.save() 
+			updated++
+		}
+
 	}
 
 	return message.channel.send(`You fixed the ATK/DEF stats of ${updated} cards in the Format Library database.`)

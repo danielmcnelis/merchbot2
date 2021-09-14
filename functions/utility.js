@@ -228,8 +228,6 @@ const recalculate = async (match, z) => {
         }
     })
 
-    console.log('!!previouslyDefeated', previouslyDefeated)
-
     winningPlayer.stats += delta
     winningPlayer.backup = origStatsWinner
     winningPlayer.wins++

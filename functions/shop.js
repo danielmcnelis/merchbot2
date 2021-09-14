@@ -83,12 +83,10 @@ const applyPriceDecay = async () => {
             const z_diff = ( 0.15 - shop_percent ) / 0.15
             print.market_price += 0.02 * current_price * z_diff
             await print.save()
-            console.log(`${print.card_code} - ${print.card_name} decayed UP (z_diff: ${z_diff}) from ${current_price} to ${print.market_price}`)
         } else if (shop_percent >= 0.15) {
             const z_diff = ( shop_percent - 0.15 ) / 0.85
             print.market_price -= 0.06 * current_price * z_diff 
             await print.save()
-            console.log(`${print.card_code} - ${print.card_name} decayed DOWN (z_diff: ${z_diff}) from ${current_price} to ${print.market_price}`)
         }
     }
 
@@ -328,9 +326,6 @@ const calcBoxPrice = async () => {
                 + (avgScrPrice * set.secrets_per_box) 
     
             const avgPackPrice = avgBoxPrice / set.packs_per_box
-    
-            console.log('10 * Math.round(1.1 * avgPackPrice / 10)', 10 * Math.round(1.1 * avgPackPrice / 10))
-            console.log('100 * Math.round(21 * 1.1 * avgPackPrice / 100)', 100 * Math.round(21 * 1.1 * avgPackPrice / 100))
     
             set.unit_price = 10 * Math.round(1.1 * avgPackPrice / 10)
             set.box_price = 100 * Math.round(21 * 1.1 * avgPackPrice / 100)

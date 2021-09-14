@@ -1597,8 +1597,6 @@ if(cmd === `!count`) {
 		}
 	}
 
-	console.log('weightedCount', weightedCount)
-
 	if (weightedCount < 1) weightedCount = 1 
     const core_count = most_recent === 'core' ?  Math.ceil(weightedCount / 8) : Math.ceil(weightedCount / 16)
     const mini_count = most_recent === 'core' ?  0 : Math.ceil(weightedCount * 3 / 32)
@@ -2460,7 +2458,6 @@ if (losscom.includes(cmd)) {
 
 		const daily_bonus = count ? 0 : 3
 		const pack_bonus = count === 1
-		console.log('pack_bonus', pack_bonus)
 		const origStatsWinner = winningPlayer.stats
 		const origStatsLoser = losingPlayer.stats
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
@@ -2701,7 +2698,6 @@ if (losscom.includes(cmd)) {
 		})
 		const daily_bonus = count ? 0 : 3
 		const pack_bonus = count === 1
-		console.log('pack_bonus', pack_bonus)
 		const origStatsWinner = winningPlayer.stats
 		const origStatsLoser = losingPlayer.stats
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
@@ -2908,7 +2904,6 @@ if (manualcom.includes(cmd)) {
 		})
 		const daily_bonus = count ? 0 : 3
 		const pack_bonus = count === 1
-		console.log('pack_bonus', pack_bonus)
 		const origStatsWinner = winningPlayer.stats
 		const origStatsLoser = losingPlayer.stats
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
@@ -4648,7 +4643,6 @@ if(cmd === `!steal`) {
     // It's also required after using the !combine command, but the bot will remind you to do it.
 if (cmd === `!recalc`) {
 	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	message.channel.send(`Recalculating data. Please wait...`)
 	const players = await Player.findAll()
     const matches = await Match.findAll({
             where: {
@@ -4658,7 +4652,7 @@ if (cmd === `!recalc`) {
             }, order: [['createdAt', 'ASC']]
         })
 
-    console.log(`Found ${matches.length} ranked and tournament matches.`)
+	message.channel.send(`Recalculating data for ${matches.length} matches. Please wait...`)
 	for (let i = 0; i < players.length; i++) {
 		const player = players[i]
 		player.stats = 500

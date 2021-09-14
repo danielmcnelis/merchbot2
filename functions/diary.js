@@ -86,7 +86,7 @@ const completeTask = async (channel, playerId, task, milliseconds = 2000) => {
 
     const diary = await Diary.findOne({ where: { playerId } })
     const wallet = await Wallet.findOne({ where: { playerId } })
-    if (!diary || !wallet) return console.log(`Error: could not find player's Diary.`)
+    if (!diary || !wallet) return
     diary[task] = true
     await diary.save()
 

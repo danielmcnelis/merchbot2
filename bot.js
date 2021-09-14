@@ -2067,6 +2067,11 @@ if(bindercom.includes(cmd)) {
 			continue
 		}
 
+		if (!print && card_name) {
+			message.channel.send(`You do not have any copies of ${card_name}.`)
+			continue
+		} 
+		
 		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 
 		const binderKeys = Object.keys(binder.dataValues)
@@ -2084,11 +2089,6 @@ if(bindercom.includes(cmd)) {
 		}
 
 		if (foundCopy) continue
-
-		if (!print && card_name) {
-			message.channel.send(`You do not have any copies of ${card_name}.`)
-			continue
-		} 
 
 		const inv = await Inventory.findOne({ 
 			where: { 

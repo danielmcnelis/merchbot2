@@ -170,48 +170,59 @@ if (cmd === `!ping`) return message.channel.send('🏓')
 
 //TEST
 if(cmd === `!test`) {
-	if (!isAmbassador(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	const card_code = args[0].toUpperCase()
-	const print = await Print.findOne({ where: { card_code: card_code }})
-	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 
-	const invs = await Inventory.findAll({ where: {
-		printId: print.id,
-		quantity: { [Op.gt]: 0 }
-	}})
-
-	const quants = invs.map((i) => i.quantity)
-	const total = quants.length ? quants.reduce((a, b) => a + b) : 0
-
-	const merchbotinv = await Inventory.findOne({ where: {
-		printId: print.id,
-		quantity: { [Op.gt]: 0 },
-		playerId: merchbotId
-	}})
-
-	const shop_pop = merchbotinv ? merchbotinv.quantity : 0
-	const shop_percent = total ? shop_pop / total : 0
-
-	let current_price = print.market_price
-	const results = [`Estimated Decay - ${card}:`, `Day 0 - ${Math.round(current_price)}${stardust}`]
-
-	if (shop_percent < 0.15) {
-		const z_diff = ( 0.15 - shop_percent ) / 0.15
-
-		for (let i = 0; i < 30; i++) {
-			current_price += 0.02 * current_price * z_diff 
-			results.push(`Day ${i+1} - ${Math.round(current_price)}${stardust}`)
-		}
-	} else if (shop_percent >= 0.15) {
-		const z_diff = ( shop_percent - 0.15 ) / 0.85
-
-		for (let i = 0; i < 30; i++) {
-			current_price -= 0.06 * current_price * z_diff 
-			results.push(`Day ${i+1} - ${Math.round(current_price)}${stardust}`)
-		}
+	let num = 1
+	let code = 'TEB'
+	for (let i = 0; i < args.length; i++) {
+		if (isFinite(args[i])) {
+			num = parseInt(args[i])
+			break
+		} 
 	}
 
-	return message.channel.send(results.join('\n'))	
+	if (num < 1) return message.channel.send(`You cannot buy less than 1 Pack.`)
+
+	for (let i = 0; i < args.length; i++) {
+		if (!isFinite(args[i])) {
+			code = args[i].toUpperCase()
+			break
+		} 
+	}
+
+	const results = {
+		supers: 0,
+		ultras: 0,
+		secrets: 0
+	}
+
+	const set = await Set.findOne({ where: { code: code }})
+	if (!set) return message.channel.send(`Could not find set code: ${code}.`)
+	if (!set.for_sale) return message.channel.send(`Sorry, ${code} ${eval(set.emoji)} Packs are not available.`)
+
+		for (let j = 0; j < num; j++) {
+			const yourCommons = set.commons_per_pack > 1 ? getRandomSubset(commons, set.commons_per_pack) : set.secrets_per_pack === 1 ? [getRandomElement(commons)] : []
+			const yourRares = set.rares_per_pack > 1 ? getRandomSubset(rares, set.rares_per_pack) : set.rares_per_pack === 1 ? [getRandomElement(rares)] : []
+			const yourSupers = set.supers_per_pack > 1 ? getRandomSubset(supers, set.supers_per_pack) : set.supers_per_pack === 1 ? [getRandomElement(supers)] : []
+			const yourUltras = set.ultras_per_pack > 1 ? getRandomSubset(ultras, set.ultras_per_pack) : set.ultras_per_pack === 1 ? [getRandomElement(ultras)] : []
+			const yourSecrets = set.secrets_per_pack > 1 ? getRandomSubset(secrets, set.secrets_per_pack) : set.secrets_per_pack === 1 ? [getRandomElement(secrets)] :  []
+
+			const odds = []
+			if (!yourCommons.length) for (let i = 0; i < set.commons_per_box; i++) odds.push("commons")
+			if (!yourRares.length) for (let i = 0; i < set.rares_per_box; i++) odds.push("rares")
+			if (!yourSupers.length) for (let i = 0; i < set.supers_per_box; i++) odds.push("supers")
+			if (!yourUltras.length) for (let i = 0; i < set.ultras_per_box; i++) odds.push("ultras")
+			if (!yourSecrets.length) for (let i = 0; i < set.secrets_per_box; i++) odds.push("secrets")
+
+			const luck = getRandomElement(odds)
+			results[luck]++
+		}
+
+	return message.channel.send(
+		`Simulation of ${num} ${set.code} ${eval(set.code)} Packs:`
+		+ `\n${sup} Supers: ${results.supers} `
+		+ `\n${ult} Ultras: ${results.ultras} `
+		+ `\n${scr} Secrets: ${results.secrets} `
+	)
 }
 
 // ASSIGN ROLES
@@ -3568,7 +3579,7 @@ if (cmd === `!reset`) {
 	if (!game) {
 		const date = new Date()
 		const player = await Player.findOne({ where: { id: maid }})
-		const time_diff = player.last_reset ? date.getTime() - player.last_reset.getTime() : 0	
+		const time_diff = player.last_reset ? date.getTime() - player.last_reset.getTime() : date.getTime() - player.createdAt.getTime()
 		const days = Math.floor(time_diff / (24 * 60 * 60 * 1000))
 		if (player.last_reset && days < 30) {
 			return message.channel.send(`Sorry, you cannot reset your account for another ${days === 29 ? 'day' : `${30 - days} days` }.`)

@@ -722,14 +722,14 @@ if(startcom.includes(cmd)) {
 			await writeToSheet(spreadsheetId, 'Summary', 'RAW', sheet2Data)
 			//await uploadDeckFolder(name)
 			
-			// message.channel.send(`Please wait while I open some pack(s)... ${blue}`)
-			// for (let i = 0; i < entries.length; i++) {
-			// 	const playerId = entries[i].playerId
-			// 	const wallet = await Wallet.findOne({ where: { playerId: playerId }})
-			// 	wallet.stardust -= 50
-			// 	await wallet.save()
-			// 	await awardPack(message.channel, playerId, set, 1)
-			// }
+			message.channel.send(`Please wait while I open some pack(s)... ${blue}`)
+			for (let i = 0; i < entries.length; i++) {
+				const playerId = entries[i].playerId
+				const wallet = await Wallet.findOne({ where: { playerId: playerId }})
+				wallet.stardust -= 50
+				await wallet.save()
+				await awardPack(message.channel, playerId, set, 1)
+			}
 	
 			return message.channel.send(`Let's go! Your tournament is starting now: https://challonge.com/${url} ${FiC}`)
 		} else {

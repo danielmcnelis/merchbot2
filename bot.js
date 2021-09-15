@@ -1496,7 +1496,7 @@ if (cmd === `!shop`) {
 			const ultras = prints.filter((p) => p.rarity === 'ult').sort((a, b) => b.market_price - a.market_price)
 			const secrets = prints.filter((p) => p.rarity === 'scr').sort((a, b) => b.market_price - a.market_price)
 
-			const results = [`**${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? eval(set.emoji) : ''} Price List**`]
+			const results = [`**${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? ` ${eval(set.alt_emoji)}` : ''} Price List**`]
 			
 			for (let i = 0; i < secrets.length; i++) {
 				const print = secrets[i]
@@ -1537,8 +1537,9 @@ if (cmd === `!shop`) {
 				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
 				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
 			}
+			const results = [`${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? ` ${eval(set.alt_emoji)}` : ''} Price List`]
 
-			message.channel.send(`I messaged you the ${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? eval(set.emoji) : ''} Price List you requested.`)
+			message.channel.send(`I messaged you the ${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? ` ${eval(set.alt_emoji)}` : ''} Price List you requested.`)
 			for (let i = 0 ; i < results.length; i+=10) message.author.send(results.slice(i, i+10))
 			return
 			

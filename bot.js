@@ -548,10 +548,8 @@ if (aliuscom.includes(cmd)) {
 	for (let i = 0; i < values.length; i++) {
 		const alius = values[i].content.toLowerCase()
 		const old_nick = await Nickname.findOne({ where: { alius } })
-		console.log('!!old_nick', !!old_nick)
 		if (old_nick) console.log('old_nick.card_name', old_nick.card_name)
-		console.log('card_name', card_name)
-
+	
 		if (old_nick) {
 			message.channel.send(`"${alius}" was previously used for ${old_nick.card_name}.`)
 			await old_nick.destroy()
@@ -1487,6 +1485,79 @@ if (cmd === `!shop`) {
 		const query = args.join(' ')
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 		const card_name = await findCard(query, fuzzyPrints)
+		const set_code = query.toUpperCase()
+		const valid_set_code = !!(await Set.count({ where: { code: set_code }}))
+		if (valid_set_code) {
+			const set = await Set.findOne({ where: { code: set_code }})
+			const prints = await Print.findAll({ where: { set_code: set_code } })
+			const commons = prints.filter((p) => p.rarity === 'com').sort((a, b) => b.market_price - a.market_price)
+			const rares = prints.filter((p) => p.rarity === 'rar').sort((a, b) => b.market_price - a.market_price)
+			const supers = prints.filter((p) => p.rarity === 'sup').sort((a, b) => b.market_price - a.market_price)
+			const ultras = prints.filter((p) => p.rarity === 'ult').sort((a, b) => b.market_price - a.market_price)
+			const secrets = prints.filter((p) => p.rarity === 'scr').sort((a, b) => b.market_price - a.market_price)
+
+			const results = []
+			if (secrets.length) {
+				results.push(`${set.code} ${eval(set.emoji)}${set.emoji === set.alt_emoji ? eval(set.emoji) : ''} Secrets ${scr}:`)
+				for (let i = 0; i < secrets.length; i++) {
+					const print = secrets[i]
+					const market_price = print.market_price
+					const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
+					const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
+					results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+				}
+			}
+
+			if (ultras.length) {
+				results.push(`${set.code} ${eval(set.emoji)}${set.emoji === set.alt_emoji ? eval(set.emoji) : ''} Ultras ${ult}:`)
+				for (let i = 0; i < ultras.length; i++) {
+					const print = ultras[i]
+					const market_price = print.market_price
+					const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
+					const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
+					results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+				}
+			}
+
+			if (supers.length) {
+				results.push(`${set.code} ${eval(set.emoji)}${set.emoji === set.alt_emoji ? eval(set.emoji) : ''} Supers ${sup}:`)
+				for (let i = 0; i < supers.length; i++) {
+					const print = supers[i]
+					const market_price = print.market_price
+					const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
+					const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
+					results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+				}
+			}
+
+			if (rares.length) {
+				results.push(`${set.code} ${eval(set.emoji)}${set.emoji === set.alt_emoji ? eval(set.emoji) : ''} Rares ${rar}:`)
+				for (let i = 0; i < rares.length; i++) {
+					const print = rares[i]
+					const market_price = print.market_price
+					const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
+					const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
+					results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+				}
+			}
+
+			if (commons.length) {
+				results.push(`${set.code} ${eval(set.emoji)}${set.emoji === set.alt_emoji ? eval(set.emoji) : ''} Commons ${com}:`)
+				for (let i = 0; i < commons.length; i++) {
+					const print = commons[i]
+					const market_price = print.market_price
+					const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
+					const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
+					results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+				}
+			}
+
+			message.channel.send(`I messaged you the trade history you requested.`)
+			for (let i = 0 ; i < results.length; i+=10) message.author.send(results[i])
+			return
+			
+		}
+
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 		const prints = valid_card_code ? await Print.findAll({ where: { card_code: card_code }, order: [['createdAt', 'ASC']]}) : card_name ? await Print.findAll({ where: { card_name: card_name }, order: [['createdAt', 'ASC']]}) : null
 		if (!prints || !prints.length) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)

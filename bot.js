@@ -548,22 +548,23 @@ if (aliuscom.includes(cmd)) {
 	for (let i = 0; i < values.length; i++) {
 		const alius = values[i].content.toLowerCase()
 		const old_nick = await Nickname.findOne({ where: { alius } })
-		if (old_nick && old_nick.card_name === card_name) {
+
+		if (old_nick && old_nick.card_name === card_name.toLowerCase()) {
 			message.channel.send(`"${alius}" was previously used for ${old_nick.card_name}.`)
 			await old_nick.destroy()
 		} 
-		
-		const new_nick = await Nickname.create({
-			alius,
-			card_name
-		})
 
-		if (!new_nick) {
-			message.channel.send(`"${alius}" was already being used for ${card_name}.`)
-		} else {
+		try {
+			await Nickname.create({
+				alius,
+				card_name
+			})
+			
 			message.channel.send(`Created an alius for ${card_name}: ${alius}`)
-		} 
-
+		} catch (err) {
+			console.log(err)
+			message.channel.send(`"${alius}" was already being used for ${card_name}.`)
+		}
 	}
 }
 

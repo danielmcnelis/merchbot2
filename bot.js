@@ -1560,8 +1560,8 @@ if (cmd === `!shop`) {
 	
 			const auction = await Auction.findOne({ where: { printId: print.id } })
 			const market_price = print.market_price
-			const selling_price = Math.z(market_price * 1.1)
-			const buying_price = Math.ceil(market_price * 0.7)
+			const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1			
+			const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
 
 			if (!inv) {
 				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - Out of Stock.`)
@@ -5719,7 +5719,7 @@ if(cmd === `!dump`) {
 		const quantityToSell = sellerInv.quantity - quantityToKeep
 		count += quantityToSell
 		cards.push(`${quantityToSell} ${eval(print.rarity)}${print.card_name}`)
-		const price = Math.ceil(print.market_price * 0.7) * quantityToSell
+		const price = Math.floor(print.market_price * 0.7) > 0 ? Math.floor(print.market_price * 0.7) * quantityToSell : quantityToSell
 		compensation += price
 	}
 

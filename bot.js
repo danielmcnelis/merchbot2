@@ -548,8 +548,11 @@ if (aliuscom.includes(cmd)) {
 	for (let i = 0; i < values.length; i++) {
 		const alius = values[i].content.toLowerCase()
 		const old_nick = await Nickname.findOne({ where: { alius } })
+		console.log('!!old_nick', !!old_nick)
+		if (old_nick) console.log('old_nick.card_name', old_nick.card_name)
+		console.log('card_name', card_name)
 
-		if (old_nick && old_nick.card_name === card_name.toLowerCase()) {
+		if (old_nick && old_nick.card_name.toLowerCase() === card_name.toLowerCase()) {
 			message.channel.send(`"${alius}" was previously used for ${old_nick.card_name}.`)
 			await old_nick.destroy()
 		} 

@@ -552,7 +552,7 @@ if (aliuscom.includes(cmd)) {
 		if (old_nick) console.log('old_nick.card_name', old_nick.card_name)
 		console.log('card_name', card_name)
 
-		if (old_nick && old_nick.card_name.toLowerCase() === card_name.toLowerCase()) {
+		if (old_nick) {
 			message.channel.send(`"${alius}" was previously used for ${old_nick.card_name}.`)
 			await old_nick.destroy()
 		} 

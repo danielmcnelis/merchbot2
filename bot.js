@@ -1498,7 +1498,7 @@ if (cmd === `!shop`) {
 
 			const results = []
 			if (secrets.length) {
-				results.push(`${set.code} ${eval(set.emoji)}${set.emoji === set.alt_emoji ? eval(set.emoji) : ''} Secrets ${scr}:`)
+				results.push(`${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? eval(set.emoji) : ''} Secrets ${scr}:`)
 				for (let i = 0; i < secrets.length; i++) {
 					const print = secrets[i]
 					const market_price = print.market_price
@@ -1509,7 +1509,7 @@ if (cmd === `!shop`) {
 			}
 
 			if (ultras.length) {
-				results.push(`${set.code} ${eval(set.emoji)}${set.emoji === set.alt_emoji ? eval(set.emoji) : ''} Ultras ${ult}:`)
+				results.push(`${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? eval(set.emoji) : ''} Ultras ${ult}:`)
 				for (let i = 0; i < ultras.length; i++) {
 					const print = ultras[i]
 					const market_price = print.market_price
@@ -1520,7 +1520,7 @@ if (cmd === `!shop`) {
 			}
 
 			if (supers.length) {
-				results.push(`${set.code} ${eval(set.emoji)}${set.emoji === set.alt_emoji ? eval(set.emoji) : ''} Supers ${sup}:`)
+				results.push(`${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? eval(set.emoji) : ''} Supers ${sup}:`)
 				for (let i = 0; i < supers.length; i++) {
 					const print = supers[i]
 					const market_price = print.market_price
@@ -1531,7 +1531,7 @@ if (cmd === `!shop`) {
 			}
 
 			if (rares.length) {
-				results.push(`${set.code} ${eval(set.emoji)}${set.emoji === set.alt_emoji ? eval(set.emoji) : ''} Rares ${rar}:`)
+				results.push(`${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? eval(set.emoji) : ''} Rares ${rar}:`)
 				for (let i = 0; i < rares.length; i++) {
 					const print = rares[i]
 					const market_price = print.market_price
@@ -1542,7 +1542,7 @@ if (cmd === `!shop`) {
 			}
 
 			if (commons.length) {
-				results.push(`${set.code} ${eval(set.emoji)}${set.emoji === set.alt_emoji ? eval(set.emoji) : ''} Commons ${com}:`)
+				results.push(`${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? eval(set.emoji) : ''} Commons ${com}:`)
 				for (let i = 0; i < commons.length; i++) {
 					const print = commons[i]
 					const market_price = print.market_price
@@ -1552,8 +1552,8 @@ if (cmd === `!shop`) {
 				}
 			}
 
-			message.channel.send(`I messaged you the trade history you requested.`)
-			for (let i = 0 ; i < results.length; i+=10) message.author.send(results[i])
+			message.channel.send(`I messaged you the ${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? eval(set.emoji) : ''} Price List you requested.`)
+			for (let i = 0 ; i < results.length; i+=10) message.author.send(results.slice(i, i+10))
 			return
 			
 		}

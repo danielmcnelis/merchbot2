@@ -1496,60 +1496,46 @@ if (cmd === `!shop`) {
 			const ultras = prints.filter((p) => p.rarity === 'ult').sort((a, b) => b.market_price - a.market_price)
 			const secrets = prints.filter((p) => p.rarity === 'scr').sort((a, b) => b.market_price - a.market_price)
 
-			const results = []
-			if (secrets.length) {
-				results.push(`${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? eval(set.emoji) : ''} Secrets ${scr}:`)
-				for (let i = 0; i < secrets.length; i++) {
-					const print = secrets[i]
-					const market_price = print.market_price
-					const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
-					const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-					results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
-				}
+			const results = [`**${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? eval(set.emoji) : ''} Price List**`]
+			
+			for (let i = 0; i < secrets.length; i++) {
+				const print = secrets[i]
+				const market_price = print.market_price
+				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
+				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+			}
+			
+			for (let i = 0; i < ultras.length; i++) {
+				const print = ultras[i]
+				const market_price = print.market_price
+				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
+				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+			}
+			
+			for (let i = 0; i < supers.length; i++) {
+				const print = supers[i]
+				const market_price = print.market_price
+				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
+				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+			}
+			
+			for (let i = 0; i < rares.length; i++) {
+				const print = rares[i]
+				const market_price = print.market_price
+				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
+				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
 			}
 
-			if (ultras.length) {
-				results.push(`${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? eval(set.emoji) : ''} Ultras ${ult}:`)
-				for (let i = 0; i < ultras.length; i++) {
-					const print = ultras[i]
-					const market_price = print.market_price
-					const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
-					const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-					results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
-				}
-			}
-
-			if (supers.length) {
-				results.push(`${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? eval(set.emoji) : ''} Supers ${sup}:`)
-				for (let i = 0; i < supers.length; i++) {
-					const print = supers[i]
-					const market_price = print.market_price
-					const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
-					const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-					results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
-				}
-			}
-
-			if (rares.length) {
-				results.push(`${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? eval(set.emoji) : ''} Rares ${rar}:`)
-				for (let i = 0; i < rares.length; i++) {
-					const print = rares[i]
-					const market_price = print.market_price
-					const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
-					const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-					results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
-				}
-			}
-
-			if (commons.length) {
-				results.push(`${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? eval(set.emoji) : ''} Commons ${com}:`)
-				for (let i = 0; i < commons.length; i++) {
-					const print = commons[i]
-					const market_price = print.market_price
-					const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
-					const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-					results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
-				}
+			for (let i = 0; i < commons.length; i++) {
+				const print = commons[i]
+				const market_price = print.market_price
+				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
+				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
 			}
 
 			message.channel.send(`I messaged you the ${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? eval(set.emoji) : ''} Price List you requested.`)

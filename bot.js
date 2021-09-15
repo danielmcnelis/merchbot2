@@ -1560,8 +1560,8 @@ if (cmd === `!shop`) {
 	
 			const auction = await Auction.findOne({ where: { printId: print.id } })
 			const market_price = print.market_price
-			const selling_price = Math.ceil(market_price * 1.1)
-			const buying_price = Math.ceil(market_price * 0.7)
+			const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
+			const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
 
 			if (!inv) {
 				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - Out of Stock.`)

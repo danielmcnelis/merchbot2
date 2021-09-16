@@ -43,7 +43,7 @@ const { client } = require('./static/clients.js')
 const { alchemycom, aliuscom, bindercom, botcom, boxcom, bracketcom, calccom, checklistcom, dailycom, dbcom, deckcom, dicecom, dropcom, flipcom, h2hcom, historycom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, packcom, pfpcom, populationcom, profcom, queuecom, rankcom, reducecom, referralcom, rolecom, specialcom, startcom, statscom, undocom, walletcom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
-const { king, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, shrine, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion, open, closed } = require('./static/emojis.json')
+const { king, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, shrine, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare } = require('./static/emojis.json')
 const { adminRole, arenaRole, botRole,expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')
@@ -168,6 +168,39 @@ if (cmd === `!ping`) return message.channel.send('🏓')
 
 //TEST
 if(cmd === `!test`) return message.channel.send('🧪')
+
+//DING
+if(cmd === `!ding`) return message.channel.send('🚪')
+
+//HI
+if(cmd === `!hi`) return message.channel.send('👋')
+
+//WHAT
+if(cmd === `!what`) return message.channel.send('❓')
+
+//5MIN
+if(cmd === `!5min`) return message.channel.send(fishstare)
+
+//SHIT
+if(cmd === `!shit`) return message.channel.send('💩')
+
+//STOP
+if(cmd === `!stop`) return message.channel.send('🛑')
+
+//AJT
+if(cmd === `!ajt`) return message.channel.send('🧑‍🌾')
+
+//JAZZ
+if(cmd === `!jazz`) return message.channel.send('🎷')
+
+//RANDAGE
+if(cmd === `!randage`) return message.channel.send(lmf3dao)
+
+//YELLOW
+if(cmd === `!yellow`) return message.channel.send('🟨')
+
+//OP
+if(cmd === `!operation`) return message.channel.send('❄️☃️❄️☃️❄️')
 
 // ASSIGN ROLES
 if (cmd === `!assign_roles`) {
@@ -4514,6 +4547,7 @@ if(cmd === `!award`) {
 	let set_code = query.includes('chaospack') || query.includes('chaos pack') || query === 'ch2' ? 'CH2' :
 		query === 'ch1' ? 'CH1' :
 		query === 'pack' || query === 'packs' || query === 'teb' ? 'TEB' :
+		query === 'orf' ? 'ORF' :
 		query === 'doc' ? 'DOC' :
 		null
 

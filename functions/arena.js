@@ -50,6 +50,7 @@ const getArenaSample = async (message, query) => {
     return collected
 }
 
+//START ARENA
 const startArena = async(guild) => {
     const arenaChannel = client.channels.cache.get(arenaChannelId)
     arenaChannel.send(`Arena players, please check your DMs!`)
@@ -134,6 +135,7 @@ const startArena = async(guild) => {
     }, 61000)
 }
 
+//GET CONFIRMATION
 const getConfirmation = async (guild, arena_entry, contestant) => {
     const arenaChannel = client.channels.cache.get(arenaChannelId)
     const playerId = arena_entry.playerId
@@ -181,6 +183,7 @@ const getConfirmation = async (guild, arena_entry, contestant) => {
 	})
 }
 
+//ASSIGN ARENA ROLES
 const assignArenaRoles = (guild, entries) => {
     entries.forEach((entry) => {
         const member = guild.members.cache.get(entry.playerId)
@@ -188,6 +191,7 @@ const assignArenaRoles = (guild, entries) => {
     })
 }
 
+//START ROUND
 const startRound = async (info, entries) => {
     const arenaChannel = client.channels.cache.get(arenaChannelId)
     const guild = client.guilds.cache.get("842476300022054913")
@@ -322,34 +326,36 @@ const startRound = async (info, entries) => {
     }
 }
 
+//FORFEIT
 const forfeit = async (winnerId, loserId) => {
 		const info = await Info.findOne({ where: { element: 'arena' } })
 		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
 
-		const losingContestant = await Arena.findOne({ where: { playerId: loserId }})
-		const winningContestant = await Arena.findOne({ where: { playerId: winnerId }})
-		if (!winningContestant || !losingContestant) return message.channel.send(`Could not process forfeiture.`)
+		const losingPlayer = await Player.findOne({ where: { id: loserId }, include: [Arena, Wallet] })
+		const winningPlayer = await Player.findOne({ where: { id: winnerId }, include: [Arena, Wallet] })
+		if (!winningPlayer || !losingPlayer) return message.channel.send(`Could not process forfeiture.`)
 		
-		winningContestant.wallet.starchips += 3
+		winningPlayer.wallet.starchips += 5
 		await winningPlayer.wallet.save()
 
-		losingContestant.is_playing = false
-		await losingContestant.save()
+		losingPlayer.arena.is_playing = false
+		await losingPlayer.arena.save()
 
-		winningContestant.score++
-		winningContestant.is_playing = false
-		await winningContestant.save()
+		winningPlayer.arena.score++
+		winningPlayer.arena.is_playing = false
+		await winningPlayer.arena.save()
 
-		message.channel.send(`${losingPlayer.name} (+0${starchips}), your Arena loss to ${winner.user.username} (+3${starchips}) has been recorded.`)
+		message.channel.send(`${losingPlayer.name} (+0${starchips}), your Arena loss to ${winningPlayer.name} (+5${starchips}) has been recorded.`)
 		return checkArenaProgress(info) 
 }
 
+//DOUBLE FORFEIT
 const doubleForfeit = async (player1Id, player2Id) => {
     const info = await Info.findOne({ where: { element: 'arena' } })
     if (!info) return message.channel.send(`Error: could not find game: "arena".`)
 
-    const contestant1 = await Arena.findOne({ where: { playerId: player1Id }, include: Player })
-    const contestant2 = await Arena.findOne({ where: { playerId: player2Id }, include: Player })
+    const contestant1 = await Player.findOne({ where: { id: player1Id }, include: Player })
+    const contestant2 = await Player.findOne({ where: { id: player2Id }, include: Player })
     if (!contestant1 || !contestant2) return message.channel.send(`Could not process double forfeiture.`)
     
     contestant1.is_playing = false
@@ -362,6 +368,7 @@ const doubleForfeit = async (player1Id, player2Id) => {
     return checkArenaProgress(info) 
 }
 
+//POST STANDINGS
 const postStandings = async (info, entries) => {
     const arenaChannel = client.channels.cache.get(arenaChannelId)
 

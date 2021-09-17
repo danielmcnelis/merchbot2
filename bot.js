@@ -43,7 +43,7 @@ const { client } = require('./static/clients.js')
 const { alchemycom, aliuscom, bindercom, botcom, boxcom, bracketcom, calccom, checklistcom, dailycom, dbcom, deckcom, dicecom, dropcom, flipcom, h2hcom, historycom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, packcom, pfpcom, populationcom, profcom, queuecom, rankcom, reducecom, referralcom, rolecom, specialcom, startcom, statscom, undocom, walletcom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
-const { king, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, shrine, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare } = require('./static/emojis.json')
+const { abuser, galaxy, robbed, king, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, shrine, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare } = require('./static/emojis.json')
 const { adminRole, arenaRole, botRole,expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')
@@ -188,13 +188,19 @@ if(cmd === `!shit`) return message.channel.send('💩')
 if(cmd === `!stop`) return message.channel.send('🛑')
 
 //AJT
-if(cmd === `!ajt`) return message.channel.send('🧑‍🌾')
+if(cmd === `!ajt` || cmd === `!ajtbls`) return message.channel.send('🧑‍🌾')
+
+//CAMERON
+if(cmd === `!cam` || cmd === `!cameron`) return message.channel.send(cavebob)
 
 //JAZZ
-if(cmd === `!jazz`) return message.channel.send('🎷')
+if(cmd === `!jazz`) return message.channel.send(abuser)
 
 //RANDAGE
 if(cmd === `!randage`) return message.channel.send(lmf3dao)
+
+//CALEB
+if(cmd === `!caleb`) return message.channel.send(robbed)
 
 //YELLOW
 if(cmd === `!yellow`) return message.channel.send('🟨')
@@ -446,29 +452,31 @@ if (cmd === `!new_set`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	
 	const set = {
-		code: "CH2",
-		name: "Chaos Pack 2",
-		type: "tour",
-		emoji: "milleye",
-		alt_emoji: "milleye",
-		size: 20,
-		commons: 9,
-		rares: 6,
-		supers: 4,
-		ultras: 1,
+		code: "GL1",
+		name: "Galaxy Pack 1",
+		type: "draft",
+		emoji: "galaxy",
+		alt_emoji: "galaxy",
+		size: 200,
+		commons: 120,
+		rares: 64,
+		supers: 16,
+		ultras: 0,
 		secrets: 0,
 		specials: 0,
 		for_sale: false,
 		spec_for_sale: false,
-		unit_price: 15,
+		unit_price: 30,
 		unit_sales: 0,
-		cards_per_pack: 3,
+		cards_per_pack: 18,
 		packs_per_box: 24,
-		commons_per_pack: 2,
-		commons_per_box: 48,
-		rares_per_box: 24,
-		supers_per_box: 7,
-		ultras_per_box: 1,
+		commons_per_pack: 12,
+		commons_per_box: 288,
+		rares_per_pack: 5,
+		rares_per_box: 120,
+		supers_per_pack: 1,
+		supers_per_box: 24,
+		ultras_per_box: 0,
 		secrets_per_box: 0
 	}
 

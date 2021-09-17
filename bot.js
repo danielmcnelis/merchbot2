@@ -1603,6 +1603,7 @@ if (cmd === `!shop`) {
 
 		for (let i = 0; i < prints.length; i++) {
 			const print = prints[i]
+			if (print.draft || print.hidden) continue
 			const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 			const inv = await Inventory.findOne({ where: {
 				printId: print.id,
@@ -1640,6 +1641,7 @@ if (populationcom.includes(cmd)) {
 
 	for (let i = 0; i < prints.length; i++) {
 		const print = prints[i]
+		if (print.draft || print.hidden) continue
 		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 		const set = await Set.findOne({ where: { id: print.setId }})
 		const invs = await Inventory.findAll({ where: {
@@ -1819,7 +1821,7 @@ if (historycom.includes(cmd)) {
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	const card_name = await findCard(query, fuzzyPrints)
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-	if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+	if (!print || print.draft || print.hidden) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 	const item = print.card_code
 

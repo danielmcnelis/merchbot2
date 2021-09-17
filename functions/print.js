@@ -125,6 +125,8 @@ const selectPrint = async (message, playerId, card_name, private = false, inInv 
         order: [['createdAt', 'ASC']]
     })
 
+    prints.filter((p) => !p.hidden && !p.draft)
+
     const channel = private ? message.author : message.channel
 
     if (!prints.length) return null

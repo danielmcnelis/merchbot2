@@ -413,7 +413,7 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
     const new_changes = all_statuses.filter((status) => {
 		const updatedAt = status.updatedAt
 		const updatedTime = updatedAt.getTime()
-		if (isWithinXHours(48, time, updatedTime)) return status
+		if (isWithinXHours(0, time, updatedTime)) return status
     })
 	const affected_cards = new_changes.map((c) => c.name)
 
@@ -421,12 +421,12 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
     const all_new_prints = all_prints.filter((print) => {
 		const createdAt = print.createdAt
 		const createdTime = createdAt.getTime()
-		if (isWithinXHours(48, time, createdTime)) return print
+		if (isWithinXHours(0, time, createdTime)) return print
     })
     const all_old_prints = all_prints.filter((print) => {
 		const createdAt = print.createdAt
 		const createdTime = createdAt.getTime()
-		if (!isWithinXHours(48, time, createdTime)) return print
+		if (!isWithinXHours(0, time, createdTime)) return print
     })
     const all_new_print_names = all_new_prints.map((p) => p.card_name)
     const all_old_print_names = all_old_prints.map((p) => p.card_name)
@@ -526,7 +526,7 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
     const new_changes = all_statuses.filter((s) => {
 		const updatedAt = s.updatedAt
 		const updatedTime = updatedAt.getTime()
-		if (isWithinXHours(48, time, updatedTime)) return s
+		if (isWithinXHours(0, time, updatedTime)) return s
     })
 	const affected_cards = new_changes.map((c) => c.name)
 
@@ -534,12 +534,12 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
     const all_new_prints = all_prints.filter((print) => {
 		const createdAt = print.createdAt
 		const createdTime = createdAt.getTime()
-		if (isWithinXHours(48, time, createdTime)) return print
+		if (isWithinXHours(0, time, createdTime)) return print
     })
     const all_old_prints = all_prints.filter((print) => {
 		const createdAt = print.createdAt
 		const createdTime = createdAt.getTime()
-		if (!isWithinXHours(48, time, createdTime)) return print
+		if (!isWithinXHours(0, time, createdTime)) return print
     })
     const all_new_print_names = all_new_prints.map((p) => p.card_name)
     const all_old_print_names = all_old_prints.map((p) => p.card_name)

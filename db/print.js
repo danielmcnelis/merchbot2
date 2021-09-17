@@ -32,6 +32,16 @@ const Print = db.define('print', {
     type: Sequelize.FLOAT,
     defaultValue: 10.00,
     allowNull: false
+  },
+  draft: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+    allowNull: true
+  },
+  hidden: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+    allowNull: true
   }
 })
 

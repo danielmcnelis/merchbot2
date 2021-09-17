@@ -688,6 +688,9 @@ if (cmd === `!print`) {
 		rarity === 'scr' ? 256 :
 		20
 
+	const draft = !!set_code.startsWith('GL')
+	const hidden = !!set_code.startsWith('CH')
+
 	const print = {
 		card_name: card.name,
 		card_id: card.id,
@@ -696,7 +699,9 @@ if (cmd === `!print`) {
 		card_code,
 		card_slot,
 		rarity,
-		market_price
+		market_price,
+		draft,
+		hidden
 	}
 
 	await Print.create(print)

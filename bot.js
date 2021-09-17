@@ -1590,6 +1590,8 @@ if (cmd === `!shop`) {
 			
 		}
 
+		console.log('card_name', card_name)
+
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 		const prints = valid_card_code ? await Print.findAll({ where: { card_code: card_code }, order: [['createdAt', 'ASC']]}) : card_name ? await Print.findAll({ where: { card_name: card_name }, order: [['createdAt', 'ASC']]}) : null
 		if (!prints || !prints.length) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)

@@ -1,7 +1,7 @@
 
 //UTILITY FUNCTIONS
 
-const { adminRole, ambassadorRole, arenaRole, modRole, tourRole } = require('../static/roles.json')
+const { adminRole, ambassadorRole, arenaRole, draftRole, modRole, tourRole } = require('../static/roles.json')
 const { mad, sad, rocks, bronze, silver, gold, platinum, diamond, master, legend, god } = require('../static/emojis.json')
 const { Op } = require('sequelize')
 const { Arena, Auction, Binder, Card, Daily, Diary, Draft, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Reset, Set, Tournament, Trade, Trivia, Wallet, Wishlist  } = require('../db/index.js')
@@ -270,6 +270,9 @@ const isAmbassador = (member) => member.roles.cache.some(role => role.id === amb
 //IS ARENA PLAYER?
 const isArenaPlayer = (member) => member.roles.cache.some(role => role.id === arenaRole)
 
+//IS DRAFT PLAYER?
+const isDraftPlayer = (member) => member.roles.cache.some(role => role.id === draftRole)
+
 //IS TOUR PLAYER?
 const isTourPlayer = (member) => member.roles.cache.some(role => role.id === tourRole || role.id === '864960157758914570')
 
@@ -380,6 +383,7 @@ module.exports = {
     isAdmin,
     isAmbassador,
     isArenaPlayer,
+    isDraftPlayer,
     isJazz,
     isMod,
     isTourPlayer,

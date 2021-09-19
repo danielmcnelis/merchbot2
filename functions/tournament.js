@@ -418,7 +418,7 @@ const getTournamentType = async (message) => {
 	}).then(collected => {
 		const response = collected.first().content.toLowerCase()
         if (response.includes(1) || response.startsWith('single')) tournamentType = 'single elimination'
-        else if (response.includes(2) || response.startsWith('double')) tournamentType = 'single elimination'
+        else if (response.includes(2) || response.startsWith('double')) tournamentType = 'double elimination'
         else if (response.includes(3) || response.startsWith('swiss')) tournamentType = 'swiss'
         else if (response.includes(4) || response.startsWith('round')) tournamentType = 'round robin'
         else return 

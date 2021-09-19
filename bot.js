@@ -21,6 +21,7 @@ const { askForBidCancellation, askForBidPlacement, manageBidding } = require('./
 const { updateBinder } = require('./functions/binder.js')
 const { awardStarterDeck, getShopDeck } = require('./functions/decks.js')
 const { checkCoreSetComplete, completeTask } = require('./functions/diary.js')
+const { checkDraftProgress, endDraft, resetDraft, startDraft, startDraftRound } = require('./functions/draft.js')
 //const { uploadDeckFolder } = require('./functions/drive.js')
 const { askForGrindAllConfirmation } = require('./functions/mod.js')
 const { awardPack } = require('./functions/packs.js')
@@ -34,7 +35,7 @@ const { askForDBUsername, checkChallongePairing, findNextMatch, findNextOpponent
 const { processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
 const { getBuyerConfirmation, getInvoiceMerchBotPurchase, getInvoiceMerchBotSale, getInvoiceP2PSale, getSellerConfirmation, processMerchBotSale, processP2PSale } = require('./functions/transaction.js')
 const { askQuestion, resetTrivia, startTrivia } = require('./functions/trivia.js')
-const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isJazz, isMod, isTourPlayer, isVowel, getArenaVictories, getMedal, getRandomElement, getRandomSubset, resetPlayer } = require('./functions/utility.js')
+const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isDraftPlayer, isJazz, isMod, isTourPlayer, isVowel, getArenaVictories, getMedal, getRandomElement, getRandomSubset, resetPlayer } = require('./functions/utility.js')
 
 // STATIC IMPORTS
 const arenas = require('./static/arenas.json')
@@ -2514,7 +2515,7 @@ if (losscom.includes(cmd)) {
 	if (!winningPlayer) return message.channel.send(`That user is not in the database.`)
 	
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
-	//: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
+	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
 	: message.channel === client.channels.cache.get(pauperChannelId) ? "Pauper"
 	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
 	: "Ranked"
@@ -2527,6 +2528,7 @@ if (losscom.includes(cmd)) {
 	const today = `${y}-${m}-${d}`
 
 	const hasArenaRole = isArenaPlayer(message.member)
+	const hasDraftRole = isDraftPlayer(message.member)
 	const hasTourRole = isTourPlayer(message.member)
 
 	if (hasTourRole && game === 'Tournament') {
@@ -2768,7 +2770,78 @@ if (losscom.includes(cmd)) {
 		return message.channel.send(`You do not have the Arena Players role. Please report your loss in the appropriate channel.`)
 	} else if (hasArenaRole && game !== 'Arena') {
 		return message.channel.send(`You have the Arena Players role. Please report your Arena loss in <#${arenaChannelId}>, or get a Moderator to help you.`)
-	} else if (!hasArenaRole && game === 'Pauper') {
+	} else if (hasDraftRole && game === 'Draft') {
+		const losingContestant = await Draft.findOne({ where: { playerId: maid }})
+		if (!losingContestant) return message.channel.send(`You are not in the current Draft.`)
+		const winningContestant = await Draft.findOne({ where: { playerId: oppo }})
+		if (!winningContestant) return message.channel.send(`That player is not your Draft opponent.`)
+		if (!losingContestant.is_playing || !winningContestant.is_playing) return message.channel.send(`Your match result was already recorded for this round of the Draft.`)
+
+		const info = await Info.findOne({ where: { element: 'draft' } })
+		if (!info) return message.channel.send(`Error: could not find game: "draft".`)
+		
+		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"]] :
+            info.round === 2 ? [["P1", "P3"], ["P2", "P4"]] :
+            info.round === 3 ? [["P1", "P4"], ["P2", "P3"]] : 
+            null
+	
+		let correct_pairing = info.round === 4 ? true : false
+		if (!correct_pairing) {
+			for (let i = 0; i < 2; i++) {
+				if ((pairings[i][0] === losingContestant.contestant && 
+						pairings[i][1] === winningContestant.contestant) ||
+					(pairings[i][0] === winningContestant.contestant &&
+						pairings[i][1] === losingContestant.contestant)) correct_pairing = true
+			}
+		}
+
+		if (!correct_pairing) return message.channel.send(`That player is not your Draft opponent.`)
+
+		const origStatsWinner = winningPlayer.draft_stats
+		const origStatsLoser = losingPlayer.draft_stats
+		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
+		
+		winningPlayer.draft_stats += delta
+		winningPlayer.draft_backup = origStatsWinner
+		winningPlayer.draft_wins++
+		await winningPlayer.save()
+
+		losingPlayer.draft_stats -= delta
+		losingPlayer.draft_backup = origStatsLoser
+		losingPlayer.draft_losses++
+		await losingPlayer.save()
+	
+		winningPlayer.wallet.starchips += 12
+		await winningPlayer.wallet.save()
+
+		losingPlayer.wallet.starchips += 6
+		await losingPlayer.wallet.save()
+
+		losingContestant.is_playing = false
+		await losingContestant.save()
+
+		winningContestant.score++
+		winningContestant.is_playing = false
+		await winningContestant.save()
+
+		await Match.create({ 
+			game_mode: "draft",
+			winner_name: winningPlayer.name,
+			winnerId: winningPlayer.id,
+			loser_name: losingPlayer.name,
+			loserId: losingPlayer.id,
+			delta: delta,
+			chipsWinner: 12,
+			chipsLoser: 6
+		})
+
+		message.channel.send(`${losingPlayer.name} (+3${starchips}), your Draft loss to ${winner.user.username} (+5${starchips}) has been recorded.`)
+		return checkDraftProgress(info)
+	} else if (!hasDraftRole && game === 'Draft') {
+		return message.channel.send(`You do not have the Draft Players role. Please report your loss in the appropriate channel.`)
+	} else if (hasDraftRole && game !== 'Draft') {
+		return message.channel.send(`You have the Draft Players role. Please report your Draft loss in <#${draftChannelId}>, or get a Moderator to help you.`)
+	} else if (!hasArenaRole && !hasDraftRole && game === 'Pauper') {
 		const origStatsWinner = winningPlayer.pauper_stats
 		const origStatsLoser = losingPlayer.pauper_stats
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
@@ -2902,8 +2975,8 @@ if (manualcom.includes(cmd)) {
 
 	const usersMap = message.mentions.users
 	const userIds = [...usersMap.keys()]	
-	const winnerId = message.mentions.users.first() ? message.mentions.users.first().id : null	
-	const loserId = userIds.length > 1 ? userIds[1] : null	
+	const winnerId = message.mentions.users.first() ? message.mentions.users.first().id : args.length > 0 ? args[0]	: null
+	const loserId = userIds.length > 1 ? userIds[1] : args.length > 1 ? args[1] : null	
 	if (!winnerId || !loserId) return message.channel.send(`Please specify 2 players.`)
 	if (winnerId === loserId) return message.channel.send(`Please specify 2 different players.`)
 
@@ -2912,17 +2985,18 @@ if (manualcom.includes(cmd)) {
 	const winningPlayer = await Player.findOne({ where: { id: winnerId }, include: [Diary, Wallet] })
 	const losingPlayer = await Player.findOne({ where: { id: loserId }, include: [Diary, Wallet] })
 
-	if (winner.roles.cache.some(role => role.id === botRole) || loser.roles.cache.some(role => role.id === botRole)) return message.channel.send(`Sorry, Bots do not play Forged in Chaos... *yet*.`)
-	if (!losingPlayer) return message.channel.send(`Sorry, ${loser.user.username} is not in the database.`)
+	if ((winner && winner.roles.cache.some(role => role.id === botRole)) || (loser && loser.roles.cache.some(role => role.id === botRole))) return message.channel.send(`Sorry, Bots do not play Forged in Chaos... *yet*.`)
+	if (!losingPlayer && loser) return message.channel.send(`Sorry, ${loser.user.username} is not in the database.`)
+	if (!losingPlayer && !loser) return message.channel.send(`Sorry, I cannot find user ${loserId} in the database.`)
 	if (!winningPlayer) (`Sorry, ${winner.user.username} was not in the database.`)
 
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
-	//: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
+	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
 	: message.channel === client.channels.cache.get(pauperChannelId) ? "Pauper"
 	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
 	: "Ranked"
 
-	if (winner.roles.cache.some(role => role.id === arenaRole) || loser.roles.cache.some(role => role.id === arenaRole)) {
+	if ((winner && winner.roles.cache.some(role => role.id === arenaRole)) || (loser && loser.roles.cache.some(role => role.id === arenaRole))) {
 		if (game !== "Arena") return message.channel.send(`Please report this loss in: <#${arenaChannelId}>`)
 		
 		const losingContestant = await Arena.findOne({ where: { playerId: loserId }})
@@ -3075,12 +3149,12 @@ if (manualcom.includes(cmd)) {
 			chipsLoser: chipsLoser
 		})
 
-		if (winningPlayer.stats >= 530 && !winner.roles.cache.some(role => role.id === expertRole)) {
+		if (winningPlayer.stats >= 530 && winner && !winner.roles.cache.some(role => role.id === expertRole)) {
 			winner.roles.add(expertRole)
 			winner.roles.remove(noviceRole)
 		}
 
-		if (losingPlayer.stats < 530 && !loser.roles.cache.some(role => role.id === noviceRole)) {
+		if (losingPlayer.stats < 530 && loser && !loser.roles.cache.some(role => role.id === noviceRole)) {
 			loser.roles.add(noviceRole)
 			loser.roles.remove(expertRole)
 		}
@@ -3604,7 +3678,7 @@ if(joincom.includes(cmd)) {
 
 	if (!alreadyIn) {
 		const count = await eval(game).count()
-		if (game === 'Arena' && count >= 6 || game === 'Trivia' && count === 5) {
+		if (game === 'Arena' && count >= 4 || game === 'Draft' && count >= 4 || game === 'Trivia' && count >= 4) {
 			return message.channel.send(`Sorry, ${player.name}, ${ game === 'Trivia' ? 'Trivia' : `the ${game}` } is full.`)
 		} 
 
@@ -3615,12 +3689,15 @@ if(joincom.includes(cmd)) {
 			info.status = 'confirming'
 			await info.save()
 			return startArena(message.guild)
+		} else if (game === 'Draft' && count === 3) {
+			info.status = 'confirming'
+			await info.save()
+			return startDraft(message.guild)
 		} else if (game === 'Trivia' && count === 4) {
 			info.status = 'confirming'
 			await info.save()
 			return startTrivia(message.guild)
 		}
-
 	} else {
 		return message.channel.send(`You were already in the ${game} queue.`)
 	}
@@ -3696,6 +3773,8 @@ if (cmd === `!reset`) {
 	
 		if (game === 'Arena') {
 			resetArena(info, entries)
+		} else if (game === 'Draft') {
+			resetArena(info, entries)
 		} else if (game === 'Trivia') {
 			resetTrivia(message.guild, info, entries)
 		}
@@ -3723,6 +3802,8 @@ if (cmd === `!resume`) {
 
 	if (game === 'Arena') {
 		startRound(info, entries)
+	} if (game === 'Draft') {
+		startDraftRound(info, entries)
 	} else if (game === 'Trivia') {
 		const triviaArr = Object.entries(trivia)
 		const questionsArr = getRandomSubset(triviaArr, 10)
@@ -3787,6 +3868,8 @@ if (cmd === `!end`) {
 
 	if (game === 'Arena') {
 		endArena(message.channel, info, entries)
+	} if (game === 'Draft') {
+		endDraft(message.channel, info, entries)
 	} else if (game === 'Trivia') {
 		return message.channel.send(`This is not programmed for Trivia yet.`)
 	}

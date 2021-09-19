@@ -224,7 +224,7 @@ const askQuestion = async (guild, channel, info, entries, questionsArr) => {
             channel.send(`${name}${timedOut ? ` did not answer in time. That's a shame. ${orange}` : ` said: ${answer}. ${score ? `Correct! ${cultured}` : `That ain't it! ${amongmfao}`}`}`)
         }, 6000)
         
-        if (!score_0 && !score_1 && !score_2 && !score_3 && !score_4) {
+        if (!score_0 && !score_1 && !score_2 && !score_3) {
             setTimeout(() => channel.send(`The correct answer is: **${answers[0]}**`), 8000)
         }
 

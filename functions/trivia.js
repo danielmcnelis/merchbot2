@@ -21,7 +21,6 @@ const startTrivia = async (guild) => {
     getTriviaConfirmation(guild, channel, allTriviaEntries[1])
     getTriviaConfirmation(guild, channel, allTriviaEntries[2])
     getTriviaConfirmation(guild, channel, allTriviaEntries[3])
-    getTriviaConfirmation(guild, channel, allTriviaEntries[4])
 
     const triviaArr = Object.entries(trivia)
     const questionsArr = getRandomSubset(triviaArr, 10)
@@ -41,7 +40,7 @@ const startTrivia = async (guild) => {
                 status: 'active'
             } })
 
-            if (count === 5 && !active) {
+            if (count === 4 && !active) {
                 info.round = 1
                 info.status = 'active'
                 await info.save()
@@ -66,7 +65,7 @@ const startTrivia = async (guild) => {
             status: 'active'
         } })
 
-        if (count !== 5 && !active) {
+        if (count !== 4 && !active) {
             const missingTriviaEntries = await Trivia.findAll({ 
                 where: { 
                     active: false
@@ -84,7 +83,7 @@ const startTrivia = async (guild) => {
             }
             
             return channel.send(`Unfortunately, Trivia cannot begin without 5 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`)
-        } else if (count === 5 && !active) {
+        } else if (count === 4 && !active) {
             info.round = 1
             info.status = 'active'
             await info.save()
@@ -176,7 +175,6 @@ const askQuestion = async (guild, channel, info, entries, questionsArr) => {
     getAnswer(guild, entries[1], question)
     getAnswer(guild, entries[2], question)
     getAnswer(guild, entries[3], question)
-    getAnswer(guild, entries[4], question)
 
     setTimeout(async() => {
         const updatedEntries = await Trivia.findAll({ include: Player})
@@ -185,19 +183,16 @@ const askQuestion = async (guild, channel, info, entries, questionsArr) => {
         const score_1 = await checkAnswer(updatedEntries[1].answer, fuzzyAnswers, stringency)
         const score_2 = await checkAnswer(updatedEntries[2].answer, fuzzyAnswers, stringency)
         const score_3 = await checkAnswer(updatedEntries[3].answer, fuzzyAnswers, stringency)
-        const score_4 = await checkAnswer(updatedEntries[4].answer, fuzzyAnswers, stringency)
     
         if (score_0 === true) updatedEntries[0].score++, checkKnowledge(updatedEntries[0].playerId, questionNumber)
         if (score_1 === true) updatedEntries[1].score++, checkKnowledge(updatedEntries[1].playerId, questionNumber)
         if (score_2 === true) updatedEntries[2].score++, checkKnowledge(updatedEntries[2].playerId, questionNumber)
         if (score_3 === true) updatedEntries[3].score++, checkKnowledge(updatedEntries[3].playerId, questionNumber)
-        if (score_4 === true) updatedEntries[4].score++, checkKnowledge(updatedEntries[4].playerId, questionNumber)
     
         await updatedEntries[0].save()
         await updatedEntries[1].save()
         await updatedEntries[2].save()
         await updatedEntries[3].save()
-        await updatedEntries[4].save()
 
         let name = updatedEntries[0].player.name
         let timedOut = updatedEntries[0].answer === 'no answer' ? true : false
@@ -228,20 +223,12 @@ const askQuestion = async (guild, channel, info, entries, questionsArr) => {
             let score = score_3
             channel.send(`${name}${timedOut ? ` did not answer in time. That's a shame. ${orange}` : ` said: ${answer}. ${score ? `Correct! ${cultured}` : `That ain't it! ${amongmfao}`}`}`)
         }, 6000)
-
-        setTimeout(() => {
-            let name = updatedEntries[4].player.name
-            let timedOut = updatedEntries[4].answer === 'no answer' ? true : false
-            let answer = updatedEntries[4].answer
-            let score = score_4
-            channel.send(`${name}${timedOut ? ` did not answer in time. That's a shame. ${orange}` : ` said: ${answer}. ${score ? `Correct! ${cultured}` : `That ain't it! ${amongmfao}`}`}`)
-        }, 8000)
         
         if (!score_0 && !score_1 && !score_2 && !score_3 && !score_4) {
-            setTimeout(() => channel.send(`The correct answer is: **${answers[0]}**`), 10000)
+            setTimeout(() => channel.send(`The correct answer is: **${answers[0]}**`), 8000)
         }
 
-        return setTimeout(() => postTriviaStandings(guild, channel, info, updatedEntries, questionsArr), 13000)
+        return setTimeout(() => postTriviaStandings(guild, channel, info, updatedEntries, questionsArr), 11000)
     }, 21000)
 }
 

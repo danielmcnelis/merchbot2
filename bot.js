@@ -3673,7 +3673,7 @@ if(joincom.includes(cmd)) {
 
 	if (!alreadyIn) {
 		const count = await eval(game).count()
-		if (game === 'Arena' && count >= 4 || game === 'Draft' && count >= 4 || game === 'Trivia' && count >= 5) {
+		if (game === 'Arena' && count >= 4 || game === 'Draft' && count >= 4 || game === 'Trivia' && count >= 4) {
 			return message.channel.send(`Sorry, ${player.name}, ${ game === 'Trivia' ? 'Trivia' : `the ${game}` } is full.`)
 		} 
 
@@ -3688,7 +3688,7 @@ if(joincom.includes(cmd)) {
 			info.status = 'confirming'
 			await info.save()
 			return startDraft(message.guild)
-		} else if (game === 'Trivia' && count === 4) {
+		} else if (game === 'Trivia' && count === 3) {
 			info.status = 'confirming'
 			await info.save()
 			return startTrivia(message.guild)

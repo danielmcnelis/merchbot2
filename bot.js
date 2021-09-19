@@ -76,11 +76,6 @@ client.on('ready', async () => {
 		if (shopOpen) updateShop()
 	}, 1000 * 60 * 10)
 
-	setInterval(async () =>  {
-		const shopOpen = await checkShopOpen()
-		if (shopOpen) updateShop()
-	}, 1000 * 60 * 10)
-
 	if (!shopShouldBe) return client.channels.cache.get(staffChannelId).send(`<@&${adminRole}>, The Shop status could not be read from the database.`)
 	if (!shopOpen && shopShouldBe === 'open') client.channels.cache.get(staffChannelId).send(`<@&${modRole}>, The Shop is unexpectedly closed.`)
 	if (shopOpen && shopShouldBe === 'closed') client.channels.cache.get(staffChannelId).send(`<@&${modRole}>, The Shop is unexpectedly open.`)
@@ -3678,7 +3673,7 @@ if(joincom.includes(cmd)) {
 
 	if (!alreadyIn) {
 		const count = await eval(game).count()
-		if (game === 'Arena' && count >= 4 || game === 'Draft' && count >= 4 || game === 'Trivia' && count >= 4) {
+		if (game === 'Arena' && count >= 4 || game === 'Draft' && count >= 4 || game === 'Trivia' && count >= 5) {
 			return message.channel.send(`Sorry, ${player.name}, ${ game === 'Trivia' ? 'Trivia' : `the ${game}` } is full.`)
 		} 
 

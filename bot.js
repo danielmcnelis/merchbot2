@@ -213,8 +213,8 @@ if(cmd === `!fix_trades`) {
 
 	
 	for (let i = 0; i < players.length; i++) {
-		console.log('player.name', player.name)
 		const player = players[i]
+		console.log('player.name', player.name)
 		const playerId = player.id
 		const profile = player.profile
 		const cutoff = player.last_reset

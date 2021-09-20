@@ -217,6 +217,7 @@ if(cmd === `!fix_trades`) {
 		console.log('player.name', player.name)
 		const playerId = player.id
 		const profile = player.profile
+		if (!profile) continue
 		const cutoff = player.last_reset
 
 		const trades = await Trade.findAll({ where: { 
@@ -244,7 +245,7 @@ if(cmd === `!fix_trades`) {
 		profile.trade_partners = partners.length
 		await profile.save()
 
-		message.channel.send(`${player.name} has traded with ${partners.trade_partners} players.`)
+		message.channel.send(`${player.name} has traded with ${profile.trade_partners} players.`)
 	}
 
 }

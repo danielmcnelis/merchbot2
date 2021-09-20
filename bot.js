@@ -221,7 +221,7 @@ if(cmd === `!fix_trades`) {
 
 		const trades = await Trade.findAll({ where: { 
 			[Op.or]: [{ senderId: playerId }, { receiverId: playerId}],
-			createdAt: { [Op.gte]: initiator_cutoff }
+			createdAt: { [Op.gte]: cutoff }
 		}})
 
 		const partners = []

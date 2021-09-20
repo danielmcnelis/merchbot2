@@ -207,14 +207,17 @@ if(cmd === `!operation`) return message.channel.send('❄️☃️❄️☃️�
 
 //FIX TRADES
 if(cmd === `!fix_trades`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 
 	const players = await Player.findAll({ where: { last_reset : { [Op.not]: null } }, include: Profile })
 
 	
 	for (let i = 0; i < players.length; i++) {
+		console.log('player.name', player.name)
 		const player = players[i]
 		const playerId = player.id
 		const profile = player.profile
+		const cutoff = player.last_reset
 
 		const trades = await Trade.findAll({ where: { 
 			[Op.or]: [{ senderId: playerId }, { receiverId: playerId}],

@@ -204,6 +204,49 @@ if(cmd === `!yellow`) return message.channel.send('🟨')
 //OP
 if(cmd === `!operation`) return message.channel.send('❄️☃️❄️☃️❄️')
 
+
+//FIX TRADES
+if(cmd === `!fix_trades`) {
+
+	const players = await Player.findAll({ where: { last_reset : { [Op.not]: null } }, include: Profile })
+
+	
+	for (let i = 0; i < players.length; i++) {
+		const player = players[i]
+		const playerId = player.id
+		const profile = player.profile
+
+		const trades = await Trade.findAll({ where: { 
+			[Op.or]: [{ senderId: playerId }, { receiverId: playerId}],
+			createdAt: { [Op.gte]: initiator_cutoff }
+		}})
+
+		const partners = []
+
+		for (let j = 0; j < trades.length; j++) {
+			const trade = trades[j]
+			const senderId = trade.senderId
+			const receiverId = trade.receiverId
+			if (senderId === playerId && !partners.includes(receiverId)) {
+				partners.push(receiverId)
+			} else if (receiverId === playerId && !partners.includes(senderId)) {
+				partners.push(senderId)
+			}
+		}
+
+		console.log('profile.trade_partners', profile.trade_partners)
+		console.log('partners.length', partners.length)
+		console.log('partners:', partners)
+		
+		profile.trade_partners = partners.length
+		await profile.save()
+
+		message.channel.send(`${player.name} has traded with ${partners.trade_partners} players.`)
+	}
+
+}
+
+
 // ASSIGN ROLES
 if (cmd === `!assign_roles`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
@@ -1945,8 +1988,11 @@ if(cmd === `!trades`) {
 	const player = await Player.findOne({ where: { id: playerId } })
 	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 
+	const cutoff = player.last_reset ? player.last_reset : player.createdAt
+	
 	const trades = await Trade.findAll({ where: { 
-		[Op.or]: [{ senderId: playerId }, { receiverId: playerId }]
+		[Op.or]: [{ senderId: playerId }, { receiverId: playerId }],
+		createdAt: { [Op.gte]: cutoff }
 	}})
 
 	if (!trades.length) return message.channel.send(`You have not made any trades.`)
@@ -6192,26 +6238,51 @@ if(cmd === `!trade`) {
 	const lastTrade = await Trade.findAll({ order: [['createdAt', 'DESC']]})
 	const transaction_id = lastTrade.length ? parseInt(lastTrade[0].transaction_id) + 1 : 1
 
-	const tradeHistory1 = await Trade.count({ 
+	const initiator_cutoff = initiatingPlayer.last_reset || initiatingPlayer.createdAt
+
+	const initiator_history_1 = await Trade.count({ 
 		where: {
 			senderId: initiatingPlayer.id,
-			receiverId: receivingPlayer.id
+			receiverId: receivingPlayer.id,
+			createdAt: { [Op.gte]: initiator_cutoff }
 		}
 	})
 
-	const tradeHistory2 = await Trade.count({ 
+	const initiator_history_2 = await Trade.count({ 
 		where: {
 			senderId: receivingPlayer.id,
-			receiverId: initiatingPlayer.id
+			receiverId: initiatingPlayer.id,
+			createdAt: { [Op.gte]: initiator_cutoff }
 		}
 	})
 
-	if (tradeHistory1 + tradeHistory2 === 0) {
+
+	if (initiator_history_1 + initiator_history_2 === 0) {
 		const senderProfile = await Profile.findOne({where: { playerId: initiatingPlayer.id } })
 		senderProfile.trade_partners++
 		await senderProfile.save()
 		if (senderProfile.trade_partners >= 20) completeTask(message.channel, initiatingPlayer.id, 'm7', 5000)
+	}
 
+	const receiver_cutoff = receivingPlayer.last_reset || receivingPlayer.createdAt
+
+	const receiver_history_1 = await Trade.count({ 
+		where: {
+			senderId: initiatingPlayer.id,
+			receiverId: receivingPlayer.id,
+			createdAt: { [Op.gte]: receiver_cutoff }
+		}
+	})
+
+	const receiver_history_2 = await Trade.count({ 
+		where: {
+			senderId: receivingPlayer.id,
+			receiverId: initiatingPlayer.id,
+			createdAt: { [Op.gte]: receiver_cutoff }
+		}
+	})
+
+	if (receiver_history_1 + receiver_history_2 === 0) {
 		const receiverProfile = await Profile.findOne({where: { playerId: receivingPlayer.id } })
 		receiverProfile.trade_partners++
 		await receiverProfile.save()

@@ -97,9 +97,9 @@ const startDraft = async(guild) => {
 }
 
 //GET CONFIRMATION
-const getConfirmation = async (guild, draft_entry) => {
+const getConfirmation = async (guild, entry, contestant) => {
     const draftChannel = client.channels.cache.get(draftChannelId)
-    const playerId = draft_entry.playerId
+    const playerId = entry.playerId
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
@@ -118,8 +118,9 @@ const getConfirmation = async (guild, draft_entry) => {
         if (!count) return member.send(`Sorry, time expired.`)
 
         if(yescom.includes(response)) {
-            draft_entry.active = true
-            await draft_entry.save()
+            entry.active = true
+            entry.contestant = contestant
+            await entry.save()
             member.send(`Thanks! The Draft will be starting soon. Look out for more DMs.`)
             return draftChannel.send(`${member.user.username} confirmed their participation in the Draft!`)
         } else {

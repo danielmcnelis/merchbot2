@@ -46,7 +46,7 @@ const startDraft = async(guild) => {
                     draftChannel.send(`<@&${draftRole}>, pay attention nerds! The Draft starts in 10 seconds. ${koolaid}`)
                 }, 1000)
                 return setTimeout(() => {
-                    return startDraftRound(info)
+                    return createPacks()
                 }, 11000)
             }
         }, i * 5000)

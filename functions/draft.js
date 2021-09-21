@@ -264,6 +264,7 @@ const draftCards = async () => {
 //GET PICK
 const getPick = async (entry, pack) => {
     const playerId = entry.playerId
+    const guild = client.guilds.cache.get("842476300022054913")
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
 

@@ -189,7 +189,8 @@ const createPacks = async () => {
             const pool = await Pool.create({ 
                 pack_code: pack_code,
                 card_code: print.card_code,
-                card_name: print.card_name
+                card_name: print.card_name,
+                printId: print.id
             })
 
             if (!pool) return message.channel.send(`Error creating Draft Pool.`)
@@ -207,6 +208,11 @@ const draftCards = async () => {
     const pack_2 = await Pool.findAll({ where: { pack_code: 'pack_2' }, include: Print, order: [['card_code', 'ASC']] })
     const pack_3 = await Pool.findAll({ where: { pack_code: 'pack_3' }, include: Print, order: [['card_code', 'ASC']] })
     const pack_4 = await Pool.findAll({ where: { pack_code: 'pack_4' }, include: Print, order: [['card_code', 'ASC']] })
+
+    console.log('pack_1', pack_1)
+    console.log('pack_2', pack_2)
+    console.log('pack_3', pack_3)
+    console.log('pack_4', pack_4)
 
     const P1_pack = info.count % 4 === 1 ? pack_1 :
         info.count % 4 === 2 && info.round % 2 === 1 ? pack_2 :

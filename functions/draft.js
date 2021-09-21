@@ -304,7 +304,6 @@ const getPick = async (entry, pack) => {
         console.log(!!pool_selection, pool_selection)
         const card = `${eval(pool_selection.print.rarity)}${pool_selection.card_code} - ${pool_selection.card_name}`
 
-        console.log('time', time)
         if (!pool_selection) return false
 
         const inv = await Inventory.findOne({ where: {

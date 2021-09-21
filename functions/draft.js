@@ -179,7 +179,6 @@ const createPacks = async () => {
         const pack_super = getRandomElement(supers)
         const pack = [...pack_commons, ...pack_rares, pack_super].sort((a, b) => b - a)
         const pack_code = `pack_${j + 1}`
-        console.log(pack_code, pack)
     
         for (let i = 0; i < pack.length; i++) {
             const card_code = pack[i]
@@ -208,11 +207,6 @@ const draftCards = async () => {
     const pack_2 = await Pool.findAll({ where: { pack_code: 'pack_2' }, include: Print, order: [['card_code', 'ASC']] })
     const pack_3 = await Pool.findAll({ where: { pack_code: 'pack_3' }, include: Print, order: [['card_code', 'ASC']] })
     const pack_4 = await Pool.findAll({ where: { pack_code: 'pack_4' }, include: Print, order: [['card_code', 'ASC']] })
-
-    console.log('pack_1', pack_1)
-    console.log('pack_2', pack_2)
-    console.log('pack_3', pack_3)
-    console.log('pack_4', pack_4)
 
     const P1_pack = info.count % 4 === 1 ? pack_1 :
         info.count % 4 === 2 && info.round % 2 === 1 ? pack_2 :
@@ -276,6 +270,8 @@ const getPick = async (entry, pack) => {
 
     const cards = pack.map((p, index) => `(${index + 1}) - ${eval(p.print.rarity)}${p.card_code} - ${p.card_name}` )
 
+    console.log('pack in getPick()', pack)
+
     const filter = m => m.author.id === playerId
 	const msg = await member.send(`Please select a card:\n${cards.join('\n')}`)
 	const collected = await msg.channel.awaitMessages(filter, {
@@ -284,27 +280,28 @@ const getPick = async (entry, pack) => {
 	}).then(async collected => {
 		const response = collected.first().content
         let pool_selection
-        if (pack.length > 0 && (response.replace(/[^0-9]/g, '') === 1 || response.includes(pack[0].card_name))) pool_selection = pack[0]
-        if (pack.length > 1 && (response.replace(/[^0-9]/g, '') === 2 || response.includes(pack[1].card_name))) pool_selection = pack[1]
-        if (pack.length > 2 && (response.replace(/[^0-9]/g, '') === 3 || response.includes(pack[2].card_name))) pool_selection = pack[2]
-        if (pack.length > 3 && (response.replace(/[^0-9]/g, '') === 4 || response.includes(pack[3].card_name))) pool_selection = pack[3]
-        if (pack.length > 4 && (response.replace(/[^0-9]/g, '') === 5 || response.includes(pack[4].card_name))) pool_selection = pack[4]
-        if (pack.length > 5 && (response.replace(/[^0-9]/g, '') === 6 || response.includes(pack[5].card_name))) pool_selection = pack[5]
-        if (pack.length > 6 && (response.replace(/[^0-9]/g, '') === 7 || response.includes(pack[6].card_name))) pool_selection = pack[6]
-        if (pack.length > 7 && (response.replace(/[^0-9]/g, '') === 8 || response.includes(pack[7].card_name))) pool_selection = pack[7]
-        if (pack.length > 8 && (response.replace(/[^0-9]/g, '') === 9 || response.includes(pack[8].card_name))) pool_selection = pack[8]
-        if (pack.length > 9 && (response.replace(/[^0-9]/g, '') === 10 || response.includes(pack[9].card_name))) pool_selection = pack[9]
-        if (pack.length > 10 && (response.replace(/[^0-9]/g, '') === 11 || response.includes(pack[10].card_name))) pool_selection = pack[10]
-        if (pack.length > 11 && (response.replace(/[^0-9]/g, '') === 12 || response.includes(pack[11].card_name))) pool_selection = pack[11]
-        if (pack.length > 12 && (response.replace(/[^0-9]/g, '') === 13 || response.includes(pack[12].card_name))) pool_selection = pack[12]
-        if (pack.length > 13 && (response.replace(/[^0-9]/g, '') === 14 || response.includes(pack[13].card_name))) pool_selection = pack[13]
-        if (pack.length > 14 && (response.replace(/[^0-9]/g, '') === 15 || response.includes(pack[14].card_name))) pool_selection = pack[14]
-        if (pack.length > 15 && (response.replace(/[^0-9]/g, '') === 16 || response.includes(pack[15].card_name))) pool_selection = pack[15]
-        if (pack.length > 16 && (response.replace(/[^0-9]/g, '') === 17 || response.includes(pack[16].card_name))) pool_selection = pack[16]
-        if (pack.length > 17 && (response.replace(/[^0-9]/g, '') === 18 || response.includes(pack[17].card_name))) pool_selection = pack[17]
+        if (pack.length > 0 && (response.replace(/[^0-9]/g, '') === '1' || response.includes(pack[0].card_name))) pool_selection = pack[0]
+        if (pack.length > 1 && (response.replace(/[^0-9]/g, '') === '2' || response.includes(pack[1].card_name))) pool_selection = pack[1]
+        if (pack.length > 2 && (response.replace(/[^0-9]/g, '') === '3' || response.includes(pack[2].card_name))) pool_selection = pack[2]
+        if (pack.length > 3 && (response.replace(/[^0-9]/g, '') === '4' || response.includes(pack[3].card_name))) pool_selection = pack[3]
+        if (pack.length > 4 && (response.replace(/[^0-9]/g, '') === '5' || response.includes(pack[4].card_name))) pool_selection = pack[4]
+        if (pack.length > 5 && (response.replace(/[^0-9]/g, '') === '6' || response.includes(pack[5].card_name))) pool_selection = pack[5]
+        if (pack.length > 6 && (response.replace(/[^0-9]/g, '') === '7' || response.includes(pack[6].card_name))) pool_selection = pack[6]
+        if (pack.length > 7 && (response.replace(/[^0-9]/g, '') === '8' || response.includes(pack[7].card_name))) pool_selection = pack[7]
+        if (pack.length > 8 && (response.replace(/[^0-9]/g, '') === '9' || response.includes(pack[8].card_name))) pool_selection = pack[8]
+        if (pack.length > 9 && (response.replace(/[^0-9]/g, '') === '10' || response.includes(pack[9].card_name))) pool_selection = pack[9]
+        if (pack.length > 10 && (response.replace(/[^0-9]/g, '') === '11' || response.includes(pack[10].card_name))) pool_selection = pack[10]
+        if (pack.length > 11 && (response.replace(/[^0-9]/g, '') === '12' || response.includes(pack[11].card_name))) pool_selection = pack[11]
+        if (pack.length > 12 && (response.replace(/[^0-9]/g, '') === '13' || response.includes(pack[12].card_name))) pool_selection = pack[12]
+        if (pack.length > 13 && (response.replace(/[^0-9]/g, '') === '14' || response.includes(pack[13].card_name))) pool_selection = pack[13]
+        if (pack.length > 14 && (response.replace(/[^0-9]/g, '') === '15' || response.includes(pack[14].card_name))) pool_selection = pack[14]
+        if (pack.length > 15 && (response.replace(/[^0-9]/g, '') === '16' || response.includes(pack[15].card_name))) pool_selection = pack[15]
+        if (pack.length > 16 && (response.replace(/[^0-9]/g, '') === '17' || response.includes(pack[16].card_name))) pool_selection = pack[16]
+        if (pack.length > 17 && (response.replace(/[^0-9]/g, '') === '18' || response.includes(pack[17].card_name))) pool_selection = pack[17]
         
         console.log('response', response)
         console.log(`response.replace(/[^0-9]/g, '')`, response.replace(/[^0-9]/g, ''))
+        console.log(!!pool_selection, pool_selection)
         const card = `${eval(pool_selection.print.rarity)}${pool_selection.card_code} - ${pool_selection.card_name}`
 
         console.log('time', time)

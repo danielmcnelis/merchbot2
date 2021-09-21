@@ -309,10 +309,11 @@ const endTrivia = async (guild, channel, info, entries) => {
     }
 }
 
-const resetTrivia = async (guild, info, entries) => {
+const resetTrivia = async (info, entries) => {
     info.status = 'pending'
     info.round = null
     await info.save()
+    const guild = client.guilds.cache.get("842476300022054913")
 
     for (let i = 0; i < entries.length; i++) {
         const entry = entries[i]

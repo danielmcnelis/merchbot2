@@ -201,76 +201,8 @@ if(cmd === `!caleb`) return message.channel.send(robbed)
 //YELLOW
 if(cmd === `!yellow`) return message.channel.send('🟨')
 
-//OP
+//OPERATION
 if(cmd === `!operation`) return message.channel.send('❄️☃️❄️☃️❄️')
-
-
-//FIX TRADES
-if(cmd === `!fix_trades`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
-
-	const players = await Player.findAll({ where: { last_reset : { [Op.not]: null } }, include: Profile })
-
-	
-	for (let i = 0; i < players.length; i++) {
-		const player = players[i]
-		console.log('player.name', player.name)
-		const playerId = player.id
-		const profile = player.profile
-		if (!profile) continue
-		const cutoff = player.last_reset
-
-		const trades = await Trade.findAll({ where: { 
-			[Op.or]: [{ senderId: playerId }, { receiverId: playerId}],
-			createdAt: { [Op.gte]: cutoff }
-		}})
-
-		const partners = []
-
-		for (let j = 0; j < trades.length; j++) {
-			const trade = trades[j]
-			const senderId = trade.senderId
-			const receiverId = trade.receiverId
-			if (senderId === playerId && !partners.includes(receiverId)) {
-				partners.push(receiverId)
-			} else if (receiverId === playerId && !partners.includes(senderId)) {
-				partners.push(senderId)
-			}
-		}
-
-		console.log('profile.trade_partners', profile.trade_partners)
-		console.log('partners.length', partners.length)
-		console.log('partners:', partners)
-		
-		profile.trade_partners = partners.length
-		await profile.save()
-
-		message.channel.send(`${player.name} has traded with ${profile.trade_partners} players.`)
-	}
-
-}
-
-
-// ASSIGN ROLES
-if (cmd === `!assign_roles`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	const membersMap = await message.guild.members.fetch()
-	const memberIds = [...membersMap.keys()]
-	for (let i = 0; i < memberIds.length; i++) {
-		const id = memberIds[i]
-		const member = membersMap.get(id)
-		const player = await Player.findOne({ where: { id: id }})
-		if (player.stats >= 530) {
-			member.roles.add(expertRole)
-			member.roles.remove(noviceRole)
-		} else {
-			member.roles.add(noviceRole)
-			member.roles.remove(expertRole)
-		}
-
-		message.channel.send(`${member.user.username} was assigned the ${player.stats >= 530 ? 'Expert' : 'Novice'} Role.`)
-	}
-}
 
 //IMPORT_DATA
 if (cmd === `!import_card_data`) {
@@ -3819,9 +3751,9 @@ if (cmd === `!reset`) {
 		if (game === 'Arena') {
 			resetArena(info, entries)
 		} else if (game === 'Draft') {
-			resetArena(info, entries)
+			resetDraft(info, entries)
 		} else if (game === 'Trivia') {
-			resetTrivia(message.guild, info, entries)
+			resetTrivia(info, entries)
 		}
 	
 		return message.channel.send(`${game === 'Trivia' ? 'Trivia' : `The ${game}`} has been reset.`)

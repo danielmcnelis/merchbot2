@@ -1,5 +1,5 @@
 
-const { Draft, Diary, Info, Player, Profile, Wallet, Match } = require('../db')
+const { Draft, Diary, Info, Player, Pool, Print, Profile, Set, Wallet, Match, Inventory } = require('../db')
 const { Op } = require('sequelize')
 const { yescom, nocom } = require('../static/commands.json')
 const { king, shrine, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, dragon, draft, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, spellcaster, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
@@ -7,9 +7,8 @@ const { draftRole } = require('../static/roles.json')
 const { draftChannelId } = require('../static/channels.json')
 const { client } = require('../static/clients.js')
 const { completeTask } = require('./diary')
-const { shuffleArray, getRandomElement, capitalize } = require('./utility.js')
+const { shuffleArray, getRandomElement, getRandomSubset, capitalize } = require('./utility.js')
 const { awardCard } = require('./award.js')
-
 
 //START DRAFT
 const startDraft = async(guild) => {
@@ -82,15 +81,16 @@ const startDraft = async(guild) => {
             
             return draftChannel.send(`Unfortunately, The Draft cannot begin without 4 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`)
         } else if (count === 4 && !active) {
+            info.count = 1
             info.round = 1
-            info.status = 'active'
+            info.status = 'drafting'
             await info.save()
             assignDraftRoles(guild, allDraftEntries)
             setTimeout(() => {
                 draftChannel.send(`<@&${draftRole}>, pay attention nerds! The Draft starts in 10 seconds. ${koolaid}`)
             }, 1000)
             return setTimeout(() => {
-                return startDraftRound(info)
+                return createPacks()
             }, 11000)
         }
     }, 61000)
@@ -140,7 +140,239 @@ const assignDraftRoles = (guild, entries) => {
     })
 }
 
-//START ROUND
+
+//CREATE PACKS
+const createPacks = async () => {
+    const draftChannel = client.channels.cache.get(draftChannelId)
+    const set = await Set.findOne({ where: { code: 'GL1' } })
+    if (!set) return draftChannel.send(`Could not find set.`)
+
+	const commons = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "com"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map((print) => print.card_code)
+
+	const rares = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "rar"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map((print) => print.card_code)
+
+	const supers = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "sup"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map((print) => print.card_code)
+
+
+    for (let j = 0; j < 4; j++) {
+        const pack_commons = getRandomSubset(commons, 12)
+        const pack_rares = getRandomSubset(rares, 5)
+        const pack_super = getRandomElement(supers)
+        const pack = [...pack_commons, ...pack_rares, pack_super]
+        pack.sort((a, b) => a - b)
+        const pack_code = `pack_${j + 1}`
+        console.log(pack_code, pack)
+    
+        for (let i = 0; i < pack.length; i++) {
+            const card_code = pack[i]
+            const print = await Print.findOne({ where: { card_code: card_code }})
+            if (!print.id) return message.channel.send(`${card_code} does not exist in the Print database.`)
+    
+            const pool = await Pool.create({ 
+                pack_code: pack_code,
+                card_code: print.card_code,
+                card_name: print.card_name
+            })
+
+            if (!pool) return message.channel.send(`Error creating Draft Pool.`)
+        }
+    }
+
+    return draftCards()
+}
+
+// DRAFT CARDS
+const draftCards = async () => {
+    const info = await Info.findOne({ where: { element: 'draft' }})
+    const entries = await Draft.findAll({ order: [['contestant', 'ASC']] })
+    const pack_1 = await Pool.findAll({ where: { pack_code: 'pack_1' }, include: Print, order: [['card_code', 'ASC']] })
+    const pack_2 = await Pool.findAll({ where: { pack_code: 'pack_2' }, include: Print, order: [['card_code', 'ASC']] })
+    const pack_3 = await Pool.findAll({ where: { pack_code: 'pack_3' }, include: Print, order: [['card_code', 'ASC']] })
+    const pack_4 = await Pool.findAll({ where: { pack_code: 'pack_4' }, include: Print, order: [['card_code', 'ASC']] })
+
+    const P1_pack = info.count % 4 === 1 ? pack_1 :
+        info.count % 4 === 2 && info.round % 2 === 1 ? pack_2 :
+        info.count % 4 === 2 && info.round % 2 === 0 ? pack_4 :
+        info.count % 4 === 3 ? pack_3 :
+        info.count % 4 === 0 && info.round % 2 === 1 ? pack_4 :
+        pack_2 
+        
+    const P2_pack = info.count % 4 === 1 ? pack_2 :
+        info.count % 4 === 2 && info.round % 2 === 1 ? pack_3 :
+        info.count % 4 === 2 && info.round % 2 === 0 ? pack_1 :
+        info.count % 4 === 3 ? pack_4 :
+        info.count % 4 === 0 && info.round % 2 === 1 ? pack_1 :
+        pack_3 
+
+    const P3_pack = info.count % 4 === 1 ? pack_3 :
+        info.count % 4 === 2 && info.round % 2 === 1 ? pack_4 :
+        info.count % 4 === 2 && info.round % 2 === 0 ? pack_2 :
+        info.count % 4 === 3 ? pack_1 :
+        info.count % 4 === 0 && info.round % 2 === 1 ? pack_2 :
+        pack_4 
+
+    const P4_pack = info.count % 4 === 1 ? pack_4 :
+        info.count % 4 === 2 && info.round % 2 === 1 ? pack_1 :
+        info.count % 4 === 2 && info.round % 2 === 0 ? pack_3 :
+        info.count % 4 === 3 ? pack_2 :
+        info.count % 4 === 0 && info.round % 2 === 1 ? pack_3 :
+        pack_1
+        
+    getPick(entries[0], P1_pack)
+    getPick(entries[1], P2_pack)
+    getPick(entries[2], P3_pack)
+    getPick(entries[3], P4_pack)
+
+    return setTimeout(async() => {
+        if (info.count <= 15) {
+            info.count ++
+            await info.save()
+            return draftCards()
+        } else if (info.round <= 3) {
+            info.count = 1
+            info.round++
+            await info.save()
+            return draftCards()
+        } else {
+            info.count = null
+            info.round = 1
+            info.status = 'dueling'
+            await info.save()
+            return startDraftRound(info, entries)
+        }
+    }, 20000)
+}
+
+//GET PICK
+const getPick = async (entry, pack) => {
+    const playerId = entry.playerId
+    const member = guild.members.cache.get(playerId)
+    if (!member || playerId !== member.user.id) return
+
+    const cards = pack.map((p, index) => `(${index + 1}) - ${eval(p.print.rarity)}${p.card_code} - ${p.card_name}` )
+
+    const filter = m => m.author.id === playerId
+	const msg = await member.send(`Please select a card:\n${cards.join('\n')}`)
+	const collected = await msg.channel.awaitMessages(filter, {
+		max: 1,
+		time: 18000
+	}).then(async collected => {
+		const response = collected.first().content
+        let pool_selection
+        if (pack.length > 0 && (response.replaceAll("\\D", "") === 1 || response.includes(pack[0].card_name))) pool_selection = pack[0]
+        if (pack.length > 1 && (response.replaceAll("\\D", "") === 2 || response.includes(pack[1].card_name))) pool_selection = pack[1]
+        if (pack.length > 2 && (response.replaceAll("\\D", "") === 3 || response.includes(pack[2].card_name))) pool_selection = pack[2]
+        if (pack.length > 3 && (response.replaceAll("\\D", "") === 4 || response.includes(pack[3].card_name))) pool_selection = pack[3]
+        if (pack.length > 4 && (response.replaceAll("\\D", "") === 5 || response.includes(pack[4].card_name))) pool_selection = pack[4]
+        if (pack.length > 5 && (response.replaceAll("\\D", "") === 6 || response.includes(pack[5].card_name))) pool_selection = pack[5]
+        if (pack.length > 6 && (response.replaceAll("\\D", "") === 7 || response.includes(pack[6].card_name))) pool_selection = pack[6]
+        if (pack.length > 7 && (response.replaceAll("\\D", "") === 8 || response.includes(pack[7].card_name))) pool_selection = pack[7]
+        if (pack.length > 8 && (response.replaceAll("\\D", "") === 9 || response.includes(pack[8].card_name))) pool_selection = pack[8]
+        if (pack.length > 9 && (response.replaceAll("\\D", "") === 10 || response.includes(pack[9].card_name))) pool_selection = pack[9]
+        if (pack.length > 10 && (response.replaceAll("\\D", "") === 11 || response.includes(pack[10].card_name))) pool_selection = pack[10]
+        if (pack.length > 11 && (response.replaceAll("\\D", "") === 12 || response.includes(pack[11].card_name))) pool_selection = pack[11]
+        if (pack.length > 12 && (response.replaceAll("\\D", "") === 13 || response.includes(pack[12].card_name))) pool_selection = pack[12]
+        if (pack.length > 13 && (response.replaceAll("\\D", "") === 14 || response.includes(pack[13].card_name))) pool_selection = pack[13]
+        if (pack.length > 14 && (response.replaceAll("\\D", "") === 15 || response.includes(pack[14].card_name))) pool_selection = pack[14]
+        if (pack.length > 15 && (response.replaceAll("\\D", "") === 16 || response.includes(pack[15].card_name))) pool_selection = pack[15]
+        if (pack.length > 16 && (response.replaceAll("\\D", "") === 17 || response.includes(pack[16].card_name))) pool_selection = pack[16]
+        if (pack.length > 17 && (response.replaceAll("\\D", "") === 18 || response.includes(pack[17].card_name))) pool_selection = pack[17]
+        
+        const card = `${eval(pool_selection.print.rarity)}${pool_selection.card_code} - ${pool_selection.card_name}`
+
+        console.log('time', time)
+        if (!pool_selection) return false
+
+        const inv = await Inventory.findOne({ where: {
+            card_code: pool_selection.card_code,
+            draft: true,
+            printId: pool_selection.printId,
+            playerId: playerId
+        }})
+
+        if (inv) {
+            inv.quantity++
+            await inv.save()
+        } else {
+            await Inventory.create({ 
+                card_code: pool_selection.card_code,
+                quantity: 1,
+                draft: true,
+                printId: pool_selection.printId,
+                playerId: playerId
+            })
+        }
+        return member.send(`Thanks! You selected: ${card}.`)
+	}).catch(async err => {
+		console.log(err)
+        const pool_selection = await autoDraft(entry, pack)
+        const card = `${eval(pool_selection.print.rarity)}${pool_selection.card_code} - ${pool_selection.card_name}`
+        const inv = await Inventory.findOne({ where: {
+            card_code: pool_selection.card_code,
+            draft: true,
+            printId: pool_selection.printId,
+            playerId: playerId
+        }})
+    
+        if (inv) {
+            inv.quantity++
+            await inv.save()
+        } else {
+            await Inventory.create({ 
+                card_code: pool_selection.card_code,
+                quantity: 1,
+                draft: true,
+                printId: pool_selection.printId,
+                playerId: playerId
+            })
+        }
+    
+        await pool_selection.destroy()
+        return member.send(`Time's up! You auto-drafted: ${card}.`)
+	})
+}
+
+//AUTO DRAFT
+const autoDraft = async (entry, pack) => {
+    const playerId = entry.playerId
+    let options = []
+
+    for (let i = 0; i < pack.length; i++) {
+        const pool = pack[i]
+        if (pool.print.rarity === 'sup') { 
+            options.push(pool)
+            break
+        } else if (pool.print.rarity === 'rar') {
+            options.push(pool)
+        } else if (options.length && options[0].print.rarity !== 'rar') {
+            options.push(pool)
+        }
+    }
+
+    const pool_selection = getRandomElement(options)
+    return pool_selection
+}
+
+
+//START DRAFT ROUND
 const startDraftRound = async (info, entries) => {
     const draftChannel = client.channels.cache.get(draftChannelId)
     const guild = client.guilds.cache.get("842476300022054913")

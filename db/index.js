@@ -16,6 +16,7 @@ const Knowledge = require('./knowledge')
 const Match = require('./match')
 const Nickname = require('./nickname')
 const Player = require('./player')
+const Pool = require('./pool')
 const Print = require('./print')
 const Profile = require('./profile')
 const Reset = require('./reset')
@@ -56,6 +57,9 @@ Inventory.belongsTo(Print)
 
 Print.hasMany(Auction)
 Auction.belongsTo(Print)
+
+Print.hasMany(Pool)
+Pool.belongsTo(Print)
 
 Tournament.hasMany(Entry)
 Entry.belongsTo(Tournament)

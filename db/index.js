@@ -110,6 +110,7 @@ module.exports = {
   Match,
   Nickname,
   Player,
+  Pool,
   Print,
   Profile,
   Reset,

@@ -177,8 +177,7 @@ const createPacks = async () => {
         const pack_commons = getRandomSubset(commons, 12)
         const pack_rares = getRandomSubset(rares, 5)
         const pack_super = getRandomElement(supers)
-        const pack = [...pack_commons, ...pack_rares, pack_super]
-        pack.sort((a, b) => a - b)
+        const pack = [...pack_commons, ...pack_rares, pack_super].sort((a, b) => a - b)
         const pack_code = `pack_${j + 1}`
         console.log(pack_code, pack)
     

@@ -309,7 +309,7 @@ const getPick = async (entry, pack) => {
     }
 
     const attachment = canvas && context ?
-        new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`) :
+        new Discord.MessageAttachment(canvas.toBuffer(), `draft_pack.png`) :
         false
 
     const filter = m => m.author.id === playerId

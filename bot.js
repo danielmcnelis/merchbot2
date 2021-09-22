@@ -194,15 +194,10 @@ if(cmd === `!test`) {
 	}).map((print) => print.card_code)
 
     for (let j = 0; j < 1; j++) {
-        const pack_commons = getRandomSubset(commons, 12).sort((a, b) => b - a)
-		console.log('pack_commons', pack_commons)
-		console.log('pack_commons.sort((a, b) => b - a)', pack_commons.sort((a, b) => b - a))
-        const pack_rares = getRandomSubset(rares, 5).sort((a, b) => b - a)
-		console.log('pack_rares', pack_rares)
-		console.log('pack_rares.sort((a, b) => b - a)', pack_rares.sort((a, b) => b - a))
+        const pack_commons = getRandomSubset(commons, 12).sort()
+        const pack_rares = getRandomSubset(rares, 5).sort()
 		const pack_super = getRandomElement(supers)
         const pack = [pack_super, ...pack_rares, ...pack_commons]
-		console.log('pack', pack)
         const pack_code = `pack_${j + 1}`
     
         for (let i = 0; i < pack.length; i++) {

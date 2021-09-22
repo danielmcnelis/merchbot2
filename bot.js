@@ -3722,11 +3722,11 @@ if(joincom.includes(cmd)) {
 		if (game === 'Arena' && count === 3) {
 			info.status = 'confirming'
 			await info.save()
-			return startArena(message.guild)
+			return startArena()
 		} else if (game === 'Draft' && count === 3) {
 			info.status = 'confirming'
 			await info.save()
-			return startDraft(message.guild)
+			return startDraft()
 		} else if (game === 'Trivia' && count === 3) {
 			info.status = 'confirming'
 			await info.save()

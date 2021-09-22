@@ -1,6 +1,6 @@
 
-const Discord = require('discord.js')
 const Canvas = require('canvas')
+const Discord = require('discord.js')
 const fs = require('fs')
 const { Op } = require('sequelize')
 const { Auction, Bid, Card, Print, Set, Inventory } = require('../db')
@@ -107,7 +107,6 @@ const awardPack = async (channel, playerId, set, num = 1) => {
             }})
     
             images.push(`${card.image}`)
-        
 
             const inv = await Inventory.findOne({ where: { 
                 card_code: print.card_code,

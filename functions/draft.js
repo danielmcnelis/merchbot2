@@ -190,6 +190,7 @@ const createPacks = async () => {
         const pack_rares = getRandomSubset(rares, 5).sort()
 		const pack_super = getRandomElement(supers)
         const pack = [pack_super, ...pack_rares, ...pack_commons]
+        const pack_code = `pack_${j + 1}`
 
         for (let i = 0; i < pack.length; i++) {
             const card_code = pack[i]

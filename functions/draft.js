@@ -203,10 +203,10 @@ const createPacks = async () => {
 const draftCards = async () => {
     const info = await Info.findOne({ where: { element: 'draft' }})
     const entries = await Draft.findAll({ order: [['contestant', 'ASC']] })
-    const pack_1 = await Pool.findAll({ where: { pack_code: 'pack_1' }, include: Print, order: [['card_code', 'ASC']] })
-    const pack_2 = await Pool.findAll({ where: { pack_code: 'pack_2' }, include: Print, order: [['card_code', 'ASC']] })
-    const pack_3 = await Pool.findAll({ where: { pack_code: 'pack_3' }, include: Print, order: [['card_code', 'ASC']] })
-    const pack_4 = await Pool.findAll({ where: { pack_code: 'pack_4' }, include: Print, order: [['card_code', 'ASC']] })
+    const pack_1 = await Pool.findAll({ where: { pack_code: 'pack_1' }, include: Print, order: [['card_code', 'ASC']] }).sort((a, b) => b.print.rarity - a.print.rarity)
+    const pack_2 = await Pool.findAll({ where: { pack_code: 'pack_2' }, include: Print, order: [['card_code', 'ASC']] }).sort((a, b) => b.print.rarity - a.print.rarity)
+    const pack_3 = await Pool.findAll({ where: { pack_code: 'pack_3' }, include: Print, order: [['card_code', 'ASC']] }).sort((a, b) => b.print.rarity - a.print.rarity)
+    const pack_4 = await Pool.findAll({ where: { pack_code: 'pack_4' }, include: Print, order: [['card_code', 'ASC']] }).sort((a, b) => b.print.rarity - a.print.rarity)
 
     const P1_pack = info.count % 4 === 1 ? pack_1 :
         info.count % 4 === 2 && info.round % 2 === 1 ? pack_2 :
@@ -296,10 +296,10 @@ const getPick = async (entry, pack) => {
         if (pack.length > 16 && (response.replace(/[^0-9]/g, '') === '17' || response.includes(pack[16].card_name))) pool_selection = pack[16]
         if (pack.length > 17 && (response.replace(/[^0-9]/g, '') === '18' || response.includes(pack[17].card_name))) pool_selection = pack[17]
         
+        if (!pool_selection) pool_selection = await autoDraft(pack)
+        
         const card = `${eval(pool_selection.print.rarity)}${pool_selection.card_code} - ${pool_selection.card_name}`
 
-        if (!pool_selection) pool_selection = await autoDraft(pack)
-            
         const inv = await Inventory.findOne({ where: {
             card_code: pool_selection.card_code,
             draft: true,
@@ -367,7 +367,10 @@ const autoDraft = async (pack) => {
         }
     }
 
+    console.log('options', options)
+
     const pool_selection = getRandomElement(options)
+    console.log('!!pool_selection', !!pool_selection)
     return pool_selection
 }
 

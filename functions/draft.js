@@ -303,9 +303,9 @@ const getPick = async (entry, pack) => {
         const card = fs.existsSync(`./public/card_images/${images[i]}`) ? 
         await Canvas.loadImage(`./public/card_images/${images[i]}`) :
         await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[i]}`)
-        const bottom = i / pack.length <= Math.ceil(pack.length / 2) && rows_per_pack > 1 ? card_height : 0
-        const top = i / pack.length <= Math.ceil(pack.length / 2) && rows_per_pack > 1 ? card_height * 2 : card_height
-        if (canvas && context && card) context.drawImage(card, card_width * i, bottom, card_width, top)
+        const top = i / pack.length <= Math.ceil(pack.length / 2) && rows_per_pack > 1 ? 0 : card_height
+        //const bottom = i / pack.length <= Math.ceil(pack.length / 2) && rows_per_pack > 1 ? card_height * 2 : card_height
+        if (canvas && context && card) context.drawImage(card, card_width * i, top, card_width, card_height)
     }
 
     const attachment = canvas && context ?

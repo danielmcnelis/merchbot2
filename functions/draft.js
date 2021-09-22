@@ -203,10 +203,10 @@ const createPacks = async () => {
 const draftCards = async () => {
     const info = await Info.findOne({ where: { element: 'draft' }})
     const entries = await Draft.findAll({ order: [['contestant', 'ASC']] })
-    const pack_1 = await Pool.findAll({ where: { pack_code: 'pack_1' }, include: Print, order: [['card_code', 'ASC']] }).sort((a, b) => b.print.rarity - a.print.rarity)
-    const pack_2 = await Pool.findAll({ where: { pack_code: 'pack_2' }, include: Print, order: [['card_code', 'ASC']] }).sort((a, b) => b.print.rarity - a.print.rarity)
-    const pack_3 = await Pool.findAll({ where: { pack_code: 'pack_3' }, include: Print, order: [['card_code', 'ASC']] }).sort((a, b) => b.print.rarity - a.print.rarity)
-    const pack_4 = await Pool.findAll({ where: { pack_code: 'pack_4' }, include: Print, order: [['card_code', 'ASC']] }).sort((a, b) => b.print.rarity - a.print.rarity)
+    const pack_1 = await Pool.findAll({ where: { pack_code: 'pack_1' }, include: Print, order: [['card_code', 'ASC'], [Print, 'rarity', 'DESC']] })
+    const pack_2 = await Pool.findAll({ where: { pack_code: 'pack_2' }, include: Print, order: [['card_code', 'ASC'], [Print, 'rarity', 'DESC']] })
+    const pack_3 = await Pool.findAll({ where: { pack_code: 'pack_3' }, include: Print, order: [['card_code', 'ASC'], [Print, 'rarity', 'DESC']] })
+    const pack_4 = await Pool.findAll({ where: { pack_code: 'pack_4' }, include: Print, order: [['card_code', 'ASC'], [Print, 'rarity', 'DESC']] })
 
     const P1_pack = info.count % 4 === 1 ? pack_1 :
         info.count % 4 === 2 && info.round % 2 === 1 ? pack_2 :

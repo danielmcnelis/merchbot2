@@ -163,7 +163,64 @@ if (!message.content.startsWith("!") && message.content.includes(`{`) && message
 if (cmd === `!ping`) return message.channel.send('🏓')
 
 //TEST
-if(cmd === `!test`) return message.channel.send('🧪')
+if(cmd === `!test`) {
+	if (!isJazz(message.member)) return message.channel.send('🧪')
+
+    const set = await Set.findOne({ where: { code: 'GL1' } })
+    if (!set) return message.channel.send(`Could not find set.`)
+
+	const commons = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "com"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map((print) => print.card_code)
+
+	const rares = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "rar"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map((print) => print.card_code)
+
+	const supers = await Print.findAll({ 
+		where: {
+			setId: set.id,
+			rarity: "sup"
+		},
+		order: [['card_slot', 'ASC']]
+	}).map((print) => print.card_code)
+
+    for (let j = 0; j < 1; j++) {
+        const pack_commons = getRandomSubset(commons, 12).sort((a, b) => b - a)
+        const pack_rares = getRandomSubset(rares, 5).sort((a, b) => b - a)
+        const pack_super = getRandomElement(supers)
+        const pack = [pack_super, ...pack_rares, ...pack_commons]
+        const pack_code = `pack_${j + 1}`
+    
+        for (let i = 0; i < pack.length; i++) {
+            const card_code = pack[i]
+            const print = await Print.findOne({ where: { card_code: card_code }})
+            if (!print.id) return message.channel.send(`${card_code} does not exist in the Print database.`)
+    
+            const pool = await Pool.create({ 
+                pack_code: pack_code,
+                card_code: print.card_code,
+                card_name: print.card_name,
+                printId: print.id
+            })
+
+            if (!pool) return message.channel.send(`Error creating Draft Pool.`)
+        }
+    }
+
+	const pack = await Pool.findAll({ where: { pack_code: 'pack_1' }, include: Print, order: [['createdAt', 'ASC']]})
+    const cards = pack.map((p, index) => `(${index + 1}) - ${eval(p.print.rarity)}${p.card_code} - ${p.card_name}` )
+
+	return message.channel.send(`Please select a card:\n${cards.join('\n')}`)
+}
 
 //DING
 if(cmd === `!ding`) return message.channel.send('🚪')

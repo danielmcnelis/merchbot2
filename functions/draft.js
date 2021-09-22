@@ -243,7 +243,7 @@ const draftCards = async () => {
 
     return setTimeout(async() => {
         if (info.count <= 15) {
-            info.count ++
+            info.count++
             await info.save()
             return draftCards()
         } else if (info.round <= 3) {
@@ -267,16 +267,13 @@ const getPick = async (entry, pack) => {
     const guild = client.guilds.cache.get("842476300022054913")
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
-
     const cards = pack.map((p, index) => `(${index + 1}) - ${eval(p.print.rarity)}${p.card_code} - ${p.card_name}` )
-
-    console.log('pack in getPick()', pack)
 
     const filter = m => m.author.id === playerId
 	const msg = await member.send(`Please select a card:\n${cards.join('\n')}`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
-		time: 18000
+		time: 16000
 	}).then(async collected => {
 		const response = collected.first().content
         let pool_selection
@@ -299,13 +296,10 @@ const getPick = async (entry, pack) => {
         if (pack.length > 16 && (response.replace(/[^0-9]/g, '') === '17' || response.includes(pack[16].card_name))) pool_selection = pack[16]
         if (pack.length > 17 && (response.replace(/[^0-9]/g, '') === '18' || response.includes(pack[17].card_name))) pool_selection = pack[17]
         
-        console.log('response', response)
-        console.log(`response.replace(/[^0-9]/g, '')`, response.replace(/[^0-9]/g, ''))
-        console.log(!!pool_selection, pool_selection)
         const card = `${eval(pool_selection.print.rarity)}${pool_selection.card_code} - ${pool_selection.card_name}`
 
-        if (!pool_selection) return false
-
+        if (!pool_selection) pool_selection = await autoDraft(pack)
+            
         const inv = await Inventory.findOne({ where: {
             card_code: pool_selection.card_code,
             draft: true,
@@ -325,6 +319,8 @@ const getPick = async (entry, pack) => {
                 playerId: playerId
             })
         }
+
+        await pool_selection.destroy()
         return member.send(`Thanks! You selected: ${card}.`)
 	}).catch(async err => {
 		console.log(err)

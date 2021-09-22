@@ -155,7 +155,10 @@ const createPacks = async () => {
     if (!set) return channel.send(`Could not find set.`)
 
     const old_pool = await Pool.findAll()
-    await old_pool.destroy()
+    for (let i = 0; i < old_pool.length; i++) {
+        const pool = old_pool[i]
+        await pool.destroy()
+    }
 
 	const commons = await Print.findAll({ 
 		where: {

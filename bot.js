@@ -12,7 +12,7 @@ const fuzzyPrints = FuzzySet([], false)
 const merchbotId = '584215266586525696'
 
 // DATABASE IMPORTS
-const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Nickname, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
+const { Arena, Auction, Bid, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Nickname, Player, Pool, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist, Status } = require('./db')
 const { Op } = require('sequelize')
 
 // FUNCTION IMPORTS

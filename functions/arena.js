@@ -393,7 +393,7 @@ const postStandings = async (info, entries) => {
     }, 10000)
 }
 
-const endArena = async (channel, info, entries) => {
+const endArena = async (info, entries) => {
     info.status = 'pending'
     info.round = null
     await info.save()
@@ -403,7 +403,6 @@ const endArena = async (channel, info, entries) => {
         const entry = entries[i]
         const member = guild.members.cache.get(entry.playerId)
         member.roles.remove(arenaRole)
-        completeTask(channel, entry.playerId, 'e12', i * 2000 + 2000)
         await entry.destroy()
     }
 }

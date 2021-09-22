@@ -34,7 +34,7 @@ const { getNewStatus } = require('./functions/status.js')
 const { askForDBUsername, checkChallongePairing, findNextMatch, findNextOpponent, findOtherPreReqMatch, findNoShowOpponent, generateSheetData, getDeckListTournament, getDeckNameTournament, getMatches, getTournament, getTournamentType, putMatchResult, postParticipant, removeParticipant, seed, selectTournament } = require('./functions/tournament.js')
 const { processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
 const { getBuyerConfirmation, getInvoiceMerchBotPurchase, getInvoiceMerchBotSale, getInvoiceP2PSale, getSellerConfirmation, processMerchBotSale, processP2PSale } = require('./functions/transaction.js')
-const { askQuestion, resetTrivia, startTrivia } = require('./functions/trivia.js')
+const { askQuestion, endTrivia, resetTrivia, startTrivia } = require('./functions/trivia.js')
 const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isDraftPlayer, isJazz, isMod, isTourPlayer, isVowel, getArenaVictories, getMedal, getRandomElement, getRandomSubset, resetPlayer } = require('./functions/utility.js')
 
 // STATIC IMPORTS
@@ -3730,7 +3730,7 @@ if(joincom.includes(cmd)) {
 		} else if (game === 'Trivia' && count === 3) {
 			info.status = 'confirming'
 			await info.save()
-			return startTrivia(message.guild)
+			return startTrivia()
 		}
 	} else {
 		return message.channel.send(`You were already in the ${game} queue.`)
@@ -3901,11 +3901,11 @@ if (cmd === `!end`) {
 	if (!entries) return message.channel.send(`Could not find any entries for: "${game}".`)
 
 	if (game === 'Arena') {
-		endArena(message.channel, info, entries)
+		endArena(info, entries)
 	} if (game === 'Draft') {
-		endDraft(message.channel, info, entries)
+		endDraft(info, entries)
 	} else if (game === 'Trivia') {
-		return message.channel.send(`This is not programmed for Trivia yet.`)
+		endTrivia(info, entries)
 	}
 
 	return message.channel.send(`${role ? `<@&${role}>, ` : ''} ${game === 'Trivia' ? 'Trivia has come to an end.' : `The ${game} has come to an end.`}`)

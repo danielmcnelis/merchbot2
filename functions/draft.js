@@ -530,7 +530,7 @@ const postStandings = async (info, entries) => {
 }
 
 //END DRAFT
-const endDraft = async (channel, info, entries) => {
+const endDraft = async (info, entries) => {
     info.status = 'pending'
     info.round = null
     await info.save()

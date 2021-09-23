@@ -28,10 +28,6 @@ const Print = db.define('print', {
       type: Sequelize.TEXT,
       allowNull: true
   },
-  card_type: {
-    type: Sequelize.TEXT,
-    allowNull: true
-  },
   color: {
     type: Sequelize.TEXT,
     allowNull: true

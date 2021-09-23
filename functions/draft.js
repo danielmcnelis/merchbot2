@@ -632,6 +632,15 @@ const postStandings = async (info, entries) => {
 
 //END DRAFT
 const endDraft = async (info, entries) => {
+    const draft_invs = await Inventory.findAll({ where: {
+        draft: true
+    }})
+
+    for (let i = 0; i < draft_invs.length; i++) {
+        const inv = draft_invs[i]
+        await inv.destroy()
+    }
+
     info.status = 'pending'
     info.round = null
     await info.save()

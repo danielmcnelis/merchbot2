@@ -239,11 +239,13 @@ if(cmd === `!test`) {
             ydk.push('!side')
         }
 
+		console.log('ydk before purples', ydk)
+
         purples.forEach((inv) => {
             for (let i = 0; i < inv.quantity; i++) {
 				console.log(`ydk.indexOf('!side')`, ydk.indexOf('!side'))
 				console.log('inv.print.konami_code', inv.print.konami_code)
-                ydk.splice(ydk.indexOf('!side') - 1, 0, inv.print.konami_code)
+                ydk.splice(ydk.indexOf('!side'), 0, inv.print.konami_code)
             }
         })
 

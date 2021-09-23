@@ -165,61 +165,110 @@ if (cmd === `!ping`) return message.channel.send('🏓')
 //TEST
 if(cmd === `!test`) {
 	if (!isJazz(message.member)) return message.channel.send('🧪')
+        const playerId = maid
+		const name = 'Jazz'
+        const results = [`Your Draft Inventory:`, `${galaxy} - Galaxy Pack 1 - ${galaxy}`]
+        const invs = await Inventory.findAll({ 
+            where: {
+                playerId: playerId,
+                draft: true,
+                quantity: {
+                    [Op.gte]: 1
+                }
+            },
+           include: Print,
+           order: [['card_code', 'ASC']]
+        })
 
-    const set = await Set.findOne({ where: { code: 'GL1' } })
-    if (!set) return message.channel.send(`Could not find set.`)
+        const ydk = []
+        const yellows = []
+        const oranges = []
+        const greens = []
+        const violets = []
+        const purples = []
 
-	const commons = await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "com"
-		},
-		order: [['card_slot', 'ASC']]
-	}).map((print) => print.card_code)
+		for (let i = 0; i < invs.length; i++) {
+			const inv = invs[i]
+			const print = inv.print
+			results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv.quantity}`)
 
-	const rares = await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "rar"
-		},
-		order: [['card_slot', 'ASC']]
-	}).map((print) => print.card_code)
+            const color = print.color
+            if (color === 'yellow') yellows.push(inv)
+            if (color === 'orange') oranges.push(inv)
+            if (color === 'green') greens.push(inv)
+            if (color === 'violet') violets.push(inv)
+            if (color === 'purple') purples.push(inv)
+		}
 
-	const supers = await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "sup"
-		},
-		order: [['card_slot', 'ASC']]
-	}).map((print) => print.card_code)
+        yellows.sort((a, b) => b.print.card_name - a.print.card_name)
+        oranges.sort((a, b) => b.print.card_name - a.print.card_name)
+        greens.sort((a, b) => b.print.card_name - a.print.card_name)
+        violets.sort((a, b) => b.print.card_name - a.print.card_name)
+        purples.sort((a, b) => b.print.card_name - a.print.card_name)
 
-    for (let j = 0; j < 1; j++) {
-        const pack_commons = getRandomSubset(commons, 12).sort()
-        const pack_rares = getRandomSubset(rares, 5).sort()
-		const pack_super = getRandomElement(supers)
-        const pack = [pack_super, ...pack_rares, ...pack_commons]
-        const pack_code = `pack_${j + 1}`
-    
-        for (let i = 0; i < pack.length; i++) {
-            const card_code = pack[i]
-            const print = await Print.findOne({ where: { card_code: card_code }})
-            if (!print.id) return message.channel.send(`${card_code} does not exist in the Print database.`)
-    
-            const pool = await Pool.create({ 
-                pack_code: pack_code,
-                card_code: print.card_code,
-                card_name: print.card_name,
-                printId: print.id
+        yellows.forEach((inv) => {
+            for (let i = 0; i < inv.quantity; i++) {
+                ydk.push(inv.print.konami_code)
+            }
+        })
+
+        oranges.forEach((inv) => {
+            for (let i = 0; i < inv.quantity; i++) {
+                ydk.push(inv.print.konami_code)
+            }
+        })
+
+        greens.forEach((inv) => {
+            for (let i = 0; i < inv.quantity; i++) {
+                ydk.push(inv.print.konami_code)
+            }
+        })
+
+        violets.forEach((inv) => {
+            for (let i = 0; i < inv.quantity; i++) {
+                ydk.push(inv.print.konami_code)
+            }
+        })
+
+        if (ydk.length > 60) {
+            ydk.splice(59, 0, '#extra')
+            ydk.splice(60, 0, '!side')
+        } else {
+            ydk.push('#extra')
+            ydk.push('!side')
+        }
+
+        purples.forEach((inv) => {
+            for (let i = 0; i < inv.quantity; i++) {
+                ydk.splice(ydk.indexOf('!side') - 1, 0, inv.print.konami_code)
+            }
+        })
+
+        console.log('ydk', ydk)
+
+        const member = guild.members.cache.get(playerId)
+        if (!member || playerId !== member.user.id) continue
+        const prompt = round ? `Slick drafting, ${name}! You get a ${20 + (round * 10)} second break before Round ${round}.` :
+            `Draft complete! Take up to 10 minutes to build your deck, then find your opponent.`
+        member.send(prompt)
+
+        for (let j = 0; j < results.length; j += 30) {
+            if (results[j+31] && results[j+31].startsWith("\n")) {
+                member.send(results.slice(j, j+31).join('\n'))
+                j++
+            } else {
+                member.send(results.slice(j, j+30).join('\n'))
+            }
+        }
+
+        if (!round) {
+            fs.writeFile(`./decks/drafts/${name}.ydk`, JSON.stringify(ydk.join('\n')), (err) => { 
+                if (err) console.log(err)
             })
-
-            if (!pool) return message.channel.send(`Error creating Draft Pool.`)
+    
+            member.send(`Download this .YDK and Import it on DuelingBook!`, { files:[`../decks/drafts/${name}.ydk`] })
         }
     }
-
-	const pack = await Pool.findAll({ where: { pack_code: 'pack_1' }, include: Print, order: [['id', 'ASC']]})
-    const cards = pack.map((p, index) => `(${index + 1}) - ${eval(p.print.rarity)}${p.card_code} - ${p.card_name}` )
-
-	return message.channel.send(`Please select a card:\n${cards.join('\n')}`)
 }
 
 //DING

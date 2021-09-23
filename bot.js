@@ -268,7 +268,6 @@ if(cmd === `!test`) {
     
             member.send(`Download this .YDK and Import it on DuelingBook!`, { files:[`../decks/drafts/${name}.ydk`] })
         }
-    }
 }
 
 //DING

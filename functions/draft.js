@@ -44,6 +44,7 @@ const startDraft = async(fuzzyPrints) => {
             } })
 
             if (count === 4 && !drafting) {
+                info.count = 1
                 info.round = 1
                 info.status = 'drafting'
                 await info.save()
@@ -250,10 +251,10 @@ const draftCards = async (fuzzyPrints) => {
         info.count % 4 === 0 && info.round % 2 === 1 ? pack_3 :
         pack_1
         
-    getPick(fuzzyPrints, entries[0], P1_pack)
-    getPick(fuzzyPrints, entries[1], P2_pack)
-    getPick(fuzzyPrints, entries[2], P3_pack)
-    getPick(fuzzyPrints, entries[3], P4_pack)
+    getPick(fuzzyPrints, entries[0], P1_pack, info.count)
+    getPick(fuzzyPrints, entries[1], P2_pack, info.count)
+    getPick(fuzzyPrints, entries[2], P3_pack, info.count)
+    getPick(fuzzyPrints, entries[3], P4_pack, info.count)
 
     return setTimeout(async() => {
         if (info.count < 16) {
@@ -393,12 +394,13 @@ const sendUniversalStaples = async (entries) => {
 }
 
 //GET PICK
-const getPick = async (fuzzyPrints, entry, pack) => {
+const getPick = async (fuzzyPrints, entry, pack, count) => {
     const playerId = entry.playerId
     const guild = client.guilds.cache.get("842476300022054913")
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const cards = pack.map((p, index) => `(${index + 1}) ${eval(p.print.rarity)}${p.card_code} - ${p.card_name}` )
+    const time = (26 - count) * 1000
 
     const pack_code = pack[0].pack_code
     const letter = pack_code === 'pack_1' ? 'A' : 
@@ -438,10 +440,10 @@ const getPick = async (fuzzyPrints, entry, pack) => {
         false
 
     const filter = m => m.author.id === playerId
-	const msg = await member.send(`Please select a card:\n${galaxy} - Galaxy Pack ${letter} - ${galaxy}\n${cards.join('\n')}`, attachment)
+	const msg = await member.send(`Please select a card (${time}s):\n${galaxy} - Galaxy Pack ${letter} - ${galaxy}\n${cards.join('\n')}`, attachment)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
-		time: 20000
+		time: time
 	}).then(async collected => {
 		const response = collected.first().content
         const card_name = await findCard(response, fuzzyPrints)

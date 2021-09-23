@@ -7,16 +7,17 @@ const fs = require('fs')
 const { Card, Draft, Diary, Info, Player, Pool, Print, Profile, Set, Wallet, Match, Inventory } = require('../db')
 const { Op } = require('sequelize')
 const { yescom, nocom } = require('../static/commands.json')
-const { king, shrine, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, dragon, draft, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, spellcaster, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
+const { galaxy, king, shrine, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, dragon, draft, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, spellcaster, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
 const { draftRole } = require('../static/roles.json')
 const { draftChannelId } = require('../static/channels.json')
 const { client } = require('../static/clients.js')
-const { completeTask } = require('./diary')
+const { completeTask } = require('./diary.js')
+const { findCard } = require('./search.js')
 const { shuffleArray, getRandomElement, getRandomSubset, capitalize } = require('./utility.js')
 const { awardCard } = require('./award.js')
 
 //START DRAFT
-const startDraft = async() => {
+const startDraft = async(fuzzyPrints) => {
     const channel = client.channels.cache.get(draftChannelId)
     channel.send(`Draft players, please check your DMs!`)
     const entries = await Draft.findAll({ include: Player })
@@ -51,7 +52,7 @@ const startDraft = async() => {
                     channel.send(`<@&${draftRole}>, pay attention nerds! The Draft starts in 10 seconds. ${koolaid}`)
                 }, 1000)
                 return setTimeout(() => {
-                    return createPacks()
+                    return createPacks(fuzzyPrints)
                 }, 11000)
             }
         }, i * 5000)
@@ -94,7 +95,7 @@ const startDraft = async() => {
                 channel.send(`<@&${draftRole}>, pay attention nerds! The Draft starts in 10 seconds. ${koolaid}`)
             }, 1000)
             return setTimeout(() => {
-                return createPacks()
+                return createPacks(fuzzyPrints)
             }, 11000)
         }
     }, 61000)
@@ -149,7 +150,7 @@ const assignDraftRoles = (entries) => {
 
 
 //CREATE PACKS
-const createPacks = async () => {
+const createPacks = async (fuzzyPrints) => {
     const channel = client.channels.cache.get(draftChannelId)
     const set = await Set.findOne({ where: { code: 'GL1' } })
     if (!set) return channel.send(`Could not find set.`)
@@ -208,13 +209,13 @@ const createPacks = async () => {
         }
     }
 
-    return draftCards()
+    return draftCards(fuzzyPrints)
 }
 
 // DRAFT CARDS
-const draftCards = async () => {
+const draftCards = async (fuzzyPrints) => {
     const info = await Info.findOne({ where: { element: 'draft' }})
-    const entries = await Draft.findAll({ order: [['contestant', 'ASC']] })
+    const entries = await Draft.findAll({ include: Player, order: [['contestant', 'ASC']] })
     const pack_1 = await Pool.findAll({ where: { pack_code: 'pack_1' }, include: Print, order: [['id', 'ASC']] })
     const pack_2 = await Pool.findAll({ where: { pack_code: 'pack_2' }, include: Print, order: [['id', 'ASC']] })
     const pack_3 = await Pool.findAll({ where: { pack_code: 'pack_3' }, include: Print, order: [['id', 'ASC']] })
@@ -248,33 +249,79 @@ const draftCards = async () => {
         info.count % 4 === 0 && info.round % 2 === 1 ? pack_3 :
         pack_1
         
-    getPick(entries[0], P1_pack)
-    getPick(entries[1], P2_pack)
-    getPick(entries[2], P3_pack)
-    getPick(entries[3], P4_pack)
+    getPick(fuzzyPrints, entries[0], P1_pack, "A")
+    getPick(fuzzyPrints, entries[1], P2_pack, "B")
+    getPick(fuzzyPrints, entries[2], P3_pack, "C")
+    getPick(fuzzyPrints, entries[3], P4_pack, "D")
 
     return setTimeout(async() => {
-        if (info.count <= 15) {
+        if (info.count < 16) {
             info.count++
             await info.save()
-            return draftCards()
-        } else if (info.round <= 3) {
+            return draftCards(fuzzyPrints)
+        } else if (info.round < 4) {
             info.count = 1
             info.round++
             await info.save()
-            return draftCards()
+            await sendInventories(entries, info.round)
+            return setTimeout(async() => createPacks(fuzzyPrints), info.round * 10000)
         } else {
             info.count = null
             info.round = 1
             info.status = 'dueling'
             await info.save()
+            await sendInventories(entries, false)
             return startDraftRound(info, entries)
         }
     }, 20000)
 }
 
+//SEND INVENTORIES
+const sendInventories = async (entries, round) => {
+    const guild = client.guilds.cache.get("842476300022054913")
+
+    for (let i = 0; i < entries.length; i++) {
+        const entry = entries[i]
+        const playerId = entry.playerId
+        const name = entry.player.name
+        const results = [`${name}'s Draft Inventory:`, `${galaxy} - Galaxy Pack 1 - ${galaxy}`]
+        const invs = await Inventory.findAll({ 
+            where: {
+                playerId: playerId,
+                draft: true,
+                quantity: {
+                    [Op.gte]: 1
+                }
+            },
+           include: Print,
+           order: [['card_code', 'ASC']]
+        })
+
+		for (let i = 0; i < invs.length; i++) {
+			const inv = invs[i]
+			const print = inv.print
+			results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv.quantity}`)
+		}
+
+        const member = guild.members.cache.get(playerId)
+        if (!member || playerId !== member.user.id) continue
+        const prompt = round ? `Slick drafting, ${name}! You get a ${round * 10} second break before Round ${round}.` :
+            `Draft complete! Take 5 minutes to build your deck, then find your opponent.`
+        member.send(prompt)
+
+        for (let j = 0; j < results.length; j += 30) {
+            if (results[j+31] && results[j+31].startsWith("\n")) {
+                member.send(results.slice(j, j+31).join('\n'))
+                j++
+            } else {
+                member.send(results.slice(j, j+30).join('\n'))
+            }
+        }
+    }
+}
+
 //GET PICK
-const getPick = async (entry, pack) => {
+const getPick = async (fuzzyPrints, entry, pack, letter) => {
     const playerId = entry.playerId
     const guild = client.guilds.cache.get("842476300022054913")
     const member = guild.members.cache.get(playerId)
@@ -305,9 +352,6 @@ const getPick = async (entry, pack) => {
         await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[i]}`)
         const dx = i + 1 > cards_per_row && rows_per_pack > 1 ? card_width * (i - cards_per_row) : card_width * i
         const dy = i + 1 > cards_per_row && rows_per_pack > 1 ? 80 : 0
-        console.log(`card ${i + 1} co-ordinates:`)
-        console.log('dx', dx)
-        console.log('dy', dy)
         if (canvas && context && card) context.drawImage(card, dx, dy, card_width, card_height)
     }
 
@@ -316,32 +360,34 @@ const getPick = async (entry, pack) => {
         false
 
     const filter = m => m.author.id === playerId
-	const msg = await member.send(`Please select a card:\n${cards.join('\n')}`, attachment)
+	const msg = await member.send(`Please select a card:\n${galaxy} - Galaxy Pack ${letter} - ${galaxy}\n${cards.join('\n')}`, attachment)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 16000
 	}).then(async collected => {
 		const response = collected.first().content
+        const card_name = await findCard(response, fuzzyPrints)
+        
         let pool_selection
         let auto_draft = false
-        if (pack.length > 0 && (response.replace(/[^0-9]/g, '') === '1' || response.includes(pack[0].card_name))) pool_selection = pack[0]
-        if (pack.length > 1 && (response.replace(/[^0-9]/g, '') === '2' || response.includes(pack[1].card_name))) pool_selection = pack[1]
-        if (pack.length > 2 && (response.replace(/[^0-9]/g, '') === '3' || response.includes(pack[2].card_name))) pool_selection = pack[2]
-        if (pack.length > 3 && (response.replace(/[^0-9]/g, '') === '4' || response.includes(pack[3].card_name))) pool_selection = pack[3]
-        if (pack.length > 4 && (response.replace(/[^0-9]/g, '') === '5' || response.includes(pack[4].card_name))) pool_selection = pack[4]
-        if (pack.length > 5 && (response.replace(/[^0-9]/g, '') === '6' || response.includes(pack[5].card_name))) pool_selection = pack[5]
-        if (pack.length > 6 && (response.replace(/[^0-9]/g, '') === '7' || response.includes(pack[6].card_name))) pool_selection = pack[6]
-        if (pack.length > 7 && (response.replace(/[^0-9]/g, '') === '8' || response.includes(pack[7].card_name))) pool_selection = pack[7]
-        if (pack.length > 8 && (response.replace(/[^0-9]/g, '') === '9' || response.includes(pack[8].card_name))) pool_selection = pack[8]
-        if (pack.length > 9 && (response.replace(/[^0-9]/g, '') === '10' || response.includes(pack[9].card_name))) pool_selection = pack[9]
-        if (pack.length > 10 && (response.replace(/[^0-9]/g, '') === '11' || response.includes(pack[10].card_name))) pool_selection = pack[10]
-        if (pack.length > 11 && (response.replace(/[^0-9]/g, '') === '12' || response.includes(pack[11].card_name))) pool_selection = pack[11]
-        if (pack.length > 12 && (response.replace(/[^0-9]/g, '') === '13' || response.includes(pack[12].card_name))) pool_selection = pack[12]
-        if (pack.length > 13 && (response.replace(/[^0-9]/g, '') === '14' || response.includes(pack[13].card_name))) pool_selection = pack[13]
-        if (pack.length > 14 && (response.replace(/[^0-9]/g, '') === '15' || response.includes(pack[14].card_name))) pool_selection = pack[14]
-        if (pack.length > 15 && (response.replace(/[^0-9]/g, '') === '16' || response.includes(pack[15].card_name))) pool_selection = pack[15]
-        if (pack.length > 16 && (response.replace(/[^0-9]/g, '') === '17' || response.includes(pack[16].card_name))) pool_selection = pack[16]
-        if (pack.length > 17 && (response.replace(/[^0-9]/g, '') === '18' || response.includes(pack[17].card_name))) pool_selection = pack[17]
+        if (pack.length > 0 && (response.replace(/[^0-9]/g, '') === '1' || card_name === pack[0].card_name)) pool_selection = pack[0]
+        if (pack.length > 1 && (response.replace(/[^0-9]/g, '') === '2' || card_name === pack[1].card_name)) pool_selection = pack[1]
+        if (pack.length > 2 && (response.replace(/[^0-9]/g, '') === '3' || card_name === pack[2].card_name)) pool_selection = pack[2]
+        if (pack.length > 3 && (response.replace(/[^0-9]/g, '') === '4' || card_name === pack[3].card_name)) pool_selection = pack[3]
+        if (pack.length > 4 && (response.replace(/[^0-9]/g, '') === '5' || card_name === pack[4].card_name)) pool_selection = pack[4]
+        if (pack.length > 5 && (response.replace(/[^0-9]/g, '') === '6' || card_name === pack[5].card_name)) pool_selection = pack[5]
+        if (pack.length > 6 && (response.replace(/[^0-9]/g, '') === '7' || card_name === pack[6].card_name)) pool_selection = pack[6]
+        if (pack.length > 7 && (response.replace(/[^0-9]/g, '') === '8' || card_name === pack[7].card_name)) pool_selection = pack[7]
+        if (pack.length > 8 && (response.replace(/[^0-9]/g, '') === '9' || card_name === pack[8].card_name)) pool_selection = pack[8]
+        if (pack.length > 9 && (response.replace(/[^0-9]/g, '') === '10' || card_name === pack[9].card_name)) pool_selection = pack[9]
+        if (pack.length > 10 && (response.replace(/[^0-9]/g, '') === '11' || card_name === pack[10].card_name)) pool_selection = pack[10]
+        if (pack.length > 11 && (response.replace(/[^0-9]/g, '') === '12' || card_name === pack[11].card_name)) pool_selection = pack[11]
+        if (pack.length > 12 && (response.replace(/[^0-9]/g, '') === '13' || card_name === pack[12].card_name)) pool_selection = pack[12]
+        if (pack.length > 13 && (response.replace(/[^0-9]/g, '') === '14' || card_name === pack[13].card_name)) pool_selection = pack[13]
+        if (pack.length > 14 && (response.replace(/[^0-9]/g, '') === '15' || card_name === pack[14].card_name)) pool_selection = pack[14]
+        if (pack.length > 15 && (response.replace(/[^0-9]/g, '') === '16' || card_name === pack[15].card_name)) pool_selection = pack[15]
+        if (pack.length > 16 && (response.replace(/[^0-9]/g, '') === '17' || card_name === pack[16].card_name)) pool_selection = pack[16]
+        if (pack.length > 17 && (response.replace(/[^0-9]/g, '') === '18' || card_name === pack[17].card_name)) pool_selection = pack[17]
         
         if (!pool_selection) {
             auto_draft = true

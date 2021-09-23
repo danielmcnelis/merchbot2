@@ -2448,6 +2448,7 @@ if (statscom.includes(cmd)) {
 
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
 	: message.channel === client.channels.cache.get(pauperChannelId) ? "Pauper"
+	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
 	//: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
 	//: message.channel === client.channels.cache.get(marketPlaceChannelId) ? "Market"
 	: "Ranked"
@@ -3726,7 +3727,7 @@ if(joincom.includes(cmd)) {
 		} else if (game === 'Draft' && count === 3) {
 			info.status = 'confirming'
 			await info.save()
-			return startDraft()
+			return startDraft(fuzzyPrints)
 		} else if (game === 'Trivia' && count === 3) {
 			info.status = 'confirming'
 			await info.save()
@@ -4966,6 +4967,7 @@ if(invcom.includes(cmd)) {
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	if (playerId !== maid && !isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
 
+	const draft = !!(message.channel === client.channels.cache.get(draftChannelId))
 	const player = await Player.findOne({ where: { id: playerId }})
 	if (!player) return message.channel.send(playerId === maid ? `You are not in the database. Type **!start** to begin the game.` : `That person is not in the database.`)
 
@@ -4987,6 +4989,7 @@ if(invcom.includes(cmd)) {
 		const invs = await Inventory.findAll({
 			where: {
 				playerId,
+				draft: draft,
 				card_code: {
 					[Op.startsWith]: set_code
 				},
@@ -5012,6 +5015,7 @@ if(invcom.includes(cmd)) {
 			const invs = valid_card_code ? await Inventory.findAll({ 
 				where: { 
 					playerId,
+					draft: draft,
 					card_code: card_code,
 					quantity: {
 						[Op.gte]: 1
@@ -5021,6 +5025,7 @@ if(invcom.includes(cmd)) {
 			}) : await Inventory.findAll({ 
 				where: { 
 					playerId,
+					draft: draft,
 					printId: print.id,
 					quantity: {
 						[Op.gte]: 1
@@ -5053,6 +5058,7 @@ if(invcom.includes(cmd)) {
 		const invs = await Inventory.findAll({ 
 			where: { 
 				playerId,
+				draft: draft,
 				quantity: {
 					[Op.gte]: 1
 				}

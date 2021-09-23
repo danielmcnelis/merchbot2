@@ -247,7 +247,7 @@ if(cmd === `!test`) {
         console.log('ydk', ydk)
 
         const member = guild.members.cache.get(playerId)
-        if (!member || playerId !== member.user.id) continue
+        if (!member || playerId !== member.user.id) return
         const prompt = round ? `Slick drafting, ${name}! You get a ${20 + (round * 10)} second break before Round ${round}.` :
             `Draft complete! Take up to 10 minutes to build your deck, then find your opponent.`
         member.send(prompt)

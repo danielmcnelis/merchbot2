@@ -241,6 +241,8 @@ if(cmd === `!test`) {
 
         purples.forEach((inv) => {
             for (let i = 0; i < inv.quantity; i++) {
+				console.log(`ydk.indexOf('!side')`, ydk.indexOf('!side'))
+				console.log('inv.print.konami_code', inv.print.konami_code)
                 ydk.splice(ydk.indexOf('!side') - 1, 0, inv.print.konami_code)
             }
         })
@@ -260,13 +262,11 @@ if(cmd === `!test`) {
             }
         }
 
-        if (!round) {
-            fs.writeFile(`./decks/drafts/${name}.ydk`, JSON.stringify(ydk.join('\n')), (err) => { 
-                if (err) console.log(err)
-            })
-    
-            message.channel.send(`Download this .YDK and Import it on DuelingBook!`, { files:[`../decks/drafts/${name}.ydk`] })
-        }
+		fs.writeFile(`./decks/drafts/${name}.ydk`, JSON.stringify(ydk.join('\n')), (err) => { 
+			if (err) console.log(err)
+		})
+
+		message.channel.send(`Download this .YDK and Import it on DuelingBook!`, { files:[`../decks/drafts/${name}.ydk`] })
 }
 
 //DING

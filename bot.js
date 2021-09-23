@@ -552,6 +552,7 @@ if (cmd === `!konami`) {
 			}
 		})
 
+		console.log('card.name:', card.name)
 		let konami_code = card.image.slice(0, -4)
 		while (konami_code.length < 8) konami_code = '0' + konami_code
 		print.konami_code = konami_code

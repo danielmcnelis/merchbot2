@@ -537,6 +537,40 @@ if (cmd === `!new_set`) {
 	message.channel.send(`I created a new set: ${set.name} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? ` ${eval(set.alt_emoji)}` : ''}.`)
 }
 
+
+//KONAMI
+if (cmd === `!konami`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	const prints = await Print.findAll()
+
+	for (let i = 0; i < prints.length; i++) {
+		const print = prints[i]
+		const card_id = print.card_id
+		const card = await Card.findOne({
+			where: {
+				id: card_id
+			}
+		})
+
+		let konami_code = card.image.slice(0, -4)
+		while (konami_code.length < 8) konami_code = '0' + konami_code
+		print.konami_code = konami_code
+		console.log(`saving konami code for ${print.card_name}: ${konami_code}`)
+
+		const color = card.card === 'Monster' && card.category === 'Effect' ? 'orange' :
+			card.card === 'Monster' && card.category === 'Normal' ? 'yellow' :
+			card.card === 'Monster' && card.category === 'Fusion' ? 'purple' :
+			card.card === 'Spell' ? 'green' :
+			card.card === 'Trap' ? 'violet' :
+			null
+		
+		print.color = color
+		console.log(`saving color for ${print.card_name}: ${color}`)
+				
+		await print.save()
+	}
+}
+
 //INIT
 if (cmd === `!init`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
@@ -2867,10 +2901,10 @@ if (losscom.includes(cmd)) {
 		losingPlayer.draft_losses++
 		await losingPlayer.save()
 	
-		winningPlayer.wallet.starchips += 12
+		winningPlayer.wallet.starchips += 15
 		await winningPlayer.wallet.save()
 
-		losingPlayer.wallet.starchips += 6
+		losingPlayer.wallet.starchips += 8
 		await losingPlayer.wallet.save()
 
 		losingContestant.is_playing = false
@@ -2887,8 +2921,8 @@ if (losscom.includes(cmd)) {
 			loser_name: losingPlayer.name,
 			loserId: losingPlayer.id,
 			delta: delta,
-			chipsWinner: 12,
-			chipsLoser: 6
+			chipsWinner: 15,
+			chipsLoser: 8
 		})
 
 		message.channel.send(`${losingPlayer.name} (+3${starchips}), your Draft loss to ${winner.user.username} (+5${starchips}) has been recorded.`)
@@ -3058,7 +3092,7 @@ if (manualcom.includes(cmd)) {
 		const losingContestant = await Arena.findOne({ where: { playerId: loserId }})
 		if (!losingContestant) return message.channel.send(`You are not in the current Arena.`)
 		const winningContestant = await Arena.findOne({ where: { playerId: winnerId }})
-		if (!winningContestant) return message.channel.send(`That player is not your Arena opponent.`)
+		if (!winningContestant) return message.channel.send(`That player is not the correct Arena opponent.`)
 
 		const info = await Info.findOne({ where: { element: 'arena' } })
 		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
@@ -3078,9 +3112,15 @@ if (manualcom.includes(cmd)) {
 			}
 		}
 
-		if (!correct_pairing) return message.channel.send(`That player is not your Arena opponent.`)
+		if (!correct_pairing) return message.channel.send(`That player is not the correct Arena opponent.`)
 		
+		const origStatsWinner = winningPlayer.arena_stats
+		const origStatsLoser = losingPlayer.arena_stats
+		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
+
 		losingPlayer.arena_losses++
+		losingPlayer.arena_stats -= delta
+		losingPlayer.arena_backup = origStatsLoser
 		await losingPlayer.save()
 
 		losingPlayer.wallet.starchips += 3
@@ -3090,6 +3130,8 @@ if (manualcom.includes(cmd)) {
 		await losingContestant.save()
 
 		winningPlayer.arena_wins++
+		winningPlayer.arena_stats += delta
+		winningPlayer.arena_backup = origStatsWinner
 		await winningPlayer.save()
 
 		winningPlayer.wallet.starchips += 5
@@ -3105,13 +3147,81 @@ if (manualcom.includes(cmd)) {
 			winnerId: winningPlayer.id,
 			loser_name: losingPlayer.name,
 			loserId: losingPlayer.id,
-			delta: 0,
+			delta: delta,
 			chipsWinner: 5,
 			chipsLoser: 3
 		})
 
 		message.channel.send(`A manual Arena loss by ${losingPlayer.name} (+3${starchips}) to ${winningPlayer.name} (+5${starchips}) has been recorded.`)
 		return checkArenaProgress(info)
+	} else if ((winner && winner.roles.cache.some(role => role.id === draftRole)) || (loser && loser.roles.cache.some(role => role.id === draftRole))) {
+		if (game !== "Draft") return message.channel.send(`Please report this loss in: <#${draftChannelId}>`)
+		
+		const losingContestant = await Draft.findOne({ where: { playerId: loserId }})
+		if (!losingContestant) return message.channel.send(`You are not in the current Draft.`)
+		const winningContestant = await Draft.findOne({ where: { playerId: winnerId }})
+		if (!winningContestant) return message.channel.send(`That player is not the correct Draft opponent.`)
+
+		const info = await Info.findOne({ where: { element: 'draft' } })
+		if (!info) return message.channel.send(`Error: could not find game: "draft".`)
+	
+		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"]] :
+            info.round === 2 ? [["P1", "P3"], ["P2", "P4"]] :
+            info.round === 3 ? [["P1", "P4"], ["P2", "P3"]] : 
+            null
+
+		let correct_pairing = info.round === 4 ? true : false
+		if (!correct_pairing) {
+			for (let i = 0; i < 2; i++) {
+				if ((pairings[i][0] === losingContestant.contestant && 
+						pairings[i][1] === winningContestant.contestant) ||
+					(pairings[i][0] === winningContestant.contestant &&
+						pairings[i][1] === losingContestant.contestant)) correct_pairing = true
+			}
+		}
+
+		if (!correct_pairing) return message.channel.send(`That player is not your Draft opponent.`)
+		
+		const origStatsWinner = winningPlayer.arena_stats
+		const origStatsLoser = losingPlayer.arena_stats
+		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
+
+		losingPlayer.draft_losses++
+		losingPlayer.draft_stats -= delta
+		losingPlayer.draft_backup = origStatsLoser
+		await losingPlayer.save()
+
+		losingPlayer.wallet.starchips += 8
+		await losingPlayer.wallet.save()
+	
+		losingContestant.is_playing = false
+		await losingContestant.save()
+
+		winningPlayer.draft_wins++
+		winningPlayer.draft_stats += delta
+		winningPlayer.draft_backup = origStatsWinner
+		await winningPlayer.save()
+
+		winningPlayer.wallet.starchips += 15
+		await winningPlayer.wallet.save()
+
+		winningContestant.score++
+		winningContestant.is_playing = false
+		await winningContestant.save()
+
+		await Match.create({
+			game_mode: "draft",
+			winner_name: winningPlayer.name,
+			winnerId: winningPlayer.id,
+			loser_name: losingPlayer.name,
+			loserId: losingPlayer.id,
+			delta: delta,
+			chipsWinner: 15,
+			chipsLoser: 8
+		})
+
+		message.channel.send(`A manual Draft loss by ${losingPlayer.name} (+8${starchips}) to ${winningPlayer.name} (+15${starchips}) has been recorded.`)
+		return checkDraftProgress(info)
 	} else if (game === 'Pauper') {
 		winningPlayer.pauper_wins++
 		await winningPlayer.save()
@@ -3371,6 +3481,53 @@ if (noshowcom.includes(cmd)) {
 
 		message.channel.send(`A no-show by ${noShowPlayer.name} (+0${starchips}) to ${winningPlayer.name} (+5${starchips}) has been recorded.`)
 		return checkArenaProgress(info)
+	} else if (game === 'Draft') {
+		if (!noShowMember.roles.cache.some(role => role.id === draftRole)) return message.channel.send(`${noShowPlayer.name} does not appear to have the Draft Players role.`)
+			
+		const noShowContestant = await Draft.findOne({ where: { playerId: noShowId }})
+		if (!noShowContestant) return message.channel.send(`That player is not in the current Draft.`)
+
+		const info = await Info.findOne({ where: { element: 'draft' } })
+		if (!info) return message.channel.send(`Error: could not find game: "draft".`)
+
+		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"]] :
+			info.round === 2 ? [["P1", "P3"], ["P2", "P4"]] :
+			info.round === 3 ? [["P1", "P4"], ["P2", "P3"]] : 
+			null
+	
+		let PX = false
+
+		let correct_pairing = info.round === 4 ? true : false
+
+		if (!correct_pairing) {
+			for (let i = 0; i < 2; i++) {
+				if (pairings[i][0] === noShowContestant.contestant) PX = pairings[i][1]
+				if (PX) break
+				if (pairings[i][1] === noShowContestant.contestant) PX = pairings[i][0]
+				if (PX) break
+			}
+		}
+
+		if (!PX) return message.channel.send(`Could not find Draft opponent. Please try **!manual**.`)
+			
+		const winningContestant = await Draft.findOne({ where: { contestant: PX }})
+		if (!winningContestant) return message.channel.send(`Could not find Draft opponent. Please try **!manual**.`)
+			
+		const winningPlayer = await Player.findOne({ where: { id: winningContestant.playerId }, include: Wallet })
+		if (!winningPlayer) return message.channel.send(`Could not find Draft opponent in the database.`)
+	
+		noShowContestant.is_playing = false
+		await noShowContestant.save()
+
+		winningPlayer.wallet.starchips += 15
+		await winningPlayer.wallet.save()
+
+		winningContestant.score++
+		winningContestant.is_playing = false
+		await winningContestant.save()
+
+		message.channel.send(`A no-show by ${noShowPlayer.name} (+0${starchips}) to ${winningPlayer.name} (+15${starchips}) has been recorded.`)
+		return checkDraftProgress(info)
 	}
 	
 }

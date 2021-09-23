@@ -86,6 +86,11 @@ const Profile = db.define('profile', {
         type: Sequelize.INTEGER,
         defaultValue: 0,  
         allowNull: false
+    },
+    draft_trophies: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,  
+        allowNull: false
     }
 })
 

@@ -24,6 +24,18 @@ const Print = db.define('print', {
     allowNull: true,
     unique: true
   },
+  konami_code: {
+      type: Sequelize.TEXT,
+      allowNull: true
+  },
+  card_type: {
+    type: Sequelize.TEXT,
+    allowNull: true
+  },
+  color: {
+    type: Sequelize.TEXT,
+    allowNull: true
+  },
   rarity: {
     type: Sequelize.STRING,
     allowNull: true

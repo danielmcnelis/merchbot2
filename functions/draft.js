@@ -7,7 +7,7 @@ const fs = require('fs')
 const { Card, Draft, Diary, Info, Player, Pool, Print, Profile, Set, Wallet, Match, Inventory } = require('../db')
 const { Op } = require('sequelize')
 const { yescom, nocom } = require('../static/commands.json')
-const { galaxy, king, shrine, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, dragon, draft, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, spellcaster, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
+const { forgestone, galaxy, king, shrine, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, dragon, draft, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, spellcaster, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
 const { draftRole } = require('../static/roles.json')
 const { draftChannelId } = require('../static/channels.json')
 const { client } = require('../static/clients.js')
@@ -295,11 +295,71 @@ const sendInventories = async (entries, round) => {
            order: [['card_code', 'ASC']]
         })
 
+        const ydk = []
+        const yellows = []
+        const oranges = []
+        const greens = []
+        const violets = []
+        const purples = []
+
 		for (let i = 0; i < invs.length; i++) {
 			const inv = invs[i]
 			const print = inv.print
 			results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv.quantity}`)
+
+            const color = print.color
+            if (color === 'yellow') yellows.push(inv)
+            if (color === 'orange') oranges.push(inv)
+            if (color === 'green') greens.push(inv)
+            if (color === 'violet') violets.push(inv)
+            if (color === 'purple') purples.push(inv)
 		}
+
+        yellows.sort((a, b) => b.print.card_name - a.print.card_name)
+        oranges.sort((a, b) => b.print.card_name - a.print.card_name)
+        greens.sort((a, b) => b.print.card_name - a.print.card_name)
+        violets.sort((a, b) => b.print.card_name - a.print.card_name)
+        purples.sort((a, b) => b.print.card_name - a.print.card_name)
+
+        yellows.forEach((inv) => {
+            for (let i = 0; i < inv.quantity; i++) {
+                ydk.push(inv.print.konami_code)
+            }
+        })
+
+        oranges.forEach((inv) => {
+            for (let i = 0; i < inv.quantity; i++) {
+                ydk.push(inv.print.konami_code)
+            }
+        })
+
+        greens.forEach((inv) => {
+            for (let i = 0; i < inv.quantity; i++) {
+                ydk.push(inv.print.konami_code)
+            }
+        })
+
+        violets.forEach((inv) => {
+            for (let i = 0; i < inv.quantity; i++) {
+                ydk.push(inv.print.konami_code)
+            }
+        })
+
+        if (ydk.length > 60) {
+            ydk.splice(59, 0, '#extra')
+            ydk.splice(60, 0, '!side')
+        } else {
+            ydk.push('#extra')
+            ydk.push('!side')
+        }
+
+        purples.forEach((inv) => {
+            for (let i = 0; i < inv.quantity; i++) {
+                ydk.splice(ydk.indexOf(!side) - 1, 0, inv.print.konami_code)
+            }
+        })
+
+        console.log('ydk', ydk)
 
         const member = guild.members.cache.get(playerId)
         if (!member || playerId !== member.user.id) continue
@@ -314,6 +374,14 @@ const sendInventories = async (entries, round) => {
             } else {
                 member.send(results.slice(j, j+30).join('\n'))
             }
+        }
+
+        if (!round) {
+            fs.writeFile(`../decks/drafts/${name}.ydk`, JSON.stringify(ydk.join('\n')), (err) => { 
+                if (err) console.log(err)
+            })
+    
+            member.send(`Download this .YDK and Import it on DuelingBook!`, { files:[`../decks/drafts/${name}.ydk`] })
         }
     }
 }
@@ -554,53 +622,77 @@ const startDraftRound = async (info, entries) => {
     const channel = client.channels.cache.get(draftChannelId)
     const guild = client.guilds.cache.get("842476300022054913")
 
-    if (info.round === 5) {
-        const playerId = entries[0].playerId
-        channel.send(`Congratulations to <@${playerId}> on an impressive showing! You truly deserve the TBD!`)
-        return endDraft(info, entries)
-    } else if (info.round === 4) {
+    if (info.round === 4) {
         if (entries[0].score > entries[1].score) {
         //1st place outright
             for (let i = 1; i < entries.length; i++) {
                 const entry = entries[i]
-                channel.send(`<@${entry.playerId}> garnered X TBD from the Draft. Congrats!`)
+                const playerId = entry.playerId
+                const quantity = entry.score + 1
+                const wallet = await Wallet.findOne({ where: { playerId: playerId }})
+                wallet.forgestone += quantity
+                await wallet.save()
+                channel.send(`<@${playerId}> harvested ${quantity} ${quantity > 1 ? 'Forgestones' : 'Forgestone'}${forgestone} from the Draft. Slick!`)
             }
 
-            const playerId = entries[0].playerId
-            const player = await Player.findOne({ where: { id: playerId } })
-            player.draft_wins++
-            await player.save()
-            channel.send(`Congratulations to <@${playerId}> on an impressive showing! You truly deserve the TBD!`)
+            const entry = entries[0]
+            const playerId = entry.playerId
+            const quantity = entry.score + 7
+            const player = await Player.findOne({ where: { id: playerId }, include: [Profile, Wallet] })
+           
+            const profile = player.profile
+            profile.draft_trophies++
+            await profile.save()
+
+            const wallet = player.wallet
+            wallet.forgestone += quantity
+            await wallet.save()
+
+            channel.send(`Congratulations to <@${playerId}> on a dazzling victory! You truly deserve these ${quantity} beautiful Forgestones${forgestone}! ${wokeaf}`)
             return endDraft(info, entries)
         } else if ((entries[0].score === entries[1].score) && entries[1].score > entries[2].score) {
         //2 way tie
             for (let i = 2; i < entries.length; i++) {
                 const entry = entries[i]
-                channel.send(`<@${entry.playerId}> garnered X TBD from the Draft. Congrats!`)
-                const member = guild.members.cache.get(entry.playerId)
-                member.roles.remove(draftRole)
-                entry.score = 0
-                await entry.save()
+                const playerId = entry.playerId
+                const quantity = entry.score + 1
+                const wallet = await Wallet.findOne({ where: { playerId: playerId }})
+                wallet.forgestone += quantity
+                await wallet.save()
+                channel.send(`<@${playerId}> harvested ${quantity} ${quantity > 1 ? 'Forgestones' : 'Forgestone'}${forgestone} from the Draft. Slick!`)
             }
 
-            entries[0].score = 1
-            await entries[0].save()
-
-            entries[1].score = 1
-            await entries[1].save()
-
-            const title = `<!> <!> <!> DRAFT FINALS <!> <!> <!>` 
-            const match = `<@${entries[0].playerId}> vs <@${entries[1].playerId}>`
-
-            return channel.send(`${title}\n${match}`)
-        } else {
-        //3 way tie
-            for (let i = 0; i < entries.length; i++) {
+            for (let i = 0; i < 2; i++) {
                 const entry = entries[i]
-                channel.send(`<@${entry.playerId}> garnered X TBD from the Draft. Congrats!`)
+                const playerId = entry.playerId
+                const quantity = entry.score + 1
+                const wallet = await Wallet.findOne({ where: { playerId: playerId }})
+                wallet.forgestone += quantity
+                await wallet.save()
+                channel.send(`Congratulations to <@${playerId}> on a dazzling performance! You truly deserve these ${quantity} beautiful Forgestones${forgestone}! ${wokeaf}`)
             }
 
-            channel.send(`No winner could be determined in this Draft.`)
+            return endDraft(info, entries)
+        } else {
+        //3 way tie 
+            const entry = entries[3]
+            const playerId = entry.playerId
+            const quantity = entry.score + 1
+            const wallet = await Wallet.findOne({ where: { playerId: playerId }})
+            wallet.forgestone += quantity
+            await wallet.save()
+            channel.send(`<@${playerId}> harvested ${quantity} ${quantity > 1 ? 'Forgestones' : 'Forgestone'}${forgestone} from the Draft. Slick!`)
+
+            for (let i = 0; i < 3; i++) {
+                const entry = entries[i]
+                const playerId = entry.playerId
+                const quantity = entry.score + 3
+                const wallet = await Wallet.findOne({ where: { playerId: playerId }})
+                wallet.forgestone += quantity
+                await wallet.save()
+                channel.send(`Congratulations to <@${playerId}> on a dazzling performance! You truly deserve these ${quantity} beautiful Forgestones${forgestone}! ${wokeaf}`)
+            }
+
             return endDraft(info, entries)
         }
     } else {

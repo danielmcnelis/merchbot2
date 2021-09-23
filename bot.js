@@ -264,7 +264,9 @@ if(cmd === `!test`) {
             }
         }
 
-		fs.writeFile(`./decks/drafts/${name}.ydk`, JSON.stringify(ydk.join('\n')), (err) => { 
+		const file = ydk.join('\n')
+
+		fs.writeFile(`./decks/drafts/${name}.ydk`, file, (err) => { 
 			if (err) console.log(err)
 		})
 

@@ -305,9 +305,9 @@ const getPick = async (entry, pack) => {
         const card = fs.existsSync(`./public/card_images/${images[i]}`) ? 
         await Canvas.loadImage(`./public/card_images/${images[i]}`) :
         await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[i]}`)
-        const dx = i / pack.length <= Math.ceil(pack.length / 2) && rows_per_pack > 1 ? card_width * i : card_width * (9 - i)
-        const dy = i / pack.length <= Math.ceil(pack.length / 2) && rows_per_pack > 1 ? 0 : 80
-        console.log(`card ${i} co-ordinates:`)
+        const dx = i + 1 <= Math.ceil(pack.length / 2) && rows_per_pack > 1 ? card_width * i : card_width * (9 - i)
+        const dy = i + 1 <= Math.ceil(pack.length / 2) && rows_per_pack > 1 ? 0 : 80
+        console.log(`card ${i + 1} co-ordinates:`)
         console.log('dx', dx)
         console.log('dy', dy)
         //const bottom = i / pack.length <= Math.ceil(pack.length / 2) && rows_per_pack > 1 ? card_height * 2 : card_height

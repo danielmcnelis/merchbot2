@@ -299,18 +299,15 @@ const getPick = async (entry, pack) => {
     const canvas = Canvas.createCanvas(card_width * cards_per_row, card_height * rows_per_pack)
     const context = canvas.getContext('2d')
 
-    console.log('images', images)
-
     for (let i = 0; i < pack.length; i++) {
         const card = fs.existsSync(`./public/card_images/${images[i]}`) ? 
         await Canvas.loadImage(`./public/card_images/${images[i]}`) :
         await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[i]}`)
-        const dx = i + 1 <= Math.ceil(pack.length / 2) && rows_per_pack > 1 ? card_width * i : card_width * (i - 9)
-        const dy = i + 1 <= Math.ceil(pack.length / 2) && rows_per_pack > 1 ? 0 : 80
+        const dx = i + 1 > cards_per_row && rows_per_pack > 1 ? card_width * (i - cards_per_row) : card_width * i
+        const dy = i + 1 > cards_per_row && rows_per_pack > 1 ? 80 : 0
         console.log(`card ${i + 1} co-ordinates:`)
         console.log('dx', dx)
         console.log('dy', dy)
-        //const bottom = i / pack.length <= Math.ceil(pack.length / 2) && rows_per_pack > 1 ? card_height * 2 : card_height
         if (canvas && context && card) context.drawImage(card, dx, dy, card_width, card_height)
     }
 

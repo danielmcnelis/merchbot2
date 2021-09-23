@@ -387,9 +387,9 @@ const sendUniversalStaples = async (entries) => {
                 playerId: playerId
             },
             include: Print
-        }).map((i) => `${eval(i.print.rarity)}${eval(i.card_code)} - ${i.print.card_name} - ${i.quantity}`)
+        }).map((i) => `${eval(i.print.rarity)}${i.card_code} - ${i.print.card_name} - ${i.quantity}`)
 
-        member.send(`Your Draft Inventory begins with the 6 universal staples:\n` + draft_inv.join('\n') + `\n\nThere will be 4 rounds of opening and passing around Galaxy Packs, in which each player selects 16 cards. At the end, you will have 64 drafted cards + 6 universal staples to construct a 40 card deck and side deck. Best of luck!`)
+        member.send(`Your Draft Inventory begins with the 6 universal staples ${galaxy}:\n` + draft_inv.join('\n') + `\n\nThere will be 4 rounds of opening and passing around Galaxy Packs, in which each player selects 16 cards. At the end, you will have 64 drafted cards + 6 universal staples to construct a 40 card deck and side deck. Best of luck!`)
     }
 }
 

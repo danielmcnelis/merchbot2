@@ -479,6 +479,29 @@ if (cmd === `!auc`) {
     return message.channel.send(`You added ${quantity} ${card} to the auction pool.`)
 }
 
+
+//KILL GL1
+if (cmd === `!kill_gl1`) {
+
+	const prints = await Print.findAll({ where: {
+		set_code: 'GL1'
+	}})
+
+	for (let i = 0; i < prints.length; i++) {
+		const print = prints[i]
+		await print.destroy()
+	}
+
+	const set = await Set.findOne({ where: {
+		code: 'GL1'
+	}})
+
+	await set.destroy()
+
+	return message.channel.send(`You deleted all traces of Galaxy Pack 1. ${orange}`)
+
+}
+
 //NEW SET
 if (cmd === `!new_set`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
@@ -489,10 +512,10 @@ if (cmd === `!new_set`) {
 		type: "draft",
 		emoji: "galaxy",
 		alt_emoji: "galaxy",
-		size: 200,
-		commons: 120,
-		rares: 64,
-		supers: 16,
+		size: 150,
+		commons: 100,
+		rares: 40,
+		supers: 10,
 		ultras: 0,
 		secrets: 0,
 		specials: 0,

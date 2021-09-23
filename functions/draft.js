@@ -249,10 +249,10 @@ const draftCards = async (fuzzyPrints) => {
         info.count % 4 === 0 && info.round % 2 === 1 ? pack_3 :
         pack_1
         
-    getPick(fuzzyPrints, entries[0], P1_pack, "A")
-    getPick(fuzzyPrints, entries[1], P2_pack, "B")
-    getPick(fuzzyPrints, entries[2], P3_pack, "C")
-    getPick(fuzzyPrints, entries[3], P4_pack, "D")
+    getPick(fuzzyPrints, entries[0], P1_pack)
+    getPick(fuzzyPrints, entries[1], P2_pack)
+    getPick(fuzzyPrints, entries[2], P3_pack)
+    getPick(fuzzyPrints, entries[3], P4_pack)
 
     return setTimeout(async() => {
         if (info.count < 16) {
@@ -264,7 +264,7 @@ const draftCards = async (fuzzyPrints) => {
             info.round++
             await info.save()
             await sendInventories(entries, info.round)
-            return setTimeout(async() => createPacks(fuzzyPrints), info.round * 10000)
+            return setTimeout(async() => createPacks(fuzzyPrints), 60000)
         } else {
             info.count = null
             info.round = 1
@@ -273,7 +273,7 @@ const draftCards = async (fuzzyPrints) => {
             await sendInventories(entries, false)
             return startDraftRound(info, entries)
         }
-    }, 20000)
+    }, 24000)
 }
 
 //SEND INVENTORIES
@@ -305,8 +305,8 @@ const sendInventories = async (entries, round) => {
 
         const member = guild.members.cache.get(playerId)
         if (!member || playerId !== member.user.id) continue
-        const prompt = round ? `Slick drafting, ${name}! You get a ${round * 10} second break before Round ${round}.` :
-            `Draft complete! Take 5 minutes to build your deck, then find your opponent.`
+        const prompt = round ? `Slick drafting, ${name}! You get a 60 second break before Round ${round}.` :
+            `Draft complete! Take up to 10 minutes to build your deck, then find your opponent.`
         member.send(prompt)
 
         for (let j = 0; j < results.length; j += 30) {
@@ -321,12 +321,18 @@ const sendInventories = async (entries, round) => {
 }
 
 //GET PICK
-const getPick = async (fuzzyPrints, entry, pack, letter) => {
+const getPick = async (fuzzyPrints, entry, pack) => {
     const playerId = entry.playerId
     const guild = client.guilds.cache.get("842476300022054913")
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
-    const cards = pack.map((p, index) => `(${index + 1}) - ${eval(p.print.rarity)}${p.card_code} - ${p.card_name}` )
+    const cards = pack.map((p, index) => `(${index + 1}) ${eval(p.print.rarity)}${p.card_code} - ${p.card_name}` )
+
+    const pack_code = pack[0].pack_code
+    const letter = pack_code === 'pack_1' ? 'A' : 
+        pack_code === 'pack_2' ? 'B' : 
+        pack_code === 'pack_3' ? 'C' : 
+        'D'
 
     const images = []
     for (let i = 0; i < pack.length; i++) {
@@ -363,7 +369,7 @@ const getPick = async (fuzzyPrints, entry, pack, letter) => {
 	const msg = await member.send(`Please select a card:\n${galaxy} - Galaxy Pack ${letter} - ${galaxy}\n${cards.join('\n')}`, attachment)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
-		time: 16000
+		time: 20000
 	}).then(async collected => {
 		const response = collected.first().content
         const card_name = await findCard(response, fuzzyPrints)
@@ -632,6 +638,13 @@ const postStandings = async (info, entries) => {
 
 //END DRAFT
 const endDraft = async (info, entries) => {
+    const pools = await Pool.findAll()
+
+    for (let i = 0; i < pools.length; i++) {
+        const pool = pools[i]
+        await pool.destroy()
+    }
+
     const draft_invs = await Inventory.findAll({ where: {
         draft: true
     }})

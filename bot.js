@@ -246,18 +246,16 @@ if(cmd === `!test`) {
 
         console.log('ydk', ydk)
 
-        const member = guild.members.cache.get(playerId)
-        if (!member || playerId !== member.user.id) return
         const prompt = round ? `Slick drafting, ${name}! You get a ${20 + (round * 10)} second break before Round ${round}.` :
             `Draft complete! Take up to 10 minutes to build your deck, then find your opponent.`
-        member.send(prompt)
+        message.channel.send(prompt)
 
         for (let j = 0; j < results.length; j += 30) {
             if (results[j+31] && results[j+31].startsWith("\n")) {
-                member.send(results.slice(j, j+31).join('\n'))
+                message.channel.send(results.slice(j, j+31).join('\n'))
                 j++
             } else {
-                member.send(results.slice(j, j+30).join('\n'))
+                message.channel.send(results.slice(j, j+30).join('\n'))
             }
         }
 
@@ -266,7 +264,7 @@ if(cmd === `!test`) {
                 if (err) console.log(err)
             })
     
-            member.send(`Download this .YDK and Import it on DuelingBook!`, { files:[`../decks/drafts/${name}.ydk`] })
+            message.channel.send(`Download this .YDK and Import it on DuelingBook!`, { files:[`../decks/drafts/${name}.ydk`] })
         }
 }
 

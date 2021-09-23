@@ -545,14 +545,16 @@ if (cmd === `!konami`) {
 
 	for (let i = 0; i < prints.length; i++) {
 		const print = prints[i]
+		console.log('print', print.card_name)
 		const card_id = print.card_id
+		console.log('card_id', card_id)
 		const card = await Card.findOne({
 			where: {
 				id: card_id
 			}
 		})
 
-		console.log('card.name:', card.name)
+		console.log('!!card:', !!card)
 		let konami_code = card.image.slice(0, -4)
 		while (konami_code.length < 8) konami_code = '0' + konami_code
 		print.konami_code = konami_code

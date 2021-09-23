@@ -50,12 +50,10 @@ const startDraft = async(fuzzyPrints) => {
                 await info.save()
                 assignDraftRoles(entries)
                 sendUniversalStaples(entries)
-                setTimeout(() => {
-                    channel.send(`<@&${draftRole}>, pay attention nerds! The Draft starts in 10 seconds. ${koolaid}`)
-                }, 1000)
+                channel.send(`<@&${draftRole}>, pay attention nerds! The Draft starts in 20 seconds. ${koolaid}`)
                 return setTimeout(() => {
                     return createPacks(fuzzyPrints)
-                }, 11000)
+                }, 20000)
             }
         }, i * 5000)
     }
@@ -93,12 +91,10 @@ const startDraft = async(fuzzyPrints) => {
             info.status = 'drafting'
             await info.save()
             assignDraftRoles(entries)
-            setTimeout(() => {
-                channel.send(`<@&${draftRole}>, pay attention nerds! The Draft starts in 10 seconds. ${koolaid}`)
-            }, 1000)
+            channel.send(`<@&${draftRole}>, pay attention nerds! The Draft starts in 20 seconds. ${koolaid}`)
             return setTimeout(() => {
                 return createPacks(fuzzyPrints)
-            }, 11000)
+            }, 20000)
         }
     }, 61000)
 }
@@ -275,7 +271,7 @@ const draftCards = async (fuzzyPrints) => {
             await sendInventories(entries, false)
             return startDraftRound(info, entries)
         }
-    }, 24000)
+    }, (27 - info.count) * 1000)
 }
 
 //SEND INVENTORIES
@@ -400,7 +396,6 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const cards = pack.map((p, index) => `(${index + 1}) ${eval(p.print.rarity)}${p.card_code} - ${p.card_name}` )
-    const time = (26 - count) * 1000
 
     const pack_code = pack[0].pack_code
     const letter = pack_code === 'pack_1' ? 'A' : 
@@ -440,10 +435,10 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
         false
 
     const filter = m => m.author.id === playerId
-	const msg = await member.send(`Please select a card (${time}s):\n${galaxy} - Galaxy Pack ${letter} - ${galaxy}\n${cards.join('\n')}`, attachment)
+	const msg = await member.send(`Please select a card (${23 - count}s):\n${galaxy} - Galaxy Pack ${letter} - ${galaxy}\n${cards.join('\n')}`, attachment)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
-		time: time
+		time: (23 - count) * 1000
 	}).then(async collected => {
 		const response = collected.first().content
         const card_name = await findCard(response, fuzzyPrints)

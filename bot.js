@@ -44,7 +44,7 @@ const { client } = require('./static/clients.js')
 const { alchemycom, aliuscom, bindercom, botcom, boxcom, bracketcom, calccom, checklistcom, dailycom, dbcom, deckcom, dicecom, dropcom, flipcom, h2hcom, historycom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, packcom, pfpcom, populationcom, profcom, queuecom, rankcom, reducecom, referralcom, rolecom, specialcom, startcom, statscom, undocom, walletcom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
-const { abuser, galaxy, robbed, king, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, shrine, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare } = require('./static/emojis.json')
+const { abuser, galaxy, orange, robbed, king, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, shrine, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare } = require('./static/emojis.json')
 const { adminRole, arenaRole, botRole, draftRole, expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')
@@ -482,7 +482,6 @@ if (cmd === `!auc`) {
 
 //KILL GL1
 if (cmd === `!kill_gl1`) {
-
 	const prints = await Print.findAll({ where: {
 		set_code: 'GL1'
 	}})
@@ -499,7 +498,6 @@ if (cmd === `!kill_gl1`) {
 	await set.destroy()
 
 	return message.channel.send(`You deleted all traces of Galaxy Pack 1. ${orange}`)
-
 }
 
 //NEW SET

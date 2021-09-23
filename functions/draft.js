@@ -48,6 +48,7 @@ const startDraft = async(fuzzyPrints) => {
                 info.status = 'drafting'
                 await info.save()
                 assignDraftRoles(entries)
+                sendUniversalStaples(entries)
                 setTimeout(() => {
                     channel.send(`<@&${draftRole}>, pay attention nerds! The Draft starts in 10 seconds. ${koolaid}`)
                 }, 1000)
@@ -317,6 +318,77 @@ const sendInventories = async (entries, round) => {
                 member.send(results.slice(j, j+30).join('\n'))
             }
         }
+    }
+}
+
+//SEND UNIVERSAL STAPLES
+const sendUniversalStaples = async (entries) => {
+    const guild = client.guilds.cache.get("842476300022054913")
+
+    for (let i = 0; i < entries.length; i++) {
+        const entry = entries[i]
+        const playerId = entry.playerId
+                
+        await Inventory.create({
+            card_code: 'GL1-US1',
+            quantity: 1,
+            draft: true,
+            playerId: playerId,
+            printId: 1069
+        })
+
+        await Inventory.create({
+            card_code: 'GL1-US2',
+            quantity: 1,
+            draft: true,
+            playerId: playerId,
+            printId: 1070
+        })
+
+        await Inventory.create({
+            card_code: 'GL1-US3',
+            quantity: 1,
+            draft: true,
+            playerId: playerId,
+            printId: 1075
+        })
+
+        await Inventory.create({
+            card_code: 'GL1-US4',
+            quantity: 1,
+            draft: true,
+            playerId: playerId,
+            printId: 1076
+        })
+
+        await Inventory.create({
+            card_code: 'GL1-US5',
+            quantity: 1,
+            draft: true,
+            playerId: playerId,
+            printId: 1077
+        })
+
+        await Inventory.create({
+            card_code: 'GL1-US6',
+            quantity: 1,
+            draft: true,
+            playerId: playerId,
+            printId: 1078
+        })
+
+        const member = guild.members.cache.get(playerId)
+        if (!member || playerId !== member.user.id) continue
+        
+        const draft_inv = await Inventory.findAll({ 
+            where: {
+                draft: true,
+                playerId: playerId
+            },
+            include: Print
+        }).map((i) => `${eval(i.print.rarity)}${eval(i.card_code)} - ${i.print.card_name} - ${i.quantity}`)
+
+        member.send(`Your Draft Inventory begins with the 6 universal staples:\n` + draft_inv.join('\n') + `\n\nThere will be 4 rounds of opening and passing around Galaxy Packs, in which each player selects 16 cards. At the end, you will have 64 drafted cards + 6 universal staples to construct a 40 card deck and side deck. Best of luck!`)
     }
 }
 

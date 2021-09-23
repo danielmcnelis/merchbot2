@@ -165,6 +165,7 @@ if (cmd === `!ping`) return message.channel.send('🏓')
 //TEST
 if(cmd === `!test`) {
 	if (!isJazz(message.member)) return message.channel.send('🧪')
+		const round = 2
         const playerId = maid
 		const name = 'Jazz'
         const results = [`Your Draft Inventory:`, `${galaxy} - Galaxy Pack 1 - ${galaxy}`]

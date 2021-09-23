@@ -355,7 +355,7 @@ const sendInventories = async (entries, round) => {
 
         purples.forEach((inv) => {
             for (let i = 0; i < inv.quantity; i++) {
-                ydk.splice(ydk.indexOf(!side) - 1, 0, inv.print.konami_code)
+                ydk.splice(ydk.indexOf('!side') - 1, 0, inv.print.konami_code)
             }
         })
 

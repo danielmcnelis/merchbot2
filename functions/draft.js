@@ -719,7 +719,7 @@ const startDraftRound = async (info, entries) => {
             info.round === 3 ? [[P1, P4], [P2, P3]] : 
             null
     
-        const title = `${draft}  ------  Draft Round ${info.round}  ------  ${draft}\n` 
+        const title = `${draft}  ------  Draft Round ${info.round}  ------  ${draft}` 
         const matches = pairings.map((pairing, index) => {
             if (pairing[0].active === false && pairing[1].active === false) {
                 setTimout(() => doubleForfeit(pairing[0].playerId, pairing[1].playerId), index * 1000 + 1000)

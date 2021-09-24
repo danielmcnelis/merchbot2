@@ -317,9 +317,9 @@ const sendInventories = async (entries, round) => {
 		}
 
         const compare = (a, b) => {
-            if (a.print.card_name < b.print.card_name) {
+            if (a.print.card_name > b.print.card_name) {
                 return 1
-            } else if (a.print.card_name > b.print.card_name) {
+            } else if (a.print.card_name < b.print.card_name) {
                 return -1
             } else {
                 return 0

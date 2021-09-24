@@ -203,17 +203,17 @@ if(cmd === `!stonks`) {
     
         if (shop_percent < 0.15) {
             const z_diff = ( 0.15 - shop_percent ) / 0.15
-            if (z_diff > 0.5) {
+            if (z_diff > 0.3) {
                 print.trending_up = true
                 print.trending_down = false
             } else {
-                print.trending_down = true
+                print.trending_down = false
                 print.trending_up = false
             }
             await print.save()
         } else if (shop_percent >= 0.15) {
             const z_diff = ( shop_percent - 0.15 ) / 0.85
-            if (z_diff > 0.5 && print.market_price > 50) {
+            if (z_diff > 0.3 && print.market_price > 50) {
                 print.trending_down = true
                 print.trending_up = false
             } else {
@@ -1730,7 +1730,7 @@ if (cmd === `!shop`) {
 			if (!inv) {
 				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - Out of Stock${print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}`)
 			} else {
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - ${print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}${inv.quantity}${auction ? ` - ${no}`: ''}`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card}${print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}${inv.quantity}${auction ? ` - ${no}`: ''}`)
 			}
 		}
 

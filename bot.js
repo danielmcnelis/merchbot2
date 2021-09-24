@@ -1730,7 +1730,7 @@ if (cmd === `!shop`) {
 			if (!inv) {
 				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - Out of Stock${print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}`)
 			} else {
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card}${print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}${inv.quantity}${auction ? ` - ${no}`: ''}`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - ${inv.quantity}${print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}${auction ? ` - ${no}`: ''}`)
 			}
 		}
 

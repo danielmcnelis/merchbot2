@@ -378,10 +378,10 @@ const sendInventories = async (entries, round) => {
 
         for (let j = 0; j < results.length; j += 30) {
             if (results[j+31] && results[j+31].startsWith("\n")) {
-                message.channel.send(results.slice(j, j+31).join('\n'))
+                member.send(results.slice(j, j+31).join('\n'))
                 j++
             } else {
-                message.channel.send(results.slice(j, j+30).join('\n'))
+                member.send(results.slice(j, j+30).join('\n'))
             }
         }
 
@@ -877,6 +877,7 @@ module.exports = {
     checkDraftProgress,
     endDraft,
     resetDraft,
+    sendInventories,
     startDraft,
     startDraftRound
 }

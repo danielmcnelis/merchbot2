@@ -21,7 +21,7 @@ const { askForBidCancellation, askForBidPlacement, manageBidding } = require('./
 const { updateBinder } = require('./functions/binder.js')
 const { awardStarterDeck, getShopDeck } = require('./functions/decks.js')
 const { checkCoreSetComplete, completeTask } = require('./functions/diary.js')
-const { checkDraftProgress, endDraft, resetDraft, startDraft, startDraftRound } = require('./functions/draft.js')
+const { checkDraftProgress, endDraft, resetDraft, sendInventories, startDraft, startDraftRound } = require('./functions/draft.js')
 //const { uploadDeckFolder } = require('./functions/drive.js')
 const { askForGrindAllConfirmation } = require('./functions/mod.js')
 const { awardPack } = require('./functions/packs.js')
@@ -3965,7 +3965,7 @@ if (cmd === `!resume`) {
 	if (game === 'Arena') {
 		startRound(info, entries)
 	} if (game === 'Draft') {
-		startDraftRound(info, entries)
+		sendInventories(entries, info.round)
 	} else if (game === 'Trivia') {
 		const triviaArr = Object.entries(trivia)
 		const questionsArr = getRandomSubset(triviaArr, 10)

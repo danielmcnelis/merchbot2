@@ -3,7 +3,7 @@ const { Auction, Bid, Card, Match, Player, Tournament, Print, Set, Wallet, Diary
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { nocom, yescom } = require('../static/commands.json')
-const { upward, forgestone, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, closed, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, open, ORF, TEB, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, stonks, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
+const { downward, upward, forgestone, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, closed, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, open, ORF, TEB, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, stonks, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
 const { awardPacksToShop } = require('./packs')
 const adminId = '194147938786738176'
 const { client } = require('../static/clients.js')
@@ -454,7 +454,7 @@ const updateShop = async () => {
             const market_price = print.market_price
             const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
             const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(print.rarity)}${inv.card_code} - ${print.card_name} - ${inv.quantity}${print.trending_up ? ` - ${upward}` : ''}${excluded ? ` - ${no}` : ''}`) 
+            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(print.rarity)}${inv.card_code} - ${print.card_name} - ${inv.quantity}${print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}${excluded ? ` - ${no}` : ''}`) 
         }
     
         for (let i = 0; i < results.length; i += 10) shopChannel.send(results.slice(i, i+10))

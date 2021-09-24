@@ -3959,7 +3959,7 @@ if (cmd === `!resume`) {
 	const info = await Info.findOne({ where: { element: game.toLowerCase() }})
 	if (!info) return message.channel.send(`Could not find game-mode: "${game}".`)
 
-	const entries = await eval(game).findAll()
+	const entries = await eval(game).findAll({ include: Player })
 	if (!entries) return message.channel.send(`Could not find any entries for: "${game}".`)
 
 	if (game === 'Arena') {

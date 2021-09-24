@@ -875,6 +875,7 @@ const checkDraftProgress = async (info) => {
 
 module.exports = {
     checkDraftProgress,
+    createPacks,
     endDraft,
     resetDraft,
     sendInventories,

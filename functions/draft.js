@@ -317,7 +317,11 @@ const sendInventories = async (entries, round) => {
 		}
 
         yellows.sort((a, b) => b.print.card_name - a.print.card_name)
-        oranges.sort((a, b) => b.print.card_name - a.print.card_name)
+        oranges.sort((a, b) => {
+            console.log(b.print.card_name)
+            console.log(a.print.card_name)
+            return b.print.card_name - a.print.card_name
+        })
         greens.sort((a, b) => b.print.card_name - a.print.card_name)
         violets.sort((a, b) => b.print.card_name - a.print.card_name)
         purples.sort((a, b) => b.print.card_name - a.print.card_name)
@@ -354,20 +358,16 @@ const sendInventories = async (entries, round) => {
             ydk.push('!side')
         }
 
-		console.log('ydk before purples', ydk)
-
         purples.forEach((inv) => {
             for (let i = 0; i < inv.quantity; i++) {
-				console.log(`ydk.indexOf('!side')`, ydk.indexOf('!side'))
-				console.log('inv.print.konami_code', inv.print.konami_code)
                 ydk.splice(ydk.indexOf('!side'), 0, inv.print.konami_code)
             }
         })
 
-		ydk.unshift('#created by ...')
-		ydk.unshift('#main')
+        const header = ['#main', '#created by ...']
+
         console.log('ydk', ydk)
-		const file = ydk.join('\n') + '\n'
+		const file = [...header, ...ydk].join('\n') + '\n'
 		console.log('file', file)
 
         const member = guild.members.cache.get(playerId)

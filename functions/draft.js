@@ -282,6 +282,7 @@ const sendInventories = async (entries, round) => {
         const entry = entries[i]
         const playerId = entry.playerId
         const name = entry.player.name
+        const tag = entry.player.tag
         const results = [`${name}'s Draft Inventory:`, `${galaxy} - Galaxy Pack 1 - ${galaxy}`]
         const invs = await Inventory.findAll({ 
             where: {
@@ -353,13 +354,21 @@ const sendInventories = async (entries, round) => {
             ydk.push('!side')
         }
 
+		console.log('ydk before purples', ydk)
+
         purples.forEach((inv) => {
             for (let i = 0; i < inv.quantity; i++) {
-                ydk.splice(ydk.indexOf('!side') - 1, 0, inv.print.konami_code)
+				console.log(`ydk.indexOf('!side')`, ydk.indexOf('!side'))
+				console.log('inv.print.konami_code', inv.print.konami_code)
+                ydk.splice(ydk.indexOf('!side'), 0, inv.print.konami_code)
             }
         })
 
+		ydk.unshift('#created by ...')
+		ydk.unshift('#main')
         console.log('ydk', ydk)
+		const file = ydk.join('\n')
+		console.log('file', file)
 
         const member = guild.members.cache.get(playerId)
         if (!member || playerId !== member.user.id) continue
@@ -369,19 +378,19 @@ const sendInventories = async (entries, round) => {
 
         for (let j = 0; j < results.length; j += 30) {
             if (results[j+31] && results[j+31].startsWith("\n")) {
-                member.send(results.slice(j, j+31).join('\n'))
+                message.channel.send(results.slice(j, j+31).join('\n'))
                 j++
             } else {
-                member.send(results.slice(j, j+30).join('\n'))
+                message.channel.send(results.slice(j, j+30).join('\n'))
             }
         }
 
         if (!round) {
-            fs.writeFile(`../decks/drafts/${name}.ydk`, JSON.stringify(ydk.join('\n')), (err) => { 
+            fs.writeFile(`../decks/drafts/${tag}_draft.ydk`, file, (err) => { 
                 if (err) console.log(err)
             })
     
-            member.send(`Download this .YDK and Import it on DuelingBook!`, { files:[`../decks/drafts/${name}.ydk`] })
+            member.send(`You can also download your .YDK file for DuelingBook! ${blue}`, { files:[`../decks/drafts/${tag}_draft.ydk`] })
         }
     }
 }

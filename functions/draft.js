@@ -271,7 +271,7 @@ const draftCards = async (fuzzyPrints) => {
             await sendInventories(entries, false)
             return startDraftRound(info, entries)
         }
-    }, (23 - info.count) * 1000)
+    }, (27 - info.count) * 1000)
 }
 
 //SEND INVENTORIES
@@ -514,10 +514,10 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
         false
 
     const filter = m => m.author.id === playerId
-	const msg = await member.send(`Please select a card (${21 - count} seconds):\n${galaxy} - Galaxy Pack ${letter} - ${galaxy}\n${cards.join('\n')}`, attachment)
+	const msg = await member.send(`Please select a card (${24 - count} seconds):\n${galaxy} - Galaxy Pack ${letter} - ${galaxy}\n${cards.join('\n')}`, attachment)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
-		time: (21 - count) * 1000
+		time: (24 - count) * 1000
 	}).then(async collected => {
 		const response = collected.first().content
         const card_name = await findCard(response, fuzzyPrints)

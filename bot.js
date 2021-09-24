@@ -249,6 +249,9 @@ if(cmd === `!test`) {
             }
         })
 
+		ydk.unshift('#created by ...')
+		ydk.unshift('#main')
+
         console.log('ydk', ydk)
 
         const prompt = round ? `Slick drafting, ${name}! You get a ${20 + (round * 10)} second break before Round ${round}.` :
@@ -270,9 +273,10 @@ if(cmd === `!test`) {
 
 		fs.writeFile(`./decks/drafts/${name}.ydk`, file, (err) => { 
 			if (err) console.log(err)
+			else console.log('wrote file')
 		})
 
-		message.channel.send(`Download this .YDK and Import it on DuelingBook!`, { files:[`../decks/drafts/${name}.ydk`] })
+		message.channel.send(`You can also download this .YDK file for DuelingBook! ${blue}`, { files:[`./decks/drafts/${name}.ydk`] })
 }
 
 //DING

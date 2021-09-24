@@ -266,6 +266,8 @@ if(cmd === `!test`) {
 
 		const file = ydk.join('\n')
 
+		console.log('file', file)
+
 		fs.writeFile(`./decks/drafts/${name}.ydk`, file, (err) => { 
 			if (err) console.log(err)
 		})

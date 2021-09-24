@@ -41,6 +41,11 @@ const Print = db.define('print', {
     defaultValue: 10.00,
     allowNull: false
   },
+  trending_up: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+    allowNull: true
+  },
   draft: {
     type: Sequelize.BOOLEAN,
     defaultValue: false,

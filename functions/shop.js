@@ -3,7 +3,7 @@ const { Auction, Bid, Card, Match, Player, Tournament, Print, Set, Wallet, Diary
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { nocom, yescom } = require('../static/commands.json')
-const { forgestone, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, closed, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, open, ORF, TEB, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
+const { forgestone, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, closed, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, open, ORF, TEB, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, stonks, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
 const { awardPacksToShop } = require('./packs')
 const adminId = '194147938786738176'
 const { client } = require('../static/clients.js')
@@ -83,11 +83,13 @@ const applyPriceDecay = async () => {
             const z_diff = ( 0.15 - shop_percent ) / 0.15
             console.log(`${print.card_code} - ${print.card_name} decayed UP (z_diff = ${z_diff}) from ${print.market_price} to ${print.market_price + (0.02 * current_price * z_diff)}`)
             print.market_price += 0.02 * current_price * z_diff
+            print.trending_up = true
             await print.save()
         } else if (shop_percent >= 0.15) {
             const z_diff = ( shop_percent - 0.15 ) / 0.85
             console.log(`${print.card_code} - ${print.card_name} decayed DOWN (z_diff = ${z_diff}) from ${print.market_price} to ${print.market_price - (0.06 * current_price * z_diff)}`)
             print.market_price -= 0.06 * current_price * z_diff 
+            print.trending_up = false
             await print.save()
         }
     }
@@ -448,7 +450,7 @@ const updateShop = async () => {
             const market_price = print.market_price
             const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
             const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(print.rarity)}${inv.card_code} - ${print.card_name} - ${inv.quantity}${excluded ? ` - ${no}` : ''}`) 
+            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(print.rarity)}${inv.card_code} - ${print.card_name} - ${inv.quantity}${excluded ? ` - ${no}` : ''}${print.trending_up ? ` - ${stonks}` : ''}`) 
         }
     
         for (let i = 0; i < results.length; i += 10) shopChannel.send(results.slice(i, i+10))
@@ -457,6 +459,7 @@ const updateShop = async () => {
 
 // POST BIDS
 const postBids = async () => {
+    await calcBoxPrice()
     const shopChannel = client.channels.cache.get(shopChannelId)
     shopChannel.bulkDelete(100)
     
@@ -467,6 +470,14 @@ const postBids = async () => {
     setTimeout(() => {
         shopChannel.bulkDelete(100)
     }, 4000)
+
+    setTimeout(() => {
+        shopChannel.bulkDelete(100)
+    }, 6000)
+
+    setTimeout(() => {
+        shopChannel.bulkDelete(100)
+    }, 8000)
 
     setTimeout(async () => {
         const results = [
@@ -508,30 +519,61 @@ const postBids = async () => {
             }
         }
 
-        results.push(`\n${ygocard} --- Singles Auction --- ${ygocard}`)
+        results.push(`\n💰 --- Singles Auction --- 💰`)
 
-        const newlyInStock = await Auction.findAll({ 
+        const auctions = await Auction.findAll({ 
             include: Print,
             order: [[Print, 'market_price', 'DESC']]
         })
     
-        if (!newlyInStock.length) results.push('N/A')
-        for (let i = 0; i < newlyInStock.length; i++) {
-            const card_code = newlyInStock[i].card_code
-            const row = await Inventory.findOne({
+        const auction_printIds = auctions.map((a) => a.printId)
+
+        if (!auctions.length) results.push('N/A')
+        for (let i = 0; i < auctions.length; i++) {
+            const card_code = auctions[i].card_code
+            const inv = await Inventory.findOne({
                 where: {
+                    quantity: {
+                        [Op.gte]: 1
+                    },
                     playerId: merchbotId,
                     card_code
                 }, include: Print
             })
-            const market_price = row.print.market_price
+
+            if (!inv) continue
+            const market_price = inv.print.market_price
             const selling_price = Math.ceil(market_price * 1.1)
             const buying_price = Math.ceil(market_price * 0.7)
-            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(row.print.rarity)}${row.card_code} - ${row.print.card_name} - ${row.quantity}`) 
+            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(inv.print.rarity)}${inv.card_code} - ${inv.print.card_name} - ${inv.quantity}`) 
+        }
+
+        const shopInv = await Inventory.findAll({ 
+            where: { 
+                playerId: merchbotId,
+                quantity: {
+                    [Op.gte]: 1
+                }
+             },
+            include: Print,
+            order: [[Print, 'market_price', 'DESC']]
+        })
+
+        results.push(`\n${ygocard} --- Single Cards --- ${ygocard}`)
+    
+        for (let i = 0; i < shopInv.length; i++) {
+            const inv = shopInv[i]
+            const print = inv.print
+            const excluded = !!auction_printIds.includes(print.id)
+            if (excluded) continue
+            const market_price = print.market_price
+            const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
+            const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
+            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(print.rarity)}${inv.card_code} - ${print.card_name} - ${inv.quantity}`) 
         }
     
         for (let i = 0; i < results.length; i += 10) shopChannel.send(results.slice(i, i+10))
-    }, 5000)
+    }, 9000)
 }
 
 // ASK FOR DUMP CONFIRMATION

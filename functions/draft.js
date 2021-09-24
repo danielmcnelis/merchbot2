@@ -11,10 +11,8 @@ const { forgestone, galaxy, king, shrine, gem, orb, swords, beast, blue, bronze,
 const { draftRole } = require('../static/roles.json')
 const { draftChannelId } = require('../static/channels.json')
 const { client } = require('../static/clients.js')
-const { completeTask } = require('./diary.js')
 const { findCard } = require('./search.js')
 const { shuffleArray, getRandomElement, getRandomSubset, capitalize } = require('./utility.js')
-const { awardCard } = require('./award.js')
 
 //START DRAFT
 const startDraft = async(fuzzyPrints) => {

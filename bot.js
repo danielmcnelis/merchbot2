@@ -44,7 +44,7 @@ const { client } = require('./static/clients.js')
 const { alchemycom, aliuscom, bindercom, botcom, boxcom, bracketcom, calccom, checklistcom, dailycom, dbcom, deckcom, dicecom, dropcom, flipcom, h2hcom, historycom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, packcom, pfpcom, populationcom, profcom, queuecom, rankcom, reducecom, referralcom, rolecom, specialcom, startcom, statscom, undocom, walletcom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
-const { abuser, galaxy, orange, robbed, king, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, shrine, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare } = require('./static/emojis.json')
+const { abuser, galaxy, orange, robbed, king, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, shrine, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, stonks, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare } = require('./static/emojis.json')
 const { adminRole, arenaRole, botRole, draftRole, expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')
@@ -73,7 +73,11 @@ client.on('ready', async () => {
 
 	setInterval(async () =>  {
 		const shopOpen = await checkShopOpen()
-		if (shopOpen) updateShop()
+		if (shopOpen) {
+			updateShop()
+		} else {
+			postBids()
+		}
 	}, 1000 * 60 * 10)
 
 	if (!shopShouldBe) return client.channels.cache.get(staffChannelId).send(`<@&${adminRole}>, The Shop status could not be read from the database.`)
@@ -166,6 +170,43 @@ if (cmd === `!ping`) return message.channel.send('🏓')
 if(cmd === `!test`) {
 	if (!isJazz(message.member)) return message.channel.send('🧪')
 	else return message.channel.send('🧪')
+}
+
+//STONKS
+if(cmd === `!stonks`) {
+	if (!isJazz(message.member)) return message.channel.send('🧪')
+	
+	const prints = await Print.findAll()
+
+    for (let i = 0; i < prints.length; i++) {
+        const print = prints[i]
+        const invs = await Inventory.findAll({ where: {
+            printId: print.id,
+            quantity: { [Op.gt]: 0 }
+        }})
+    
+        const quants = invs.map((i) => i.quantity)
+        const total = quants.length ? quants.reduce((a, b) => a + b) : 0
+    
+        const merchbotinv = await Inventory.findOne({ where: {
+            printId: print.id,
+            quantity: { [Op.gt]: 0 },
+            playerId: merchbotId
+        }})
+    
+        const shop_pop = merchbotinv ? merchbotinv.quantity : 0
+        const shop_percent = total ? shop_pop / total : 0
+    
+        if (shop_percent < 0.15) {
+            print.trending_up = true
+            await print.save()
+        } else if (shop_percent >= 0.15) {
+            print.trending_up = false
+            await print.save()
+        }
+    }
+
+	return message.channel.send(`${stonks}`)
 }
 
 //DING
@@ -1570,6 +1611,12 @@ if (cmd === `!shop`) {
 		const card_name = await findCard(query, fuzzyPrints)
 		const set_code = query.toUpperCase()
 		const valid_set_code = !!(await Set.count({ where: { code: set_code }}))
+		const rarity =  query === 'com' || query === 'common' || query === 'commmons' ? 'com' :
+				query === 'rar' || query === 'rare' || query === 'rares' ? 'rar' :
+				query === 'sup' || query === 'super' || query === 'supers' ? 'sup' :
+				query === 'ult' || query === 'ultra' || query === 'ultras' ? 'ult' :
+				query === 'scr' || query === 'secret' || query === 'secrets' ? 'scr' :
+				null
 		if (valid_set_code) {
 			const set = await Set.findOne({ where: { code: set_code }})
 			const prints = await Print.findAll({ where: { set_code: set_code } })
@@ -1621,10 +1668,24 @@ if (cmd === `!shop`) {
 				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
 			}
 
-			message.channel.send(`I messaged you the ${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? ` ${eval(set.alt_emoji)}` : ''} Price List you requested.`)
+			message.channel.send(`I messaged you the ${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? ` ${eval(set.alt_emoji)}` : ''} Price List.`)
 			for (let i = 0 ; i < results.length; i+=10) message.author.send(results.slice(i, i+10))
 			return
+		} else if (rarity) {
+			const prints = await Print.findAll({ where: { rarity: rarity }, order: [['market_price', 'DESC']] })
+			const results = [`**${eval(rarity)} Price List**`]
 			
+			for (let i = 0; i < prints.length; i++) {
+				const print = prints[i]
+				const market_price = print.market_price
+				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
+				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+			}
+
+			message.channel.send(`I messaged you the ${eval(rarity)} Price List.`)
+			for (let i = 0 ; i < results.length; i+=10) message.author.send(results.slice(i, i+10))
+			return
 		}
 
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
@@ -1969,7 +2030,7 @@ if (historycom.includes(cmd)) {
 		results.push(`**Trade ${i+1}** - ${days ? days : 'Earlier Today'} ${days === 0 ? '' : days === 1 ? 'Day Ago' : 'Days Ago'}\n${summary.p1_name} received:\n${summary.p1_receives.join("\n")}\n${summary.p2_name} received:\n${summary.p2_receives.join("\n")}`)
 	}
 
-	message.channel.send(`I messaged you the trade history you requested.`)
+	message.channel.send(`I messaged you the trade history for ${card}.`)
 	for (let i = 0 ; i < results.length; i++) message.author.send(results[i])
 	return
 }

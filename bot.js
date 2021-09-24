@@ -198,7 +198,12 @@ if(cmd === `!stonks`) {
         const shop_percent = total ? shop_pop / total : 0
     
         if (shop_percent < 0.15) {
-            print.trending_up = true
+            const z_diff = ( 0.15 - shop_percent ) / 0.15
+            if (z_diff > 0.3) {
+                print.trending_up = true
+            } else {
+                print.trending_up = false
+            }
             await print.save()
         } else if (shop_percent >= 0.15) {
             print.trending_up = false

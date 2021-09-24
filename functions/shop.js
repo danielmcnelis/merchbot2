@@ -83,7 +83,11 @@ const applyPriceDecay = async () => {
             const z_diff = ( 0.15 - shop_percent ) / 0.15
             console.log(`${print.card_code} - ${print.card_name} decayed UP (z_diff = ${z_diff}) from ${print.market_price} to ${print.market_price + (0.02 * current_price * z_diff)}`)
             print.market_price += 0.02 * current_price * z_diff
-            print.trending_up = true
+            if (z_diff > 0.3) {
+                print.trending_up = true
+            } else {
+                print.trending_up = false
+            }
             await print.save()
         } else if (shop_percent >= 0.15) {
             const z_diff = ( shop_percent - 0.15 ) / 0.85
@@ -450,7 +454,7 @@ const updateShop = async () => {
             const market_price = print.market_price
             const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
             const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(print.rarity)}${inv.card_code} - ${print.card_name} - ${inv.quantity}${excluded ? ` - ${no}` : ''}${print.trending_up ? ` - ${stonks}` : ''}`) 
+            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(print.rarity)}${inv.card_code} - ${print.card_name} - ${inv.quantity}${print.trending_up ? ` 📈` : ''}${excluded ? ` - ${no}` : ''}`) 
         }
     
         for (let i = 0; i < results.length; i += 10) shopChannel.send(results.slice(i, i+10))

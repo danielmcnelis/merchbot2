@@ -3966,6 +3966,7 @@ if (cmd === `!resume`) {
 		startRound(info, entries)
 	} if (game === 'Draft') {
 		sendInventories(entries, info.round)
+		return setTimeout(async() => createPacks(fuzzyPrints), (20 + (info.round * 10)) * 1000)
 	} else if (game === 'Trivia') {
 		const triviaArr = Object.entries(trivia)
 		const questionsArr = getRandomSubset(triviaArr, 10)

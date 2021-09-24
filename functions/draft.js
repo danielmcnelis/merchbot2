@@ -386,11 +386,12 @@ const sendInventories = async (entries, round) => {
         }
 
         if (!round) {
-            fs.writeFile(`../decks/drafts/${tag}_draft.ydk`, file, (err) => { 
+            fs.writeFile(`./decks/drafts/${tag}_draft.ydk`, file, (err) => { 
                 if (err) console.log(err)
+                else console.log('wrote file')
             })
     
-            member.send(`You can also download your .YDK file for DuelingBook! ${blue}`, { files:[`../decks/drafts/${tag}_draft.ydk`] })
+            member.send(`You can also download your .YDK file for DuelingBook! ${blue}`, { files:[`./decks/drafts/${tag}_draft.ydk`] })
         }
     }
 }

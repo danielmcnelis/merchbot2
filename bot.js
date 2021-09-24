@@ -44,7 +44,7 @@ const { client } = require('./static/clients.js')
 const { alchemycom, aliuscom, bindercom, botcom, boxcom, bracketcom, calccom, checklistcom, dailycom, dbcom, deckcom, dicecom, dropcom, flipcom, h2hcom, historycom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, packcom, pfpcom, populationcom, profcom, queuecom, rankcom, reducecom, referralcom, rolecom, specialcom, startcom, statscom, undocom, walletcom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
-const { abuser, galaxy, orange, robbed, king, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, shrine, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, stonks, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare } = require('./static/emojis.json')
+const { abuser, galaxy, orange, robbed, king, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, warrior, shrine, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, downward, upward, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare } = require('./static/emojis.json')
 const { adminRole, arenaRole, botRole, draftRole, expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')
@@ -184,6 +184,10 @@ if(cmd === `!stonks`) {
             printId: print.id,
             quantity: { [Op.gt]: 0 }
         }})
+
+		if (print.set_code !== 'GL1') print.draft = false
+		print.hidden = false
+		await print.save()
     
         const quants = invs.map((i) => i.quantity)
         const total = quants.length ? quants.reduce((a, b) => a + b) : 0
@@ -199,19 +203,29 @@ if(cmd === `!stonks`) {
     
         if (shop_percent < 0.15) {
             const z_diff = ( 0.15 - shop_percent ) / 0.15
-            if (z_diff > 0.3) {
+            if (z_diff > 0.5) {
                 print.trending_up = true
+                print.trending_down = false
             } else {
+                print.trending_down = true
                 print.trending_up = false
             }
             await print.save()
         } else if (shop_percent >= 0.15) {
+            const z_diff = ( shop_percent - 0.15 ) / 0.85
+            if (z_diff > 0.5 && print.market_price > 50) {
+                print.trending_down = true
+                print.trending_up = false
+            } else {
+                print.trending_down = false
+                print.trending_up = false
+            }
             print.trending_up = false
             await print.save()
         }
     }
 
-	return message.channel.send(`${stonks}`)
+	return message.channel.send(`${upward}`)
 }
 
 //DING
@@ -1615,7 +1629,7 @@ if (cmd === `!shop`) {
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 		const card_name = await findCard(query, fuzzyPrints)
 		const set_code = query.toUpperCase()
-		const valid_set_code = !!(await Set.count({ where: { code: set_code }}))
+		const valid_set_code = !!(await Set.count({ where: { code: set_code }}) && set_code !== 'GL1')
 		const rarity =  query === 'com' || query === 'common' || query === 'commmons' ? 'com' :
 				query === 'rar' || query === 'rare' || query === 'rares' ? 'rar' :
 				query === 'sup' || query === 'super' || query === 'supers' ? 'sup' :
@@ -1677,7 +1691,7 @@ if (cmd === `!shop`) {
 			for (let i = 0 ; i < results.length; i+=10) message.author.send(results.slice(i, i+10))
 			return
 		} else if (rarity) {
-			const prints = await Print.findAll({ where: { rarity: rarity }, order: [['market_price', 'DESC']] })
+			const prints = await Print.findAll({ where: { rarity: rarity, draft: false }, order: [['market_price', 'DESC']] })
 			const results = [`**${eval(rarity)} Price List**`]
 			
 			for (let i = 0; i < prints.length; i++) {
@@ -1694,7 +1708,7 @@ if (cmd === `!shop`) {
 		}
 
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-		const prints = valid_card_code ? await Print.findAll({ where: { card_code: card_code }, order: [['createdAt', 'ASC']]}) : card_name ? await Print.findAll({ where: { card_name: card_name }, order: [['createdAt', 'ASC']]}) : null
+		const prints = valid_card_code ? await Print.findAll({ where: { card_code: card_code, draft: false }, order: [['createdAt', 'ASC']]}) : card_name ? await Print.findAll({ where: { card_name: card_name }, order: [['createdAt', 'ASC']]}) : null
 		if (!prints || !prints.length) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 		const results = []
 
@@ -1714,9 +1728,9 @@ if (cmd === `!shop`) {
 			const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
 
 			if (!inv) {
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - Out of Stock.`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - Out of Stock${print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}`)
 			} else {
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - ${inv.quantity}${auction ? ` - ${no}`: ''}`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - ${print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}${inv.quantity}${auction ? ` - ${no}`: ''}`)
 			}
 		}
 

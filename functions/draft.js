@@ -347,8 +347,8 @@ const sendInventories = async (entries, round) => {
         })
 
         if (ydk.length > 60) {
-            ydk.splice(59, 0, '#extra')
-            ydk.splice(60, 0, '!side')
+            ydk.splice(60, 0, '#extra')
+            ydk.splice(61, 0, '!side')
         } else {
             ydk.push('#extra')
             ydk.push('!side')
@@ -367,13 +367,13 @@ const sendInventories = async (entries, round) => {
 		ydk.unshift('#created by ...')
 		ydk.unshift('#main')
         console.log('ydk', ydk)
-		const file = ydk.join('\n')
+		const file = ydk.join('\n') + '\n'
 		console.log('file', file)
 
         const member = guild.members.cache.get(playerId)
         if (!member || playerId !== member.user.id) continue
         const prompt = round ? `Slick drafting, ${name}! You get a ${20 + (round * 10)} second break before Round ${round}.` :
-            `Draft complete! Take up to 10 minutes to build your deck, then find your opponent.`
+            `Draft complete! Take up to 5 minutes to build your deck, then find your opponent.`
         member.send(prompt)
 
         for (let j = 0; j < results.length; j += 30) {

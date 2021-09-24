@@ -316,15 +316,21 @@ const sendInventories = async (entries, round) => {
             if (color === 'purple') purples.push(inv)
 		}
 
-        yellows.sort((a, b) => b.print.card_name - a.print.card_name)
-        oranges.sort((a, b) => {
-            console.log(b.print.card_name)
-            console.log(a.print.card_name)
-            return b.print.card_name - a.print.card_name
-        })
-        greens.sort((a, b) => b.print.card_name - a.print.card_name)
-        violets.sort((a, b) => b.print.card_name - a.print.card_name)
-        purples.sort((a, b) => b.print.card_name - a.print.card_name)
+        const compare = (a, b) => {
+            if (a.print.card_name < b.print.card_name) {
+                return 1
+            } else if (a.print.card_name < b.print.card_name) {
+                return -1
+            } else {
+                return 0
+            }
+        }
+
+        yellows.sort(compare)
+        oranges.sort(compare)
+        greens.sort(compare)
+        violets.sort(compare)
+        purples.sort(compare)
 
         yellows.forEach((inv) => {
             for (let i = 0; i < inv.quantity; i++) {
@@ -364,7 +370,7 @@ const sendInventories = async (entries, round) => {
             }
         })
 
-        const header = ['#main', '#created by ...']
+        const header = ['#created by ...', '#main']
 
         console.log('ydk', ydk)
 		const file = [...header, ...ydk].join('\n') + '\n'

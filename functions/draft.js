@@ -371,11 +371,7 @@ const sendInventories = async (entries, round) => {
         })
 
         const header = ['#created by ...', '#main']
-
-        console.log('ydk', ydk)
 		const file = [...header, ...ydk].join('\n') + '\n'
-		console.log('file', file)
-
         const member = guild.members.cache.get(playerId)
         if (!member || playerId !== member.user.id) continue
         const prompt = round ? `Slick drafting, ${name}! You get a ${20 + (round * 10)} second break before Round ${round}.` :
@@ -394,7 +390,6 @@ const sendInventories = async (entries, round) => {
         if (!round) {
             fs.writeFile(`./decks/drafts/${tag}_draft.ydk`, file, (err) => { 
                 if (err) console.log(err)
-                else console.log('wrote file')
             })
     
             member.send(`You can also download your .YDK file for DuelingBook! ${blue}`, { files:[`./decks/drafts/${tag}_draft.ydk`] })

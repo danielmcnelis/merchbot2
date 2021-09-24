@@ -491,20 +491,16 @@ if (cmd === `!konami`) {
 
 	for (let i = 0; i < prints.length; i++) {
 		const print = prints[i]
-		console.log('print', print.card_name)
 		const card_id = print.card_id
-		console.log('card_id', card_id)
 		const card = await Card.findOne({
 			where: {
 				id: card_id
 			}
 		})
 
-		console.log('!!card:', !!card)
 		let konami_code = card.image.slice(0, -4)
 		while (konami_code.length < 8) konami_code = '0' + konami_code
 		print.konami_code = konami_code
-		console.log(`saving konami code for ${print.card_name}: ${konami_code}`)
 
 		const color = card.card === 'Monster' && card.category === 'Effect' ? 'orange' :
 			card.card === 'Monster' && card.category === 'Normal' ? 'yellow' :
@@ -514,7 +510,6 @@ if (cmd === `!konami`) {
 			null
 		
 		print.color = color
-		console.log(`saving color for ${print.card_name}: ${color}`)
 				
 		await print.save()
 	}
@@ -2874,7 +2869,7 @@ if (losscom.includes(cmd)) {
 			chipsLoser: 8
 		})
 
-		message.channel.send(`${losingPlayer.name} (+3${starchips}), your Draft loss to ${winner.user.username} (+5${starchips}) has been recorded.`)
+		message.channel.send(`${losingPlayer.name} (+8${starchips}), your Draft loss to ${winner.user.username} (+15${starchips}) has been recorded.`)
 		return checkDraftProgress(info)
 	} else if (!hasDraftRole && game === 'Draft') {
 		return message.channel.send(`You do not have the Draft Players role. Please report your loss in the appropriate channel.`)

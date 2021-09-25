@@ -1525,16 +1525,19 @@ if(profcom.includes(cmd)) {
 
 //REFERRAL
 if(referralcom.includes(cmd)) {
-	const playerProfile = await Profile.findOne({ where: { playerId: maid }})
-	const diary = await Diary.findOne({ where: { playerId: maid }})
-	if (!playerProfile || !diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
-	if (playerProfile.referral) return message.channel.send(`You already gave a referral.`)
+	const player = await Player.findOne({ where: { id: maid }, include: [Diary, Profile]})
+	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	const diary = player.diary
+	const profile = player.profile
+	if (!profile || !diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (player.last_reset) return message.channel.send(`You cannot give a referral after resetting your account.`)
+	if (profile.referral) return message.channel.send(`You already gave a referral.`)
 
 	const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
 	if (!easy_complete) return message.channel.send(`You must complete your Easy Diary before you are allowed to give a referral.`)
 
 	if (!args.length) return message.channel.send(`No player specified.`)
-	const referrer = message.mentions.users.first() ? message.mentions.users.first().id : null	
+	const referrer = message.mentions.users.first() ? message.mentions.users.first().id : null
 	if (!referrer || referrer.length < 17 || referrer.length > 18) return message.channel.send(`No player specified.`)
 
 	const referringPlayer = await Player.findOne({ where: { id: referrer }, include: Wallet })
@@ -1551,8 +1554,8 @@ if(referralcom.includes(cmd)) {
 		referringPlayer.wallet.starchips += 15
 		await referringPlayer.wallet.save()
 
-		playerProfile.referral = true
-		await playerProfile.save()
+		profile.referral = true
+		await profile.save()
 
 		return message.channel.send(`Okay! <@${referringPlayer.id}> was awarded 15${starchips} for a referral.`)
 	}).catch(err => {

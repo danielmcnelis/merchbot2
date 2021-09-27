@@ -168,7 +168,47 @@ if (cmd === `!ping`) return message.channel.send('🏓')
 
 //TEST
 if(cmd === `!test`) {
-	if (!isJazz(message.member)) return message.channel.send('🧪')
+	if (!isJazz(message.member)) {
+		const x = args[0] || 1000
+		const results = []
+		const rarities = []
+		const commons = await Print.findAll({ where: { set_code: 'TEB', rarity = 'com' }})
+		const rares = await Print.findAll({ where: { set_code: 'TEB', rarity = 'rar' }})
+		const supers = await Print.findAll({ where: { set_code: 'TEB', rarity = 'sup' }})
+		const ultras = await Print.findAll({ where: { set_code: 'TEB', rarity = 'ult' }})
+		const secrets = await Print.findAll({ where: { set_code: 'TEB', rarity = 'scr' }})
+	
+		for (let i = 0; i < 10000; i++) {
+			let best = 1
+			const matrix = new Array(3600)
+			matrix.fill(1, 0, 3463)
+			matrix.fill(2, 3463, 3559)
+			matrix.fill(3, 3559, 3591)
+			matrix.fill(4, 3591, 3599)
+			matrix.fill(5, 3599, 3600)
+	
+			for (let i = 0; i < x; i++) {
+				const sample = getRandomElement(matrix)
+				if (sample > best) best = sample
+			}
+	
+			const rarity = best === 5 ? "secrets" :
+			best === 4 ? "ultras" :
+			best === 3 ? "supers" :
+			best === 2 ? "rares" :
+			"commons"
+	
+			const print = getRandomElement(eval(rarity))
+			rarities.push(rarities)
+			results.push(print.market_price)
+		}
+	
+		console.log(`Results from a trial of 10,000 wagers at ${x}sd:\n${rarities}`)
+	
+		const expected_value = Math.round(results.reduce((a, b) => a + b) / results.length)
+		return message.channel.send(`In 10,000 random trials the average market value of a random TEB ${'TEB'} card from a ${x}${stardust} wager was ${expected_value}${stardust}.`)
+	}
+
 	else return message.channel.send('🧪')
 }
 

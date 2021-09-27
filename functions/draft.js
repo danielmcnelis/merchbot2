@@ -672,7 +672,7 @@ const startDraftRound = async (info, entries) => {
             for (let i = 0; i < 2; i++) {
                 const entry = entries[i]
                 const playerId = entry.playerId
-                const quantity = entry.score + 1
+                const quantity = entry.score + 4
                 const wallet = await Wallet.findOne({ where: { playerId: playerId }})
                 wallet.forgestone += quantity
                 await wallet.save()

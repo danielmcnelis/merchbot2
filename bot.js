@@ -172,11 +172,11 @@ if(cmd === `!test`) {
 		const x = args[0] || 1000
 		const results = []
 		const rarities = []
-		const commons = await Print.findAll({ where: { set_code: 'TEB', rarity = 'com' }})
-		const rares = await Print.findAll({ where: { set_code: 'TEB', rarity = 'rar' }})
-		const supers = await Print.findAll({ where: { set_code: 'TEB', rarity = 'sup' }})
-		const ultras = await Print.findAll({ where: { set_code: 'TEB', rarity = 'ult' }})
-		const secrets = await Print.findAll({ where: { set_code: 'TEB', rarity = 'scr' }})
+		const commons = await Print.findAll({ where: { set_code: 'TEB', rarity: 'com' }})
+		const rares = await Print.findAll({ where: { set_code: 'TEB', rarity: 'rar' }})
+		const supers = await Print.findAll({ where: { set_code: 'TEB', rarity: 'sup' }})
+		const ultras = await Print.findAll({ where: { set_code: 'TEB', rarity: 'ult' }})
+		const secrets = await Print.findAll({ where: { set_code: 'TEB', rarity: 'scr' }})
 	
 		for (let i = 0; i < 10000; i++) {
 			let best = 1

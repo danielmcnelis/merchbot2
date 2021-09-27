@@ -168,7 +168,7 @@ if (cmd === `!ping`) return message.channel.send('🏓')
 
 //TEST
 if(cmd === `!test`) {
-	if (!isJazz(message.member)) {
+	if (isJazz(message.member)) {
 		const x = args[0] || 1000
 		const results = []
 		const rarities = []
@@ -207,9 +207,9 @@ if(cmd === `!test`) {
 	
 		const expected_value = Math.round(results.reduce((a, b) => a + b) / results.length)
 		return message.channel.send(`In 10,000 random trials the average market value of a random TEB ${'TEB'} card from a ${x}${stardust} wager was ${expected_value}${stardust}.`)
+	} else {
+		return message.channel.send('🧪')
 	}
-
-	else return message.channel.send('🧪')
 }
 
 //STONKS

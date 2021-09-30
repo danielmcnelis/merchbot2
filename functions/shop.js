@@ -343,7 +343,7 @@ const calcBoxPrice = async () => {
             console.log('avgPackPrice', avgPackPrice)
     
             set.unit_price = Math.round(avgPackPrice)
-            set.box_price = 21 * Math.round(avgPackPrice)
+            set.box_price = set.type === 'core' ? 21 * Math.round(avgPackPrice) : null
             await set.save()
         } else if (set.type === 'starter_deck') {
             const prints = await Print.findAll({ where: { set_code: set_code }})

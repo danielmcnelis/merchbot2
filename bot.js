@@ -401,13 +401,14 @@ if (cmd === `!fix_cards`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const ygoprodeckCards = ygoprodeck.data
 	let updated = 0
-
+	
 	for (let i = 0; i < ygoprodeckCards.length; i++) {
 		if (ygoprodeckCards[i].atk === 0 || ygoprodeckCards[i].def === 0) {
 			const card = await Card.findOne({ where: { name: ygoprodeckCards[i].name }})
 			if (!card) {
 				continue
 			}
+			console.log('card.name', card.name)
 			const atk = ygoprodeckCards[i].atk === 0 ? 0 : null
 			const def = ygoprodeckCards[i].def === 0 ? 0 : null
 			card.atk = atk
@@ -417,6 +418,7 @@ if (cmd === `!fix_cards`) {
 		}
 	}
 
+	console.log('ygoprodeckCards.length', ygoprodeckCards.length)
 	return message.channel.send(`You fixed the ATK/DEF stats of ${updated} cards in the Format Library database.`)
 }
 
@@ -1757,9 +1759,14 @@ if(cmd === `!count`) {
 	}
 
 	if (weightedCount < 1) weightedCount = 1 
-    const core_count = most_recent === 'core' ?  Math.ceil(weightedCount / 8) : Math.ceil(weightedCount / 16)
-    const mini_count = most_recent === 'core' ?  0 : Math.ceil(weightedCount * 3 / 32)
-	results.push(`\nIf The Shop closed now, we'd open ${most_recent === 'mini' ? `${mini_count} ${mini_count === 1 ? 'Pack' : 'Packs'} of ORF ${ORF} and ` : ''}${core_count} ${core_count === 1 ? 'Pack' : 'Packs'} of TEB ${TEB} to restock our inventory.`)
+    const count = Math.ceil(weightedCount / 8)
+	results.push(
+		`\nIf The Shop closed now, we'd open:` + 
+		`\n- ${count} ${count === 1 ? 'Pack' : 'Packs'} of FON ${FON}` +
+		`\n- ${count} ${count === 1 ? 'Pack' : 'Packs'} of TEB ${TEB}` +
+		`\n- ${count} ${count === 1 ? 'Pack' : 'Packs'} of ORF ${ORF}` +
+		`\n- ${count} ${count === 1 ? 'Pack' : 'Packs'} of DOC ${DOC}`
+	)
 	return message.channel.send(results.join("\n"))
 }
 

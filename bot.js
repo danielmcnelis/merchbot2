@@ -409,8 +409,8 @@ if (cmd === `!fix_cards`) {
 				continue
 			}
 			console.log('card.name', card.name)
-			const atk = ygoprodeckCards[i].atk === 0 ? 0 : null
-			const def = ygoprodeckCards[i].def === 0 ? 0 : null
+			const atk = ygoprodeckCards[i].atk === 0 ? 0 : ygoprodeckCards[i].atk ? ygoprodeckCards[i].atk : null
+			const def = ygoprodeckCards[i].def === 0 ? 0 : ygoprodeckCards[i].def ? ygoprodeckCards[i].def : null
 			card.atk = atk
 			card.def = def
 			await card.save() 

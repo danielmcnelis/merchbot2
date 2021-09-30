@@ -342,8 +342,8 @@ const calcBoxPrice = async () => {
             const avgPackPrice = avgBoxPrice / set.packs_per_box
             console.log('avgPackPrice', avgPackPrice)
     
-            set.unit_price = Math.round(avgPackPrice)
-            set.box_price = set.type === 'core' ? 21 * Math.round(avgPackPrice) : null
+            set.unit_price = Math.round(avgPackPrice / 10) * 10  
+            set.box_price = set.type === 'core' ? Math.round(21 * set.unit_price / 100) * 100 : null
             await set.save()
         } else if (set.type === 'starter_deck') {
             const prints = await Print.findAll({ where: { set_code: set_code }})
@@ -372,7 +372,7 @@ const calcBoxPrice = async () => {
 
             const avgDeckPrice = (deck1Price + deck2Price) / 2
             console.log('avgDeckPrice', avgDeckPrice)
-            set.unit_price = Math.round(avgDeckPrice)
+            set.unit_price = Math.round(avgDeckPrice / 10) * 10
             await set.save()
         }
     }

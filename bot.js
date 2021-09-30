@@ -5438,7 +5438,7 @@ if(checklistcom.includes(cmd)) {
 //PACK
 if(packcom.includes(cmd)) {
 	let num = 1
-	let code = 'TEB'
+	let code = 'FON'
 	for (let i = 0; i < args.length; i++) {
 		if (isFinite(args[i])) {
 			num = parseInt(args[i])

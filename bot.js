@@ -222,62 +222,6 @@ if(cmd === `!test`) {
 	}
 }
 
-//STONKS
-if(cmd === `!stonks`) {
-	if (!isJazz(message.member)) return message.channel.send('🧪')
-	
-	const prints = await Print.findAll()
-
-    for (let i = 0; i < prints.length; i++) {
-        const print = prints[i]
-        const invs = await Inventory.findAll({ where: {
-            printId: print.id,
-            quantity: { [Op.gt]: 0 }
-        }})
-
-		if (print.set_code !== 'GL1') print.draft = false
-		print.hidden = false
-		await print.save()
-    
-        const quants = invs.map((i) => i.quantity)
-        const total = quants.length ? quants.reduce((a, b) => a + b) : 0
-    
-        const merchbotinv = await Inventory.findOne({ where: {
-            printId: print.id,
-            quantity: { [Op.gt]: 0 },
-            playerId: merchbotId
-        }})
-    
-        const shop_pop = merchbotinv ? merchbotinv.quantity : 0
-        const shop_percent = total ? shop_pop / total : 0
-    
-        if (shop_percent < 0.15) {
-            const z_diff = ( 0.15 - shop_percent ) / 0.15
-            if (z_diff > 0.3) {
-                print.trending_up = true
-                print.trending_down = false
-            } else {
-                print.trending_down = false
-                print.trending_up = false
-            }
-            await print.save()
-        } else if (shop_percent >= 0.15) {
-            const z_diff = ( shop_percent - 0.15 ) / 0.85
-            if (z_diff > 0.3 && print.market_price > 50) {
-                print.trending_down = true
-                print.trending_up = false
-            } else {
-                print.trending_down = false
-                print.trending_up = false
-            }
-            print.trending_up = false
-            await print.save()
-        }
-    }
-
-	return message.channel.send(`${upward}`)
-}
-
 //DING
 if(cmd === `!ding`) return message.channel.send('🚪')
 
@@ -452,8 +396,6 @@ if (cmd === `!update_cards`) {
 	return message.channel.send(`You added ${created} new cards from YGOPRODeck.com to the Format Library database.`)
 }
 
-
-
 //FIX CARDS 
 if (cmd === `!fix_cards`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
@@ -476,84 +418,6 @@ if (cmd === `!fix_cards`) {
 	}
 
 	return message.channel.send(`You fixed the ATK/DEF stats of ${updated} cards in the Format Library database.`)
-}
-
-
-// AUCTION
-if (cmd === `!auc`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	const quantity = parseInt(args[0])
-	if (quantity < 1) return message.channel.send(`Sorry, ${quantity} is not a valid quantity.`)
-	const card_code = args[1]
-	const print = await Print.findOne({ where: { card_code: card_code }})
-		
-	const buyerCount = await Inventory.count({ 
-		where: { 
-			card_code: card_code,
-			printId: print.id,
-			playerId: merchbotId
-		}
-	})
-
-	if (!buyerCount) {
-		await Inventory.create({ 
-			card_code: card_code,
-			printId: print.id,
-			playerId: merchbotId
-		})
-	}
-
-	const buyerInv = await Inventory.findOne({ 
-		where: { 
-			card_code: card_code,
-			printId: print.id,
-			playerId: merchbotId
-		}
-	})
-
-	if (!buyerInv) {
-		message.channel.send(`Database error: Could not find or create Buyer Inventory for: ${print.card_name}.`)
-	}
-
-    const auction = await Auction.findOne({ where: { printId: print.id }})
-
-	if (auction) {
-		auction.quantity += quantity
-		await auction.save()
-	} else {
-		await Auction.create({
-			card_code: card_code,
-			quantity: quantity,
-			printId: print.id
-		})
-	} 
-
-	buyerInv.quantity += quantity
-	await buyerInv.save()
-
-	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
-    return message.channel.send(`You added ${quantity} ${card} to the auction pool.`)
-}
-
-
-//KILL GL1
-if (cmd === `!kill_gl1`) {
-	const prints = await Print.findAll({ where: {
-		set_code: 'GL1'
-	}})
-
-	for (let i = 0; i < prints.length; i++) {
-		const print = prints[i]
-		await print.destroy()
-	}
-
-	const set = await Set.findOne({ where: {
-		code: 'GL1'
-	}})
-
-	await set.destroy()
-
-	return message.channel.send(`You deleted all traces of Galaxy Pack 1. ${orange}`)
 }
 
 //NEW SET

@@ -362,7 +362,7 @@ const calcBoxPrice = async () => {
             
             for (let i = 0; i < prints.length; i++) {
                 const print = prints[i]
-                const market_price = Math.round(p.market_price) || 1
+                const market_price = Math.round(print.market_price) || 1
                 console.log('market_price of SS card', market_price)
                 const d1quantity = decks[deck1].cards[print.card_code] || 0
                 const d2quantity = decks[deck2].cards[print.card_code] || 0

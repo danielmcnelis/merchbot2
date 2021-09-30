@@ -29,7 +29,7 @@ const { askForAdjustConfirmation, collectNicknames, getNewMarketPrice, askForSet
 const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard, getResetConfirmation } = require('./functions/profile.js')
 const { fetchAllCardNames, fetchAllUniquePrintNames, findCard, search } = require('./functions/search.js')
 const { addSheet, makeSheet, writeToSheet } = require('./functions/sheets.js')
-const { applyPriceDecay, getBarterCard, getBarterQuery, getVoucher, getTradeInCard, getBarterDirection, askForBarterConfirmation, checkShopShouldBe, getDecayCountdown, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop,  } = require('./functions/shop.js')
+const { applyPriceDecay, getBarterCard, getBarterQuery, getVoucher, getTradeInCard, getBarterDirection, askForBarterConfirmation, checkShopShouldBe, getMidnightCountdown, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop, getMidnightCountdown,  } = require('./functions/shop.js')
 const { getNewStatus } = require('./functions/status.js')
 const { askForDBUsername, checkChallongePairing, findNextMatch, findNextOpponent, findOtherPreReqMatch, findNoShowOpponent, generateSheetData, getDeckListTournament, getDeckNameTournament, getMatches, getTournament, getTournamentType, putMatchResult, postParticipant, removeParticipant, seed, selectTournament } = require('./functions/tournament.js')
 const { processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
@@ -58,8 +58,18 @@ client.on('ready', async () => {
 	const allUniquePrints = await fetchAllUniquePrintNames()
     allUniquePrints.forEach((card) => fuzzyPrints.add(card))
 
-	const decayCountdown = getDecayCountdown()
-	setTimeout(() => applyPriceDecay(), decayCountdown)
+	const midnightCountdown = getMidnightCountdown()
+
+	setTimeout(async () => {
+		const dailies = await Daily.findAll()
+		for (let i = 0; i < dailies.length; i++) {
+			const daily = dailies[i]
+			daily.fon_packs = 0
+			await daily.save()
+		}
+	}, midnightCountdown)
+
+	setTimeout(() => applyPriceDecay(), midnightCountdown + 10000)
 	
 	const shopShouldBe = checkShopShouldBe()
 	const shopCountdown = getShopCountdown()
@@ -206,7 +216,7 @@ if(cmd === `!test`) {
 		console.log(`Results from a trial of 10,000 wagers at ${x}sd:\n${rarities}`)
 	
 		const expected_value = Math.round(results.reduce((a, b) => a + b) / results.length)
-		return message.channel.send(`In 10,000 random trials the average market value of a random TEB ${'TEB'} card from a ${x}${stardust} wager was ${expected_value}${stardust}.`)
+		return message.channel.send(`In 10,000 random trials the average market value of a random TEB ${eval(TEB)} card from a ${x}${stardust} wager was ${expected_value}${stardust}.`)
 	} else {
 		return message.channel.send('🧪')
 	}
@@ -551,32 +561,32 @@ if (cmd === `!new_set`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	
 	const set = {
-		code: "GL1",
-		name: "Galaxy Pack 1",
-		type: "draft",
-		emoji: "galaxy",
-		alt_emoji: "galaxy",
-		size: 150,
-		commons: 100,
-		rares: 40,
-		supers: 10,
-		ultras: 0,
+		code: "SS4",
+		name: "Start Series 4",
+		type: "starter",
+		emoji: "reptile",
+		alt_emoji: "warrior",
+		size: 43,
+		commons: 41,
+		rares: 0,
+		supers: 0,
+		ultras: 2,
 		secrets: 0,
 		specials: 0,
 		for_sale: false,
 		spec_for_sale: false,
-		unit_price: 30,
+		unit_price: 75,
 		unit_sales: 0,
-		cards_per_pack: 18,
-		packs_per_box: 24,
-		commons_per_pack: 12,
-		commons_per_box: 288,
-		rares_per_pack: 5,
-		rares_per_box: 120,
-		supers_per_pack: 1,
-		supers_per_box: 24,
-		ultras_per_box: 0,
-		secrets_per_box: 0
+		cards_per_pack: null,
+		packs_per_box: null,
+		commons_per_pack: null,
+		commons_per_box: 47,
+		rares_per_pack: null,
+		rares_per_box: null,
+		supers_per_pack: null,
+		supers_per_box: null,
+		ultras_per_box: 3,
+		secrets_per_box: null
 	}
 
 	await Set.create(set)
@@ -925,11 +935,12 @@ if(startcom.includes(cmd)) {
 		const set1 = await Set.findOne({ where: { code: 'DOC' }})
 		const set2 = await Set.findOne({ where: { code: 'ORF' }})
 		const set3 = await Set.findOne({ where: { code: 'TEB' }})
+		const set4 = await Set.findOne({ where: { code: 'FON' }})
 
-		if (!set1 || !set2 || !set3) return message.channel.send(`Could not find sets: "DOC", "ORF", or "TEB".`)
+		if (!set1 || !set2 || !set3 || !set4) return message.channel.send(`Could not find sets: "DOC", "ORF", "TEB", or "FON".`)
 	
 		const filter = m => m.author.id === maid
-		await message.channel.send(`Greetings, champ! Which deck would you like to start?\n- (1) Dragon\'s Inferno ${dragon}\n- (2) Spellcaster\'s Art ${spellcaster}`)
+		await message.channel.send(`Greetings, champ! Which deck would you like to start?\n- (1) Reptile\'s Charm ${reptile}\n- (2) Warrior\'s Legend ${warrior}`)
 		
 		message.channel.awaitMessages(filter, {
 			max: 1,
@@ -938,10 +949,10 @@ if(startcom.includes(cmd)) {
 			const response = collected.first().content.toLowerCase()
 			let starter
 	
-			if(response.includes('drag') || response.includes(dragon) || response.includes("(1)") || response === "1") {
-				starter = 'dragon'
-			} else if(response.includes('spell') || response.includes('cast') || response.includes(spellcaster) || response.includes === "(2)" || response === "2") {
-				starter = 'spellcaster'
+			if(response.includes('rep') || response.includes(reptile) || response.includes("(1)") || response === "1") {
+				starter = 'reptile'
+			} else if(response.includes('war') || response.includes(warrior) || response.includes === "(2)" || response === "2") {
+				starter = 'warrior'
 			}
 	
 			if (!starter) return message.channel.send('You did not select a valid Starter Deck. Please type **!start** to try again.')
@@ -951,13 +962,14 @@ if(startcom.includes(cmd)) {
 			message.member.roles.add(fpRole)
 			message.member.roles.add(noviceRole)
 			message.channel.send(`Excellent choice, ${message.author.username}! ${legend}` +
-			`\nYou received a copy of ${starter === "dragon" ? `Dragon's Inferno ${dragon}` : `Spellcaster's Art ${spellcaster}`} and the **Forged Players** role! ${wokeaf}` +
+			`\nYou received a copy of ${starter === "reptile" ? `Reptile's Charm ${reptile}` : `Warrior's Legend ${warrior}`} and the **Forged Players** role! ${wokeaf}` +
 			`\nPlease wait while I open some packs... ${blue}`
 			)
 	
 			await awardPack(message.channel, maid, set1, 24)
 			await awardPack(message.channel, maid, set2, 24)
 			await awardPack(message.channel, maid, set3, 24)
+			await awardPack(message.channel, maid, set4, 24)
 			await completeTask(message.channel, maid, 'e1')
 			await completeTask(message.channel, maid, 'm4', 4000)
 			return message.channel.send(`I wish you luck on your journey, new duelist! ${master}`)
@@ -1481,6 +1493,8 @@ if(profcom.includes(cmd)) {
 		player.profile.starter === 'plant' ? `Plant's Harmony` :
 		player.profile.starter === 'dragon' ? `Dragon's Inferno` :
 		player.profile.starter === 'spellcaster' ? `Spellcaster's Art` :
+		player.profile.starter === 'reptile' ? `Reptile's Charm` :
+		player.profile.starter === 'warrior' ? `Warrior's Legend` :
 		''
 	const card = await Card.findOne({ 
 		where: { 
@@ -4580,7 +4594,7 @@ if(cmd === `!wager`) {
 
 	const x = parseInt(args[0])
 	if (!x || isNaN(x)) return message.channel.send(`Please specify the amount of ${stardust} you wish to wager.`)
-	if (x < 10) return message.channel.send(`You cannot wager less than 10${stardust}.`)
+	if (x < 1) return message.channel.send(`You cannot wager less than 1${stardust}.`)
 	if (x > 1000) return message.channel.send(`You cannot wager more than 1000${stardust}.`)
 	if (x % 1 !== 0) return message.channel.send(`You cannot wager partial ${stardust}.`)
 	if (x > player.wallet.stardust) return message.channel.send(`You only have ${player.wallet.stardust}${stardust}.`)
@@ -5500,16 +5514,20 @@ if(packcom.includes(cmd)) {
 		return print.card_code
 	})
 
-	const player = await Player.findOne( { where: { id: maid }, include: [Diary, Wallet] })
+	const player = await Player.findOne( { where: { id: maid }, include: [Daily, Diary, Wallet] })
 	const wallet = player.wallet
+	const daily = player.daily
 	const diary = player.diary
-    const hard_complete = diary.h1 && diary.h2 && diary.h3 && diary.h4 && diary.h5 && diary.h6 && diary.h7 && diary.h8
+	const merchbot_wallet = await Wallet.findOne( { where: { playerId: merchbotId } })
+	if (!daily || !diary || !wallet || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	const hard_complete = diary.h1 && diary.h2 && diary.h3 && diary.h4 && diary.h5 && diary.h6 && diary.h7 && diary.h8
     const discount = hard_complete && set.currency === 'stardust' ? (1 / 1.1) : 1
 
-	const merchbot_wallet = await Wallet.findOne( { where: { playerId: merchbotId } })
-	if (!wallet || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	const money = wallet[set.currency]
 	if (money < (Math.round(set.unit_price * discount) * num)) return message.channel.send(`Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${num > 1 ? `${num} ` : ''}${set.name} ${eval(set.emoji)} Packs cost ${Math.round(set.unit_price * discount) * num}${eval(set.currency)}.`)
+	
+	const fon_packs = daily.fon_packs
+	if ((fon_packs + num) > 8) return message.channel.send(`Sorry, ${player.name}, you cannot purchase more than 8 Force of Nature ${FON} packs per day.`)
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send(`${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.unit_price * discount) * num}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`)
@@ -5520,7 +5538,10 @@ if(packcom.includes(cmd)) {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
 		
 		message.channel.send(`Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}.`)
+		
 		let gotSecret = false
+		const boxes = Math.floor(num / set.packs_per_box)
+		const packs_from_boxes = boxes * set.packs_per_box
 
 		for (let j = 0; j < num; j++) {
 			const images = []
@@ -5538,7 +5559,7 @@ if(packcom.includes(cmd)) {
 			if (!yourUltras.length) for (let i = 0; i < set.ultras_per_box; i++) odds.push("ultras")
 			if (!yourSecrets.length) for (let i = 0; i < set.secrets_per_box; i++) odds.push("secrets")
 
-			const luck = getRandomElement(odds)
+			const luck = j < packs_from_boxes ? odds[j % set.packs_per_box] : getRandomElement(odds)
 			const yourFoil = getRandomElement(eval(luck))
 
 			const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil]
@@ -5603,6 +5624,11 @@ if(packcom.includes(cmd)) {
 
 		set.unit_sales += num
 		await set.save()
+
+		if (set.code === 'FON') {
+			daily.fon_packs += num
+			await daily.save()
+		}
 
 		completeTask(message.channel, maid, 'e6')
 		if (set.type === 'core' && num >= 5) completeTask(message.channel, maid, 'm3', 3000)
@@ -6346,7 +6372,8 @@ if(cmd === `!barter`) {
 		if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 		if (
 			print.set_code === 'APC' || 
-			print.set_code === 'FPC' || 
+			print.set_code === 'FON' ||
+			print.set_code === 'FPC' ||  
 			print.set_code.startsWith('SS') || 
 			print.set_code.startsWith('CH')
 		) return message.channel.send(`You cannot barter for ${print.set_code} cards.`)

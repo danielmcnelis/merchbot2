@@ -148,16 +148,16 @@ const getShopCountdown = () => {
 }
 
 
-// GET DECAY COUNTDOWN
-const getDecayCountdown = () => {
+// GET MIDNIGHT COUNTDOWN
+const getMidnightCountdown = () => {
 	const date = new Date()
 	const hours = date.getHours()
 	const mins = date.getMinutes()
 	const minsLeftInPeriod = 60 - mins
 	const hoursLeftInPeriod = 23 - hours
 
-    const decayCountdown = ( hoursLeftInPeriod * 60 + minsLeftInPeriod ) * 60 * 1000
-    return decayCountdown
+    const midnightCountdown = ( hoursLeftInPeriod * 60 + minsLeftInPeriod ) * 60 * 1000
+    return midnightCountdown
 }
 
 //CHECK SHOP SHOULD BE
@@ -1059,8 +1059,8 @@ module.exports = {
     getDumpQuantity,
     getExclusions,
     getExcludedPrintIds,
+    getMidnightCountdown,
     getTradeInCard,
-    getDecayCountdown,
     getShopCountdown,
     getVoucher,
     openShop,

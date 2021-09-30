@@ -171,7 +171,9 @@ const convertCardsArrayToObject = (arr) => {
 
 //CREATE PROFILE
 const createProfile = async (playerId, starter) => {
-    const card = starter === 'dragon' ? 'White-Horned Dragon' :
+    const card = starter === 'reptile' ? 'Dark Alligator' :
+        starter === 'warrior' ? 'Gilford the Lightning' :
+        starter === 'dragon' ? 'White-Horned Dragon' :
         starter === 'spellcaster' ? 'Dark Red Enchanter' :
         starter === 'dinosaur' ? 'Sauropod Brachion' :
         starter === 'plant' ? 'Sylvan Guardioak' :

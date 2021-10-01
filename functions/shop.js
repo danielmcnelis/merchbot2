@@ -78,7 +78,7 @@ const applyPriceDecay = async () => {
 		if (isWithinXHours(48, time, createdTime)) return print
     })
 
-    const old_prints = all_prints.filter((print) => {
+    const old_prints = prints.filter((print) => {
 		const createdAt = print.createdAt
 		const createdTime = createdAt.getTime()
 		if (!isWithinXHours(48, time, createdTime)) return print

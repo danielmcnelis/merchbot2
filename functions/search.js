@@ -28,7 +28,7 @@ const search = async (query, fuzzyCards) => {
 	if (card.category) classes.push(card.category)
 
 	const labels = card.card === "Monster" ? `**Attribute:** ${card.attribute}\n${card.category === 'Xyz' ? '**Rank:**' : card.category === 'Link' ? '**Link Rating:**' : '**Level:**'} ${card.level}\n**Release Date:** ${card.date}\n**[** ${classes.join(" / ")} **]**` : `**Category:** ${card.category}\n**Release Date:** ${card.date}` 
-	const stats = card.card === "Monster" ? `**ATK:** ${card.atk} ${card.def === null ? '' : `**DEF:** ${card.def}`}` : ''
+	const stats = card.card === "Monster" ? `**ATK:** ${card.atk === null ? '?' : `**ATK:** ${card.atk}`} ${card.def === null && card.category !== 'Link' ? '?' : card.def === null && card.category === 'Link' ? '' : `**DEF:** ${card.def}`}` : ''
 	
 	const attachment = fs.existsSync(`./public/card_images/${card.image}`) ?
 		new Discord.MessageAttachment(`./public/card_images/${card.image}`, card.image) :

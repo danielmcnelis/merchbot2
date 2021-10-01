@@ -1,5 +1,5 @@
 
-const { Auction, Bid, Card, Match, Player, Tournament, Print, Set, Wallet, Diary, Inventory, Arena, Trivia, Keeper, Gauntlet, Draft, Daily, Binder, Wishlist, Profile, Info } = require('../db')
+const { Auction, Bid, Card, Match, Player, Tournament, Print, Set, Status, Wallet, Diary, Inventory, Arena, Trivia, Keeper, Gauntlet, Draft, Daily, Binder, Wishlist, Profile, Info } = require('../db')
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { nocom, yescom } = require('../static/commands.json')
@@ -11,6 +11,7 @@ const { fpRole } = require('../static/roles.json')
 const { announcementsChannelId, botSpamChannelId, shopChannelId, staffChannelId } = require('../static/channels.json')
 const { completeTask } = require('./diary.js')
 const { findCard } = require('./search.js')
+const { isWithinXHours } = require('./utility')
 const decks = require('../static/decks.json')
 
 // OPEN SHOP
@@ -56,10 +57,43 @@ const closeShop = async () => {
 
 // APPLY PRICE DECAY
 const applyPriceDecay = async () => {
+    console.log('applyPriceDecay()')
+    const date = new Date()
+	const time = date.getTime()
+    const statuses = await Status.findAll()
+    const changes = statuses.filter((status) => {
+		const updatedAt = status.updatedAt
+		const updatedTime = updatedAt.getTime()
+		if (isWithinXHours(48, time, updatedTime)) return status
+    })
+
+	const affected_names = changes.map((c) => c.name)
+    console.log('affected_names', affected_names)
+
 	const prints = await Print.findAll()
+    
+    const new_prints = prints.filter((print) => {
+		const createdAt = print.createdAt
+		const createdTime = createdAt.getTime()
+		if (isWithinXHours(48, time, createdTime)) return print
+    })
+
+    const old_prints = all_prints.filter((print) => {
+		const createdAt = print.createdAt
+		const createdTime = createdAt.getTime()
+		if (!isWithinXHours(48, time, createdTime)) return print
+    })
+
+    const new_print_names = new_prints.map((p) => p.card_name)
+    const old_print_names = old_prints.map((p) => p.card_name)
+    const new_reprint_names = new_print_names.filter((name) => old_print_names.includes(name))
+    console.log('new_reprint_names', new_reprint_names)
 
     for (let i = 0; i < prints.length; i++) {
         const print = prints[i]
+        const name = print.card_name
+        if (new_reprint_names.includes(name) || affected_names.includes(name)) continue
+
         const invs = await Inventory.findAll({ where: {
             printId: print.id,
             quantity: { [Op.gt]: 0 }

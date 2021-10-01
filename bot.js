@@ -2043,6 +2043,9 @@ if(cmd === `!dairy`) return message.channel.send('🐮')
 //SHIP
 if(cmd === `!ship`) return message.channel.send('🚢')
 
+//POOP
+if(cmd === `!poop`) return message.channel.send('💩')
+
 //WALL-E
 if(cmd === `!walley` || cmd === `!walle`) return message.channel.send('🤖')
 

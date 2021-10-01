@@ -488,7 +488,7 @@ const updateShop = async () => {
             const market_price = print.market_price
             const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
             const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(print.rarity)}${inv.card_code} - ${print.card_name} - ${inv.quantity}${print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}${excluded ? ` - ${no}` : ''}`) 
+            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(print.rarity)}${inv.card_code} - ${print.card_name} - ${inv.quantity}${print.frozen ? " - ❄️" : print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}${excluded ? ` - ${no}` : ''}`) 
         }
     
         for (let i = 0; i < results.length; i += 10) shopChannel.send(results.slice(i, i+10))
@@ -607,7 +607,7 @@ const postBids = async () => {
             const market_price = print.market_price
             const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
             const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(print.rarity)}${inv.card_code} - ${print.card_name} - ${inv.quantity}${print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}`) 
+            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(print.rarity)}${inv.card_code} - ${print.card_name} - ${inv.quantity}${print.frozen ? " - ❄️" : print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}`) 
         }
     
         for (let i = 0; i < results.length; i += 10) shopChannel.send(results.slice(i, i+10))

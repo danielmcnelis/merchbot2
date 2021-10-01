@@ -60,6 +60,11 @@ const Print = db.define('print', {
     type: Sequelize.BOOLEAN,
     defaultValue: false,
     allowNull: true
+  },
+  frozen: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+    allowNull: true
   }
 })
 

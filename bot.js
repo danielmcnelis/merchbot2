@@ -638,6 +638,53 @@ if (cmd === `!decay`) {
 }
 
 
+//FREEZE 
+if (cmd === `!freeze`) {
+	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+    const date = new Date()
+	const time = date.getTime()
+    const statuses = await Status.findAll()
+    const changes = statuses.filter((status) => {
+		const updatedAt = status.updatedAt
+		const updatedTime = updatedAt.getTime()
+		if (isWithinXHours(48, time, updatedTime)) return status
+    })
+
+	const affected_names = changes.map((c) => c.name)
+
+	const prints = await Print.findAll()
+    
+    const new_prints = prints.filter((print) => {
+		const createdAt = print.createdAt
+		const createdTime = createdAt.getTime()
+		if (isWithinXHours(48, time, createdTime)) return print
+    })
+
+    const old_prints = prints.filter((print) => {
+		const createdAt = print.createdAt
+		const createdTime = createdAt.getTime()
+		if (!isWithinXHours(48, time, createdTime)) return print
+    })
+
+    const new_print_names = new_prints.map((p) => p.card_name)
+    const old_print_names = old_prints.map((p) => p.card_name)
+    const new_reprint_names = new_print_names.filter((name) => old_print_names.includes(name))
+
+    for (let i = 0; i < prints.length; i++) {
+        const print = prints[i]
+        const name = print.card_name
+        if (new_reprint_names.includes(name) || affected_names.includes(name)) {
+			print.trending_up = false
+			print.trending_down = false
+			print.frozen = true
+			await print.save()
+		} else {
+			continue
+		}
+	}
+}
+
+
 //PRINT 
 if (cmd === `!print`) {
 	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
@@ -1656,9 +1703,9 @@ if (cmd === `!shop`) {
 			const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
 
 			if (!inv) {
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - Out of Stock${print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - Out of Stock${print.frozen ? " - ❄️" : print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}`)
 			} else {
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - ${inv.quantity}${print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}${auction ? ` - ${no}`: ''}`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${card} - ${inv.quantity}${print.frozen ? " - ❄️" : print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}${auction ? ` - ${no}`: ''}`)
 			}
 		}
 

@@ -1575,7 +1575,7 @@ if (cmd === `!shop`) {
 				const market_price = print.market_price
 				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
 				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv.quantity ? inv.quantity : 'Out of Stock'}`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv && inv.quantity ? inv.quantity : 'Out of Stock'}`)
 			}
 			
 			for (let i = 0; i < ultras.length; i++) {
@@ -1584,7 +1584,7 @@ if (cmd === `!shop`) {
 				const market_price = print.market_price
 				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
 				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv.quantity ? inv.quantity : 'Out of Stock'}`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv && inv.quantity ? inv.quantity : 'Out of Stock'}`)
 			}
 			
 			for (let i = 0; i < supers.length; i++) {
@@ -1593,7 +1593,7 @@ if (cmd === `!shop`) {
 				const market_price = print.market_price
 				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
 				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv.quantity ? inv.quantity : 'Out of Stock'}`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv && inv.quantity ? inv.quantity : 'Out of Stock'}`)
 			}
 			
 			for (let i = 0; i < rares.length; i++) {
@@ -1602,7 +1602,7 @@ if (cmd === `!shop`) {
 				const market_price = print.market_price
 				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
 				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv.quantity ? inv.quantity : 'Out of Stock'}`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv && inv.quantity ? inv.quantity : 'Out of Stock'}`)
 			}
 
 			for (let i = 0; i < commons.length; i++) {
@@ -1611,7 +1611,7 @@ if (cmd === `!shop`) {
 				const market_price = print.market_price
 				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
 				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv.quantity ? inv.quantity : 'Out of Stock'}`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv && inv.quantity ? inv.quantity : 'Out of Stock'}`)
 			}
 
 			message.channel.send(`I messaged you the ${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? ` ${eval(set.alt_emoji)}` : ''} Price List.`)
@@ -1627,7 +1627,7 @@ if (cmd === `!shop`) {
 				const market_price = print.market_price
 				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
 				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv.quantity ? inv.quantity : 'Out of Stock'}`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv && inv.quantity ? inv.quantity : 'Out of Stock'}`)
 			}
 
 			message.channel.send(`I messaged you the ${eval(rarity)} Price List.`)

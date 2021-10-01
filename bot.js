@@ -1193,7 +1193,7 @@ if(deckcom.includes(cmd)) {
 		if (!wallet || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 
 		const deck = await getShopDeck(message, args[0])
-		const valid_decks = ["dragon", "spellcaster", "dinosaur", "plant", "fish", "rock"]
+		const valid_decks = ["reptile", "warrior", "dragon", "spellcaster", "dinosaur", "plant", "fish", "rock"]
 		if (!deck) return
 		if (!valid_decks.includes(deck)) return message.channel.send(`Sorry, I do not have that deck for sale.`)
 
@@ -1216,7 +1216,8 @@ if(deckcom.includes(cmd)) {
 			time: 15000
 		}).then(async collected => {
 			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
-			const code = deck === 'dragon' || deck === 'spellcaster' ? 'SS3' :
+			const code = deck === 'reptile' || deck === 'warrior' ? 'SS4' :
+				deck === 'dragon' || deck === 'spellcaster' ? 'SS3' :
 				deck === 'plant' || deck === 'dinosaur' ? 'SS2' :
 				'SS1'
 			const set = await Set.findOne({ where: { code: code } })

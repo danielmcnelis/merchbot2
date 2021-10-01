@@ -1571,42 +1571,47 @@ if (cmd === `!shop`) {
 			
 			for (let i = 0; i < secrets.length; i++) {
 				const print = secrets[i]
+				const inv = await Inventory.findOne({ where: { playerId: merchbotId, printId: print.id }})
 				const market_price = print.market_price
 				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
 				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv.quantity ? inv.quantity : 'Out of Stock'}`)
 			}
 			
 			for (let i = 0; i < ultras.length; i++) {
 				const print = ultras[i]
+				const inv = await Inventory.findOne({ where: { playerId: merchbotId, printId: print.id }})
 				const market_price = print.market_price
 				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
 				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv.quantity ? inv.quantity : 'Out of Stock'}`)
 			}
 			
 			for (let i = 0; i < supers.length; i++) {
 				const print = supers[i]
+				const inv = await Inventory.findOne({ where: { playerId: merchbotId, printId: print.id }})
 				const market_price = print.market_price
 				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
 				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv.quantity ? inv.quantity : 'Out of Stock'}`)
 			}
 			
 			for (let i = 0; i < rares.length; i++) {
 				const print = rares[i]
+				const inv = await Inventory.findOne({ where: { playerId: merchbotId, printId: print.id }})
 				const market_price = print.market_price
 				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
 				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv.quantity ? inv.quantity : 'Out of Stock'}`)
 			}
 
 			for (let i = 0; i < commons.length; i++) {
 				const print = commons[i]
+				const inv = await Inventory.findOne({ where: { playerId: merchbotId, printId: print.id }})
 				const market_price = print.market_price
 				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
 				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv.quantity ? inv.quantity : 'Out of Stock'}`)
 			}
 
 			message.channel.send(`I messaged you the ${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? ` ${eval(set.alt_emoji)}` : ''} Price List.`)
@@ -1618,10 +1623,11 @@ if (cmd === `!shop`) {
 			
 			for (let i = 0; i < prints.length; i++) {
 				const print = prints[i]
+				const inv = await Inventory.findOne({ where: { playerId: merchbotId, printId: print.id }})
 				const market_price = print.market_price
 				const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
 				const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv.quantity ? inv.quantity : 'Out of Stock'}`)
 			}
 
 			message.channel.send(`I messaged you the ${eval(rarity)} Price List.`)

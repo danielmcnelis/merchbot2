@@ -3988,7 +3988,7 @@ if (cmd === `!resume`) {
 	if (game === 'Arena') {
 		startRound(info, entries)
 	} if (game === 'Draft') {
-		return setTimeout(async() => draftCards(fuzzyPrints), 30000)
+		setTimeout(async() => draftCards(fuzzyPrints), 30000)
 	} else if (game === 'Trivia') {
 		const triviaArr = Object.entries(trivia)
 		const questionsArr = getRandomSubset(triviaArr, 10)

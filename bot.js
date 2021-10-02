@@ -21,7 +21,7 @@ const { askForBidCancellation, askForBidPlacement, manageBidding } = require('./
 const { updateBinder } = require('./functions/binder.js')
 const { awardStarterDeck, getShopDeck } = require('./functions/decks.js')
 const { checkCoreSetComplete, completeTask } = require('./functions/diary.js')
-const { checkDraftProgress, endDraft, resetDraft, sendInventories, createPacks, startDraft, startDraftRound } = require('./functions/draft.js')
+const { checkDraftProgress, endDraft, resetDraft, sendInventories, createPacks, startDraft, startDraftRound, draftCards } = require('./functions/draft.js')
 //const { uploadDeckFolder } = require('./functions/drive.js')
 const { askForGrindAllConfirmation } = require('./functions/mod.js')
 const { awardPack } = require('./functions/packs.js')
@@ -3988,8 +3988,7 @@ if (cmd === `!resume`) {
 	if (game === 'Arena') {
 		startRound(info, entries)
 	} if (game === 'Draft') {
-		sendInventories(entries, false)
-		//return setTimeout(async() => createPacks(fuzzyPrints), (20 + (info.round * 10)) * 1000)
+		return setTimeout(async() => draftCards(fuzzyPrints), 30000)
 	} else if (game === 'Trivia') {
 		const triviaArr = Object.entries(trivia)
 		const questionsArr = getRandomSubset(triviaArr, 10)

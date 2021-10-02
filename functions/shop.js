@@ -66,7 +66,7 @@ const unfreeze = async () => {
     for (let i = 0; i < prints.length; i++) {
         const print = prints[i]
         const updatedAt = print.updatedAt
-        if (!isWithinXHours(10, time, updatedAt)) {
+        if (!isWithinXHours(9, time, updatedAt)) {
             console.log('unfreezing print:', print.id)
             print.frozen = false
             await print.save()

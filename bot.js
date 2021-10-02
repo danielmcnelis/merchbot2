@@ -3987,15 +3987,21 @@ if (cmd === `!resume`) {
 
 	if (game === 'Arena') {
 		startRound(info, entries)
+		return message.channel.send(`<@&${role}>, The Arena can now resume.`)
 	} if (game === 'Draft') {
-		setTimeout(async() => draftCards(fuzzyPrints), 30000)
+		if (info.status === 'drafting') {
+			setTimeout(async() => draftCards(fuzzyPrints), 30000)
+			return message.channel.send(`<@&${role}>, The Draft will resume in 30 seconds.`)
+		} else if (info.status === 'playing') {
+			startDraftRound(info, entries)
+			return message.channel.send(`<@&${role}>, The Draft can now resume.`)
+		}
 	} else if (game === 'Trivia') {
 		const triviaArr = Object.entries(trivia)
 		const questionsArr = getRandomSubset(triviaArr, 10)
 		setTimeout(() => askQuestion(message.guild, message.channel, info, entries, questionsArr), 30000)
+		return message.channel.send(`<@&${role}>, Trivia will resume in 30 seconds.`)
 	}
-
-	return message.channel.send(`${role ? `<@&${role}>, ` : ''} ${game === 'Trivia' ? 'Trivia will resume in 30 seconds.' : `The ${game} can now resume.`}`)
 }
 
 //END

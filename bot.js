@@ -637,54 +637,6 @@ if (cmd === `!decay`) {
 	applyPriceDecay()
 }
 
-
-//FREEZE 
-if (cmd === `!freeze`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
-    const date = new Date()
-	const time = date.getTime()
-    const statuses = await Status.findAll()
-    const changes = statuses.filter((status) => {
-		const updatedAt = status.updatedAt
-		const updatedTime = updatedAt.getTime()
-		if (isWithinXHours(48, time, updatedTime)) return status
-    })
-
-	const affected_names = changes.map((c) => c.name)
-
-	const prints = await Print.findAll()
-    
-    const new_prints = prints.filter((print) => {
-		const createdAt = print.createdAt
-		const createdTime = createdAt.getTime()
-		if (isWithinXHours(48, time, createdTime)) return print
-    })
-
-    const old_prints = prints.filter((print) => {
-		const createdAt = print.createdAt
-		const createdTime = createdAt.getTime()
-		if (!isWithinXHours(48, time, createdTime)) return print
-    })
-
-    const new_print_names = new_prints.map((p) => p.card_name)
-    const old_print_names = old_prints.map((p) => p.card_name)
-    const new_reprint_names = new_print_names.filter((name) => old_print_names.includes(name))
-
-    for (let i = 0; i < prints.length; i++) {
-        const print = prints[i]
-        const name = print.card_name
-        if (new_reprint_names.includes(name) || affected_names.includes(name)) {
-			print.trending_up = false
-			print.trending_down = false
-			print.frozen = true
-			await print.save()
-		} else {
-			continue
-		}
-	}
-}
-
-
 //PRINT 
 if (cmd === `!print`) {
 	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
@@ -749,6 +701,15 @@ if (cmd === `!print`) {
 	const draft = !!set_code.startsWith('GL')
 	const hidden = !!set_code.startsWith('CH')
 
+	let frozen = false
+	const prints = await Print.findAll({ where: { card_name: card_name } })
+	for (let i = 0; i < prints.length; i++) {
+		frozen = true
+		const old_print = prints[i]
+		old_print.frozen = true
+		await old_print.save()
+	}
+
 	const print = {
 		card_name: card.name,
 		card_id: card.id,
@@ -758,11 +719,15 @@ if (cmd === `!print`) {
 		card_slot,
 		rarity,
 		market_price,
+		trending_down: false,
+		trending_up: false,
 		draft,
-		hidden
+		hidden,
+		frozen
 	}
 
 	await Print.create(print)
+
 
 	return message.channel.send(`Created a new print: ${eval(rarity)}${card_code} - ${card_name} - ${stardust}${market_price}`)
 }
@@ -6632,6 +6597,13 @@ if(cmd === `!move`) {
 				konami_code,
 				current: new_status
 			})
+		}
+
+		const prints = await Print.findAll({ where: { card_name: card_name }})
+		for (let i = 0; i < prints.length; i++) {
+			const print = prints[i]
+			print.frozen = true
+			await print.save()
 		}
 
 		return message.channel.send(`Okay, ${card_name} has been moved from "${old_status}" to "${new_status}".`)

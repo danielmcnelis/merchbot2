@@ -11,7 +11,7 @@ const { fpRole } = require('../static/roles.json')
 const { announcementsChannelId, botSpamChannelId, shopChannelId, staffChannelId } = require('../static/channels.json')
 const { completeTask } = require('./diary.js')
 const { findCard } = require('./search.js')
-const { isWithinXHours } = require('./utility')
+const { isWithinXHours } = require('./utility.js')
 const decks = require('../static/decks.json')
 
 // OPEN SHOP
@@ -55,44 +55,69 @@ const closeShop = async () => {
 	} 
 }
 
-// APPLY PRICE DECAY
-const applyPriceDecay = async () => {
-    console.log('applyPriceDecay()')
+
+// UNFREEZE
+const unfreeze = async () => {
+    console.log('unfreeze()')
     const date = new Date()
 	const time = date.getTime()
-    const statuses = await Status.findAll()
-    const changes = statuses.filter((status) => {
-		const updatedAt = status.updatedAt
-		const updatedTime = updatedAt.getTime()
-		if (isWithinXHours(48, time, updatedTime)) return status
-    })
-
-	const affected_names = changes.map((c) => c.name)
-    console.log('affected_names', affected_names)
-
-	const prints = await Print.findAll()
-    
-    const new_prints = prints.filter((print) => {
-		const createdAt = print.createdAt
-		const createdTime = createdAt.getTime()
-		if (isWithinXHours(48, time, createdTime)) return print
-    })
-
-    const old_prints = prints.filter((print) => {
-		const createdAt = print.createdAt
-		const createdTime = createdAt.getTime()
-		if (!isWithinXHours(48, time, createdTime)) return print
-    })
-
-    const new_print_names = new_prints.map((p) => p.card_name)
-    const old_print_names = old_prints.map((p) => p.card_name)
-    const new_reprint_names = new_print_names.filter((name) => old_print_names.includes(name))
-    console.log('new_reprint_names', new_reprint_names)
+	const prints = await Print.findAll({ where: { frozen: true } })
 
     for (let i = 0; i < prints.length; i++) {
         const print = prints[i]
-        const name = print.card_name
-        if (new_reprint_names.includes(name) || affected_names.includes(name)) continue
+        const updatedAt = print.updatedAt
+        if (!isWithinXHours(10, time, updatedAt)) {
+            console.log('unfreezing print:', print.id)
+            print.frozen = false
+            await print.save()
+
+            const invs = await Inventory.findAll({ where: {
+                printId: print.id,
+                quantity: { [Op.gt]: 0 }
+            }})
+        
+            const quants = invs.map((i) => i.quantity)
+            const total = quants.length ? quants.reduce((a, b) => a + b) : 0
+        
+            const merchbot_inv = await Inventory.findOne({ where: {
+                printId: print.id,
+                quantity: { [Op.gt]: 0 },
+                playerId: merchbotId
+            }})
+        
+            const shop_pop = merchbot_inv ? merchbot_inv.quantity : 0
+            const shop_percent = total ? shop_pop / total : 0
+        
+            const current_price = print.market_price
+        
+            if (shop_percent < 0.15) {
+                const z_diff = ( 0.15 - shop_percent ) / 0.15
+                console.log(`${print.card_code} - ${print.card_name} decayed UP (z_diff = ${z_diff}) from ${print.market_price} to ${print.market_price + (0.02 * current_price * z_diff)}`)
+                print.market_price += 0.02 * current_price * z_diff
+                if (z_diff > 0.3) {
+                    print.trending_up = true
+                } else {
+                    print.trending_up = false
+                }
+                await print.save()
+            } else if (shop_percent >= 0.15) {
+                const z_diff = ( shop_percent - 0.15 ) / 0.85
+                console.log(`${print.card_code} - ${print.card_name} decayed DOWN (z_diff = ${z_diff}) from ${print.market_price} to ${print.market_price - (0.06 * current_price * z_diff)}`)
+                print.market_price -= 0.06 * current_price * z_diff 
+                print.trending_up = false
+                await print.save()
+            }
+        }
+    }
+}
+
+
+// APPLY PRICE DECAY
+const applyPriceDecay = async () => {
+	const prints = await Print.findAll({ where: { frozen: false } })
+    
+    for (let i = 0; i < prints.length; i++) {
+        const print = prints[i]
 
         const invs = await Inventory.findAll({ where: {
             printId: print.id,
@@ -133,7 +158,6 @@ const applyPriceDecay = async () => {
     }
 
     return setTimeout(async () => applyPriceDecay(), 24 * 60 * 60 * 1000)
-
 }
 
 // CHECK SHOP OPEN
@@ -406,6 +430,7 @@ const calcBoxPrice = async () => {
 // UPDATE SHOP
 const updateShop = async () => {
     await calcBoxPrice()
+    await unfreeze()
     const shopChannel = client.channels.cache.get(shopChannelId)
     shopChannel.bulkDelete(100)
 

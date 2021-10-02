@@ -523,6 +523,7 @@ const updateShop = async () => {
 // POST BIDS
 const postBids = async () => {
     await calcBoxPrice()
+    await unfreeze()
     const shopChannel = client.channels.cache.get(shopChannelId)
     shopChannel.bulkDelete(100)
     

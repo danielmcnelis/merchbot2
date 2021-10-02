@@ -222,6 +222,56 @@ if(cmd === `!test`) {
 	}
 }
 
+
+//FIX
+if(cmd === `!fix`) {
+	if (isJazz(message.member)) {
+		const prints = await Print.findAll({ where: { frozen: false } })
+		for (let i = 0; i < prints.length; i++) {
+			const print = prints[i]
+
+			const invs = await Inventory.findAll({ where: {
+				printId: print.id,
+				quantity: { [Op.gt]: 0 }
+			}})
+
+			const quants = invs.map((i) => i.quantity)
+			const total = quants.length ? quants.reduce((a, b) => a + b) : 0
+
+			const merchbotinv = await Inventory.findOne({ where: {
+				printId: print.id,
+				quantity: { [Op.gt]: 0 },
+				playerId: merchbotId
+			}})
+
+			const shop_pop = merchbotinv ? merchbotinv.quantity : 0
+			const shop_percent = total ? shop_pop / total : 0
+
+			if (shop_percent < 0.15) {
+				const z_diff = ( 0.15 - shop_percent ) / 0.15
+				if (z_diff > 0.3) {
+					print.trending_up = true
+				} else {
+					print.trending_up = false
+				}
+				print.trending_down = false
+				await print.save()
+			} else if (shop_percent >= 0.15) {
+				const z_diff = ( shop_percent - 0.15 ) / 0.85
+				if (z_diff > 0.3) {
+					print.trending_down = true
+				} else {
+					print.trending_down = false
+				}
+				print.trending_up = false
+				await print.save()
+			}
+		}
+	} else {
+		return message.channel.send('🛠️')
+	}
+}
+
 //DING
 if(cmd === `!ding`) return message.channel.send('🚪')
 

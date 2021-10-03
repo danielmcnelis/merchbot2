@@ -249,7 +249,7 @@ if(cmd === `!fix`) {
 
 			if (shop_percent < 0.15) {
 				const z_diff = ( 0.15 - shop_percent ) / 0.15
-				if (z_diff > 0.3) {
+				if (print.market_price >= 40 && z_diff > 0.3) {
 					print.trending_up = true
 				} else {
 					print.trending_up = false
@@ -258,7 +258,7 @@ if(cmd === `!fix`) {
 				await print.save()
 			} else if (shop_percent >= 0.15) {
 				const z_diff = ( shop_percent - 0.15 ) / 0.85
-				if (z_diff > 0.3) {
+				if (print.market_price >= 40 && z_diff > 0.3) {
 					print.trending_down = true
 				} else {
 					print.trending_down = false

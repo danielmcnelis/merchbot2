@@ -142,7 +142,7 @@ const applyPriceDecay = async () => {
             const z_diff = ( 0.15 - shop_percent ) / 0.15
             console.log(`${print.card_code} - ${print.card_name} decayed UP (z_diff = ${z_diff}) from ${print.market_price} to ${print.market_price + (0.02 * current_price * z_diff)}`)
             print.market_price += 0.02 * current_price * z_diff
-            if (z_diff > 0.3) {
+            if (print.market_price >= 40 && z_diff > 0.3) {
                 print.trending_up = true
             } else {
                 print.trending_up = false
@@ -153,7 +153,7 @@ const applyPriceDecay = async () => {
             const z_diff = ( shop_percent - 0.15 ) / 0.85
             console.log(`${print.card_code} - ${print.card_name} decayed DOWN (z_diff = ${z_diff}) from ${print.market_price} to ${print.market_price - (0.06 * current_price * z_diff)}`)
             print.market_price -= 0.06 * current_price * z_diff 
-            if (z_diff > 0.3) {
+            if (print.market_price >= 40 && z_diff > 0.3) {
                 print.trending_down = true
             } else {
                 print.trending_down = false

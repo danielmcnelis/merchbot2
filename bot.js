@@ -266,7 +266,6 @@ if(cmd === `!fix`) {
 				print.trending_up = false
 				await print.save()
 			}
-			console.log('i', i)
 		}
 	} else {
 		return message.channel.send('🛠️')

@@ -492,6 +492,9 @@ const updateShop = async () => {
                 } else if (set.name === 'Starter Series 3') {
                     results.push(`${set.unit_price}${eval(set.currency)} - Dragon's Inferno ${eval(set.emoji)} - Deck`)
                     results.push(`${set.unit_price}${eval(set.currency)} - Spellcaster's Art ${eval(set.alt_emoji)} - Deck`)
+                } else if (set.name === 'Starter Series 4') {
+                    results.push(`${set.unit_price}${eval(set.currency)} - Reptile's Charm ${eval(set.emoji)} - Deck`)
+                    results.push(`${set.unit_price}${eval(set.currency)} - Warrior's Legend ${eval(set.alt_emoji)} - Deck`)
                 }
             }
         }
@@ -585,6 +588,9 @@ const postBids = async () => {
                 } else if (set.name === 'Starter Series 3') {
                     results.push(`${set.unit_price}${eval(set.currency)} - Dragon's Inferno ${eval(set.emoji)} - Deck`)
                     results.push(`${set.unit_price}${eval(set.currency)} - Spellcaster's Art ${eval(set.alt_emoji)} - Deck`)
+                } else if (set.name === 'Starter Series 4') {
+                    results.push(`${set.unit_price}${eval(set.currency)} - Reptile's Charm ${eval(set.emoji)} - Deck`)
+                    results.push(`${set.unit_price}${eval(set.currency)} - Warrior's Legend ${eval(set.alt_emoji)} - Deck`)
                 }
             }
         }

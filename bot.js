@@ -151,17 +151,17 @@ client.on('message', async (message) => {
 	) return
 
 	//remove extra spaces between arguments
-    const messageArray = message.content.split(' ')
-	for(let i = 0; i < messageArray.length; i++) {
-		if (messageArray[i] === '') { 
-			messageArray.splice(i, 1)
+    const marr = message.content.split(' ')
+	for(let i = 0; i < marr.length; i++) {
+		if (marr[i] === '') { 
+			marr.splice(i, 1)
 			i--
 		}
 	}
 
 	//convert all commands to lowercase
-    const cmd = messageArray[0].toLowerCase()
-    const args = messageArray.slice(1)
+    const cmd = marr[0].toLowerCase()
+    const args = marr.slice(1)
     const maid = message.author.id
 
 //CARD SEARCH USING CURLY BRACKETS
@@ -226,46 +226,11 @@ if(cmd === `!test`) {
 //FIX
 if(cmd === `!fix`) {
 	if (isJazz(message.member)) {
-		const prints = await Print.findAll({ where: { frozen: false } })
-		for (let i = 0; i < prints.length; i++) {
-			const print = prints[i]
-
-			const invs = await Inventory.findAll({ where: {
-				printId: print.id,
-				quantity: { [Op.gt]: 0 }
-			}})
-
-			const quants = invs.map((i) => i.quantity)
-			const total = quants.length ? quants.reduce((a, b) => a + b) : 0
-
-			const merchbotinv = await Inventory.findOne({ where: {
-				printId: print.id,
-				quantity: { [Op.gt]: 0 },
-				playerId: merchbotId
-			}})
-
-			const shop_pop = merchbotinv ? merchbotinv.quantity : 0
-			const shop_percent = total ? shop_pop / total : 0
-
-			if (shop_percent < 0.15) {
-				const z_diff = ( 0.15 - shop_percent ) / 0.15
-				if (print.market_price >= 40 && z_diff > 0.3) {
-					print.trending_up = true
-				} else {
-					print.trending_up = false
-				}
-				print.trending_down = false
-				await print.save()
-			} else if (shop_percent >= 0.15) {
-				const z_diff = ( shop_percent - 0.15 ) / 0.85
-				if (print.market_price >= 40 && z_diff > 0.3) {
-					print.trending_down = true
-				} else {
-					print.trending_down = false
-				}
-				print.trending_up = false
-				await print.save()
-			}
+		const dailies = await Daily.findAll()
+		for (let i = 0; i < dailies.length; i++) {
+			const daily = dailies[i]
+			daily.fon_packs = 0
+			await daily.save()
 		}
 	} else {
 		return message.channel.send('🛠️')
@@ -2768,6 +2733,7 @@ if (losscom.includes(cmd)) {
 			message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned a bonus pack of DOC ${DOC} for your second ranked win of the day! ${god}`)
 		}, 2000)
 		message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your Tournament loss to ${winningPlayer.name} (+${chipsWinner + diary_bonus}${starchips}) has been recorded.`)
+		
 		const updatedMatchesArr = await getMatches(tournamentId)
 		const winnerNextMatch = findNextMatch(updatedMatchesArr, matchId, winningEntry.participantId)
 		const winnerNextOpponent = winnerNextMatch ? await findNextOpponent(tournamentId, updatedMatchesArr, winnerNextMatch, winningEntry.participantId) : null
@@ -6547,8 +6513,8 @@ if(cmd === `!challenge` || cmd === `!gauntlet`) {
 
 	//if (status['gauntlet'] == 'confirming') { return message.reply("The Gauntlet confirmation process is currently underway. Please wait."); }
 
-	if (messageArray.length > 1) { rMem = messageArray[1].replace(/[\\<>@#&!]/g, ""); }
-	if (messageArray.length == 1) { return message.channel.send("\nIf you wish to challenge another player please provide:\n- an @ mention\n\n Example: **!gauntlet @Jazz**"); }
+	if (marr.length > 1) { rMem = marr[1].replace(/[\\<>@#&!]/g, ""); }
+	if (marr.length == 1) { return message.channel.send("\nIf you wish to challenge another player please provide:\n- an @ mention\n\n Example: **!gauntlet @Jazz**"); }
 
 	if(!(rawdata.includes(maid))) { return message.channel.send(`You are not in the database. Type **!start** to begin the game.`) }
 

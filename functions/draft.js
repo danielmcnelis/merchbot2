@@ -486,7 +486,7 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
             name: print.card_name
         }})
 
-        images.push(`${card.image}`)
+        images.push(`${card.image_file}`)
     }
 
     const card_width = 57

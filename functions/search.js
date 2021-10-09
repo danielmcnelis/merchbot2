@@ -27,14 +27,14 @@ const search = async (query, fuzzyCards) => {
 	if (card.subclass) classes.push(card.subclass)
 	if (card.category) classes.push(card.category)
 
-	const labels = card.card === "Monster" ? `**Attribute:** ${card.attribute}\n${card.category === 'Xyz' ? '**Rank:**' : card.category === 'Link' ? '**Link Rating:**' : '**Level:**'} ${card.level}\n**Release Date:** ${card.date}\n**[** ${classes.join(" / ")} **]**` : `**Category:** ${card.category}\n**Release Date:** ${card.date}` 
+	const labels = card.card === "Monster" ? `**Attribute:** ${card.attribute}\n${card.category === 'Xyz' ? '**Rank:**' : card.category === 'Link' ? '**Link Rating:**' : '**Level:**'} ${card.level}\n**Release Date:** ${card.tcg_date}\n**[** ${classes.join(" / ")} **]**` : `**Category:** ${card.category}\n**Release Date:** ${card.tcg_date}` 
 	const stats = card.card === "Monster" ? `**ATK:** ${card.atk === null ? '?' : card.atk} ${card.def === null && card.category !== 'Link' ? '?' : card.def === null && card.category === 'Link' ? '' : `**DEF:** ${card.def}`}` : ''
 	
-	const attachment = fs.existsSync(`./public/card_images/${card.image}`) ?
-		new Discord.MessageAttachment(`./public/card_images/${card.image}`, card.image) :
+	const attachment = fs.existsSync(`./public/card_images/${card.image_file}`) ?
+		new Discord.MessageAttachment(`./public/card_images/${card.image_file}`, card.image_file) :
 		false
 
-	const thumbnail = attachment ? `attachment://${card.image}` : `https://ygoprodeck.com/pics/${card.image}`
+	const thumbnail = attachment ? `attachment://${card.image_file}` : `https://ygoprodeck.com/pics/${card.image_file}`
 	const cardEmbed = new Discord.MessageEmbed()
 	if (attachment) cardEmbed.attachFiles(attachment) 
 	cardEmbed.setColor(color)

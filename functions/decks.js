@@ -141,26 +141,26 @@ const saveYDK = async (member, url) => {
         })
 
         const cardIds = allForgedCards.map(card => {
-            let id = card.image.slice(0,-4)
+            let id = card.konami_code
             while (id.length < 8) id = '0' + id
             return id
         })
 
         const singleIds = yourSingles.map(card => {
-            let id = card.image.slice(0,-4)
+            let id = card.konami_code
             while (id.length < 8) id = '0' + id
             return id
         })
 
 
         const doubleIds = yourDoubles.map(card => {
-            let id = card.image.slice(0,-4)
+            let id = card.konami_code
             while (id.length < 8) id = '0' + id
             return id
         })
 
         const tripleIds = yourTriples.map(card => {
-            let id = card.image.slice(0,-4)
+            let id = card.konami_code
             while (id.length < 8) id = '0' + id
             return id
         })

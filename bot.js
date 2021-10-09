@@ -222,7 +222,6 @@ if(cmd === `!test`) {
 	}
 }
 
-
 //FIX
 if(cmd === `!fix`) {
 	if (isJazz(message.member)) {
@@ -303,9 +302,9 @@ if (cmd === `!import_print_images`) {
 			continue
 		} 
 
-		console.log(`found card ${card.name}, ${card.image}`)
-		const url = `https://ygoprodeck.com/pics/${card.image}`
-		const writer = fs.createWriteStream(`./public/card_images/${card.image}`)
+		console.log(`found card ${card.name}, ${card.image_file}`)
+		const url = `https://ygoprodeck.com/pics/${card.image_file.slice(-4)}`
+		const writer = fs.createWriteStream(`./public/card_images/${card.image_file}`)
 
 		const response = await axios({
 			url,
@@ -314,7 +313,7 @@ if (cmd === `!import_print_images`) {
 		})
 
 		const success = await response.data.pipe(writer)
-		console.log(`success = ${!!success} for ${card.image}`)
+		console.log(`success = ${!!success} for ${card.image_file}`)
 	}
 
 	return message.channel.send(`Successfully imported high quality images for Forged in Chaos cards from YGOPRODeck.`)
@@ -369,7 +368,7 @@ if (cmd === `!update_cards`) {
 	for (let i = 0; i < newCards.length; i++) {
 		const newCard = newCards[i]
 		if (newCard.type === 'Token' || newCard.name.includes('(Skill Card)') || (!newCard.misc_info[0].tcg_date && !newCard.misc_info[0].ocg_date) ) continue
-		const image = `${newCard.id}.jpg`
+		const image_file = `${newCard.id}.jpg`
 		const name = newCard.name
 		const newCardTypeArr = newCard.type.split(" ")
 		const card = newCardTypeArr.includes('Monster') ? 'Monster' : newCardTypeArr.includes('Spell') ? 'Spell' : 'Trap'
@@ -386,7 +385,7 @@ if (cmd === `!update_cards`) {
 		
 		try {
 			await Card.create({
-				image,
+				image_file,
 				name,
 				card,
 				category,
@@ -487,7 +486,7 @@ if (cmd === `!konami`) {
 			}
 		})
 
-		let konami_code = card.image.slice(0, -4)
+		let konami_code = card.konami_code
 		while (konami_code.length < 8) konami_code = '0' + konami_code
 		print.konami_code = konami_code
 
@@ -1394,7 +1393,7 @@ if(profcom.includes(cmd)) {
 		}
 	})
 	
-	const card_image = card ? `https://ygoprodeck.com/pics/${card.image}` : ''
+	const card_image = card ? `https://ygoprodeck.com/pics/${card.image_file}` : ''
 	const quote = player.profile.quote ? `"${player.profile.quote}" -- ${player.profile.author}` : ''
 
 	let networth = parseInt(player.wallet.starchips) + parseInt(player.wallet.stardust / 10)
@@ -4482,9 +4481,9 @@ if(dailycom.includes(cmd)) {
 
 	const canvas = Canvas.createCanvas(105, 158)
 	const context = canvas.getContext('2d')
-	const background = fs.existsSync(`./public/card_images/${card.image}`) ? 
-						await Canvas.loadImage(`./public/card_images/${card.image}`) :
-						await Canvas.loadImage(`https://ygoprodeck.com/pics/${card.image}`)
+	const background = fs.existsSync(`./public/card_images/${card.image_file}`) ? 
+						await Canvas.loadImage(`./public/card_images/${card.image_file}`) :
+						await Canvas.loadImage(`https://ygoprodeck.com/pics/${card.image_file}`)
 	if (background && canvas && context) context.drawImage(background, 0, 0, canvas.width, canvas.height)
 	const attachment = background && canvas && context ? new Discord.MessageAttachment(canvas.toBuffer(), `${card.name}.png`) : false
 
@@ -4591,9 +4590,9 @@ if(cmd === `!wager`) {
 
 		const canvas = Canvas.createCanvas(105, 158)
 		const context = canvas.getContext('2d')
-		const background = fs.existsSync(`./public/card_images/${card.image}`) ? 
-							await Canvas.loadImage(`./public/card_images/${card.image}`) :
-							await Canvas.loadImage(`https://ygoprodeck.com/pics/${card.image}`)
+		const background = fs.existsSync(`./public/card_images/${card.image_file}`) ? 
+							await Canvas.loadImage(`./public/card_images/${card.image_file}`) :
+							await Canvas.loadImage(`https://ygoprodeck.com/pics/${card.image_file}`)
 		if (background && canvas && context) context.drawImage(background, 0, 0, canvas.width, canvas.height)
 		const attachment = background && canvas && context ? new Discord.MessageAttachment(canvas.toBuffer(), `${card.name}.png`) : false
 		const enthusiasm = rarity === "com" ? `Ho-Hum.` : rarity === "rar" ? `Not bad.` : rarity === 'sup' ? `Cool beans!` : rarity === 'ult' ? `Now *that's* based!` : `Holy $#%t balls!`
@@ -5488,7 +5487,7 @@ if(packcom.includes(cmd)) {
 					name: print.card_name
 				}})
 		
-				images.push(`${card.image}`)
+				images.push(`${card.image_file}`)
 			
 				const inv = await Inventory.findOne({ where: { 
 					card_code: print.card_code,
@@ -5747,7 +5746,7 @@ if(specialcom.includes(cmd)) {
 					name: print.card_name
 				}})
 		
-				images.push(`${card.image}`)
+				images.push(`${card.image_file}`)
 			
 				const inv = await Inventory.findOne({ where: { 
 					card_code: print.card_code,
@@ -5926,7 +5925,7 @@ if(boxcom.includes(cmd)) {
 					name: print.card_name
 				}})
 		
-				images.push(`${card.image}`)
+				images.push(`${card.image_file}`)
 				
 				const inv = await Inventory.findOne({ where: { 
 					card_code: print.card_code,
@@ -6596,7 +6595,7 @@ if(cmd === `!move`) {
 	const card_name = await findCard(query, fuzzyPrints)
 	const card = card_name ? await Card.findOne({ where: { name: card_name }}) : null
 	if (!card) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
-	let konami_code = card.image.slice(0, -4)
+	let konami_code = card.konami_code
 	while (konami_code.length < 8) konami_code = '0' + konami_code
 	
 	const status = await Status.findOne({ where: {

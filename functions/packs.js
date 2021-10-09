@@ -106,7 +106,7 @@ const awardPack = async (channel, playerId, set, num = 1) => {
                 name: print.card_name
             }})
     
-            images.push(`${card.image}`)
+            images.push(`${card.image_file}`)
 
             const inv = await Inventory.findOne({ where: { 
                 card_code: print.card_code,

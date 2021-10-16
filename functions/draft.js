@@ -163,7 +163,7 @@ const createPacks = async (fuzzyPrints) => {
 			rarity: "com"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((print) => print.card_code)
+	}).map((p) => p.card_code)
 
 	const rares = await Print.findAll({ 
 		where: {
@@ -171,7 +171,7 @@ const createPacks = async (fuzzyPrints) => {
 			rarity: "rar"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((print) => print.card_code)
+	}).map((p) => p.card_code)
 
 	const supers = await Print.findAll({ 
 		where: {
@@ -179,7 +179,7 @@ const createPacks = async (fuzzyPrints) => {
 			rarity: "sup"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((print) => print.card_code)
+	}).map((p) => p.card_code)
 
 
     for (let j = 0; j < 4; j++) {

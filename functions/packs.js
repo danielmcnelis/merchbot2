@@ -22,9 +22,7 @@ const awardPack = async (channel, playerId, set, num = 1) => {
 			rarity: "com"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const rares = await Print.findAll({ 
 		where: {
@@ -32,22 +30,15 @@ const awardPack = async (channel, playerId, set, num = 1) => {
 			rarity: "rar"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const supers = await Print.findAll({ 
 		where: {
 			setId: set.id,
-			rarity: "sup",
-			card_slot: {
-				[Op.lt]: 200
-			}
+			rarity: "sup"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
 
 	const ultras = await Print.findAll({ 
 		where: {
@@ -55,9 +46,7 @@ const awardPack = async (channel, playerId, set, num = 1) => {
 			rarity: "ult"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const secrets = await Print.findAll({ 
 		where: {
@@ -65,9 +54,7 @@ const awardPack = async (channel, playerId, set, num = 1) => {
 			rarity: "scr"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
     let gotSecret = false
 
@@ -176,9 +163,7 @@ const awardPacksToShop = async (num, core = true) => {
                 rarity: "com"
             },
             order: [['card_slot', 'ASC']]
-        }).map(function(print) {
-            return print.card_code
-        })
+        }).map((p) => p.card_code)
     
         const rares = await Print.findAll({ 
             where: {
@@ -186,22 +171,15 @@ const awardPacksToShop = async (num, core = true) => {
                 rarity: "rar"
             },
             order: [['card_slot', 'ASC']]
-        }).map(function(print) {
-            return print.card_code
-        })
+        }).map((p) => p.card_code)
     
         const supers = await Print.findAll({ 
             where: {
                 setId: set.id,
-                rarity: "sup",
-                card_slot: {
-                    [Op.lt]: 200
-                }
+                rarity: "sup"
             },
             order: [['card_slot', 'ASC']]
-        }).map(function(print) {
-            return print.card_code
-        })
+        }).filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
         
         const ultras = await Print.findAll({ 
             where: {
@@ -209,9 +187,7 @@ const awardPacksToShop = async (num, core = true) => {
                 rarity: "ult"
             },
             order: [['card_slot', 'ASC']]
-        }).map(function(print) {
-            return print.card_code
-        })
+        }).map((p) => p.card_code)
     
         const secrets = await Print.findAll({ 
             where: {
@@ -219,9 +195,7 @@ const awardPacksToShop = async (num, core = true) => {
                 rarity: "scr"
             },
             order: [['card_slot', 'ASC']]
-        }).map(function(print) {
-            return print.card_code
-        })
+        }).map((p) => p.card_code)
     
         const results = []
         const boxes = Math.floor(num / set.packs_per_box)

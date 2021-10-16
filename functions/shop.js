@@ -383,7 +383,7 @@ const calcBoxPrice = async () => {
         if (set.type === 'core' || set.type === 'mini') {
             const commons = await Print.findAll({ where: { set_code: set_code, rarity: "com" } }).map((p) => Math.round(p.market_price) || 1)
             const rares = await Print.findAll({ where: { set_code: set_code, rarity: "rar" } }).map((p) => Math.round(p.market_price) || 1)
-            const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup", card_slot: { [Op.lt]: 200 } } }).map((p) => Math.round(p.market_price) || 1)
+            const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup" } }).filter((p) => !p.card_code.includes('-SE')).map((p) => Math.round(p.market_price) || 1)
             const ultras = await Print.findAll({ where: { set_code: set_code, rarity: "ult" } }).map((p) => Math.round(p.market_price) || 1)
             const secrets = await Print.findAll({ where: { set_code: set_code, rarity: "scr" } }).map((p) => Math.round(p.market_price) || 1)
             

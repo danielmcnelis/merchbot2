@@ -184,7 +184,7 @@ if(cmd === `!test`) {
 		const rarities = []
 		const commons = await Print.findAll({ where: { set_code: 'TEB', rarity: 'com' }})
 		const rares = await Print.findAll({ where: { set_code: 'TEB', rarity: 'rar' }})
-		const supers = await Print.findAll({ where: { set_code: 'TEB', rarity: 'sup' }})
+		const supers = await Print.findAll({ where: { set_code: 'TEB', rarity: 'sup' }}).filter((p) => !p.card_code.includes('-SE'))
 		const ultras = await Print.findAll({ where: { set_code: 'TEB', rarity: 'ult' }})
 		const secrets = await Print.findAll({ where: { set_code: 'TEB', rarity: 'scr' }})
 	
@@ -1298,7 +1298,7 @@ if(calccom.includes(cmd)) {
 	if (set.type === 'core' || set.type === 'mini' || set.type === 'tour') {
 		const commons = await Print.findAll({ where: { set_code: set_code, rarity: "com" } }).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
 		const rares = await Print.findAll({ where: { set_code: set_code, rarity: "rar" } }).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
-		const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup", card_slot: { [Op.lt]: 200 } } }).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
+		const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup" } }).filter((p) => !p.card_code.includes('-SE')).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
 		const ultras = await Print.findAll({ where: { set_code: set_code, rarity: "ult" } }).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
 		const secrets = await Print.findAll({ where: { set_code: set_code, rarity: "scr" } }).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
 		const avgComPrice = commons.length ? commons.reduce((a, b) => a + b) / commons.length : 0
@@ -4361,9 +4361,7 @@ if(dailycom.includes(cmd)) {
 			rarity: "com"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const rares = await Print.findAll({ 
 		where: {
@@ -4371,22 +4369,15 @@ if(dailycom.includes(cmd)) {
 			rarity: "rar"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const supers = await Print.findAll({ 
 		where: {
 			setId: set.id,
-			rarity: "sup",
-			card_slot: {
-				[Op.lt]: 200
-			}
+			rarity: "sup"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
 
 	const ultras = await Print.findAll({ 
 		where: {
@@ -4394,9 +4385,7 @@ if(dailycom.includes(cmd)) {
 			rarity: "ult"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const secrets = await Print.findAll({ 
 		where: {
@@ -4404,9 +4393,7 @@ if(dailycom.includes(cmd)) {
 			rarity: "scr"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 	
 	const odds = []
 	for (let i = 0; i < set.commons_per_box; i++) odds.push("commons")
@@ -5378,9 +5365,7 @@ if(packcom.includes(cmd)) {
 			rarity: "com"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const rares = await Print.findAll({ 
 		where: {
@@ -5388,22 +5373,15 @@ if(packcom.includes(cmd)) {
 			rarity: "rar"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const supers = await Print.findAll({ 
 		where: {
 			setId: set.id,
-			rarity: "sup",
-			card_slot: {
-				[Op.lt]: 200
-			}
+			rarity: "sup"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
 
 	const ultras = await Print.findAll({ 
 		where: {
@@ -5411,9 +5389,7 @@ if(packcom.includes(cmd)) {
 			rarity: "ult"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const secrets = await Print.findAll({ 
 		where: {
@@ -5421,9 +5397,7 @@ if(packcom.includes(cmd)) {
 			rarity: "scr"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const player = await Player.findOne( { where: { id: maid }, include: [Daily, Diary, Wallet] })
 	const wallet = player.wallet
@@ -5556,7 +5530,7 @@ if(packcom.includes(cmd)) {
 
 //SPECIAL EDITION
 if(specialcom.includes(cmd)) {
-	let code = args[0] || 'DOC'
+	let code = args[0] || 'TEB'
 	const set = await Set.findOne({ where: { code: code }})
 	if (!set) return message.channel.send(`Could not find set code: ${code}.`)
 	if (!set.specs_for_sale) return message.channel.send(`Sorry, ${code} ${eval(set.emoji)} Special Editions are not available.`)
@@ -5567,9 +5541,7 @@ if(specialcom.includes(cmd)) {
 			rarity: "com"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const rares = await Print.findAll({ 
 		where: {
@@ -5577,22 +5549,15 @@ if(specialcom.includes(cmd)) {
 			rarity: "rar"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const supers = await Print.findAll({ 
 		where: {
 			setId: set.id,
-			rarity: "sup",
-			card_slot: {
-				[Op.lt]: 200
-			}
+			rarity: "sup"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
 
 	const ultras = await Print.findAll({ 
 		where: {
@@ -5600,9 +5565,7 @@ if(specialcom.includes(cmd)) {
 			rarity: "ult"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const secrets = await Print.findAll({ 
 		where: {
@@ -5610,9 +5573,7 @@ if(specialcom.includes(cmd)) {
 			rarity: "scr"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const specials = await Print.findAll({ 
 		where: {
@@ -5623,9 +5584,7 @@ if(specialcom.includes(cmd)) {
 			}
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const wallet = await Wallet.findOne( { where: { playerId: maid }, include: Player })
 	if (!wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
@@ -5835,9 +5794,7 @@ if(boxcom.includes(cmd)) {
 			rarity: "com"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const rares = await Print.findAll({ 
 		where: {
@@ -5845,22 +5802,15 @@ if(boxcom.includes(cmd)) {
 			rarity: "rar"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const supers = await Print.findAll({ 
 		where: {
 			setId: set.id,
-			rarity: "sup",
-			card_slot: {
-				[Op.lt]: 200
-			}
+			rarity: "sup"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
 
 	const ultras = await Print.findAll({ 
 		where: {
@@ -5868,9 +5818,7 @@ if(boxcom.includes(cmd)) {
 			rarity: "ult"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const secrets = await Print.findAll({ 
 		where: {
@@ -5878,9 +5826,7 @@ if(boxcom.includes(cmd)) {
 			rarity: "scr"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map(function(print) {
-		return print.card_code
-	})
+	}).map((p) => p.card_code)
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send(`${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.box_price * discount)}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`)
@@ -6283,7 +6229,6 @@ if(cmd === `!barter`) {
 		if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 		if (
 			print.set_code === 'APC' || 
-			print.set_code === 'FON' ||
 			print.set_code === 'FPC' ||  
 			print.set_code.startsWith('SS') || 
 			print.set_code.startsWith('CH')

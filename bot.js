@@ -295,7 +295,7 @@ if (cmd === `!import_print_images`) {
 		} 
 
 		console.log(`found card ${card.name}, ${card.image_file}`)
-		const url = `https://ygoprodeck.com/pics/${card.image_file.slice(-4)}`
+		const url = `https://ygoprodeck.com/pics/${card.image_file}`
 		const writer = fs.createWriteStream(`./public/card_images/${card.image_file}`)
 
 		const response = await axios({

@@ -58,7 +58,6 @@ const closeShop = async () => {
 
 // UNFREEZE
 const unfreeze = async () => {
-    console.log('unfreeze()')
     const date = new Date()
 	const time = date.getTime()
 	const prints = await Print.findAll({ where: { frozen: true } })
@@ -109,6 +108,18 @@ const unfreeze = async () => {
             }
         }
     }
+}
+
+
+// CLEAR DAILIES
+const clearDailies = async () => {
+    const dailies = await Daily.findAll()
+    for (let i = 0; i < dailies.length; i++) {
+        const daily = dailies[i]
+        daily.fon_packs = 0
+        await daily.save()
+
+    return setTimeout(async () => clearDailies(), 24 * 60 * 60 * 1000)
 }
 
 
@@ -1123,6 +1134,7 @@ module.exports = {
     askForExclusions,
     checkShopOpen,
     checkShopShouldBe,
+    clearDailies,
     closeShop,
     getBarterCard,
     getBarterQuery,

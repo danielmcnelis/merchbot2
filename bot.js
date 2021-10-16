@@ -29,7 +29,7 @@ const { askForAdjustConfirmation, collectNicknames, getNewMarketPrice, askForSet
 const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard, getResetConfirmation } = require('./functions/profile.js')
 const { fetchAllCardNames, fetchAllUniquePrintNames, findCard, search } = require('./functions/search.js')
 const { addSheet, makeSheet, writeToSheet } = require('./functions/sheets.js')
-const { applyPriceDecay, getBarterCard, getBarterQuery, getVoucher, getTradeInCard, getBarterDirection, askForBarterConfirmation, checkShopShouldBe, getMidnightCountdown, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop  } = require('./functions/shop.js')
+const { applyPriceDecay, getBarterCard, getBarterQuery, getVoucher, getTradeInCard, getBarterDirection, askForBarterConfirmation, checkShopShouldBe, getMidnightCountdown, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop, clearDailies  } = require('./functions/shop.js')
 const { getNewStatus } = require('./functions/status.js')
 const { askForDBUsername, checkChallongePairing, findNextMatch, findNextOpponent, findOtherPreReqMatch, findNoShowOpponent, generateSheetData, getDeckListTournament, getDeckNameTournament, getMatches, getTournament, getTournamentType, putMatchResult, postParticipant, removeParticipant, seed, selectTournament } = require('./functions/tournament.js')
 const { processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
@@ -60,15 +60,7 @@ client.on('ready', async () => {
 
 	const midnightCountdown = getMidnightCountdown()
 
-	setTimeout(async () => {
-		const dailies = await Daily.findAll()
-		for (let i = 0; i < dailies.length; i++) {
-			const daily = dailies[i]
-			daily.fon_packs = 0
-			await daily.save()
-		}
-	}, midnightCountdown)
-
+	setTimeout(() => clearDailies(), midnightCountdown)
 	setTimeout(() => applyPriceDecay(), midnightCountdown + 10000)
 	
 	const shopShouldBe = checkShopShouldBe()

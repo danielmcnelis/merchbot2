@@ -321,7 +321,7 @@ if (cmd === `!import_all_images`) {
 	
 	for (let i = 0; i <= all_cards.length; i++) {
 		const name = all_cards[i].name
-		const image_url = all_cards[i].image
+		const image_url = all_cards[i].image_file
 		if (!file_names.includes(image_url)) {
 			console.log('missing', image_url)
 			count++
@@ -5654,20 +5654,20 @@ if(specialcom.includes(cmd)) {
 		console.log('!!spec_card_1', !!spec_card_1)
 		console.log('!!spec_card_2', !!spec_card_2)
 
-		console.log('spec_card_1.image', spec_card_1.image)
-		console.log('spec_card_2.image', spec_card_2.image)
+		console.log('spec_card_1.image', spec_card_1.image_file)
+		console.log('spec_card_2.image_file', spec_card_2.image_file)
 
 		const promos_canvas = Canvas.createCanvas(57 * 2, 80)
 		const promos_context = promos_canvas.getContext('2d')
 
-		const promo_1 = fs.existsSync(`./public/card_images/${spec_card_1.image}`) ? 
-		await Canvas.loadImage(`./public/card_images/${spec_card_1.image}`) :
-		await Canvas.loadImage(`https://ygoprodeck.com/pics/${spec_card_1.image}`)
+		const promo_1 = fs.existsSync(`./public/card_images/${spec_card_1.image_file}`) ? 
+		await Canvas.loadImage(`./public/card_images/${spec_card_1.image_file}`) :
+		await Canvas.loadImage(`https://ygoprodeck.com/pics/${spec_card_1.image_file}`)
 		if (promos_canvas && promos_context && promo_1) promos_context.drawImage(promo_1, 0, 0, 57, 80)
 		
-		const promo_2 = fs.existsSync(`./public/card_images/${spec_card_2.image}`) ? 
-		await Canvas.loadImage(`./public/card_images/${spec_card_2.image}`) :
-		await Canvas.loadImage(`https://ygoprodeck.com/pics/${spec_card_2.image}`)
+		const promo_2 = fs.existsSync(`./public/card_images/${spec_card_2.image_file}`) ? 
+		await Canvas.loadImage(`./public/card_images/${spec_card_2.image_file}`) :
+		await Canvas.loadImage(`https://ygoprodeck.com/pics/${spec_card_2.image_file}`)
 		if (promos_canvas && promos_context && promo_2) promos_context.drawImage(promo_2, 57, 0, 57, 80)
 
 		const promos_attachment = promos_canvas && promos_context ?

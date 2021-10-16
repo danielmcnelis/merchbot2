@@ -70,7 +70,8 @@
   },
   "scripts": {
     "test": "tap test/*.js",
-    "seed": "node ./bin/seed"
+    "seed": "node ./bin/seed",
+    "lab": "node ./bin/lab"
   },
   "version": "0.5.1"
 }

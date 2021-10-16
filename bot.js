@@ -5551,6 +5551,8 @@ if(specialcom.includes(cmd)) {
 		order: [['card_slot', 'ASC']]
 	}).filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
 
+	console.log('supers', supers)
+
 	const ultras = await Print.findAll({ 
 		where: {
 			setId: set.id,
@@ -5640,6 +5642,7 @@ if(specialcom.includes(cmd)) {
 				playerId: maid
 			})
 		}
+
 		const spec_card_1 = await Card.findOne({ where: {
 			name: spec_print_1.card_name
 		}}) 
@@ -5647,6 +5650,12 @@ if(specialcom.includes(cmd)) {
 		const spec_card_2 = await Card.findOne({ where: {
 			name: spec_print_2.card_name
 		}}) 
+
+		console.log('!!spec_card_1', !!spec_card_1)
+		console.log('!!spec_card_2', !!spec_card_2)
+
+		console.log('spec_card_1.image', spec_card_1.image)
+		console.log('spec_card_2.image', spec_card_2.image)
 
 		const promos_canvas = Canvas.createCanvas(57 * 2, 80)
 		const promos_context = promos_canvas.getContext('2d')

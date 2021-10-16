@@ -118,6 +118,7 @@ const clearDailies = async () => {
         const daily = dailies[i]
         daily.fon_packs = 0
         await daily.save()
+    }
 
     return setTimeout(async () => clearDailies(), 24 * 60 * 60 * 1000)
 }

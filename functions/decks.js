@@ -129,6 +129,7 @@ const saveYDK = async (player, url, tournamentName = 'other') => {
         const { singleIds, doubleIds, tripleIds } = await getInventorySummary(allForgedCards, player.id)
        
         const illegalCards = []
+        const phantomCards = []
         const forbiddenCards = []
         const limitedCards = []
         const semiLimitedCards = []

@@ -259,7 +259,7 @@ const checkDeckList = async (client, message, member, formatName, formatEmoji, f
 
 
 //GET DECK TYPE
-const getDeckType = async (player, format, tournamentName = 'other') => {
+const getDeckType = async (player, tournamentName = 'other') => {
     const file = `./decks/${tournamentName}/${player.tag.replace(/[^\w\s]/gi, "_").replace(/ /g,'')}.ydk`
     const raw = fs.readFileSync(file, 'utf8')
     if (!raw) return

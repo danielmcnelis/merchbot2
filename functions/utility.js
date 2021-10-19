@@ -157,7 +157,7 @@ const getRandomString = (length, chars) => {
 }
 
 //CONVERT CARDS ARRAY TO OBJECT
-const convertCardsArrayToObject = (arr) => {
+const convertArrayToObject = (arr) => {
     const obj = {}
     arr.forEach(elem => {
         if (!obj[elem]) {
@@ -383,7 +383,7 @@ const getDeckCategory = (deckType) => {
 
 module.exports = {
     capitalize,
-    convertCardsArrayToObject,
+    convertArrayToObject,
     createPlayer,
     createProfile,
     getArenaVictories,

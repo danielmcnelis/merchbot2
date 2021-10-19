@@ -84,7 +84,6 @@ const saveYDK = async (player, url, tournamentName = 'other') => {
     const options = new firefox.Options()
     options.addArguments("-headless")
     const driver = await new Builder().forBrowser('firefox').setFirefoxOptions(options).build()
-    
 
     try {
         console.log(`Loading ${player.tag}'s deck at ${url}...`)
@@ -122,9 +121,9 @@ const saveYDK = async (player, url, tournamentName = 'other') => {
         const cards_arr = deck_arr.filter(el => el.charAt(0) !== '#' && el.charAt(0) !== '!' && el !== '').sort()
         const cards_obj = convertArrayToObject(cards_arr)    
 
-        const forbiddenCardIds = await Status.findAll({ where: { [formatList]: 'forbidden' }, include: Card }).map(s => s.card.konami_code)
-        const limitedCardIds = await Status.findAll({ where: { [formatList]: 'limited' }, include: Card }).map(s => s.card.konami_code)
-        const semiLimitedCardIds = await Status.findAll({ where: { [formatList]: 'semi-limited' }, include: Card }).map(s => s.card.konami_code)
+        const forbiddenCardIds = await Status.findAll({ where: { current: 'forbidden' }}).map(s => s.konami_code)
+        const limitedCardIds = await Status.findAll({ where: { current: 'limited' }}).map(s => s.konami_code)
+        const semiLimitedCardIds = await Status.findAll({ where: { current: 'semi-limited' }}).map(s => s.konami_code)
         const allForgedCards = await fetchAllForgedCards()
         const cardIds = allForgedCards.map(c => c.konami_code)
         const { singleIds, doubleIds, tripleIds } = await getInventorySummary(allForgedCards, playerId)

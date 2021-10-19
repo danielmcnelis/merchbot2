@@ -97,14 +97,14 @@ const getInventorySummary = async (allForgedCards, playerId) => {
 		if (inv_map[name] >= 3) three_of_names.push(name)
 	})
 
-	const yourSingles = allForgedCards.filter(card => one_of_names.includes(card.name))
-	const yourDoubles = allForgedCards.filter(card => two_of_names.includes(card.name))
-	const yourTriples = allForgedCards.filter(card => three_of_names.includes(card.name))
+	const singleIds = allForgedCards.filter(card => one_of_names.includes(card.name)).map(c => c.konami_code)
+	const doubleIds = allForgedCards.filter(card => two_of_names.includes(card.name)).map(c => c.konami_code)
+	const tripleIds = allForgedCards.filter(card => three_of_names.includes(card.name)).map(c => c.konami_code)
 
 	const summary = {
-		yourSingles,
-		yourDoubles,
-		yourTriples
+		singleIds,
+		doubleIds,
+		tripleIds
 	}
 
     return summary

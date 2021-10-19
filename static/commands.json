@@ -17,7 +17,7 @@
     "historycom": ["!hist", "!history"],
     "infocom": ["!info", "!information", "!rules"],
     "invcom": ["!inv", "!i", "!inventory", "!cards", "!collection"],
-    "joincom": ["!join", "!j", "!enter", "!play", "!in"],
+    "joincom": ["!join", "!j", "!enter", "!play", "!in", "!resubmit"],
     "legalcom": ["!legal", "!checklegal", "!deckcheck"],
     "listcom": ["!banlist", "!bans"],
     "losscom": ["!loss", "!lose", "!lost", "!lossvs", "!lossto", "!lossat", "!losevs", "!loseto", "!loseat", "!lostvs", "!lostto", "!lostat"],

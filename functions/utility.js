@@ -371,12 +371,23 @@ const isSameDay = (d1, d2) => d1.getFullYear() === d2.getFullYear() && d1.getMon
 //IS WITHIN X HOURS
 const isWithinXHours = (x = 24, t1, t2) => Math.abs(t1 - t2) <= (x * 60 * 60 * 1000)
 
+
+//GET DECK CATEGORY
+const getDeckCategory = (deckType) => {
+    return (deckType === 'aggro bomb') ? 'aggro'
+        : (deckType === 'counter fairy') ? 'lockdown'
+        : (deckType === 'ben kei otk') ? 'combo'
+        : (deckType === 'cat control') ? 'control'
+        : 'other'
+}
+
 module.exports = {
     capitalize,
     convertCardsArrayToObject,
     createPlayer,
     createProfile,
     getArenaVictories,
+    getDeckCategory,
     getMedal,
     getRandomElement,
     getRandomString,

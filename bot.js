@@ -19,7 +19,7 @@ const { Op } = require('sequelize')
 const { checkArenaProgress, endArena , getArenaSample, resetArena, startArena, startRound } = require('./functions/arena.js')
 const { askForBidCancellation, askForBidPlacement, manageBidding } = require('./functions/bids.js')
 const { updateBinder } = require('./functions/binder.js')
-const { awardStarterDeck, getShopDeck } = require('./functions/decks.js')
+const { awardStarterDeck, getDeckType, getShopDeck } = require('./functions/decks.js')
 const { checkCoreSetComplete, completeTask } = require('./functions/diary.js')
 const { checkDraftProgress, endDraft, resetDraft, sendInventories, createPacks, startDraft, startDraftRound, draftCards } = require('./functions/draft.js')
 //const { uploadDeckFolder } = require('./functions/drive.js')
@@ -31,11 +31,11 @@ const { fetchAllCardNames, fetchAllUniquePrintNames, findCard, search } = requir
 const { addSheet, makeSheet, writeToSheet } = require('./functions/sheets.js')
 const { applyPriceDecay, getBarterCard, getBarterQuery, getVoucher, getTradeInCard, getBarterDirection, askForBarterConfirmation, checkShopShouldBe, getMidnightCountdown, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop, clearDailies  } = require('./functions/shop.js')
 const { getNewStatus } = require('./functions/status.js')
-const { askForDBUsername, checkChallongePairing, findNextMatch, findNextOpponent, findOtherPreReqMatch, findNoShowOpponent, generateSheetData, getDeckListTournament, getDeckNameTournament, getMatches, getTournament, getTournamentType, putMatchResult, postParticipant, removeParticipant, seed, selectTournament } = require('./functions/tournament.js')
+const { askForDBName, checkChallongePairing, findNextMatch, findNextOpponent, findOtherPreReqMatch, findNoShowOpponent, generateSheetData, getDeckList, getDeckName, getMatches, getTournament, getTournamentType, putMatchResult, postParticipant, removeParticipant, seed, selectTournament } = require('./functions/tournament.js')
 const { processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
 const { getBuyerConfirmation, getInvoiceMerchBotPurchase, getInvoiceMerchBotSale, getInvoiceP2PSale, getSellerConfirmation, processMerchBotSale, processP2PSale } = require('./functions/transaction.js')
 const { askQuestion, endTrivia, resetTrivia, startTrivia } = require('./functions/trivia.js')
-const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isDraftPlayer, isJazz, isMod, isTourPlayer, isVowel, isWithinXHours, getArenaVictories, getMedal, getRandomElement, getRandomSubset, resetPlayer } = require('./functions/utility.js')
+const { getRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isDraftPlayer, isJazz, isMod, isTourPlayer, isVowel, isWithinXHours, getArenaVictories, getDeckCategory, getMedal, getRandomElement, getRandomSubset, resetPlayer } = require('./functions/utility.js')
 
 // STATIC IMPORTS
 const arenas = require('./static/arenas.json')
@@ -3815,6 +3815,9 @@ if(queuecom.includes(cmd)) {
 
 //JOIN
 if(joincom.includes(cmd)) {
+	const mention = message.mentions.members.first()
+    if (isMod(message.member) && mention) return message.channel.send(`Please type **!signup @user** to register someone else for the tournament.`)
+        
 	const member = message.member
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
 	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
@@ -3828,39 +3831,53 @@ if(joincom.includes(cmd)) {
 	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 
 	if (game === 'Tournament') {
-		if (isTourPlayer(member)) return message.channel.send(`Sorry, you can only play in one tournament at a time.`)
-		const tournaments = await Tournament.findAll({ where: { state: 'pending' }, order: [['createdAt', 'ASC']] })
-		const count = await Tournament.count({ where: { state: 'underway' } })
-		const tournament = await selectTournament(message, tournaments, maid)
-		if (!tournament && count) return message.channel.send(`Sorry, the tournament already started.`)
-		if (!tournament && !count) return message.channel.send(`There is no active tournament.`)
+        const tournaments = await Tournament.findAll({ where: { state: 'pending', guildId: mgid }, order: [['createdAt', 'ASC']] })
+        const count = await Tournament.count({ where: { state: 'underway' } })
+        const tournament = await selectTournament(message, tournaments, maid)
+        if (!tournament && count) return message.channel.send(`Sorry, the tournament already started.`)
+        if (!tournament && !count) return message.channel.send(`There is no active tournament.`)
+        const entry = await Entry.findOne({ where: { playerId: maid, tournamentId: tournament.id } })
 		
-		message.channel.send(`Please check your DMs.`)
-		const dbName = player.duelingBook ? player.duelingBook : await askForDBUsername(member, player)
-		if (!dbName) return
-		const deckListUrl = await getDeckListTournament(member, player, resubmission = false)
-		if (!deckListUrl) return
-		const deckName = await getDeckNameTournament(member, player)
-		if (!deckName) return
+        message.channel.send(`Please check your DMs.`)
+        const dbName = player.duelingBook ? player.duelingBook : await askForDBName(message.member, player)
+        if (!dbName) return
+        const deckListUrl = await getDeckList(message.member, player, tournament.name, resubmission = false)
+        if (!deckListUrl) return
+        const deckName = await getDeckName(message.member, player)
+        const deckType = await getDeckType(player, tournament.name)
+        if (!deckType) return
+        const deckCategory = getDeckCategory(deckType)
+        if (!deckCategory) return
 											
-		const { participant } = await postParticipant(tournament, player)
-		if (!participant) return message.channel.send(`Could not access tournament: ${tournament.name}`)
+        if (!entry) {                                  
+            const { participant } = await postParticipant(tournament, player)
+            if (!participant) return message.channel.send(`Error: Could not access tournament: ${tournament.name}`)
+            
+			await Entry.create({
+				pilot: player.name,
+				url: deckListUrl,
+				name: deckName || deckType,
+				type: deckType,
+				category: deckCategory,
+				participantId: participant.id,
+				playerId: player.id,
+				tournamentId: tournament.id
+			})
 
-		await Entry.create({
-			pilot: player.name,
-			url: deckListUrl,
-			name: deckName,
-			type: deckName,
-			category: 'Other',
-			participantId: participant.id,
-			playerId: player.id,
-			tournamentId: tournament.id
-		})
-
-		member.roles.add(tourRole)
-		
-		message.author.send(`Thanks! I have all the information we need from you. Good luck in the tournament!`)
-		return client.channels.cache.get(tournamentChannelId).send(`<@${player.id}> is now registered for the tournament!`)
+			member.roles.add(tourRole)
+			message.author.send(`Thanks! I have all the information we need from you. Good luck in the tournament!`)
+			return client.channels.cache.get(tournamentChannelId).send(`<@${player.id}> is now registered for ${tournament.name}!`)
+		} else {
+            await entry.update({
+                url: deckListUrl,
+                name: deckName || deckType,
+                type: deckType,
+                category: deckCategory
+            })
+    
+            message.author.send(`Thanks! I have your updated deck list for the tournament.`)
+            return lient.channels.cache.get(tournamentChannelId).send(`<@${player.id}> resubmitted their deck list for ${tournament.name}!`)
+        }
 	}
 
 	const alreadyIn = await eval(game).count({ where: { playerId: maid} })
@@ -3893,39 +3910,6 @@ if(joincom.includes(cmd)) {
 	} else {
 		return message.channel.send(`You were already in the ${game} queue.`)
 	}
-}
-
-
-//RESUBMIT
-if(cmd === '!resubmit') {
-	const member = message.member	
-	const player = await Player.findOne({ where: { id: maid }})
-	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
-	if (!isTourPlayer(member)) return message.channel.send(`You are not currently signed-up for a tournament.`)
-	const entries = await Entry.findAll({ where: { playerId: player.id }, include: Tournament })
-	if (!entries.length) return message.channel.send(`You are not currently signed-up for a tournament.`)
-	const entry = entries.filter((e) => e.tournament.state === 'pending')[0]
-	if (!entry) return message.channel.send(`Sorry, the tournament already started.`)
-	
-	const tournaments = await Tournament.findAll({ where: { state: 'pending' }, order: [['createdAt', 'ASC']] })
-	const count = await Tournament.count({ where: { state: 'underway' } })
-	const tournament = await selectTournament(message, tournaments, maid)
-	if (!tournament && count) return message.channel.send(`Sorry, the tournament already started.`)
-	if (!tournament && !count) return message.channel.send(`There is no active tournament.`)
-	
-	message.channel.send(`Please check your DMs.`)
-	const deckListUrl = await getDeckListTournament(member, player, resubmission = true)
-	if (!deckListUrl) return
-	const deckName = await getDeckNameTournament(member, player)
-	if (!deckName) return
-
-	await entry.update({
-		url: deckListUrl,
-		name: deckName,
-		type: deckName
-	})
-
-	return message.author.send(`Thanks! I have your updated deck list for the tournament.`)
 }
 
 //RESET
@@ -4148,15 +4132,15 @@ if (cmd.toLowerCase() === `!remove`) {
 
 //CREATE 
 if (cmd === `!create`) {
-	if (!isAdmin(message.member) && !isMod(message.member)) return message.channel.send('You do not have permission to do that.')
+	if (!isAdmin(message.member)) return message.channel.send('You do not have permission to do that.')
 	if (!args.length) return message.channel.send(`Please provide a name for the new tournament.`)
-
+	const tournament_format = await getTournamentFormat(message)
+	if (!tournament_format) return message.channel.send(`Please specify a valid format.`)
 	const tournament_type = await getTournamentType(message)
 	if (!tournament_type) return message.channel.send(`Please select a valid tournament type.`)
+	const str = generateRandomString(10, '0123456789abcdefghijklmnopqrstuvwxyz')
+	const name = args[0].replace(/[^\w\s]/gi, "_").replace(/ /g,'')
 	
-	const str = getRandomString(10, '0123456789abcdefghijklmnopqrstuvwxyz')
-	const name = args[0]
-
 	try {
 		const { status, data } = await axios({
 			method: 'post',
@@ -4172,52 +4156,23 @@ if (cmd === `!create`) {
 			}
 		})
 		
-		if (status === 200) {
+		if (status && data && status === 200) {
 			await Tournament.create({ 
 				id: data.tournament.id,
 				name: data.tournament.name,
 				state: data.tournament.state,
 				swiss_rounds: data.tournament.swiss_rounds, 
 				tournament_type: data.tournament.tournament_type,
-				url: data.tournament.url
+				url: data.tournament.url,
 			})
-		
-			return message.channel.send(
-				`You created a new tournament:` + 
-				`\nName: ${data.tournament.name} ${FiC}` + 
-				`\nType: ${capitalize(data.tournament.tournament_type)}` +
-				`\nBracket: https://challonge.com/${data.tournament.url}`
-			)
-		} 
-	} catch (err) {
-		console.log(err)
-	}
-	
-	try {
-		const { status, data } = await axios({
-			method: 'post',
-			url: 'https://api.challonge.com/v1/tournaments.json',
-			data: {
-				api_key: challongeAPIKey,
-				tournament: {
-					name: name,
-					url: str,
-					tournament_type: tournament_type,
-					gameName: 'Yu-Gi-Oh!',
+
+			fs.mkdir(`./decks/${name}`, (err) => {
+				if (err) {
+					return console.error(err)
 				}
-			}
-		})
-		
-		if (status === 200) {
-			await Tournament.create({ 
-				id: data.tournament.id,
-				name: data.tournament.name,
-				state: data.tournament.state,
-				swiss_rounds: data.tournament.swiss_rounds, 
-				tournament_type: data.tournament.tournament_type,
-				url: data.tournament.url
+				console.log(`made new directory: ./decks/${name}`)
 			})
-		
+
 			return message.channel.send(
 				`You created a new tournament:` + 
 				`\nName: ${data.tournament.name} ${FiC}` + 
@@ -4227,8 +4182,50 @@ if (cmd === `!create`) {
 		} 
 	} catch (err) {
 		console.log(err)
-		return message.channel.send(`Unable to connect to Challonge.com.`)
-	}		
+		try {
+			const { status, data } = await axios({
+				method: 'post',
+				url: 'https://api.challonge.com/v1/tournaments.json',
+				data: {
+					api_key: challongeAPIKey,
+					tournament: {
+						name: name,
+						url: str,
+						tournament_type: tournament_type,
+						gameName: 'Yu-Gi-Oh!',
+					}
+				}
+			})
+			
+			if (status && data && status === 200) {
+				await Tournament.create({ 
+					id: data.tournament.id,
+					name: data.tournament.name,
+					state: data.tournament.state,
+					swiss_rounds: data.tournament.swiss_rounds, 
+					tournament_type: data.tournament.tournament_type,
+					url: data.tournament.url,
+				})
+				
+				fs.mkdir(`./decks/${name}`, (err) => {
+					if (err) {
+						return console.error(err)
+					}
+					console.log(`made new directory: ./decks/${name}`)
+				})
+				
+				return message.channel.send(
+					`You created a new tournament:` + 
+					`\nName: ${data.tournament.name} ${FiC}` + 
+					`\nType: ${capitalize(data.tournament.tournament_type)}` +
+					`\nBracket: https://challonge.com/${data.tournament.url}`
+				)
+			} 
+		} catch (err) {
+			console.log(err)
+			return message.channel.send(`Unable to create tournament on Challonge.com.`)
+		}
+	}
 }
 
 //BRACKET

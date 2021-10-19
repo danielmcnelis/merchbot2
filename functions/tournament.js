@@ -9,11 +9,13 @@ const { client } = require('../static/clients.js')
 const { saveYDK, saveAllYDK } = require('./decks.js')
 const { capitalize, shuffleArray } = require('./utility.js')
 
-//ASK FOR DB USERNAME
-const askForDBUsername = async (member, player, error = false, attempt = 1) => {
+//ASK FOR DB NAME
+const askForDBName = async (member, player, override = false, error = false, attempt = 1) => {
     const filter = m => m.author.id === member.user.id
-    const prompt = error ? `I think you're getting ahead of yourself. First, I need your DuelingBook username.`
-    : `Hi! This appears to be your first tournament in our system. Can you please provide your DuelingBook username?`
+    const pronoun = override ? `${player.name}'s` : 'your'
+    const greeting = override ? '' : 'Hi! '
+    const prompt = error ? `I think you're getting ahead of yourself. First, I need ${pronoun} DuelingBook name.`
+    : `${greeting}This appears to be ${player.name}'s first tournament in our system. Can you please provide ${pronoun} DuelingBook name?`
 	const msg = await member.user.send(prompt)
 
     const collected = await msg.channel.awaitMessages(filter, {
@@ -23,32 +25,32 @@ const askForDBUsername = async (member, player, error = false, attempt = 1) => {
         const dbName = collected.first().content
         if (dbName.includes("duelingbook.com/deck") || dbName.includes("imgur.com")) {
             if (attempt >= 3) {
-                member.user.send(`Sorry, time's up. Goodbye.`)
+                member.user.send(`Sorry, time's up. Go back to the server and try again.`)
                 return false
             } else {
-                return askForDBUsername(member, player, true, attempt++)
+                return askForDBName(member, player, override, true, attempt++)
             }
         } else {
             await player.update({
                 duelingBook: dbName
             })
-            member.user.send(`Thanks! I saved your DuelingBook username as: ${dbName}. If that's wrong, go back to the Discord server and type **!db username**.`)
+            member.user.send(`Thanks! I saved ${pronoun} DuelingBook name as: ${dbName}. If that's wrong, go back to the server and type **!db name**.`)
             return dbName
         }
     }).catch((err) => {
         console.log(err)
-        member.user.send(`Sorry, time's up. Goodbye.`)
+        member.user.send(`Sorry, time's up. Go back to the server and try again.`)
         return false
     })
 
     return collected
 }
 
-
 //GET DECK LIST TOURNAMENT
-const getDeckListTournament = async (member, player, resubmission = false) => {            
+const getDeckList = async (member, player, tournamentName, override = false) => {            
     const filter = m => m.author.id === member.user.id
-    const msg = await member.user.send("Please provide a duelingbook.com/deck link for your tournament deck.");
+    const pronoun = override ? `${player.name}'s` : 'your'
+    const msg = await member.user.send(`Please provide a duelingbook.com/deck link for ${pronoun} tournament deck.`);
     const collected = await msg.channel.awaitMessages(filter, {
         max: 1,
         time: 180000
@@ -56,27 +58,29 @@ const getDeckListTournament = async (member, player, resubmission = false) => {
         const url = collected.first().content
         if (url.includes("www.duelingbook.com/deck")) {		
             member.send('Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.')
-            const issues = await saveYDK(member, url)
-            
-            if (issues['illegalCards'].length || issues['forbiddenCards'].length || issues['limitedCards'].length || issues['semiLimitedCards'].length || issues['phantomCards'].length) {
-                let response = `I'm sorry, ${player.name}, your deck is not legal. ${FiC}`
+            const issues = await saveYDK(player, url, tournamentName)
+
+            if (override) {
+                member.send(`Thanks, ${member.user.username}, I saved a copy of ${pronoun} deck. ${soldier}`)
+                return url
+            } else if (issues['illegalCards'].length || issues['forbiddenCards'].length || issues['limitedCards'].length || issues['semiLimitedCards'].length) {
+                let response = `I'm sorry, ${member.user.username}, ${pronoun} deck is not legal. ${legend}`
                 if (issues['illegalCards'].length) response += `\n\nThe following cards are not in this game:\n${issues['illegalCards'].join('\n')}`
                 if (issues['forbiddenCards'].length) response += `\n\nThe following cards are forbidden:\n${issues['forbiddenCards'].join('\n')}`
                 if (issues['limitedCards'].length) response += `\n\nThe following cards are limited:\n${issues['limitedCards'].join('\n')}`
                 if (issues['semiLimitedCards'].length) response += `\n\nThe following cards are semi-limited:\n${issues['semiLimitedCards'].join('\n')}`
-                if (issues['phantomCards'].length) response += `\n\nThe following cards are not in your Inventory at the given quantity:\n${issues['phantomCards'].join('\n')}`
-                response += `\n\nPlease edit your deck and try again once it's legal. If you believe this message is in error, contact the Tournament Organizer.`
+                response += `\n\nPlease edit ${pronoun} deck and try again once it's legal. If you believe this message is in error, contact the Tournament Organizer.`
             
                 member.send(response)
                 return false
             } else if (issues['unrecognizedCards'].length) {
-                let response = `I'm sorry, ${player.name}, the following card IDs were not found in our database:\n${issues['unrecognizedCards'].join('\n')}`
+                let response = `I'm sorry, ${member.user.username}, the following card IDs were not found in our database:\n${issues['unrecognizedCards'].join('\n')}`
                 response += `\n\nThese cards are either alternate artwork, new to the TCG, OCG only, or incorrect in our database. Please contact the Tournament Organizer or the Admin if you can't resolve this.`
                 
                 member.send(response)
                 return false
              } else {
-                member.send(`Thanks, ${player.name}, your deck is perfectly legal. ${soldier}`)
+                member.send(`Thanks, ${member.user.username}, ${pronoun} deck is perfectly legal. ${soldier}`)
                 return url
             }
         } else {
@@ -85,7 +89,7 @@ const getDeckListTournament = async (member, player, resubmission = false) => {
         }
     }).catch((err) => {
         console.log(err)
-        member.send(`Sorry, time's up. To try again, go back to the Discord server and type **!join**. Goodbye.`)
+        member.send(`Sorry, time's up. Go back to the server and try again.`)
         return false
     })
 
@@ -118,20 +122,20 @@ const directSignUp = async (message, player, resubmission = false) => {
     return collected
 }
 
-
-//GET DECK NAME TOURNAMENT
-const getDeckNameTournament = async (member, player) => {
-	const msg = await member.send(`Please provide the common name for your deck (i.e. Chaos Control, Quickdraw Plant, Mermail, etc.).`)
+//GET DECK NAME
+const getDeckName = async (member, player, override = false) => {
+    const pronoun = override ? `${player.name}'s` : 'your'
+	const msg = await member.send(`Please provide the common name for ${pronoun} deck (i.e. Chaos Control, Chaos Turbo, Warrior, etc.).`)
     const filter = m => m.author.id === member.user.id
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
-        time: 60000
+        time: 20000
     }).then(async collected => {
-        const deckName = collected.first().content.toLowerCase()
-        return deckName
+        const response = collected.first().content.toLowerCase()
+        return response
     }).catch(err => {    
         console.log(err)
-        member.send(`Sorry, time's up. To try again, go back to the Discord server type **!join**.`)
+        member.send(`Sorry, time's up.`)
         return false
     })
 
@@ -468,7 +472,7 @@ const generateSheetData = async () => {
 }
 
 module.exports = {
-    askForDBUsername,
+    askForDBName,
     checkChallongePairing,
     directSignUp,
     findOtherPreReqMatch,
@@ -476,8 +480,8 @@ module.exports = {
     findNextOpponent,
     findNoShowOpponent,
     generateSheetData,
-    getDeckListTournament,
-    getDeckNameTournament,
+    getDeckList,
+    getDeckName,
     getPairing,
     getTournamentType,
     getMatches,

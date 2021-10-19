@@ -3,7 +3,7 @@ const axios = require('axios')
 const { challongeAPIKey } = require('../secrets.json')
 const { registrationChannelId } = require('../static/channels.json')
 const { tourRole } = require('../static/roles.json')
-const { soldier, FiC } = require('../static/emojis.json')
+const { orange, soldier, FiC } = require('../static/emojis.json')
 const { Arena, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist } = require('../db')
 const { client } = require('../static/clients.js')
 const { saveYDK, saveAllYDK } = require('./decks.js')
@@ -64,7 +64,7 @@ const getDeckList = async (member, player, tournamentName, override = false) => 
                 member.send(`Thanks, ${member.user.username}, I saved a copy of ${pronoun} deck. ${soldier}`)
                 return url
             } else if (issues['illegalCards'].length || issues['forbiddenCards'].length || issues['limitedCards'].length || issues['semiLimitedCards'].length) {
-                let response = `I'm sorry, ${member.user.username}, ${pronoun} deck is not legal. ${legend}`
+                let response = `I'm sorry, ${member.user.username}, ${pronoun} deck is not legal. ${orange}`
                 if (issues['illegalCards'].length) response += `\n\nThe following cards are not in this game:\n${issues['illegalCards'].join('\n')}`
                 if (issues['forbiddenCards'].length) response += `\n\nThe following cards are forbidden:\n${issues['forbiddenCards'].join('\n')}`
                 if (issues['limitedCards'].length) response += `\n\nThe following cards are limited:\n${issues['limitedCards'].join('\n')}`

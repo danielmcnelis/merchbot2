@@ -19,16 +19,47 @@ const search = async (query, fuzzyCards) => {
 	})
 
 	if (!card) return false
-	const color = card.card === "Spell" ? "#42f578" : card.card === "Trap" ? "#e624ed" : (card.card === "Monster" && card.category === "Normal") ? "#faf18e" : (card.card === "Monster" && card.category === "Effect") ? "#f5b042" : (card.card === "Monster" && card.category === "Fusion") ? "#a930ff" : (card.card === "Monster" && card.category === "Ritual") ? "#3b7cf5" : (card.card === "Monster" && card.category === "Synchro") ? "#ebeef5" : (card.card === "Monster" && card.category === "Xyz") ? "#6e6e6e" : null
+	
+	const color = card.category === "Spell" ? "#42f578" :
+		card.category === "Trap" ? "#e624ed" :
+		card.category === "Monster" && card.normal ? "#faf18e" :
+		card.category === "Monster" && card.effect ? "#f5b042" :
+		card.category === "Monster" && card.fusion ? "#a930ff" :
+		card.category === "Monster" && card.ritual ? "#3b7cf5" :
+		card.category === "Monster" && card.synchro ? "#ebeef5" :
+		card.category === "Monster" && card.xyz ? "#6e6e6e" :
+		card.category === "Monster" && card.pendulum ? "#a5e096" :
+		card.category === "Monster" && card.link ? "#468ef2" :
+		null
 
 	const classes = []
-	if (card.type) classes.push(card.type)
-	if (card.class) classes.push(card.class)
-	if (card.subclass) classes.push(card.subclass)
-	if (card.category) classes.push(card.category)
+	if (card.normal) classes.push("Normal")
+	if (card.effect) classes.push("Effect")
+	if (card.fusion) classes.push("Fusion")
+	if (card.ritual) classes.push("Ritual")
+	if (card.synchro) classes.push("Synchro")
+	if (card.xyz) classes.push("Xyz")
+	if (card.pendulum) classes.push("Pendulum")
+	if (card.link) classes.push("Link")
+	if (card.flip) classes.push("Flip")
+	if (card.gemini) classes.push("Gemini")
+	if (card.spirit) classes.push("Spirit")
+	if (card.toon) classes.push("Toon")
+	if (card.tuner) classes.push("Tuner")
+	if (card.union) classes.push("Union")
 
-	const labels = card.card === "Monster" ? `**Attribute:** ${card.attribute}\n${card.category === 'Xyz' ? '**Rank:**' : card.category === 'Link' ? '**Link Rating:**' : '**Level:**'} ${card.level}\n**Release Date:** ${card.tcg_date}\n**[** ${classes.join(" / ")} **]**` : `**Category:** ${card.category}\n**Release Date:** ${card.tcg_date}` 
-	const stats = card.card === "Monster" ? `**ATK:** ${card.atk === null ? '?' : card.atk} ${card.def === null && card.category !== 'Link' ? '?' : card.def === null && card.category === 'Link' ? '' : `**DEF:** ${card.def}`}` : ''
+	const labels = card.category === "Monster" ? 
+		`**Attribute:** ${card.attribute}` + 
+		`\n${card.xyz ? `**Rank:** ${card.level}` : card.link ? `**Link Rating:** ${card.rating}` : `**Level:** ${card.level}`}` +
+		`\n**Release Date:** ${card.tcg_date || 'OCG Only'}` +
+		`\n**${card.type} / ${classes.join(" / ")}**` :
+		`**Category: ${card.icon}**` +
+		`\n**Release Date:** ${card.tcg_date || 'OCG Only'}`
+	
+	const stats = card.category === "Monster" ? 
+			`**ATK:** ${card.atk === null ? '?' : card.atk}` + 
+			`${!card.link ? `**DEF:**${card.def || '?'}` : ''}` :
+			''
 	
 	const attachment = fs.existsSync(`./public/card_images/${card.image_file}`) ?
 		new Discord.MessageAttachment(`./public/card_images/${card.image_file}`, card.image_file) :

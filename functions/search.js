@@ -22,19 +22,18 @@ const search = async (query, fuzzyCards) => {
 	
 	const color = card.category === "Spell" ? "#42f578" :
 		card.category === "Trap" ? "#e624ed" :
-		card.category === "Monster" && card.normal ? "#faf18e" :
-		card.category === "Monster" && card.effect ? "#f5b042" :
 		card.category === "Monster" && card.fusion ? "#a930ff" :
 		card.category === "Monster" && card.ritual ? "#3b7cf5" :
 		card.category === "Monster" && card.synchro ? "#ebeef5" :
 		card.category === "Monster" && card.xyz ? "#6e6e6e" :
 		card.category === "Monster" && card.pendulum ? "#a5e096" :
 		card.category === "Monster" && card.link ? "#468ef2" :
+		card.category === "Monster" && card.normal ? "#faf18e" :
+		card.category === "Monster" && card.effect ? "#f5b042" :
 		null
 
 	const classes = []
 	if (card.normal) classes.push("Normal")
-	if (card.effect) classes.push("Effect")
 	if (card.fusion) classes.push("Fusion")
 	if (card.ritual) classes.push("Ritual")
 	if (card.synchro) classes.push("Synchro")
@@ -47,18 +46,19 @@ const search = async (query, fuzzyCards) => {
 	if (card.toon) classes.push("Toon")
 	if (card.tuner) classes.push("Tuner")
 	if (card.union) classes.push("Union")
+	if (card.effect) classes.push("Effect")
 
 	const labels = card.category === "Monster" ? 
 		`**Attribute:** ${card.attribute}` + 
 		`\n${card.xyz ? `**Rank:** ${card.level}` : card.link ? `**Link Rating:** ${card.rating}` : `**Level:** ${card.level}`}` +
-		`\n**[** ${card.type} / ${classes.join(" / ")} **]**` +
-		`\n**Release Date:** ${card.tcg_date || 'OCG Only'}` :
+		`\n**Release Date:** ${card.tcg_date || 'OCG Only'}` +
+		`\n**[** ${card.type} / ${classes.join(" / ")} **]**` :
 		`**Category: ${card.icon}**` +
 		`\n**Release Date:** ${card.tcg_date || 'OCG Only'}`
 	
 	const stats = card.category === "Monster" ? 
 			`**ATK:** ${card.atk === null ? '?' : card.atk}` + 
-			` ${!card.link ? `**DEF:**${card.def || '?'}` : ''}` :
+			` ${!card.link ? `**DEF:** ${card.def === null ? '?' : card.def}` : ''}` :
 			''
 	
 	const attachment = fs.existsSync(`./public/card_images/${card.image_file}`) ?

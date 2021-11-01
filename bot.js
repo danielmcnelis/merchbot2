@@ -638,12 +638,6 @@ if (nicknamecom.includes(cmd)) {
 }
 
 //PRINT 
-if (cmd === `!decay`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	applyPriceDecay()
-}
-
-//PRINT 
 if (cmd === `!print`) {
 	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const info = await Info.findOne({ where: { element: 'set_to_print' }})
@@ -1129,7 +1123,28 @@ if(infocom.includes(cmd)) {
 		` To report a loss, type **!loss @opponent**, then wait for the next round.`+
 		`\n\nThe Champion of the Arena walks away with an ${ult}Arena Prize Card according to their Tribe!`+
 		` Everyone else receives Vouchers for their wins.`+
-		` You can use **!barter** to exchange Vouchers for APCs.`)
+		` You can use **!barter** to exchange Vouchers for APCs.` +
+		` Once you complete the Medium Diary, extended bartering is available for the following cards:`
+		`\n${ult}DOC-180 - Peropero Cerperus - 10 ${mushroom}` +
+		`\n${ult}TEB-135 - Green Baboon, Defender of the Forest - 10 ${mushroom}` +
+		`\n${ult}ORF-046 - X-Saber Airbellum - 15 ${mushroom}` +
+		`\n${ult}DOC-174 - Block Golem - 10 ${moai}` +
+		`\n${ult}DOC-178 - Mardel, Generaider Boss of Light - 10 ${rose}` +
+		`\n${ult}TEB-134 - Dandylion - 10 ${rose}` +
+		`\n${ult}DOC-181 - Sharkraken - 10 ${hook}` +
+		`\n${ult}TEB-132 - Citadel Whale - 10 ${hook}` +
+		`\n${ult}DOC-176 - Giant Rex - 10 ${egg}` +
+		`\n${ult}DOC-177 - Ipiria - 10 ${cactus}` +
+		`\n${ult}DOC-182 - Sinister Serpent - 10 ${cactus}` +
+		`\n${ult}DOC-185 - Worm Xex - 10 ${cactus}` +
+		`\n${ult}ORF-047 - Elemental HERO Nova Master - 15 ${swords}` +
+		`\n${ult}DOC-188 - Reinforcement of the Army - 30 ${swords}` +
+		`\n${ult}TEB-136 - Infernoble Knight - Roland - 40 ${swords}` +
+		`\n${ult}TEB-130 - Altergeist Meluseek - 10 ${orb}` +
+		`\n${ult}TEB-137 - Shaddoll Dragon - 10 ${orb}` +
+		`\n${ult}DOC-175 - Breaker the Magical Warrior - 20 ${orb}` +
+		`\n${ult}TEB-141 - Dragon Ravine - 10 ${gem}`
+		)
 	}
 
 	if (mcid == gauntletChannelId) { 
@@ -5647,12 +5662,6 @@ if(specialcom.includes(cmd)) {
 		const spec_card_2 = await Card.findOne({ where: {
 			name: spec_print_2.card_name
 		}}) 
-
-		console.log('!!spec_card_1', !!spec_card_1)
-		console.log('!!spec_card_2', !!spec_card_2)
-
-		console.log('spec_card_1.image', spec_card_1.image_file)
-		console.log('spec_card_2.image_file', spec_card_2.image_file)
 
 		const promos_canvas = Canvas.createCanvas(57 * 2, 80)
 		const promos_context = promos_canvas.getContext('2d')

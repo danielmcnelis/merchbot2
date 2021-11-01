@@ -51,14 +51,14 @@ const search = async (query, fuzzyCards) => {
 	const labels = card.category === "Monster" ? 
 		`**Attribute:** ${card.attribute}` + 
 		`\n${card.xyz ? `**Rank:** ${card.level}` : card.link ? `**Link Rating:** ${card.rating}` : `**Level:** ${card.level}`}` +
-		`\n**Release Date:** ${card.tcg_date || 'OCG Only'}` +
-		`\n**${card.type} / ${classes.join(" / ")}**` :
+		`\n**[** ${card.type} / ${classes.join(" / ")} **]**` +
+		`\n**Release Date:** ${card.tcg_date || 'OCG Only'}` :
 		`**Category: ${card.icon}**` +
 		`\n**Release Date:** ${card.tcg_date || 'OCG Only'}`
 	
 	const stats = card.category === "Monster" ? 
 			`**ATK:** ${card.atk === null ? '?' : card.atk}` + 
-			`${!card.link ? `**DEF:**${card.def || '?'}` : ''}` :
+			` ${!card.link ? `**DEF:**${card.def || '?'}` : ''}` :
 			''
 	
 	const attachment = fs.existsSync(`./public/card_images/${card.image_file}`) ?

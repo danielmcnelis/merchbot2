@@ -1124,7 +1124,7 @@ if(infocom.includes(cmd)) {
 		`\n\nThe Champion of the Arena walks away with an ${ult}Arena Prize Card according to their Tribe!`+
 		` Everyone else receives Vouchers for their wins.`+
 		` You can use **!barter** to exchange Vouchers for APCs.` +
-		` Once you complete the Medium Diary, extended bartering is available for the following cards:`
+		`\n\nOnce you complete the Medium Diary, extended bartering is available for the following cards:` +
 		`\n${ult}DOC-180 - Peropero Cerperus - 10 ${mushroom}` +
 		`\n${ult}TEB-135 - Green Baboon, Defender of the Forest - 10 ${mushroom}` +
 		`\n${ult}ORF-046 - X-Saber Airbellum - 15 ${mushroom}` +

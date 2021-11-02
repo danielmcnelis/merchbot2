@@ -222,7 +222,7 @@ const startRound = async (info, entries) => {
         completeTask(channel, playerId, 'm10', 12000)
         if (await check6TribesComplete(playerId, 1)) completeTask(channel, playerId, 'h8', 4000)
         if (await check6TribesComplete(playerId, 3)) completeTask(channel, playerId, 'l6', 5000)
-        return endArena(channel, info, entries)
+        return endArena(info, entries)
     } else if (info.round === 4) {
         if (entries[0].score > entries[1].score) {
         //1st place outright
@@ -252,7 +252,7 @@ const startRound = async (info, entries) => {
             completeTask(channel, playerId, 'm10', 12000)
             if (await check6TribesComplete(playerId, 1)) completeTask(channel, playerId, 'h8', 4000)
             if (await check6TribesComplete(playerId, 3)) completeTask(channel, playerId, 'l6', 5000)
-            return endArena( channel, info, entries)
+            return endArena(info, entries)
         } else if ((entries[0].score === entries[1].score) && entries[1].score > entries[2].score) {
         //2 way tie
             for (let i = 2; i < entries.length; i++) {
@@ -293,7 +293,7 @@ const startRound = async (info, entries) => {
             }
 
             channel.send(`The shadows grew long over the battlefield, and the gladiators had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena.`)
-            return endArena(channel, info, entries)
+            return endArena(info, entries)
         }
     } else {
         const P1 = await Arena.findOne({ where: { contestant: "P1" }, include: Player})

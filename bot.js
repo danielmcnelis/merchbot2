@@ -5419,8 +5419,8 @@ if(packcom.includes(cmd)) {
 	const money = wallet[set.currency]
 	if (money < (Math.round(set.unit_price * discount) * num)) return message.channel.send(`Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${num > 1 ? `${num} ` : ''}${set.name} ${eval(set.emoji)} Packs cost ${Math.round(set.unit_price * discount) * num}${eval(set.currency)}.`)
 	
-	const fon_packs = daily.fon_packs
-	if (set.code === 'FON' && (fon_packs + num) > 8) return message.channel.send(`Sorry, ${player.name}, you cannot purchase more than 8 Force of Nature ${FON} packs per day.`)
+	// const fon_packs = daily.fon_packs
+	// if (set.code === 'FON' && (fon_packs + num) > 8) return message.channel.send(`Sorry, ${player.name}, you cannot purchase more than 8 Force of Nature ${FON} packs per day.`)
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send(`${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.unit_price * discount) * num}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`)

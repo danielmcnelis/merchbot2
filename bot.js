@@ -6246,7 +6246,7 @@ if(cmd === `!barter`) {
 			print.set_code.startsWith('CH')
 		) return message.channel.send(`You cannot barter for ${print.set_code} cards.`)
 
-		price = print.rarity === 'com' ? 3 : print.rarity === 'rar' ? 6 : print.rarity === 'sup' ? 12 : print.rarity === 'ult' ? 24 : 48
+		price = print.rarity === 'com' ? 4 : print.rarity === 'rar' ? 8 : print.rarity === 'sup' ? 16 : print.rarity === 'ult' ? 32 : 64
 	} else {
 		const selected_option = direction === 'get_card' ? await getBarterCard(message, voucher, medium_complete) : await getTradeInCard(message, medium_complete)
 		if (!selected_option) return message.channel.send(`You did not select a valid option.`)

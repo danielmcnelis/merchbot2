@@ -44,7 +44,7 @@ const { client } = require('./static/clients.js')
 const { alchemycom, aliuscom, bindercom, botcom, boxcom, bracketcom, calccom, checklistcom, dailycom, dbcom, deckcom, dicecom, dropcom, flipcom, h2hcom, historycom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, packcom, pfpcom, populationcom, profcom, queuecom, rankcom, reducecom, referralcom, rolecom, specialcom, startcom, statscom, undocom, walletcom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
-const { abuser, galaxy, orange, robbed, king, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, shrine, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, downward, upward, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare } = require('./static/emojis.json')
+const { abuser, galaxy, orange, robbed, king, beast, blue, bronze, cactus, cavebob, checkmark, com, skull, familiar, battery, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, shrine, spellcaster, DRT, fiend, thunder, zombie, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, downward, upward, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare } = require('./static/emojis.json')
 const { adminRole, arenaRole, botRole, draftRole, expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')
@@ -174,11 +174,11 @@ if(cmd === `!test`) {
 		const x = args[0] || 1000
 		const results = []
 		const rarities = []
-		const commons = await Print.findAll({ where: { set_code: 'TEB', rarity: 'com' }})
-		const rares = await Print.findAll({ where: { set_code: 'TEB', rarity: 'rar' }})
-		const supers = await Print.findAll({ where: { set_code: 'TEB', rarity: 'sup' }}).filter((p) => !p.card_code.includes('-SE'))
-		const ultras = await Print.findAll({ where: { set_code: 'TEB', rarity: 'ult' }})
-		const secrets = await Print.findAll({ where: { set_code: 'TEB', rarity: 'scr' }})
+		const commons = await Print.findAll({ where: { set_code: 'DRT', rarity: 'com' }})
+		const rares = await Print.findAll({ where: { set_code: 'DRT', rarity: 'rar' }})
+		const supers = await Print.findAll({ where: { set_code: 'DRT', rarity: 'sup' }}).filter((p) => !p.card_code.includes('-SE'))
+		const ultras = await Print.findAll({ where: { set_code: 'DRT', rarity: 'ult' }})
+		const secrets = await Print.findAll({ where: { set_code: 'DRT', rarity: 'scr' }})
 	
 		for (let i = 0; i < 10000; i++) {
 			let best = 1
@@ -208,7 +208,7 @@ if(cmd === `!test`) {
 		console.log(`Results from a trial of 10,000 wagers at ${x}sd:\n${rarities}`)
 	
 		const expected_value = Math.round(results.reduce((a, b) => a + b) / results.length)
-		return message.channel.send(`In 10,000 random trials the average market value of a random TEB ${eval(TEB)} card from a ${x}${stardust} wager was ${expected_value}${stardust}.`)
+		return message.channel.send(`In 10,000 random trials the average market value of a random DRT ${eval(DRT)} card from a ${x}${stardust} wager was ${expected_value}${stardust}.`)
 	} else {
 		return message.channel.send('🧪')
 	}
@@ -433,30 +433,31 @@ if (cmd === `!new_set`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	
 	const set = {
-		code: "FON",
-		name: "Force of Nature",
-		type: "mini",
-		emoji: "FON",
-		alt_emoji: "FON",
-		size: 60,
-		commons: 30,
-		rares: 12,
-		supers: 12,
-		ultras: 6,
-		secrets: 0,
+		code: "DRT",
+		name: "Dark Titans",
+		type: "core",
+		emoji: "DRT",
+		alt_emoji: "DRT",
+		size: 150,
+		commons: 72,
+		rares: 30,
+		supers: 27,
+		ultras: 15,
+		secrets: 6,
 		specials: 0,
 		for_sale: false,
 		spec_for_sale: false,
-		unit_price: 10,
+		unit_price: 15,
 		unit_sales: 0,
-		cards_per_pack: 5,
-		packs_per_box: 8,
-		commons_per_pack: 3,
+		cards_per_pack: 9,
+		packs_per_box: 24,
+		commons_per_pack: 7,
 		rares_per_pack: 1,
-		commons_per_box: 24,
-		rares_per_box: 8,
-		supers_per_box: 7,
-		ultras_per_box: 1
+		commons_per_box: 168,
+		rares_per_box: 24,
+		supers_per_box: 18,
+		ultras_per_box: 5,
+		secrets_per_box: 1
 	}
 
 	await Set.create(set)
@@ -812,8 +813,9 @@ if(startcom.includes(cmd)) {
 		const set2 = await Set.findOne({ where: { code: 'ORF' }})
 		const set3 = await Set.findOne({ where: { code: 'TEB' }})
 		const set4 = await Set.findOne({ where: { code: 'FON' }})
+		const set5 = await Set.findOne({ where: { code: 'DRT' }})
 
-		if (!set1 || !set2 || !set3 || !set4) return message.channel.send(`Could not find sets: "DOC", "ORF", "TEB", or "FON".`)
+		if (!set1 || !set2 || !set3 || !set4 || !set5) return message.channel.send(`Could not find sets: "DOC", "ORF", "TEB", "FON", or "DRT".`)
 	
 		const filter = m => m.author.id === maid
 		await message.channel.send(`Greetings, champ! Which deck would you like to start?\n- (1) Reptile\'s Charm ${reptile}\n- (2) Warrior\'s Legend ${warrior}`)
@@ -1113,7 +1115,7 @@ if(infocom.includes(cmd)) {
 
 	if (mcid == arenaChannelId) { 
 		message.channel.send(
-			`${beast}   ${dinosaur}   ${dragon}   ${fish}  ----- The Arena -----  ${plant}   ${reptile}   ${rock}   ${spellcaster}   ${warrior}`+ 
+			`${beast}  ${dinosaur}  ${dragon}  ${fiend}  ${fish}  ${plant}  --- The Arena ---  ${reptile}  ${rock}  ${spellcaster}  ${thunder}  ${warrior}  ${zombie}`+ 
 			`\nIn this channel, you get to test out the game's most powerful cards.`+
 			` Simply align yourself with a Tribe and wage war at their side.`+
 			`\n\nTo compete in the Arena, type **!join** in <#${arenaChannelId}>.`+
@@ -1131,7 +1133,7 @@ if(infocom.includes(cmd)) {
 			`Once you complete the Medium Diary, extended bartering is available for the following cards:` +
 			`\n${ult}DOC-180 - Peropero Cerperus - 10 ${mushroom}` +
 			`\n${ult}TEB-135 - Green Baboon, Defender of the Forest - 10 ${mushroom}` +
-			`\n${ult}ORF-046 - X-Saber Airbellum - 15 ${mushroom}` +
+			`\n${ult}ORF-046 - X-Saber Airbellum - 10 ${mushroom}` +
 			`\n${ult}DOC-174 - Block Golem - 10 ${moai}` +
 			`\n${ult}DOC-178 - Mardel, Generaider Boss of Light - 10 ${rose}` +
 			`\n${ult}TEB-134 - Dandylion - 10 ${rose}` +
@@ -1141,12 +1143,12 @@ if(infocom.includes(cmd)) {
 			`\n${ult}DOC-177 - Ipiria - 10 ${cactus}` +
 			`\n${ult}DOC-182 - Sinister Serpent - 10 ${cactus}` +
 			`\n${ult}DOC-185 - Worm Xex - 10 ${cactus}` +
-			`\n${ult}ORF-047 - Elemental HERO Nova Master - 15 ${swords}` +
-			`\n${ult}DOC-188 - Reinforcement of the Army - 30 ${swords}` +
-			`\n${ult}TEB-136 - Infernoble Knight - Roland - 40 ${swords}` +
+			`\n${ult}ORF-047 - Elemental HERO Nova Master - 10 ${swords}` +
+			`\n${ult}DOC-188 - Reinforcement of the Army - 10 ${swords}` +
+			`\n${ult}TEB-136 - Infernoble Knight - Roland - 10 ${swords}` +
 			`\n${ult}TEB-130 - Altergeist Meluseek - 10 ${orb}` +
 			`\n${ult}TEB-137 - Shaddoll Dragon - 10 ${orb}` +
-			`\n${ult}DOC-175 - Breaker the Magical Warrior - 20 ${orb}` +
+			`\n${ult}DOC-175 - Breaker the Magical Warrior - 10 ${orb}` +
 			`\n${ult}TEB-141 - Dragon Ravine - 10 ${gem}`
 		)
 	}
@@ -1806,6 +1808,7 @@ if(cmd === `!count`) {
     const count = Math.ceil(weightedCount / 8)
 	results.push(
 		`\nIf The Shop closed now, we'd open:` + 
+		`\n- ${count} ${count === 1 ? 'Pack' : 'Packs'} of DRT ${DRT}` +
 		`\n- ${count} ${count === 1 ? 'Pack' : 'Packs'} of FON ${FON}` +
 		`\n- ${count} ${count === 1 ? 'Pack' : 'Packs'} of TEB ${TEB}` +
 		`\n- ${count} ${count === 1 ? 'Pack' : 'Packs'} of ORF ${ORF}` +
@@ -4850,7 +4853,8 @@ if(cmd === `!award`) {
 
 	let set_code = query.includes('chaospack') || query.includes('chaos pack') || query === 'ch2' ? 'CH2' :
 		query === 'ch1' ? 'CH1' :
-		query === 'pack' || query === 'packs' || query === 'teb' ? 'TEB' :
+		query === 'pack' || query === 'packs' || query === 'drt' ? 'DRT' :
+		query === 'teb' ? 'TEB' :
 		query === 'orf' ? 'ORF' :
 		query === 'doc' ? 'DOC' :
 		null
@@ -5419,9 +5423,6 @@ if(packcom.includes(cmd)) {
 	const money = wallet[set.currency]
 	if (money < (Math.round(set.unit_price * discount) * num)) return message.channel.send(`Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${num > 1 ? `${num} ` : ''}${set.name} ${eval(set.emoji)} Packs cost ${Math.round(set.unit_price * discount) * num}${eval(set.currency)}.`)
 	
-	// const fon_packs = daily.fon_packs
-	// if (set.code === 'FON' && (fon_packs + num) > 8) return message.channel.send(`Sorry, ${player.name}, you cannot purchase more than 8 Force of Nature ${FON} packs per day.`)
-
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send(`${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.unit_price * discount) * num}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`)
 	const collected = await msg.channel.awaitMessages(filter, {
@@ -5775,7 +5776,7 @@ if(specialcom.includes(cmd)) {
 
 //BOX
 if(boxcom.includes(cmd)) {
-	const code = args[0] || 'TEB'
+	const code = args[0] || 'DRT'
 	if (code.startsWith('SS')) return message.channel.send(`Sorry, Starter Series cards are not sold by the box.`)
 	const set = await Set.findOne({ where: { code: code.toUpperCase() }})
 	if (!set) return message.channel.send(`There is no coreset with the code "${code.toUpperCase()}".`)
@@ -5989,7 +5990,7 @@ if(cmd === `!dump`) {
 	if (mcid !== botSpamChannelId) return message.channel.send(`Please use this command in <#${botSpamChannelId}>.`)
 	const info = await Info.findOne({ where: { element: 'shop'} })
 	if (info.status === 'closed') return message.channel.send(`Sorry, you cannot dump cards while The Shop is closed.`)
-	const set_code = args.length ? args[0].toUpperCase() : 'TEB'
+	const set_code = args.length ? args[0].toUpperCase() : 'DRT'
 	const set = await Set.findOne({where: { code: set_code }})
 	if (!set) return message.channel.send(`Sorry, I do not recognized the set code: "${set_code}".`)
 	const player = await Player.findOne({ where: { id: maid }, include: Wallet })

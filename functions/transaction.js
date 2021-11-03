@@ -119,7 +119,11 @@ const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer, fuzzyP
         } else if (!print) {
             message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
             return false
-        }
+        } else if (print.set_code === 'FPC') {
+			message.channel.send(`You cannot buy or sell prize cards.`)
+			return false
+		}
+
 
 		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 

@@ -12,6 +12,10 @@
             "url":"https://www.duelingbook.com/deck?id=8810411",
             "screenshot":"https://i.imgur.com/mBRB5WJ.png"
         },
+        "fiend": {
+            "url":"https://www.duelingbook.com/deck?id=9350876",
+            "screenshot":"https://i.imgur.com/o3z0Nq4.png"
+        },
         "fish": {
             "url":"https://www.duelingbook.com/deck?id=8813309",
             "screenshot":"https://i.imgur.com/o3z0Nq4.png"
@@ -32,54 +36,74 @@
             "url":"https://www.duelingbook.com/deck?id=8810412",
             "screenshot":"https://i.imgur.com/zquDNg3.png"
         },
+        "thunder": {
+            "url":"https://www.duelingbook.com/deck?id=9350811",
+            "screenshot":"https://i.imgur.com/o3z0Nq4.png"
+        },
         "warrior": {
             "url":"https://www.duelingbook.com/deck?id=8810410",
             "screenshot":"https://i.imgur.com/4MBhXNm.png"
+        },
+        "zombie": {
+            "url":"https://www.duelingbook.com/deck?id=9350745",
+            "screenshot":"https://i.imgur.com/o3z0Nq4.png"
         }
     },
     "vouchers": {
         "beast":"mushroom",
         "dinosaur":"egg",
         "dragon":"gem",
+        "fiend":"familiar",
         "fish":"hook",
         "plant":"rose",
         "reptile":"cactus",
         "rock":"moai",
         "spellcaster":"orb",
-        "warrior":"swords"
+        "thunder":"battery",
+        "warrior":"swords",
+        "zombie":"skull"
     },
     "prizes": {
         "beast":"APC-001",
         "dinosaur":"APC-005",
         "dragon":"APC-009",
+        "fiend":"APC-012",
         "fish":"APC-004",
         "plant":"APC-003",
         "reptile":"APC-006",
         "rock":"APC-002",
         "spellcaster":"APC-008",
-        "warrior":"APC-007"
+        "thunder":"APC-010",
+        "warrior":"APC-007",
+        "zombie":"APC-011"
     },
     "victories": {
         "beast":"Today, you attacked your foes with the ferocity of a wolverine!",
         "dinosaur":"Today, you flattened your foes with the weight of a sauropod!",
         "dragon":"Today, you scorched your foes with the flames of legends!",
+        "fiend":"Today, you tormented your foes with the cruelty of a demon!",
         "fish":"Today, you rushed your foes with the speed of a marlin!",
         "plant":"Today, you astonished your foes with the beauty of a princess!",
         "reptile":"Today, you paralyzed your foes with the venom of a cobra!",
         "rock":"Today, you rolled over your foes with the ease of a boulder!",
         "spellcaster":"Today, you manipulated your foes with the trickery of a sorcerer!",
-        "warrior":"Today, you conquered your foes with the heart of a champion!"
+        "thunder":"Today, you shocked your foes with the voltage of a dynamo!",
+        "warrior":"Today, you conquered your foes with the heart of a champion!",
+        "zombie":"Today, you haunted your foes with the menace of a specter!"
     },
     "apcs": {
         "beast":"<:ult:845483716888887297>APC-001 - Desmanian Devil",
         "dinosaur":"<:ult:845483716888887297>APC-005 - Spacetime Transcendence",
         "dragon":"<:ult:845483716888887297>APC-009 - Guardragon Cataclysm",
+        "fiend":"<:ult:845483716888887297>APC-012 - Fiend Griefing",
         "fish":"<:ult:845483716888887297>APC-004 - Moray of Greed",
         "plant":"<:ult:845483716888887297>APC-003 - Rose Lover",
         "reptile":"<:ult:845483716888887297>APC-006 - Viper's Rebirth",
         "rock":"<:ult:845483716888887297>APC-002 - Koa'ki Meiru Guardian",
         "spellcaster":"<:ult:845483716888887297>APC-008 - Spellbook of Knowledge",
-        "warrior":"<:ult:845483716888887297>APC-007 - Sublimation Knight"
+        "thunder":"<:ult:845483716888887297>APC-010 - Batteryman Solar",
+        "warrior":"<:ult:845483716888887297>APC-007 - Sublimation Knight",
+        "zombie":"<:ult:845483716888887297>APC-011 - Gozuki"
     },
     "verbs": [
         "absolutely deserved",

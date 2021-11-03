@@ -3,7 +3,7 @@ const { Auction, Bid, Card, Match, Player, Tournament, Print, Set, Status, Walle
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { nocom, yescom } = require('../static/commands.json')
-const { downward, upward, forgestone, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, closed, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, open, ORF, TEB, FON, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, stonks, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
+const { downward, upward, forgestone, gem, orb, swords, beast, blue, bronze, DRT, fiend, thunder, zombie, skull, familiar, battery, cactus, cavebob, checkmark, closed, com, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, open, ORF, TEB, FON, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, stonks, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
 const { awardPacksToShop } = require('./packs')
 const adminId = '194147938786738176'
 const { client } = require('../static/clients.js')
@@ -924,7 +924,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
             unlocked: [
                 [10, 'DOC-180', `(2) ${ult}DOC-180 - Peropero Cerperus - 10 ${mushroom}`],
                 [10, 'TEB-135', `(3) ${ult}TEB-135 - Green Baboon, Defender of the Forest - 10 ${mushroom}`],
-                [15, 'ORF-046', `(4) ${ult}ORF-046 - X-Saber Airbellum - 15 ${mushroom}`]
+                [10, 'ORF-046', `(4) ${ult}ORF-046 - X-Saber Airbellum - 10 ${mushroom}`]
             ]
         },
         moai: {
@@ -964,9 +964,9 @@ const getBarterCard = async (message, voucher, medium_complete) => {
         swords: {
             original: [[10, 'APC-007', `(1) ${ult}APC-007 - Sublimation Knight - 10 ${swords}`]],
             unlocked: [
-                [15, 'ORF-047', `(2) ${ult}ORF-047 - Elemental HERO Nova Master - 15 ${swords}`],
-                [30, 'DOC-188', `(3) ${ult}DOC-188 - Reinforcement of the Army - 30 ${swords}`],
-                [40, 'TEB-136', `(4) ${ult}TEB-136 - Infernoble Knight - Roland - 40 ${swords}`]
+                [10, 'ORF-047', `(2) ${ult}ORF-047 - Elemental HERO Nova Master - 10 ${swords}`],
+                [10, 'DOC-188', `(3) ${ult}DOC-188 - Reinforcement of the Army - 10 ${swords}`],
+                [10, 'TEB-136', `(4) ${ult}TEB-136 - Infernoble Knight - Roland - 10 ${swords}`]
             ]
         },
         orb: {
@@ -974,7 +974,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
             unlocked: [
                 [10, 'TEB-130', `(2) ${ult}TEB-130 - Altergeist Meluseek - 10 ${orb}`],
                 [10, 'TEB-137', `(3) ${ult}TEB-137 - Shaddoll Dragon - 10 ${orb}`],
-                [20, 'DOC-175', `(4) ${ult}DOC-175 - Breaker the Magical Warrior - 20 ${orb}`]
+                [10, 'DOC-175', `(4) ${ult}DOC-175 - Breaker the Magical Warrior - 10 ${orb}`]
             ]
         },
         gem: {

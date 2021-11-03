@@ -4,7 +4,7 @@
 const { Inventory, Player, Set, Trade, Print, Wallet } = require('../db')
 const { Op } = require('sequelize')
 const { yescom, nocom } = require('../static/commands.json')
-const { starchips, stardust, com, rar, sup, ult, scr, egg, cactus, hook, moai, mushroom, rose, orb, gem, swords } = require('../static/emojis.json')
+const { starchips, stardust, com, rar, sup, ult, scr, skull, familiar, battery, egg, cactus, hook, moai, mushroom, rose, orb, gem, swords } = require('../static/emojis.json')
 const { findCard } = require('./search.js')
 const { updateBinder } = require('./binder.js')
 const { selectPrint } = require('./print.js')
@@ -153,6 +153,9 @@ const getTradeSummary = async (message, inputs, player, fuzzyPrints) => {
 			return false
 		} else if (!print && !walletField) {
 			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+			return false
+		} else if (print.set_code === 'FPC') {
+			message.channel.send(`You cannot trade prize cards.`)
 			return false
 		}
 

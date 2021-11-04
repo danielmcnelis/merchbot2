@@ -347,10 +347,10 @@ if (cmd === `!import_all_images`) {
 if (cmd === `!update_cards`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
 	const cards = await Card.findAll()
-	const cardNames = allCards.map((card) => card.name)
+	const cardNames = cards.map((c) => c.name)
 
-	const newCards = ygoprodeck.data.filter((card) => {
-		if (!allCardNames.includes(card.name)) return card
+	const newCards = ygoprodeck.data.filter((c) => {
+		if (!cardNames.includes(c.name)) return c
 	})
 
 	if (!newCards.length) return message.channel.send(`Could not find any new Yu-Gi-Oh! cards on YGOPRODeck.com.`)

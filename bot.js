@@ -370,8 +370,8 @@ if (cmd === `!update_cards`) {
 		let konami_code = card.id
 		while (konami_code.length < 8) konami_code = '0' + konami_code
 		const category = card.type.includes('Monster') ? 'Monster' : card.type.includes('Spell') ? 'Spell' : 'Trap'
-		const tcg_legal = card.formats.includes('TCG')
-		const ocg_legal = card.formats.includes('OCG')
+		const tcg_legal = card.misc_info[0].formats.includes('TCG')
+		const ocg_legal = card.misc_info[0].formats.includes('OCG')
 		const icon = category === 'Spell' || category === 'Trap' ? card.race : null
 		const normal = category === 'Monster' && card.type.includes('Normal')
 		const effect = category === 'Monster' && card.type.includes('Effect')

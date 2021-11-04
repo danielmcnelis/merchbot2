@@ -367,7 +367,7 @@ if (cmd === `!update_cards`) {
 
 		const image_file = `${card.id}.jpg`
 		const name = card.name
-		let konami_code = card.konami_code
+		let konami_code = card.id
 		while (konami_code.length < 8) konami_code = '0' + konami_code
 		const category = card.type.includes('Monster') ? 'Monster' : card.type.includes('Spell') ? 'Spell' : 'Trap'
 		const tcg_legal = card.formats.includes('TCG')

@@ -362,7 +362,7 @@ if (cmd === `!update_cards`) {
 		if (
 			card.type === 'Token' || 
 			card.name.includes('(Skill Card)') || 
-			(!newCard.misc_info[0].tcg_date && !newCard.misc_info[0].ocg_date) 
+			(!card.misc_info[0].tcg_date && !card.misc_info[0].ocg_date) 
 		) continue
 
 		const image_file = `${card.id}.jpg`

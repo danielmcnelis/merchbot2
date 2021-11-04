@@ -346,8 +346,8 @@ if (cmd === `!import_all_images`) {
 //UPDATE CARDS
 if (cmd === `!update_cards`) {
 	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	const allCards = await Card.findAll()
-	const allCardNames = allCards.map((card) => card.name)
+	const cards = await Card.findAll()
+	const cardNames = allCards.map((card) => card.name)
 
 	const newCards = ygoprodeck.data.filter((card) => {
 		if (!allCardNames.includes(card.name)) return card
@@ -358,38 +358,77 @@ if (cmd === `!update_cards`) {
 	let created = 0
 
 	for (let i = 0; i < newCards.length; i++) {
-		const newCard = newCards[i]
-		if (newCard.type === 'Token' || newCard.name.includes('(Skill Card)') || (!newCard.misc_info[0].tcg_date && !newCard.misc_info[0].ocg_date) ) continue
-		const image_file = `${newCard.id}.jpg`
-		const name = newCard.name
-		const newCardTypeArr = newCard.type.split(" ")
-		const card = newCardTypeArr.includes('Monster') ? 'Monster' : newCardTypeArr.includes('Spell') ? 'Spell' : 'Trap'
-		const category = newCardTypeArr[0] === 'Tuner' ? 'Effect' : card === 'Spell' || card === 'Trap' ? newCard.race : newCardTypeArr[0]
-		const card_class =  newCardTypeArr[0] === 'Tuner' ? 'Tuner' : newCardTypeArr[1] !== 'Monster' && newCardTypeArr[1] !== 'Card' ? newCardTypeArr[1] : card === 'Monster' && category !== 'Effect' ? 'Effect' : null
-		const subclass = newCardTypeArr[2] || null
-		const attribute = newCard.attribute ? capitalize(newCard.attribute.toLowerCase()) : null
-		const type = card === 'Monster' ? newCard.race : null
-		const level = newCard.level || newCard.rank || newCard.linkVal || null
-		const atk = newCard.atk || newCard.atk === 0 ? newCard.atk : null
-		const def = newCard.def || newCard.def === 0 ? newCard.def : null
-		const description = newCard.desc
-		const date = newCard.misc_info[0].tcg_date || newCard.misc_info[0].ocg_date
+		const card = newCards[i]
+		if (
+			card.type === 'Token' || 
+			card.name.includes('(Skill Card)') || 
+			(!newCard.misc_info[0].tcg_date && !newCard.misc_info[0].ocg_date) 
+		) continue
+
+		const image_file = `${card.id}.jpg`
+		const name = card.name
+		let konami_code = card.konami_code
+		while (konami_code.length < 8) konami_code = '0' + konami_code
+		const category = card.type.includes('Monster') ? 'Monster' : card.type.includes('Spell') ? 'Spell' : 'Trap'
+		const tcg_legal = card.formats.includes('TCG')
+		const ocg_legal = card.formats.includes('OCG')
+		const icon = category === 'Spell' || category === 'Trap' ? card.race : null
+		const normal = category === 'Monster' && card.type.includes('Normal')
+		const effect = category === 'Monster' && card.type.includes('Effect')
+		const fusion = category === 'Monster' && card.type.includes('Fusion')
+		const ritual = category === 'Monster' && card.type.includes('Ritual')
+		const synchro = category === 'Monster' && card.type.includes('Synchro')
+		const xyz = category === 'Monster' && card.type.includes('Xyz')
+		const pendulum = category === 'Monster' && card.type.includes('Pendulum')
+		const link = category === 'Monster' && card.type.includes('Link')
+		const flip = category === 'Monster' && card.type.includes('Flip')
+		const gemini = category === 'Monster' && card.type.includes('Gemini')
+		const spirit = category === 'Monster' && card.type.includes('Spirit')
+		const toon = category === 'Monster' && card.type.includes('Toon')
+		const tuner = category === 'Monster' && card.type.includes('Tuner')
+		const union = category === 'Monster' && card.type.includes('Union')
+		const attribute = card.attribute
+		const type = category === 'Monster' ? card.race : null
+		const level = card.level || card.rank
+		const rating = card.linkVal
+		const atk = card.atk
+		const def = card.def
+		const description = card.desc
+		const tcg_date = card.misc_info[0].tcg_date 
+		const ocg_date = card.misc_info[0].ocg_date
 		
 		try {
 			await Card.create({
-				image_file,
 				name,
-				card,
+				konami_code,
+				tcg_legal,
+				ocg_legal,
+				image_file,
 				category,
-				class: card_class,
-				subclass,
+				icon,
+				normal,
+				effect,
+				fusion,
+				ritual,
+				synchro,
+				xyz,
+				pendulum,
+				link,
+				flip,
+				gemini,
+				spirit,
+				toon,
+				tuner,
+				union,
 				attribute,
 				type,
 				level,
+				rating,
 				atk,
 				def,
 				description,
-				date
+				tcg_date,
+				ocg_date
 			})
 		} catch (err) {
 			console.log(err)
@@ -483,11 +522,11 @@ if (cmd === `!konami`) {
 		while (konami_code.length < 8) konami_code = '0' + konami_code
 		print.konami_code = konami_code
 
-		const color = card.card === 'Monster' && card.category === 'Effect' ? 'orange' :
-			card.card === 'Monster' && card.category === 'Normal' ? 'yellow' :
-			card.card === 'Monster' && card.category === 'Fusion' ? 'purple' :
-			card.card === 'Spell' ? 'green' :
-			card.card === 'Trap' ? 'violet' :
+		const color = card.category === 'Monster' && card.fusion ? 'purple' :
+			card.category === 'Monster' && card.normal ? 'yellow' :
+			card.category === 'Monster' && card.fusion ? 'orange' :
+			card.category === 'Spell' ? 'green' :
+			card.category === 'Trap' ? 'violet' :
 			null
 		
 		print.color = color
@@ -848,6 +887,7 @@ if(startcom.includes(cmd)) {
 			await awardPack(message.channel, maid, set2, 24)
 			await awardPack(message.channel, maid, set3, 24)
 			await awardPack(message.channel, maid, set4, 24)
+			await awardPack(message.channel, maid, set5, 24)
 			await completeTask(message.channel, maid, 'e1')
 			await completeTask(message.channel, maid, 'm4', 4000)
 			return message.channel.send(`I wish you luck on your journey, new duelist! ${master}`)
@@ -5350,7 +5390,7 @@ if(checklistcom.includes(cmd)) {
 //PACK
 if(packcom.includes(cmd)) {
 	let num = 1
-	let code = 'FON'
+	let code = 'DRT'
 	for (let i = 0; i < args.length; i++) {
 		if (isFinite(args[i])) {
 			num = parseInt(args[i])
@@ -5518,11 +5558,6 @@ if(packcom.includes(cmd)) {
 
 		set.unit_sales += num
 		await set.save()
-
-		if (set.code === 'FON') {
-			daily.fon_packs += num
-			await daily.save()
-		}
 
 		completeTask(message.channel, maid, 'e6')
 		if (set.type === 'core' && num >= 5) completeTask(message.channel, maid, 'm3', 3000)

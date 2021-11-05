@@ -139,7 +139,10 @@ const getTradeSummary = async (message, inputs, player, fuzzyPrints) => {
 		if (query === 'rose' || query === 'roses' ) walletField = 'rose'
 		if (query === 'sword' || query === 'swords' ) walletField = 'swords'
 		if (query === 'orb' || query === 'orbs' ) walletField = 'orb'
-		if (query === 'ge' || query === 'gems' ) walletField = 'gem'
+		if (query === 'gem' || query === 'gems' ) walletField = 'gem'
+		if (query === 'skull' || query === 'skulls' ) walletField = 'skull'
+		if (query === 'familiar' || query === 'familiars' ) walletField = 'familiar'
+		if (query === 'battery' || query === 'batteries' ) walletField = 'battery'
 
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 		const card_name = await findCard(query, fuzzyPrints)

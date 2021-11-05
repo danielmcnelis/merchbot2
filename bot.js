@@ -2526,6 +2526,9 @@ if(walletcom.includes(cmd)) {
 	if (wallet.swords) results.push(`Swords: ${wallet.swords} ${swords}`)
 	if (wallet.orb) results.push(`Orbs: ${wallet.orb} ${orb}`)
 	if (wallet.gem) results.push(`Gems: ${wallet.gem} ${gem}`)
+	if (wallet.skull) results.push(`Skulls: ${wallet.gem} ${skull}`)
+	if (wallet.familiar) results.push(`Familiars: ${wallet.familiar} ${familiar}`)
+	if (wallet.battery) results.push(`Batteries: ${wallet.battery} ${battery}`)
 
 	return message.channel.send(results.join('\n'))
 }
@@ -4936,6 +4939,9 @@ if(cmd === `!award`) {
 	if (query === 'sword' || query === 'swords' ) walletField = 'swords'
 	if (query === 'orb' || query === 'orbs' ) walletField = 'orb'
 	if (query === 'gem' || query === 'gems' ) walletField = 'gem'
+	if (query === 'skull' || query === 'skulls' ) walletField = 'skull'
+	if (query === 'familiar' || query === 'familiars' ) walletField = 'familiar'
+	if (query === 'battery' || query === 'batteries' ) walletField = 'battery'
 
 	set_code = query.slice(0, 3).toUpperCase()
 	const valid_set_code = !!(!walletField && set_code.length === 3 && await Set.count({where: { code: set_code }}))
@@ -5025,6 +5031,9 @@ if(cmd === `!steal`) {
 	if (query === 'sword' || query === 'swords' ) walletField = 'swords'
 	if (query === 'orb' || query === 'orbs' ) walletField = 'orb'
 	if (query === 'gem' || query === 'gems' ) walletField = 'gem'
+	if (query === 'skull' || query === 'skulls' ) walletField = 'skull'
+	if (query === 'familiar' || query === 'familiars' ) walletField = 'familiar'
+	if (query === 'battery' || query === 'batteries' ) walletField = 'battery'
 
 	const set_code = query.toUpperCase()
 	const valid_set_code = !!(!walletField && set_code.length === 3 && await Set.count({where: { code: set_code }}))

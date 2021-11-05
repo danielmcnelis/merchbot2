@@ -347,6 +347,9 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
     if (query === 'gem' || query === 'gems' ) walletField = 'gem'
     if (query === 'orb' || query === 'orbs' ) walletField = 'orb'
     if (query === 'sword' || query === 'swords' ) walletField = 'swords'
+    if (query === 'skull' || query === 'skulls' ) walletField = 'skull'
+    if (query === 'familiar' || query === 'familiars' ) walletField = 'familiar'
+    if (query === 'battery' || query === 'batteries' ) walletField = 'battery'
 
     const print = valid_card_code && !walletField ? await Print.findOne({ where: { card_code: card_code }}) :
                 card_name && !walletField ? await selectPrint(message, sellerId, card_name, private = false, inInv = true) :

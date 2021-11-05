@@ -869,7 +869,10 @@ const getVoucher = async (message) => {
         `(7) Cacti ${cactus}`,
         `(8) Swords ${swords}`,
         `(9) Orbs ${orb}`,
-        `(10) Gems ${gem}`
+        `(10) Gems ${gem}`,
+        `(11) Skulls ${skull}`,
+        `(12) Familiars ${familiar}`,
+        `(13) Batteries ${battery}`
     ]
 
     const filter = m => m.author.id === message.member.user.id
@@ -880,7 +883,15 @@ const getVoucher = async (message) => {
     }).then(async collected => {
 		const response = collected.first().content.toLowerCase()
         let voucher
-        if((response.includes('1') && !response.includes('0')) || response.includes('forge') || response.includes('stone')) {
+        if(response.includes('10') || response.includes('gem')) {
+            voucher = 'gem'
+        } else if(response.includes('11') || response.includes('skull')) {
+            voucher = 'skull'
+        } else if(response.includes('12') || response.includes('familiar')) {
+            voucher = 'familiar'
+        } else if(response.includes('13') || response.includes('batter')) {
+            voucher = 'battery'
+        } else if(response.includes('1') || response.includes('forge') || response.includes('stone')) {
             voucher = 'forgestone'
         } else if(response.includes('2') || response.includes('mush') || response.includes('shroom')) {
             voucher = 'mushroom'
@@ -898,8 +909,6 @@ const getVoucher = async (message) => {
             voucher = 'swords'
         } else if(response.includes('9') || response.includes('orb')) {
             voucher = 'orb'
-        } else if(response.includes('10') || response.includes('gem')) {
-            voucher = 'gem'
         } else {
             message.channel.send(`You did not select a valid option.`)
             return false
@@ -982,6 +991,18 @@ const getBarterCard = async (message, voucher, medium_complete) => {
             unlocked: [
                 [10, 'TEB-141', `(2) ${ult}TEB-141 - Dragon Ravine - 10 ${gem}`]
             ]
+        },
+        skull: {
+            original: [[10, 'APC-010', `(1) ${ult}APC-010 - Gozuki - 10 ${skull}`]],
+            unlocked: []
+        },
+        familiar: {
+            original: [[10, 'APC-011', `(1) ${ult}APC-011 - Graff, Malebranche of the Burning Abyss - 10 ${familiar}`]],
+            unlocked: []
+        },
+        battery: {
+            original: [[10, 'APC-012', `(1) ${ult}APC-012 - Thunder Dragondark - 10 ${battery}`]],
+            unlocked: []
         }
     }
 
@@ -1053,7 +1074,10 @@ const getTradeInCard = async (message, medium_complete) => {
         [10, 'APC-006', `(6) ${ult}APC-006 - Viper's Rebirth - 10 ${cactus}`, 'cactus'],
         [10, 'APC-007', `(7) ${ult}APC-007 - Sublimation Knight - 10 ${swords}`, 'swords'],
         [10, 'APC-008', `(8) ${ult}APC-008 - Spellbook of Knowledge - 10 ${orb}`, 'orb'],
-        [10, 'APC-009', `(9) ${ult}APC-009 - Guardragon Cataclysm - 10 ${gem}`, 'gem']
+        [10, 'APC-009', `(9) ${ult}APC-009 - Guardragon Cataclysm - 10 ${gem}`, 'gem'],
+        [10, 'APC-010', `(10) ${ult}APC-010 - Gozuki - 10 ${skull}`, 'skull'],
+        [10, 'APC-011', `(11) ${ult}APC-011 - Graff, Malebranche of the Burning Abyss - 10 ${familiar}`, 'familiar'],
+        [10, 'APC-012', `(12) ${ult}APC-012 - Thunder Dragondark - 10 ${battery}`, 'battery']
     ]
 
     const cards = options.map((o) => o[2])
@@ -1066,7 +1090,13 @@ const getTradeInCard = async (message, medium_complete) => {
     }).then(async collected => {
 		const response = collected.first().content.toLowerCase()
         let index
-        if(response.includes('1') || response.includes('APC-001') || response.includes('devil') || response.includes('desm')) {
+        if(response.includes('10') || response.includes('APC-010') || response.includes('gozu')) {
+            index = 9
+        } else if(response.includes('11') || response.includes('APC-011') || response.includes('graff') || response.includes('burning')) {
+            index = 10
+        } else if(response.includes('12') || response.includes('APC-012') || response.includes('thunder') || response.includes('tdrag')) {
+            index = 11
+        } else if(response.includes('1') || response.includes('APC-001') || response.includes('devil') || response.includes('desm')) {
             index = 0
         } else if(response.includes('2') || response.includes('APC-002') || response.includes('koa') || response.includes('guardian')) {
             index = 1

@@ -67,15 +67,15 @@
         "beast":"APC-001",
         "dinosaur":"APC-005",
         "dragon":"APC-009",
-        "fiend":"APC-012",
+        "fiend":"APC-011",
         "fish":"APC-004",
         "plant":"APC-003",
         "reptile":"APC-006",
         "rock":"APC-002",
         "spellcaster":"APC-008",
-        "thunder":"APC-010",
+        "thunder":"APC-012",
         "warrior":"APC-007",
-        "zombie":"APC-011"
+        "zombie":"APC-010"
     },
     "victories": {
         "beast":"Today, you attacked your foes with the ferocity of a wolverine!",
@@ -95,15 +95,15 @@
         "beast":"<:ult:845483716888887297>APC-001 - Desmanian Devil",
         "dinosaur":"<:ult:845483716888887297>APC-005 - Spacetime Transcendence",
         "dragon":"<:ult:845483716888887297>APC-009 - Guardragon Cataclysm",
-        "fiend":"<:ult:845483716888887297>APC-012 - Fiend Griefing",
+        "fiend":"<:ult:845483716888887297>APC-011 - Graff, Malebranche of the Burning Abyss",
         "fish":"<:ult:845483716888887297>APC-004 - Moray of Greed",
         "plant":"<:ult:845483716888887297>APC-003 - Rose Lover",
         "reptile":"<:ult:845483716888887297>APC-006 - Viper's Rebirth",
         "rock":"<:ult:845483716888887297>APC-002 - Koa'ki Meiru Guardian",
         "spellcaster":"<:ult:845483716888887297>APC-008 - Spellbook of Knowledge",
-        "thunder":"<:ult:845483716888887297>APC-010 - Batteryman Solar",
+        "thunder":"<:ult:845483716888887297>APC-012 - Thunder Dragondark",
         "warrior":"<:ult:845483716888887297>APC-007 - Sublimation Knight",
-        "zombie":"<:ult:845483716888887297>APC-011 - Gozuki"
+        "zombie":"<:ult:845483716888887297>APC-010 - Gozuki"
     },
     "verbs": [
         "absolutely deserved",

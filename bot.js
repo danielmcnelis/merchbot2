@@ -2526,7 +2526,7 @@ if(walletcom.includes(cmd)) {
 	if (wallet.swords) results.push(`Swords: ${wallet.swords} ${swords}`)
 	if (wallet.orb) results.push(`Orbs: ${wallet.orb} ${orb}`)
 	if (wallet.gem) results.push(`Gems: ${wallet.gem} ${gem}`)
-	if (wallet.skull) results.push(`Skulls: ${wallet.gem} ${skull}`)
+	if (wallet.skull) results.push(`Skulls: ${wallet.skull} ${skull}`)
 	if (wallet.familiar) results.push(`Familiars: ${wallet.familiar} ${familiar}`)
 	if (wallet.battery) results.push(`Batteries: ${wallet.battery} ${battery}`)
 

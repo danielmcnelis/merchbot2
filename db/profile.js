@@ -82,6 +82,21 @@ const Profile = db.define('profile', {
         defaultValue: 0,        
         allowNull: false
     },
+    fiend_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,        
+        allowNull: false
+    },
+    thunder_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,        
+        allowNull: false
+    },
+    zombie_wins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,        
+        allowNull: false
+    },
     trivia_wins: {
         type: Sequelize.INTEGER,
         defaultValue: 0,  

@@ -72,6 +72,21 @@ const Wallet = db.define('wallet', {
         type: Sequelize.INTEGER,  
         defaultValue: 0,           
         allowNull: false
+    },
+    familiar: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
+    battery: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
+    skull: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
     }
 })
 

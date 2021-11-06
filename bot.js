@@ -2538,7 +2538,7 @@ if (statscom.includes(cmd)) {
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const player = await Player.findOne({ 
 		where: { id: playerId },
-		include: [Profile, Wallet] 
+		include: [Knowledge, Profile, Wallet] 
 	})
 
 	if (!player && maid === playerId) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
@@ -2547,12 +2547,12 @@ if (statscom.includes(cmd)) {
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
 	: message.channel === client.channels.cache.get(pauperChannelId) ? "Pauper"
 	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
-	//: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
-	//: message.channel === client.channels.cache.get(marketPlaceChannelId) ? "Market"
+	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
+	: message.channel === client.channels.cache.get(marketPlaceChannelId) ? "Market"
 	: "Ranked"
 
 	const allPlayers = await Player.findAll({
-		include: [Profile, Wallet]
+		include: [Knowledge, Profile, Wallet]
 	})
 
 	const membersMap = await message.guild.members.fetch()
@@ -2578,6 +2578,59 @@ if (statscom.includes(cmd)) {
 			+ `\nWins: ${player.wins}, Losses: ${player.losses}`
 			+ `\nWin Rate: ${player.wins || player.losses ? `${(100 * player.wins / (player.wins + player.losses)).toFixed(2)}%` : 'N/A'}`
 		)
+	} else if (game === 'Market') {
+		const transformed_wallets = []
+
+		for (let i = 0; i < active_players.length; i++) {
+			const w = active_players[i].wallet
+			const invs = await Inventory.findAll({ where: { playerId: w.playerId }, include: Print })
+			let networth = parseInt(w.starchips) + (parseInt(w.stardust) / 10)
+			invs.forEach((inv) => networth += (parseInt(inv.print.market_price) * parseInt(inv.quantity) / 10))
+			transformed_wallets.push([w.playerId, Math.round(networth)])
+		}
+
+		transformed_wallets.sort((a, b) => b[1] - a[1])
+		const index = transformed_wallets.length ? transformed_wallets.findIndex((w) => w[0] === playerId) : null
+		const rank = index !== null ? `#${index + 1} out of ${transformed_wallets.length}` : `N/A`
+		const networth = transformed_wallets[index][1]
+		const pCount = await Print.count({ where: { hidden: false, draft: false } })
+		const iCount = await Inventory.count({ where: { playerId: playerId, quantity: { [Op.gt]: 0 }, draft: false } })
+		const tCount = await Trade.count({ where: { [Op.or]: [ { senderId: playerId }, { receiverId: playerId }] } })
+
+		return message.channel.send(
+			`${king} --- Marketplace Stats --- ${king}`
+			+ `\nName: ${player.name}`
+			+ `\nRanking: ${rank}`
+			+ `\nNet Worth: ${networth} ${starchips}`
+			+ `\nPrints: ${iCount} out of ${pCount} ${ygocard}`
+			+ `\nTrades: ${tCount} ${robbed}`
+			+ `\nPartners: ${player.profile.trades} ${merchant}`
+		)
+	} else if (game === 'Trivia') {
+		const transformed_knowledges = []
+
+		for (let i = 0; i < active_players.length; i++) {
+			const k = active_players[i].knowledge
+			let correct_answers = 0
+			const knowledge_keys = Object.keys(k.dataValues)
+			knowledge_keys.forEach(function(key) {
+				if (key.startsWith('question') && k[key]) correct_answers++
+			})
+
+			transformed_knowledges.push([k.playerId, correct_answers])
+		}
+
+		transformed_knowledges.sort((a, b) => b[1] - a[1])
+		const index = transformed_knowledges.length ? transformed_knowledges.findIndex((k) => k[0] === playerId) : null
+		const rank = index !== null ? `#${index + 1} out of ${transformed_knowledges.length}` : `N/A`
+		const smarts = transformed_knowledges[index][1]
+		
+		return message.channel.send(
+			`${cultured} --- Trivia Stats --- ${cultured}`
+			+ `\nName: ${player.name}`
+			+ `\nRanking: ${rank}`
+			+ `\nCorrectly Answered: ${smarts} ${stoned}`
+		)
 	} else if (game === 'Arena') {
 		const filtered_players = active_players.filter((player) => player.arena_wins || player.arena_losses)
 		const sorted_players = filtered_players.sort((a, b) => {
@@ -2601,12 +2654,15 @@ if (statscom.includes(cmd)) {
 			+ `${p.beast_wins ? `\nBeast Wins: ${p.beast_wins} ${p.beast_wins >= 3 ? `${beast} ${beast} ${beast}` : p.beast_wins >= 2 ? `${beast} ${beast}` : `${beast}`}` : ''}`
 			+ `${p.dinosaur_wins ? `\nDinosaur Wins: ${p.dinosaur_wins} ${p.dinosaur_wins >= 3 ? `${dinosaur} ${dinosaur} ${dinosaur}` : p.dinosaur_wins >= 2 ? `${dinosaur} ${dinosaur}` : `${dinosaur}`}` : ''}`
 			+ `${p.dragon_wins ? `\nDragon Wins: ${p.dragon_wins} ${p.dragon_wins >= 3 ? `${dragon} ${dragon} ${dragon}` : p.dragon_wins >= 2 ? `${dragon} ${dragon}` : `${dragon}`}` : ''}`
+			+ `${p.fiend_wins ? `\nFiend Wins: ${p.fiend_wins} ${p.fiend_wins >= 3 ? `${fiend} ${fiend} ${fiend}` : p.fiend_wins >= 2 ? `${fiend} ${fiend}` : `${fiend}`}` : ''}`
 			+ `${p.fish_wins ? `\nFish Wins: ${p.fish_wins} ${p.fish_wins >= 3 ? `${fish} ${fish} ${fish}` : p.fish_wins >= 2 ? `${fish} ${fish}` : `${fish}`}` : ''}`
 			+ `${p.plant_wins ? `\nPlant Wins: ${p.plant_wins} ${p.plant_wins >= 3 ? `${plant} ${plant} ${plant}` : p.plant_wins >= 2 ? `${plant} ${plant}` : `${plant}`}` : ''}`
 			+ `${p.reptile_wins ? `\nReptile Wins: ${p.reptile_wins} ${p.reptile_wins >= 3 ? `${reptile} ${reptile} ${reptile}` : p.reptile_wins >= 2 ? `${reptile} ${reptile}` : `${reptile}`}` : ''}`
 			+ `${p.rock_wins ? `\nRock Wins: ${p.rock_wins} ${p.rock_wins >= 3 ? `${rock} ${rock} ${rock}` : p.rock_wins >= 2 ? `${rock} ${rock}` : `${rock}`}` : ''}`
 			+ `${p.spellcaster_wins ? `\nSpellcaster Wins: ${p.spellcaster_wins} ${p.spellcaster_wins >= 3 ? `${spellcaster} ${spellcaster} ${spellcaster}` : p.spellcaster_wins >= 2 ? `${spellcaster} ${spellcaster}` : `${spellcaster}`}` : ''}`
+			+ `${p.thunder_wins ? `\nThunder Wins: ${p.thunder_wins} ${p.thunder_wins >= 3 ? `${thunder} ${thunder} ${thunder}` : p.thunder_wins >= 2 ? `${thunder} ${thunder}` : `${thunder}`}` : ''}`
 			+ `${p.warrior_wins ? `\nWarrior Wins: ${p.warrior_wins} ${p.warrior_wins >= 3 ? `${warrior} ${warrior} ${warrior}` : p.warrior_wins >= 2 ? `${warrior} ${warrior}` : `${warrior}`}` : ''}`
+			+ `${p.zombie_wins ? `\nZombie Wins: ${p.zombie_wins} ${p.zombie_wins >= 3 ? `${zombie} ${zombie} ${zombie}` : p.zombie_wins >= 2 ? `${zombie} ${zombie}` : `${zombie}`}` : ''}`
 			+ `\nMedal: ${medal}`
 			+ `\nElo Rating: ${player.arena_stats.toFixed(2)}`
 			+ `\nWins: ${player.arena_wins}, Losses: ${player.arena_losses}`
@@ -3786,7 +3842,7 @@ if (rankcom.includes(cmd)) {
 			const player = top_players[i]
 			const profile = player.profile
 			const wins = getArenaVictories(profile)
-			result[i+1] = `${(i+1)}. ${player.name}${wins ? ' - ' : ''}${profile.beast_wins ? `${beast} ` : ''}${profile.dinosaur_wins ? `${dinosaur} ` : ''}${profile.fish_wins ? `${fish} ` : ''}${profile.plant_wins ? `${plant} ` : ''}${profile.reptile_wins ? `${reptile} ` : ''}${profile.rock_wins ? `${rock} ` : ''}${profile.dragon_wins ? `${dragon} ` : ''}${profile.spellcaster_wins ? `${spellcaster} ` : ''}${profile.warrior_wins ? `${warrior} ` : ''}`
+			result[i+1] = `${(i+1)}. ${player.name}${wins ? ' - ' : ''}${profile.beast_wins ? `${beast} ` : ''}${profile.dinosaur_wins ? `${dinosaur} ` : ''}${profile.fish_wins ? `${fish} ` : ''}${profile.plant_wins ? `${plant} ` : ''}${profile.reptile_wins ? `${reptile} ` : ''}${profile.rock_wins ? `${rock} ` : ''}${profile.dragon_wins ? `${dragon} ` : ''}${profile.spellcaster_wins ? `${spellcaster} ` : ''}${profile.warrior_wins ? `${warrior} ` : ''}${profile.fiend_wins ? `${fiend} ` : ''}${profile.thunder_wins ? `${thunder} ` : ''}${profile.zombie_wins ? `${zombie} ` : ''}`
 		}
 	} else if (game === 'Pauper') {
 		x === 1 ? result[0] = `${com} --- ${champion} The People's Champion ${champion} --- ${com}`

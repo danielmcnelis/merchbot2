@@ -2581,10 +2581,12 @@ if (statscom.includes(cmd)) {
 	} else if (game === 'Market') {
 		const transformed_wallets = []
 
+		const filtered_players = active_players.filter((player) => player.wallet)
 		console.log('active_players.length', active_players.length)
+		console.log('filtered_players.length', filtered_players.length)
 
-		for (let i = 0; i < active_players.length; i++) {
-			const w = active_players[i].wallet
+		for (let i = 0; i < filtered_players.length; i++) {
+			const w = filtered_players[i].wallet
 			console.log('!!w', !!w)
 			console.log('w.playerId', w.playerId)
 			const invs = await Inventory.findAll({ where: { playerId: w.playerId }, include: Print })
@@ -2613,8 +2615,12 @@ if (statscom.includes(cmd)) {
 	} else if (game === 'Trivia') {
 		const transformed_knowledges = []
 
-		for (let i = 0; i < active_players.length; i++) {
-			const k = active_players[i].knowledge
+		const filtered_players = active_players.filter((player) => player.knowledge)
+		console.log('active_players.length', active_players.length)
+		console.log('filtered_players.length', filtered_players.length)
+
+		for (let i = 0; i < filtered_players.length; i++) {
+			const k = filtered_players[i].knowledge
 			let correct_answers = 0
 			const knowledge_keys = Object.keys(k.dataValues)
 			knowledge_keys.forEach(function(key) {

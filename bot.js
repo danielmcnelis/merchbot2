@@ -2581,8 +2581,12 @@ if (statscom.includes(cmd)) {
 	} else if (game === 'Market') {
 		const transformed_wallets = []
 
+		console.log('active_players.length', active_players.length)
+
 		for (let i = 0; i < active_players.length; i++) {
 			const w = active_players[i].wallet
+			console.log('!!w', !!w)
+			console.log('w.playerId', w.playerId)
 			const invs = await Inventory.findAll({ where: { playerId: w.playerId }, include: Print })
 			let networth = parseInt(w.starchips) + (parseInt(w.stardust) / 10)
 			invs.forEach((inv) => networth += (parseInt(inv.print.market_price) * parseInt(inv.quantity) / 10))

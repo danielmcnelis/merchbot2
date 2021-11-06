@@ -2580,10 +2580,7 @@ if (statscom.includes(cmd)) {
 		)
 	} else if (game === 'Market') {
 		const transformed_wallets = []
-
-		const filtered_players = active_players.filter((player) => player.wallet)
-		console.log('active_players.length', active_players.length)
-		console.log('filtered_players.length', filtered_players.length)
+		const filtered_players = active_players.filter((player) => player.wallet && player.id !== merchbotId)
 
 		for (let i = 0; i < filtered_players.length; i++) {
 			const w = filtered_players[i].wallet
@@ -2610,14 +2607,12 @@ if (statscom.includes(cmd)) {
 			+ `\nNet Worth: ${networth} ${starchips}`
 			+ `\nPrints: ${iCount} out of ${pCount} ${ygocard}`
 			+ `\nTrades: ${tCount} ${robbed}`
-			+ `\nPartners: ${player.profile.trades} ${merchant}`
+			+ `\nPartners: ${player.profile.trade_partners} ${merchant}`
 		)
 	} else if (game === 'Trivia') {
 		const transformed_knowledges = []
 
 		const filtered_players = active_players.filter((player) => player.knowledge)
-		console.log('active_players.length', active_players.length)
-		console.log('filtered_players.length', filtered_players.length)
 
 		for (let i = 0; i < filtered_players.length; i++) {
 			const k = filtered_players[i].knowledge
@@ -2636,7 +2631,7 @@ if (statscom.includes(cmd)) {
 		const smarts = transformed_knowledges[index][1]
 		
 		return message.channel.send(
-			`${cultured} --- Trivia Stats --- ${cultured}`
+			`${no} --- Trivia Stats --- ${yes}`
 			+ `\nName: ${player.name}`
 			+ `\nRanking: ${rank}`
 			+ `\nCorrectly Answered: ${smarts} ${stoned}`

@@ -44,7 +44,7 @@ const { client } = require('./static/clients.js')
 const { alchemycom, aliuscom, bindercom, botcom, boxcom, bracketcom, calccom, checklistcom, dailycom, dbcom, deckcom, dicecom, dropcom, flipcom, h2hcom, historycom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, packcom, pfpcom, populationcom, profcom, queuecom, rankcom, reducecom, referralcom, rolecom, specialcom, startcom, statscom, undocom, walletcom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
-const { abuser, galaxy, orange, robbed, king, beast, blue, bronze, cactus, cavebob, checkmark, com, skull, familiar, battery, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, shrine, spellcaster, DRT, fiend, thunder, zombie, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, downward, upward, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare } = require('./static/emojis.json')
+const { abuser, galaxy, orange, robbed, king, beast, blue, bronze, cactus, cavebob, checkmark, com, skull, familiar, battery, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, shrine, spellcaster, DRT, fiend, thunder, zombie, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, downward, upward, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare, draft } = require('./static/emojis.json')
 const { adminRole, arenaRole, botRole, draftRole, expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')
@@ -2584,8 +2584,6 @@ if (statscom.includes(cmd)) {
 
 		for (let i = 0; i < filtered_players.length; i++) {
 			const w = filtered_players[i].wallet
-			console.log('!!w', !!w)
-			console.log('w.playerId', w.playerId)
 			const invs = await Inventory.findAll({ where: { playerId: w.playerId }, include: Print })
 			let networth = parseInt(w.starchips) + (parseInt(w.stardust) / 10)
 			invs.forEach((inv) => networth += (parseInt(inv.print.market_price) * parseInt(inv.quantity) / 10))
@@ -2611,7 +2609,6 @@ if (statscom.includes(cmd)) {
 		)
 	} else if (game === 'Trivia') {
 		const transformed_knowledges = []
-
 		const filtered_players = active_players.filter((player) => player.knowledge)
 
 		for (let i = 0; i < filtered_players.length; i++) {
@@ -2688,6 +2685,22 @@ if (statscom.includes(cmd)) {
 			+ `\nElo Rating: ${player.pauper_stats.toFixed(2)}`
 			+ `\nWins: ${player.pauper_wins}, Losses: ${player.pauper_losses}`
 			+ `\nWin Rate: ${player.pauper_wins || player.pauper_losses ? `${(100 * player.pauper_wins / (player.pauper_wins + player.pauper_losses)).toFixed(2)}%` : 'N/A'}`
+		)
+	} else if (game === 'Draft') {
+		const filtered_players = active_players.filter((player) => player.draft_wins || player.draft_losses)
+		const sorted_players = filtered_players.sort((a, b) => b.draft_stats - a.draft_stats)
+		const index = sorted_players.length ? sorted_players.findIndex((player) => player.id === playerId) : null
+		const rank = index !== null ? `#${index + 1} out of ${sorted_players.length}` : `N/A`
+		const medal = getMedal(player.draft_stats, title = true)
+
+		return message.channel.send(
+			`${draft} --- Draft Stats --- ${draft}`
+			+ `\nName: ${player.name}`
+			+ `\nMedal: ${medal}`
+			+ `\nRanking: ${rank}`
+			+ `\nElo Rating: ${player.draft_stats.toFixed(2)}`
+			+ `\nWins: ${player.draft_wins}, Losses: ${player.draft_losses}`
+			+ `\nWin Rate: ${player.draft_wins || player.draft_losses ? `${(100 * player.draft_wins / (player.draft_wins + player.draft_losses)).toFixed(2)}%` : 'N/A'}`
 		)
 	}
 }
@@ -3902,7 +3915,30 @@ if (rankcom.includes(cmd)) {
 		for (let i = 0; i < x; i++) {
 			result[i+1] = `${i+1}. ${topBookworms[i][2]} ${cultured} - ${topBookworms[i][0]}`
 		} 
-	}
+	} else if (game === 'Draft') {
+		x === 1 ? result[0] = `${draft} --- ${champion} The Draft Expert ${champion} --- ${draft}`
+		: result[0] = `${draft} --- Top ${x} Draft Players --- ${draft}`
+		
+		const players = await Player.findAll({
+			where: {
+				[Op.or]: [ 
+					{ draft_wins: { [Op.gt]: 0 } }, 
+					{ draft_losses: { [Op.gt]: 0 } }
+				]
+			}
+		})
+	
+		const filtered_players = players.filter((player) => memberIds.includes(player.id))
+		if (x > filtered_players.length) return message.channel.send(`I need a smaller number. We only have ${filtered_players.length} Draft players.`)
+		filtered_players.sort((a, b) => b.draft_stats - a.draft_stats) 
+
+		const topProfiles = filtered_players.slice(0, x)
+		for (let i = 0; i < x; i++) {
+			const p = topProfiles[i]
+			const medal = getMedal(p.draft_stats, title = false)
+			result[i+1] = `${(i+1)}. ${medal} ${p.name}`
+		} 
+	} 
 
 	message.channel.send(result.slice(0, 11))
 	if (result.length > 11) message.channel.send(result.slice(11, 41))

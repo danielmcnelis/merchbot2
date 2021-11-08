@@ -4497,7 +4497,7 @@ if(dailycom.includes(cmd)) {
 
 	if (daily.last_check_in && isSameDay(daily.last_check_in, date)) return message.channel.send(`You already used **!daily** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
 
-	const daysPassed = daily.last_check_in ? (date.setHours(0, 0, 0, 0) - daily.last_check_in.setHours(0, 0, 0, 0)) / (1000*60*60*24) : 1
+	const daysPassed = daily.last_check_in ? Math.round( ( date.setHours(0, 0, 0, 0) - daily.last_check_in.setHours(0, 0, 0, 0) ) / (1000*60*60*24) ) : 1
 
 	const sets = await Set.findAll({ 
 		where: { 
@@ -4610,7 +4610,7 @@ if(dailycom.includes(cmd)) {
 			if (gotSecret) completeTask(message.channel, daily.playerId, 'm4')
 		}, 4000)
 	} else {
-		daily.cobble_progress += (daysPassed)
+		daily.cobble_progress += daysPassed
 		if (easy_complete) {
 			setTimeout(() => {
 				message.channel.send(`Hey, ${daily.player.name}, keep cobblin', buddy.`, {files:[`./public/packs/${daily.cobble_progress}outof7.png`]})

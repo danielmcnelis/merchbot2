@@ -1934,13 +1934,16 @@ if(cmd === `!chart`) {
 	for (let i = 1; i < thunderBars; i++) thunders += thunder
 	for (let i = 1; i < zombieBars; i++) zombies += zombie
 
-	const arr = [
+	const arr1 = [
 		[beastWins, `${beast} - ${beastWins} - ${beasts}`], 
 		[dinosaurWins, `${dinosaur} - ${dinosaurWins} - ${dinosaurs}`], 
 		[fishWins, `${fish} - ${fishWins} - ${fishes}`], 
 		[plantWins, `${plant} - ${plantWins} - ${plants}`], 
 		[reptileWins, `${reptile} - ${reptileWins} - ${reptiles}`], 
-		[rockWins, `${rock} - ${rockWins} - ${rocks}`], 
+		[rockWins, `${rock} - ${rockWins} - ${rocks}`]
+	]
+
+	const arr2 = [
 		[dragonWins, `${dragon} - ${dragonWins} - ${dragons}`], 
 		[spellcasterWins, `${spellcaster} - ${spellcasterWins} - ${spellcasters}`], 
 		[warriorWins, `${warrior} - ${warriorWins} - ${warriors}`], 
@@ -1949,11 +1952,9 @@ if(cmd === `!chart`) {
 		[zombieWins, `${zombie} - ${zombieWins} - ${zombies}`]
 	]
 
-	const result = arr.sort((a, b) => b[0] - a[0]).map((el) => el[1]).join("\n")
-	console.log('result.length', result.length)
-
 	message.channel.send(`There have been ${totalWinners} Arena winners. Conquest breakdown:`)
-	return message.channel.send(result)
+	message.channel.send(arr1.sort((a, b) => b[0] - a[0]).map((el) => el[1]).join("\n"))
+	return message.channel.send(arr2.sort((a, b) => b[0] - a[0]).map((el) => el[1]).join("\n"))
 }
 
 

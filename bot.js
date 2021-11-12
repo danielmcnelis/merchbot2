@@ -1949,10 +1949,11 @@ if(cmd === `!chart`) {
 		[zombieWins, `${zombie} - ${zombieWins} - ${zombies}`]
 	]
 
-	return message.channel.send(
-		`There have been ${totalWinners} Arena winners. Conquest breakdown:\n` +
-		arr.sort((a, b) => b[0] - a[0]).map((el) => el[1]).join("\n")
-	)
+	const result = arr.sort((a, b) => b[0] - a[0]).map((el) => el[1]).join("\n")
+	console.log('result.length', result.length)
+
+	message.channel.send(`There have been ${totalWinners} Arena winners. Conquest breakdown:`)
+	return message.channel.send(result)
 }
 
 

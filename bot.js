@@ -1948,8 +1948,12 @@ if(cmd === `!chart`) {
 		[thunderWins, `${thunder} - ${thunderWins} - ${thunders}`], 
 		[zombieWins, `${zombie} - ${zombieWins} - ${zombies}`]
 	]
-
-	const mapped = arr.sort((a, b) => b[0] - a[0]).map((el) => el[1])
+	
+	console.log('arr', arr)
+	const sorted = arr.sort((a, b) => b[0] - a[0])
+	console.log('sorted', sorted)
+	const mapped = sorted.map((e) => e[1])
+	console.log('mapped', mapped)
 
 	message.channel.send(`There have been ${totalWinners} Arena winners. Conquest breakdown:`)
 	message.channel.send(mapped.slice(0, 6).join("\n"))

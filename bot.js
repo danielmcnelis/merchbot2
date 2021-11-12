@@ -1947,9 +1947,7 @@ if(cmd === `!chart`) {
 		[fiendWins, `${fiend} - ${fiendWins} - ${fiends}`], 
 		[thunderWins, `${thunder} - ${thunderWins} - ${thunders}`], 
 		[zombieWins, `${zombie} - ${zombieWins} - ${zombies}`]
-	]
-
-	arr.sort((a, b) => b[0] - a[0]).map((el) => el[1])
+	].sort((a, b) => b[0] - a[0]).map((el) => el[1])
 
 	message.channel.send(`There have been ${totalWinners} Arena winners. Conquest breakdown:`)
 	message.channel.send(arr.slice(0, 6).join("\n"))

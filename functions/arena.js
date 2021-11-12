@@ -209,7 +209,7 @@ const startRound = async (info, entries) => {
 
     if (info.round === 5) {
         const voucher = vouchers[entries[1].tribe]
-        const quantity = 5
+        const quantity = 6
         const wallet = await Wallet.findOne({ where: { playerId: entries[1].playerId }})
         wallet[voucher] += quantity
         await wallet.save()
@@ -238,7 +238,7 @@ const startRound = async (info, entries) => {
             for (let i = 1; i < entries.length; i++) {
                 const entry = entries[i]
                 const voucher = vouchers[entry.tribe]
-                const quantity = entry.score + 1
+                const quantity = entry.score + 2
                 const wallet = await Wallet.findOne({ where: { playerId: entry.playerId }})
                 wallet[voucher] += quantity
                 await wallet.save()
@@ -267,7 +267,7 @@ const startRound = async (info, entries) => {
             for (let i = 2; i < entries.length; i++) {
                 const entry = entries[i]
                 const voucher = vouchers[entry.tribe]
-                const quantity = entry.score + 1
+                const quantity = entry.score + 2
                 const wallet = await Wallet.findOne({ where: { playerId: entry.playerId }})
                 wallet[voucher] += quantity
                 await wallet.save()
@@ -294,7 +294,7 @@ const startRound = async (info, entries) => {
             for (let i = 0; i < entries.length; i++) {
                 const entry = entries[i]
                 const voucher = vouchers[entry.tribe]
-                const quantity = i < 3 ? entry.score + 4 : entry.score + 1
+                const quantity = i < 3 ? entry.score + 5 : entry.score + 2
                 const wallet = await Wallet.findOne({ where: { playerId: entry.playerId }})
                 wallet[voucher] += quantity
                 await wallet.save()

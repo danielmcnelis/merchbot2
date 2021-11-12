@@ -1940,24 +1940,24 @@ if(cmd === `!chart`) {
 		[fishWins, `${fish} - ${fishWins} - ${fishes}`], 
 		[plantWins, `${plant} - ${plantWins} - ${plants}`], 
 		[reptileWins, `${reptile} - ${reptileWins} - ${reptiles}`], 
-		[rockWins, `${rock} - ${rockWins} - ${rocks}`]
+		[rockWins, `${rock} - ${rockWins} - ${rocks}`],
 		[dragonWins, `${dragon} - ${dragonWins} - ${dragons}`], 
 		[spellcasterWins, `${spellcaster} - ${spellcasterWins} - ${spellcasters}`], 
 		[warriorWins, `${warrior} - ${warriorWins} - ${warriors}`], 
 		[fiendWins, `${fiend} - ${fiendWins} - ${fiends}`], 
 		[thunderWins, `${thunder} - ${thunderWins} - ${thunders}`], 
 		[zombieWins, `${zombie} - ${zombieWins} - ${zombies}`]
-	]
-	
-	console.log('arr', arr)
-	const sorted = arr.sort((a, b) => b[0] - a[0])
-	console.log('sorted', sorted)
-	const mapped = sorted.map((e) => e[1])
-	console.log('mapped', mapped)
+	].sort((a, b) => b[0] - a[0]).map((e) => e[1])
+
+	// console.log('arr', arr)
+	// const sorted = arr
+	// console.log('sorted', sorted)
+	// const mapped = sorted
+	// console.log('mapped', mapped)
 
 	message.channel.send(`There have been ${totalWinners} Arena winners. Conquest breakdown:`)
-	message.channel.send(mapped.slice(0, 6).join("\n"))
-	return message.channel.send(mapped.slice(6).join("\n"))
+	message.channel.send(arr.slice(0, 6).join("\n"))
+	return message.channel.send(arr.slice(6).join("\n"))
 }
 
 

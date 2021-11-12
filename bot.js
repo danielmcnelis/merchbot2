@@ -1870,6 +1870,9 @@ if(cmd === `!chart`) {
 	let dragonWins = 0
 	let spellcasterWins = 0
 	let warriorWins = 0
+	let fiendWins = 0
+	let thunderWins = 0
+	let zombieWins = 0
 
 	for (let i = 0; i < allProfiles.length; i++) {
 		const profile = allProfiles[i]
@@ -1882,12 +1885,15 @@ if(cmd === `!chart`) {
 		dragonWins += profile.dragon_wins
 		spellcasterWins += profile.spellcaster_wins
 		warriorWins += profile.warrior_wins
+		fiendWins += profile.fiend_wins
+		thunderWins += profile.thunder_wins
+		zombieWins += profile.zombie_wins
 	}
 
-	const winsArr = [beastWins, dinosaurWins, fishWins, plantWins, reptileWins, rockWins, dragonWins, spellcasterWins, warriorWins]
+	const winsArr = [beastWins, dinosaurWins, fishWins, plantWins, reptileWins, rockWins, dragonWins, spellcasterWins, warriorWins, fiendWins, thunderWins, zombieWins]
 	winsArr.sort((a, b) => b - a)
 	const longest = winsArr[0]
-	const totalWinners = beastWins + dinosaurWins + fishWins + plantWins + reptileWins + rockWins + dragonWins + spellcasterWins + warriorWins
+	const totalWinners = beastWins + dinosaurWins + fishWins + plantWins + reptileWins + rockWins + dragonWins + spellcasterWins + warriorWins + fiendWins + thunderWins + zombieWins
 
 	const beastBars = Math.round((beastWins / longest) * 10)
 	const dinosaurBars = Math.round((dinosaurWins / longest) * 10)
@@ -1898,6 +1904,9 @@ if(cmd === `!chart`) {
 	const dragonBars = Math.round((dragonWins / longest) * 10)
 	const spellcasterBars = Math.round((spellcasterWins / longest) * 10)
 	const warriorBars = Math.round((warriorWins / longest) * 10)
+	const fiendBars = Math.round((fiendWins / longest) * 10)
+	const thunderBars = Math.round((thunderWins / longest) * 10)
+	const zombieBars = Math.round((zombieWins / longest) * 10)
 
 	let beasts = beast
 	let dinosaurs = dinosaur
@@ -1908,6 +1917,9 @@ if(cmd === `!chart`) {
 	let dragons = dragon
 	let spellcasters = spellcaster
 	let warriors = warrior
+	let fiends = fiend
+	let thunders = thunder
+	let zombies = zombie
 
 	for (let i = 1; i < beastBars; i++) beasts += beast
 	for (let i = 1; i < dinosaurBars; i++) dinosaurs += dinosaur
@@ -1918,6 +1930,9 @@ if(cmd === `!chart`) {
 	for (let i = 1; i < dragonBars; i++) dragons += dragon
 	for (let i = 1; i < spellcasterBars; i++) spellcasters += spellcaster
 	for (let i = 1; i < warriorBars; i++) warriors += warrior
+	for (let i = 1; i < fiendBars; i++) fiends += fiend
+	for (let i = 1; i < thunderBars; i++) thunders += thunder
+	for (let i = 1; i < zombieBars; i++) zombies += zombie
 
 	const arr = [
 		[beastWins, `${beast} - ${beastWins} - ${beasts}`], 
@@ -1928,7 +1943,10 @@ if(cmd === `!chart`) {
 		[rockWins, `${rock} - ${rockWins} - ${rocks}`], 
 		[dragonWins, `${dragon} - ${dragonWins} - ${dragons}`], 
 		[spellcasterWins, `${spellcaster} - ${spellcasterWins} - ${spellcasters}`], 
-		[warriorWins, `${warrior} - ${warriorWins} - ${warriors}`]
+		[warriorWins, `${warrior} - ${warriorWins} - ${warriors}`], 
+		[fiendWins, `${fiend} - ${fiendWins} - ${fiends}`], 
+		[thunderWins, `${thunder} - ${thunderWins} - ${thunders}`], 
+		[zombieWins, `${zombie} - ${zombieWins} - ${zombies}`]
 	]
 
 	return message.channel.send(

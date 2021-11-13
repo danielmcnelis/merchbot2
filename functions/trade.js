@@ -157,7 +157,7 @@ const getTradeSummary = async (message, inputs, player, fuzzyPrints) => {
 		} else if (!print && !walletField) {
 			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
 			return false
-		} else if (print.set_code === 'FPC') {
+		} else if (print && print.set_code === 'FPC') {
 			message.channel.send(`You cannot trade prize cards.`)
 			return false
 		}

@@ -148,7 +148,7 @@ const resetPlayer = async (message, player) => {
 }
 
 //GET RANDOM STRING
-const getRandomString = (length, chars) => {
+const generateRandomString = (length, chars) => {
     let result = '';
     for (let i = length; i > 0; --i) {
         result += chars[Math.floor(Math.random() * chars.length)]
@@ -390,7 +390,7 @@ module.exports = {
     getDeckCategory,
     getMedal,
     getRandomElement,
-    getRandomString,
+    generateRandomString,
     getRandomSubset,
     hasProfile,
     isAdmin,

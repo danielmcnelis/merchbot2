@@ -4317,8 +4317,6 @@ if (cmd.toLowerCase() === `!remove`) {
 if (cmd === `!create`) {
 	if (!isAdmin(message.member)) return message.channel.send('You do not have permission to do that.')
 	if (!args.length) return message.channel.send(`Please provide a name for the new tournament.`)
-	const tournament_format = await getTournamentFormat(message)
-	if (!tournament_format) return message.channel.send(`Please specify a valid format.`)
 	const tournament_type = await getTournamentType(message)
 	if (!tournament_type) return message.channel.send(`Please select a valid tournament type.`)
 	const str = generateRandomString(10, '0123456789abcdefghijklmnopqrstuvwxyz')

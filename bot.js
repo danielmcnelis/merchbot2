@@ -217,12 +217,13 @@ if(cmd === `!test`) {
 //FIX
 if(cmd === `!fix`) {
 	if (isJazz(message.member)) {
-		const dailies = await Daily.findAll()
-		for (let i = 0; i < dailies.length; i++) {
-			const daily = dailies[i]
-			daily.fon_packs = 0
-			await daily.save()
+		const cards = await Card.findAll()
+		for (let i = 0; i < cards.length; i++) {
+			const card = cards[i]
+			card.attribute = card.attribute ? card.attribute.toUpperCase() : null
+			await card.save()
 		}
+		return message.channel.send(`Fixed ${cards.length} cards in the FormatLibrary database.`)
 	} else {
 		return message.channel.send('🛠️')
 	}
@@ -448,23 +449,25 @@ if (cmd === `!fix_cards`) {
 	let updated = 0
 	
 	for (let i = 0; i < ygoprodeckCards.length; i++) {
-		if (ygoprodeckCards[i].atk === 0 || ygoprodeckCards[i].def === 0) {
-			const card = await Card.findOne({ where: { name: ygoprodeckCards[i].name }})
-			if (!card) {
-				continue
-			}
-			console.log('card.name', card.name)
-			const atk = ygoprodeckCards[i].atk === 0 ? 0 : ygoprodeckCards[i].atk ? ygoprodeckCards[i].atk : null
-			const def = ygoprodeckCards[i].def === 0 ? 0 : ygoprodeckCards[i].def ? ygoprodeckCards[i].def : null
-			card.atk = atk
-			card.def = def
-			await card.save() 
-			updated++
+		const ypd_card = ygoprodeckCards[i]
+		const card = await Card.findOne({ where: { name: ypd_card.name }})
+		if (!card) {
+			continue
 		}
+		console.log('card.name', card.name)
+		let arrows = ''
+		if (ypd_card.linkmarkers && ypd_card.linkmarkers.length) {
+			ypd_card.linkmarkets.forEach((lm) => arrows += `-${lm.charAt(0)}`)
+			card.arrows = arrows
+		}
+		card.tcg_date = ypd_card.tcg_date
+		card.ocg_date = ypd_card.ocg_date
+		await card.save() 
+		updated++
 	}
 
 	console.log('ygoprodeckCards.length', ygoprodeckCards.length)
-	return message.channel.send(`You fixed the ATK/DEF stats of ${updated} cards in the Format Library database.`)
+	return message.channel.send(`You fixed the information for ${updated} cards in the Format Library database.`)
 }
 
 //NEW SET
@@ -513,7 +516,7 @@ if (cmd === `!konami`) {
 		const print = prints[i]
 		const card_id = print.card_id
 		const card = await Card.findOne({
-			where: {
+			where: {f
 				name: print.card_name
 			}
 		})

@@ -525,7 +525,7 @@ if (cmd === `!konami`) {
 		const color = card.category === 'Monster' && card.fusion ? 'purple' :
 			card.category === 'Monster' && card.normal ? 'yellow' :
 			card.category === 'Monster' && card.ritual ? 'blue' :
-			card.category === 'Monster' && card.fusion ? 'orange' :
+			card.category === 'Monster' && card.effect ? 'orange' :
 			card.category === 'Spell' ? 'green' :
 			card.category === 'Trap' ? 'violet' :
 			null

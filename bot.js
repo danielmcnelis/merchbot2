@@ -460,8 +460,8 @@ if (cmd === `!fix_cards`) {
 			ypd_card.linkmarkers.forEach((lm) => arrows += `-${lm.charAt(0)}`)
 			card.arrows = arrows.slice(1)
 		}
-		card.tcg_date = ypd_card.tcg_date
-		card.ocg_date = ypd_card.ocg_date
+		card.tcg_date = ypd_card.misc_info[0].tcg_date
+		card.ocg_date = ypd_card.misc_info[0].ocg_date
 		await card.save() 
 		updated++
 	}

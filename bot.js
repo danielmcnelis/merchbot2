@@ -518,8 +518,6 @@ if (cmd === `!konami`) {
 			}
 		})
 
-		console.log(print.card_name, '!!card', !!card)
-
 		let konami_code = card.konami_code
 		while (konami_code.length < 8) konami_code = '0' + konami_code
 		print.konami_code = konami_code
@@ -532,7 +530,9 @@ if (cmd === `!konami`) {
 			card.category === 'Trap' ? 'violet' :
 			null
 
-		console.log(card.name, 'card.category', card.category)
+		console.log('card.name', card.name)
+		console.log('card.category', card.category)
+		console.log('color:', color)
 		
 		print.color = color
 				

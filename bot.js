@@ -457,7 +457,7 @@ if (cmd === `!fix_cards`) {
 		console.log('card.name', card.name)
 		let arrows = ''
 		if (ypd_card.linkmarkers && ypd_card.linkmarkers.length) {
-			ypd_card.linkmarkets.forEach((lm) => arrows += `-${lm.charAt(0)}`)
+			ypd_card.linkmarkers.forEach((lm) => arrows += `-${lm.charAt(0)}`)
 			card.arrows = arrows
 		}
 		card.tcg_date = ypd_card.tcg_date

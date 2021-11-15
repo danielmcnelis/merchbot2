@@ -5318,7 +5318,7 @@ if(invcom.includes(cmd)) {
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	const card_name = query && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints) : null
-	const prints = valid_card_code ? await Print.findAll({ where: { card_code } }) : card_name ? await Print.findAll({ where: { card_name } }) : []
+	const prints = valid_card_code ? await Print.findAll({ where: { card_code, draft } }) : card_name ? await Print.findAll({ where: { card_name, draft } }) : []
 	
 	const results = [`${player.name}'s Inventory:`]
 
@@ -5473,10 +5473,12 @@ if(checklistcom.includes(cmd)) {
 
 	const allPrints = valid_set_code ? await Print.findAll({ 
 		where: {
-			set_code: set_code
+			set_code: set_code,
+			draft: false
 		},
 		order: [['card_code', 'ASC']]
 	}) : await Print.findAll({ 
+		where: { draft: false },
 		order: [['card_code', 'ASC']]
 	})
 

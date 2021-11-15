@@ -514,9 +514,14 @@ if (cmd === `!konami`) {
 		const card_id = print.card_id
 		const card = await Card.findOne({
 			where: {
-				id: card_id
+				name: print.card_name
 			}
 		})
+
+		if (print.card_id !== card.id) {
+			console.log(`print.card_id !== card.id`, print.card_name, 'is:', print.card_id, 'should be:', card.id)
+			print.card_id = card.id
+		}
 
 		let konami_code = card.konami_code
 		while (konami_code.length < 8) konami_code = '0' + konami_code
@@ -529,10 +534,6 @@ if (cmd === `!konami`) {
 			card.category === 'Spell' ? 'green' :
 			card.category === 'Trap' ? 'violet' :
 			null
-
-		console.log('card.name', card.name)
-		console.log('card.category', card.category)
-		console.log('color:', color)
 		
 		print.color = color
 				

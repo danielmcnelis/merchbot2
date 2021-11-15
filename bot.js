@@ -518,16 +518,21 @@ if (cmd === `!konami`) {
 			}
 		})
 
+		console.log(print.card_name, '!!card', !!card)
+
 		let konami_code = card.konami_code
 		while (konami_code.length < 8) konami_code = '0' + konami_code
 		print.konami_code = konami_code
 
 		const color = card.category === 'Monster' && card.fusion ? 'purple' :
 			card.category === 'Monster' && card.normal ? 'yellow' :
+			card.category === 'Monster' && card.ritual ? 'blue' :
 			card.category === 'Monster' && card.fusion ? 'orange' :
 			card.category === 'Spell' ? 'green' :
 			card.category === 'Trap' ? 'violet' :
 			null
+
+		console.log(card.name, 'card.category', card.category)
 		
 		print.color = color
 				
@@ -4059,7 +4064,7 @@ if(joincom.includes(cmd)) {
             })
     
             message.author.send(`Thanks! I have your updated deck list for the tournament.`)
-            return lient.channels.cache.get(tournamentChannelId).send(`<@${player.id}> resubmitted their deck list for ${tournament.name}!`)
+            return client.channels.cache.get(tournamentChannelId).send(`<@${player.id}> resubmitted their deck list for ${tournament.name}!`)
         }
 	}
 

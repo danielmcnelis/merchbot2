@@ -320,13 +320,13 @@ const startRound = async (info, entries) => {
         const title = `${shrine}    ---------    Arena Round ${info.round}    ---------    ${shrine}\n${beast} ${dinosaur} ${dragon} ${fiend} ${fish} ${plant} ${reptile} ${rock} ${spellcaster} ${thunder} ${warrior} ${zombie}` 
         const matches = pairings.map((pairing, index) => {
             if (pairing[0].active === false && pairing[1].active === false) {
-                setTimout(() => doubleForfeit(pairing[0].playerId, pairing[1].playerId), index * 1000 + 1000)
+                setTimeout(() => doubleForfeit(pairing[0].playerId, pairing[1].playerId), index * 1000 + 1000)
                 return `Match ${index + 1}: ~~<@${pairing[0].player.name}~~ vs ~~<@${pairing[1].player.name}>~~ (both forfeit)`
             } else if (pairing[0].active === false && pairing[1].active === true) {
-                setTimout(() => forfeit(winnerId = pairing[1].playerId, loserId = pairing[0].playerId), index * 1000 + 1000)
+                setTimeout(() => forfeit(winnerId = pairing[1].playerId, loserId = pairing[0].playerId), index * 1000 + 1000)
                 return `Match ${index + 1}: ~~<@${pairing[0].player.name}~~ vs <@${pairing[1].player.name}> (${pairing[0].player.name} forfeits)`
             } else if (pairing[0].active === true && pairing[1].active === false) {
-                setTimout(() => forfeit(winnerId = pairing[0].playerId, loserId = pairing[1].playerId), index * 1000 + 1000)
+                setTimeout(() => forfeit(winnerId = pairing[0].playerId, loserId = pairing[1].playerId), index * 1000 + 1000)
                 return `Match ${index + 1}: <@${pairing[0].playerId}> vs ~~<@${pairing[1].playerId}>~~ (${pairing[1].player.name} forfeits)`
             } else {
                 return `Match ${index + 1}: <@${pairing[0].playerId}> vs <@${pairing[1].playerId}>`

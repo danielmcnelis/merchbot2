@@ -3,7 +3,7 @@ const { Card, Player, Print, Set, Wallet, Diary, Info, Inventory, Auction, Statu
 const merchbotId = '584215266586525696'
 const { Op } = require('sequelize')
 const { yescom } = require('../static/commands.json')
-const { gem, orb, swords, starchips, stardust, mushroom, moai, rose, hook, egg, cactus, com, rar, sup, ult, scr } = require('../static/emojis.json')
+const { gem, orb, swords, starchips, stardust, mushroom, moai, rose, hook, egg, cactus, com, rar, sup, ult, scr, familiar, skull, battery } = require('../static/emojis.json')
 const { updateBinder } = require('./binder.js')
 const { awardPacksToShop } = require('./packs')
 const adminId = '194147938786738176'

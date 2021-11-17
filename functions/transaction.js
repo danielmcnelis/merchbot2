@@ -355,7 +355,7 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
                 card_name && !walletField ? await selectPrint(message, sellerId, card_name, private = false, inInv = true) :
                 null
     
-    if (card_name && !print) {
+    if (card_name && !print && !walletField) {
         message.channel.send(`You do not have any copies of ${card_name}.`)
         return false
     } else if (!print && !walletField) {

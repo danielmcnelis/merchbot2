@@ -2654,6 +2654,8 @@ if (statscom.includes(cmd)) {
 	} else if (game === 'Trivia') {
 		const transformed_knowledges = []
 
+		const allKnowledges = await Knowledge.findAll()
+
 		const playerIds = []
 		for (let i = 0; i < allKnowledges.length; i++) {
 			const knowledge = allKnowledges[i]

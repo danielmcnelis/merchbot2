@@ -2653,12 +2653,20 @@ if (statscom.includes(cmd)) {
 		)
 	} else if (game === 'Trivia') {
 		const transformed_knowledges = []
-		const filtered_players = active_players.filter((player) => player.knowledge)
 
-		for (let i = 0; i < filtered_players.length; i++) {
-			const k = filtered_players[i].knowledge
-			const correct_answers = await Knowledge.count({ where: { playerId: k.playerId }})
-			transformed_knowledges.push([k.playerId, correct_answers])
+		const playerIds = []
+		for (let i = 0; i < allKnowledges.length; i++) {
+			const knowledge = allKnowledges[i]
+			const playerId = knowledge.playerId
+			if (!playerIds.includes(playerId)) playerIds.push(playerId)
+		}
+
+		console.log('playerIds', playerIds)
+
+		for (let i = 0; i < playerIds.length; i++) {
+			const playerId = playerIds[i]
+			const correct_answers = await Knowledge.count({ where: { playerId: playerId }})
+			transformed_knowledges.push([playerId, correct_answers])
 		}
 
 		console.log('transformed_knowledges', transformed_knowledges)
@@ -3938,6 +3946,8 @@ if (rankcom.includes(cmd)) {
 			const playerId = knowledge.playerId
 			if (!playerIds.includes(playerId)) playerIds.push(playerId)
 		}
+
+		console.log('playerIds', playerIds)
 
 		for (let i = 0; i < playerIds.length; i++) {
 			const playerId = playerIds[i]

@@ -48,7 +48,7 @@ const { abuser, galaxy, orange, robbed, king, beast, blue, bronze, cactus, caveb
 const { adminRole, arenaRole, botRole, draftRole, expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')
-const knowledges = require('./trivia.json')
+const knowledges = require('./knowledges.json')
 const ygoprodeck = require('./static/ygoprodeck.json')
 
 //READY
@@ -220,6 +220,7 @@ if(cmd === `!fix`) {
 	if (isJazz(message.member)) {
 		let count = 0
 		const playerIds = []
+		console.log('knowledges', knowledges)
 		for (let i = 0; i < knowledges.length; i++) {
 			const smarts = knowledges[i]
 			const playerId = smarts.playerId

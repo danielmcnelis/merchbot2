@@ -233,7 +233,8 @@ if(cmd === `!fix`) {
 				if (key.startsWith('question') && smarts[key]) {
 					const question = key.slice(key.indexOf("_") + 1)
 					console.log('question', question)
-					const k = await Knowledge.create({ question: question, playerId: playerId })
+					console.log('question', question.toString())
+					const k = await Knowledge.create({ question: question.toString(), playerId: playerId })
 					if (k) count++
 					console.log('count', count)
 					if (!playerIds.includes(playerId)) playerIds.push(playerId)

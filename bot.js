@@ -221,10 +221,12 @@ if(cmd === `!fix`) {
 		let count = 0
 		const playerIds = []
 		console.log('knowledges.length', knowledges.length)
+		console.log('knowledges[0]', knowledges[0])
 		for (let i = 0; i < knowledges.length; i++) {
 			const smarts = knowledges[i]
+			const keys = Object.keys(smarts)
+			if (i === 0) console.log('keys', keys)
 			const playerId = smarts.playerId
-			const keys = Object.keys(smarts.dataValues)
 
 			for (let j = 0; j < keys.length; j++) {
 				const key = keys[i]

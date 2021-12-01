@@ -4208,6 +4208,7 @@ if (cmd === `!resume`) {
 	} else if (game === 'Trivia') {
 		const triviaArr = Object.entries(trivia)
 		const questionsArr = getRandomSubset(triviaArr, 10)
+		console.log('questionsArr', questionsArr)
 		setTimeout(() => askQuestion(message.guild, message.channel, info, entries, questionsArr), 30000)
 		return message.channel.send(`<@&${role}>, Trivia will resume in 30 seconds.`)
 	}

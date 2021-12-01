@@ -48,6 +48,7 @@ const { abuser, galaxy, orange, robbed, king, beast, blue, bronze, cactus, caveb
 const { adminRole, arenaRole, botRole, draftRole, expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')
+const knowledges = require('./trivia.json')
 const ygoprodeck = require('./static/ygoprodeck.json')
 
 //READY
@@ -217,13 +218,25 @@ if(cmd === `!test`) {
 //FIX
 if(cmd === `!fix`) {
 	if (isJazz(message.member)) {
-		const cards = await Card.findAll()
-		for (let i = 0; i < cards.length; i++) {
-			const card = cards[i]
-			card.attribute = card.attribute ? card.attribute.toUpperCase() : null
-			await card.save()
+		let count = 0
+		const playerIds = []
+		for (let i = 0; i < knowledges.length; i++) {
+			const smarts = knowledges[i]
+			const playerId = smarts.playerId
+			const keys = Object.keys(smarts.dataValues)
+
+			for (let j = 0; j < keys.length; j++) {
+				const key = keys[i]
+				if (key.startsWith('question') && smarts[key]) {
+					const knowledge = await Knowledge.create({ question: key.slice(key.indexOf("_") + 1), playerId: playerId })
+					if (knowledge) count++
+					console.log('count', count)
+					if (!playerIds.includes(playerId)) playerIds.push(playerId)
+				}
+			}
 		}
-		return message.channel.send(`Fixed ${cards.length} cards in the FormatLibrary database.`)
+
+		return message.channel.send(`Created ${count} Knowledge entries for ${playerIds.length} players in the MerchBot database.`)
 	} else {
 		return message.channel.send('🛠️')
 	}
@@ -1421,7 +1434,7 @@ if(profcom.includes(cmd)) {
 		where: { 
 			id: playerId
 		},
-		include: [Arena, Diary, Draft, Gauntlet, Knowledge, Profile, Trivia, Wallet]
+		include: [Arena, Diary, Draft, Gauntlet, Profile, Trivia, Wallet]
 	})
 
 	if (!player && maid === playerId) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
@@ -1486,12 +1499,7 @@ if(profcom.includes(cmd)) {
 	//const master_summary = master_tasks / 12 === 1 ? `100% ${legend}` : `${Math.round(master_tasks / 4 * 100)}%`
 	//\nMaster Diary: ${master_summary}
 
-	let correct_answers = 0
-	const knowledge_keys = Object.keys(player.knowledge.dataValues)
-	knowledge_keys.forEach(function(key) {
-		if (key.startsWith('question') && player.knowledge[key]) correct_answers++
-	})
-
+	const correct_answers = await Knowledge.count({ where: { playerId: playerId }})
 	let beasts = ''
 	let dinosaurs = ''
 	let fishes = ''
@@ -2570,7 +2578,7 @@ if (statscom.includes(cmd)) {
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const player = await Player.findOne({ 
 		where: { id: playerId },
-		include: [Knowledge, Profile, Wallet] 
+		include: [Profile, Wallet] 
 	})
 
 	if (!player && maid === playerId) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
@@ -2584,7 +2592,7 @@ if (statscom.includes(cmd)) {
 	: "Ranked"
 
 	const allPlayers = await Player.findAll({
-		include: [Knowledge, Profile, Wallet]
+		include: [Profile, Wallet]
 	})
 
 	const membersMap = await message.guild.members.fetch()
@@ -2645,12 +2653,7 @@ if (statscom.includes(cmd)) {
 
 		for (let i = 0; i < filtered_players.length; i++) {
 			const k = filtered_players[i].knowledge
-			let correct_answers = 0
-			const knowledge_keys = Object.keys(k.dataValues)
-			knowledge_keys.forEach(function(key) {
-				if (key.startsWith('question') && k[key]) correct_answers++
-			})
-
+			const correct_answers = await Knowledge.count({ where: { playerId: k.playerId }})
 			transformed_knowledges.push([k.playerId, correct_answers])
 		}
 
@@ -3921,22 +3924,22 @@ if (rankcom.includes(cmd)) {
 		x === 1 ? result[0] = `${FiC} --- ${champion} The Top Bookworm ${champion} --- ${FiC}`
 		: result[0] = `${FiC} --- Top ${x} Trivia Players --- ${FiC}`
 		
-		const allKnowledges = await Knowledge.findAll({ 
-			include: Player,
-			order: [[Player, 'name', 'ASC']]
-		})
-
-		const transformed_knowledges = []
-
+		const allKnowledges = await Knowledge.findAll()
+		const playerIds = []
 		for (let i = 0; i < allKnowledges.length; i++) {
-			const smarts = allKnowledges[i]
-			let correct_answers = 0
-			const knowledge_keys = Object.keys(smarts.dataValues)
-			knowledge_keys.forEach(function(key) {
-				if (key.startsWith('question') && smarts[key]) correct_answers++
-			})
+			const knowledge = allKnowledges[i]
+			const playerId = knowledge.playerId
+			if (!playerIds.includes(playerId)) playerIds.push(playerId)
+		}
 
-			if (correct_answers > 0) transformed_knowledges.push([smarts.player.name, smarts.playerId, correct_answers])
+		for (let i = 0; i < playerIds.length; i++) {
+			const playerId = playerIds[i]
+			const correct_answers = await Knowledge.count({ where: { playerId: playerId }})
+			if (correct_answers > 0) {
+				const player = await Player.findOne({ where: { id: playerId }})
+				if(!player) continue
+				transformed_knowledges.push([player.name, playerId, correct_answers])
+			} 
 		}
 
 		const filtered_knowledges = transformed_knowledges.filter((p) => memberIds.includes(p[1]))

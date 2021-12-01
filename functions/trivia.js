@@ -244,11 +244,12 @@ const checkAnswer = async (answer, fuzzyAnswers, stringency) => {
 }
 
 const checkKnowledge = async (playerId, questionNumber) => {
-    const count = await Knowledge.count({ where: { playerId: playerId, [questionNumber]: true } })
+    const count = await Knowledge.count({ where: { question: [questionNumber], playerId: playerId } })
     if (!count) {
-        const knowledge = await Knowledge.findOne({ where: { playerId: playerId } })
-        knowledge[questionNumber] = true
-        await knowledge.save()
+        await Knowledge.create({ 
+            question: [questionNumber], 
+            playerId: playerId
+        })
     }
 }
 
@@ -301,13 +302,7 @@ const endTrivia = async (info, entries) => {
             setTimeout(() => channel.send(`<@${wallet.playerId}> was awarded ${reward}${stardust} for their effort. Thanks for playing!`), i * 1000 + 1000)
         } 
 
-        let correct_answers = 0
-        const knowledge = await Knowledge.findOne({ where: { playerId: entry.playerId }})
-        const knowledge_keys = Object.keys(knowledge.dataValues)
-        knowledge_keys.forEach(function(key) {
-            if (key.startsWith('question') && knowledge[key] === true) correct_answers++
-        })
-
+        const correct_answers = await Knowledge.count({ where: { playerId: entry.playerId }})
         completeTask(channel, entry.playerId, 'e11', i * 2000 + 2000)
         if (correct_answers >= 20) completeTask(channel, entry.playerId, 'm9', i * 2000 + 2000)
         if (correct_answers >= 50) completeTask(channel, entry.playerId, 'h7', i * 2000 + 2000)

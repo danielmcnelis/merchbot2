@@ -76,7 +76,7 @@ Trivia.belongsTo(Player)
 Player.hasOne(Draft)
 Draft.belongsTo(Player)
 
-Player.hasOne(Knowledge)
+Player.hasMany(Knowledge)
 Knowledge.belongsTo(Player)
 
 Player.hasOne(Daily)

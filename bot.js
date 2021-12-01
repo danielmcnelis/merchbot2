@@ -2661,6 +2661,8 @@ if (statscom.includes(cmd)) {
 			transformed_knowledges.push([k.playerId, correct_answers])
 		}
 
+		console.log('transformed_knowledges', transformed_knowledges)
+
 		transformed_knowledges.sort((a, b) => b[1] - a[1])
 		const index = transformed_knowledges.length ? transformed_knowledges.findIndex((k) => k[0] === playerId) : null
 		const rank = index !== null ? `#${index + 1} out of ${transformed_knowledges.length}` : `N/A`
@@ -3928,6 +3930,7 @@ if (rankcom.includes(cmd)) {
 		x === 1 ? result[0] = `${FiC} --- ${champion} The Top Bookworm ${champion} --- ${FiC}`
 		: result[0] = `${FiC} --- Top ${x} Trivia Players --- ${FiC}`
 		
+		const transformed_knowledges = []
 		const allKnowledges = await Knowledge.findAll()
 		const playerIds = []
 		for (let i = 0; i < allKnowledges.length; i++) {
@@ -3945,6 +3948,8 @@ if (rankcom.includes(cmd)) {
 				transformed_knowledges.push([player.name, playerId, correct_answers])
 			} 
 		}
+
+		console.log('transformed_knowledges', transformed_knowledges)
 
 		const filtered_knowledges = transformed_knowledges.filter((p) => memberIds.includes(p[1]))
 		if (x > filtered_knowledges.length) return message.channel.send(`I need a smaller number. We only have ${filtered_knowledges.length} Trivia players.`)

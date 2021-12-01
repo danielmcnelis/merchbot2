@@ -220,7 +220,7 @@ if(cmd === `!fix`) {
 	if (isJazz(message.member)) {
 		let count = 0
 		const playerIds = []
-		console.log('knowledges', knowledges)
+		console.log('knowledges.length', knowledges.length)
 		for (let i = 0; i < knowledges.length; i++) {
 			const smarts = knowledges[i]
 			const playerId = smarts.playerId

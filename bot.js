@@ -48,7 +48,7 @@ const { abuser, galaxy, orange, robbed, king, beast, blue, bronze, cactus, caveb
 const { adminRole, arenaRole, botRole, draftRole, expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')
-const knowledges = require('./knowledges.json')
+const knowledges = require('./static/knowledges.json')
 const ygoprodeck = require('./static/ygoprodeck.json')
 
 //READY

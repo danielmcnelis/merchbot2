@@ -2663,15 +2663,11 @@ if (statscom.includes(cmd)) {
 			if (!playerIds.includes(playerId)) playerIds.push(playerId)
 		}
 
-		console.log('playerIds', playerIds)
-
 		for (let i = 0; i < playerIds.length; i++) {
 			const playerId = playerIds[i]
 			const correct_answers = await Knowledge.count({ where: { playerId: playerId }})
 			transformed_knowledges.push([playerId, correct_answers])
 		}
-
-		console.log('transformed_knowledges', transformed_knowledges)
 
 		transformed_knowledges.sort((a, b) => b[1] - a[1])
 		const index = transformed_knowledges.length ? transformed_knowledges.findIndex((k) => k[0] === playerId) : null

@@ -122,7 +122,7 @@ const getTriviaConfirmation = async (trivia_entry) => {
         if(yescom.includes(response)) {
             trivia_entry.active = true
             await trivia_entry.save()
-            member.send(`Thanks! Trivia will be starting very soon.\n\nP.S. If you have a disability that affects your typing, please contact Jazz about making Trivia more accessible. 👋`)
+            member.send(`Thanks! Trivia will be starting very soon.`)
             return channel.send(`${member.user.username} confirmed their participation in Trivia!`)
         } else {
             member.send(`Okay, sorry to see you go!`)
@@ -188,10 +188,10 @@ const askQuestion = async (info, entries, questionsArr) => {
         const score_2 = await checkAnswer(updatedEntries[2].answer, fuzzyAnswers, stringency)
         const score_3 = await checkAnswer(updatedEntries[3].answer, fuzzyAnswers, stringency)
     
-        if (score_0 === true) updatedEntries[0].score++, checkKnowledge(updatedEntries[0].playerId, questionNumber)
-        if (score_1 === true) updatedEntries[1].score++, checkKnowledge(updatedEntries[1].playerId, questionNumber)
-        if (score_2 === true) updatedEntries[2].score++, checkKnowledge(updatedEntries[2].playerId, questionNumber)
-        if (score_3 === true) updatedEntries[3].score++, checkKnowledge(updatedEntries[3].playerId, questionNumber)
+        if (score_0 === true) updatedEntries[0].score++, await checkKnowledge(updatedEntries[0].playerId, questionNumber)
+        if (score_1 === true) updatedEntries[1].score++, await checkKnowledge(updatedEntries[1].playerId, questionNumber)
+        if (score_2 === true) updatedEntries[2].score++, await checkKnowledge(updatedEntries[2].playerId, questionNumber)
+        if (score_3 === true) updatedEntries[3].score++, await checkKnowledge(updatedEntries[3].playerId, questionNumber)
     
         await updatedEntries[0].save()
         await updatedEntries[1].save()
@@ -244,10 +244,13 @@ const checkAnswer = async (answer, fuzzyAnswers, stringency) => {
 }
 
 const checkKnowledge = async (playerId, questionNumber) => {
-    const count = await Knowledge.count({ where: { question: [questionNumber], playerId: playerId } })
+    console.log('checking knowledge')
+    const question = questionNumber.slice(questionNumber.indexOf("_") + 1)
+    const count = await Knowledge.count({ where: { question: question, playerId: playerId } })
     if (!count) {
+        console.log('new knowledge for', playerId, 'on question', question, '!!!')
         await Knowledge.create({ 
-            question: [questionNumber], 
+            question: question, 
             playerId: playerId
         })
     }

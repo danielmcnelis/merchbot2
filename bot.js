@@ -221,20 +221,18 @@ if(cmd === `!fix`) {
 		let count = 0
 		const playerIds = []
 		console.log('knowledges.length', knowledges.length)
-		console.log('knowledges[0]', knowledges[0])
 		for (let i = 0; i < knowledges.length; i++) {
 			const smarts = knowledges[i]
 			const keys = Object.keys(smarts)
-			if (i === 0) console.log('keys', keys)
 			const playerId = smarts.playerId
+			console.log('checking knowledge of playerId:', playerId)
 
 			for (let j = 0; j < keys.length; j++) {
-				const key = keys[i]
-				if (key.startsWith('question') && smarts[key]) {
+				const key = keys[j]
+				if (key.startsWith('question') && smarts[key] === true) {
 					const question = key.slice(key.indexOf("_") + 1)
 					console.log('question', question)
-					console.log('question', question.toString())
-					const k = await Knowledge.create({ question: question.toString(), playerId: playerId })
+					const k = await Knowledge.create({ question: question, playerId: playerId })
 					if (k) count++
 					console.log('count', count)
 					if (!playerIds.includes(playerId)) playerIds.push(playerId)

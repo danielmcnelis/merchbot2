@@ -1501,6 +1501,9 @@ if(profcom.includes(cmd)) {
 	let dragons = ''
 	let spellcasters = ''
 	let warriors = ''
+	let fiends = ''
+	let thunders = ''
+	let zombies = ''
 	for (let i = 0; i < player.profile.beast_wins && i < 3; i++) beasts += `${beast} `
 	for (let i = 0; i < player.profile.dinosaur_wins && i < 3; i++) dinosaurs += `${dinosaur} `
 	for (let i = 0; i < player.profile.fish_wins && i < 3; i++) fishes += `${fish} `
@@ -1510,6 +1513,9 @@ if(profcom.includes(cmd)) {
 	for (let i = 0; i < player.profile.dragon_wins && i < 3; i++) dragons += `${dragon} `
 	for (let i = 0; i < player.profile.spellcaster_wins && i < 3; i++) spellcasters += `${spellcaster} `
 	for (let i = 0; i < player.profile.warrior_wins && i < 3; i++) warriors += `${warrior} `
+	for (let i = 0; i < player.profile.fiend_wins && i < 3; i++) fiends += `${fiend} `
+	for (let i = 0; i < player.profile.thunder_wins && i < 3; i++) thunders += `${thunder} `
+	for (let i = 0; i < player.profile.zombie_wins && i < 3; i++) zombies += `${zombie} `
 
 	const win_rate = player.wins || player.losses ? `${Math.round(player.wins / (player.wins + player.losses) * 100)}%` : `N/A`
 	//const keeper_win_rate = player.keeper_wins || player.keeper_losses ? `${Math.round(player.keeper_wins / (player.keeper_wins + player.keeper_losses) * 100)}%` : `N/A`
@@ -1522,8 +1528,8 @@ if(profcom.includes(cmd)) {
 		.setDescription(`Member Since: ${month} ${day}, ${year}${deck_name ? `\nFirst Deck: ${eval(player.profile.starter)} ${deck_name} ${eval(player.profile.starter)}` : ""}`)
 		.addField('Diary Progress', `Easy Diary: ${easy_summary}\nMedium Diary: ${medium_summary}\nHard Diary: ${hard_summary}\nElite Diary: ${elite_summary}`)
 		.addField('Ranked Stats', `Best Medal: ${getMedal(player.best_stats, true)}\nWin Rate: ${win_rate}\nHighest Elo: ${player.best_stats.toFixed(2)}\nVanquished Foes: ${player.vanquished_foes}\nLongest Streak: ${player.longest_streak}`)
-		.addField('Arena Stats', `Beast Wins: ${player.profile.beast_wins} ${beasts}\nDinosaur Wins: ${player.profile.dinosaur_wins} ${dinosaurs}\nFish Wins: ${player.profile.fish_wins} ${fishes}\nPlant Wins: ${player.profile.plant_wins} ${plants}\nReptile Wins: ${player.profile.reptile_wins} ${reptiles}\nRock Wins: ${player.profile.rock_wins} ${rocks}\nDragon Wins: ${player.profile.dragon_wins} ${dragons}\nSpellcaster Wins: ${player.profile.spellcaster_wins} ${spellcasters}\nWarrior Wins: ${player.profile.warrior_wins} ${warriors}`)
-		.addField('Other Stats', `Net Worth: ${Math.floor(networth)}${starchips}\nTrade Partners: ${player.profile.trade_partners}\nTrivia Wins: ${player.profile.trivia_wins}\nTrivia Answers: ${correct_answers} out of 1000`)
+		.addField('Arena Stats', `Beast Wins: ${player.profile.beast_wins} ${beasts}\nDinosaur Wins: ${player.profile.dinosaur_wins} ${dinosaurs}\nFish Wins: ${player.profile.fish_wins} ${fishes}\nPlant Wins: ${player.profile.plant_wins} ${plants}\nReptile Wins: ${player.profile.reptile_wins} ${reptiles}\nRock Wins: ${player.profile.rock_wins} ${rocks}\nDragon Wins: ${player.profile.dragon_wins} ${dragons}\nSpellcaster Wins: ${player.profile.spellcaster_wins} ${spellcasters}\nWarrior Wins: ${player.profile.warrior_wins} ${warriors}\nFiend Wins: ${player.profile.fiend_wins} ${fiends}\nThunder Wins: ${player.profile.thunder_wins} ${thunders}\nWarrior Wins: ${player.profile.zombie_wins} ${zombies}`)
+		.addField('Other Stats', `Net Worth: ${Math.floor(networth)}${starchips}\nTrade Partners: ${player.profile.trade_partners}\nTrivia Wins: ${player.profile.trivia_wins}\nTrivia Answers: ${correct_answers} out of 1500`)
 		.setImage(card_image)
 		.setFooter(quote)
 

@@ -135,17 +135,16 @@ const getTriviaConfirmation = async (trivia_entry) => {
 }
 
 
-const getAnswer = async (entry, question) => {
+const getAnswer = async (entry, question, round) => {
     const guild = client.guilds.cache.get("842476300022054913")
     const playerId = entry.playerId
-    const extraTime = playerId === '257021989078827010' ? 4000 : 0
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
-	const msg = await member.send(question)
+	const msg = await member.send(`${megaphone}  ------  Question #${round}  ------  ${dummy}\n${question}`)
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
-		time: 16000 + extraTime
+		time: 20000
 	}).then(async collected => {
 		const response = collected.first().content
         entry.answer = response
@@ -176,10 +175,10 @@ const askQuestion = async (info, entries, questionsArr) => {
 
     channel.send(`${megaphone}  ------  Question #${info.round}  ------  ${dummy}\n${question}\n\n`)
     
-    getAnswer(entries[0], question)
-    getAnswer(entries[1], question)
-    getAnswer(entries[2], question)
-    getAnswer(entries[3], question)
+    getAnswer(entries[0], question, info.round)
+    getAnswer(entries[1], question, info.round)
+    getAnswer(entries[2], question, info.round)
+    getAnswer(entries[3], question, info.round)
 
     setTimeout(async() => {
         const updatedEntries = await Trivia.findAll({ include: Player})

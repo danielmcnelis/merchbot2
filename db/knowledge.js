@@ -4002,6 +4002,2005 @@ const Knowledge = db.define('knowledge', {
     question_999: {
         type: Sequelize.BOOLEAN,  
         defaultValue: false
+    },question_1000: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1001: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1002: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1003: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1004: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1005: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1006: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1007: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1008: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1009: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1010: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1011: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1012: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1013: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1014: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1015: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1016: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1017: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1018: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1019: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1020: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1021: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1022: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1023: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1024: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1025: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1026: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1027: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1028: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1029: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1030: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1031: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1032: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1033: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1034: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1035: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1036: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1037: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1038: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1039: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1040: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1041: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1042: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1043: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1044: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1045: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1046: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1047: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1048: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1049: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1050: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1051: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1052: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1053: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1054: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1055: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1056: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1057: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1058: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1059: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1060: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1061: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1062: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1063: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1064: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1065: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1066: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1067: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1068: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1069: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1070: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1071: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1072: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1073: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1074: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1075: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1076: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1077: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1078: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1079: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1080: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1081: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1082: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1083: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1084: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1085: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1086: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1087: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1088: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1089: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1090: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1091: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1092: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1093: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1094: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1095: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1096: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1097: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1098: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1099: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1100: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1101: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1102: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1103: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1104: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1105: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1106: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1107: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1108: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1109: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1110: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1111: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1112: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1113: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1114: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1115: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1116: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1117: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1118: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1119: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1120: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1121: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1122: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1123: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1124: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1125: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1126: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1127: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1128: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1129: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1130: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1131: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1132: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1133: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1134: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1135: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1136: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1137: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1138: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1139: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1140: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1141: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1142: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1143: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1144: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1145: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1146: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1147: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1148: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1149: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1150: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1151: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1152: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1153: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1154: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1155: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1156: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1157: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1158: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1159: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1160: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1161: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1162: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1163: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1164: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1165: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1166: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1167: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1168: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1169: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1170: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1171: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1172: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1173: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1174: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1175: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1176: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1177: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1178: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1179: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1180: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1181: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1182: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1183: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1184: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1185: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1186: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1187: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1188: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1189: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1190: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1191: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1192: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1193: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1194: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1195: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1196: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1197: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1198: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1199: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1200: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1201: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1202: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1203: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1204: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1205: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1206: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1207: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1208: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1209: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1210: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1211: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1212: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1213: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1214: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1215: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1216: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1217: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1218: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1219: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1210: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1221: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1222: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1223: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1224: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1225: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1226: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1227: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1228: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1229: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1220: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1231: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1232: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1233: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1234: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1235: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1236: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1237: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1238: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1239: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1240: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1241: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1242: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1243: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1244: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1245: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1246: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1247: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1248: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1249: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1250: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1251: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1252: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1253: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1254: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1255: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1256: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1257: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1258: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1259: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1260: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1261: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1262: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1263: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1264: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1265: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1266: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1267: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1268: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1269: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1270: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1271: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1272: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1273: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1274: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1275: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1276: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1277: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1278: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1279: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1280: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1281: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1282: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1283: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1284: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1285: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1286: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1287: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1288: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1289: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1290: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1291: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1292: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1293: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1294: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1295: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1296: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1297: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1298: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1299: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1300: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1301: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1302: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1303: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1304: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1305: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1306: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1307: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1308: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1309: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1310: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1311: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1312: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1313: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1314: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1315: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1316: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1317: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1318: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1319: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1310: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1321: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1322: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1323: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1324: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1325: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1326: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1327: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1328: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1329: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1320: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1331: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1332: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1333: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1334: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1335: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1336: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1337: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1338: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1339: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1340: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1341: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1342: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1343: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1344: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1345: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1346: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1347: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1348: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1349: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1350: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1351: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1352: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1353: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1354: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1355: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1356: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1357: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1358: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1359: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1360: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1361: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1362: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1363: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1364: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1365: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1366: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1367: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1368: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1369: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1370: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1371: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1372: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1373: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1374: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1375: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1376: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1377: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1378: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1379: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1380: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1381: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1382: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1383: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1384: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1385: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1386: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1387: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1388: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1389: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1390: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1391: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1392: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1393: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1394: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1395: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1396: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1397: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1398: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1399: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1400: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1401: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1402: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1403: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1404: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1405: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1406: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1407: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1408: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1409: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1410: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1411: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1412: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1413: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1414: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1415: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1416: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1417: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1418: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1419: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1410: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1421: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1422: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1423: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1424: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1425: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1426: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1427: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1428: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1429: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1420: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1431: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1432: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1433: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1434: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1435: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1436: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1437: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1438: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1439: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1440: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1441: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1442: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1443: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1444: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1445: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1446: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1447: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1448: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1449: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1450: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1451: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1452: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1453: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1454: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1455: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1456: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1457: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1458: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1459: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1460: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1461: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1462: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1463: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1464: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1465: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1466: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1467: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1468: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1469: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1470: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1471: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1472: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1473: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1474: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1475: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1476: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1477: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1478: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1479: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1480: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1481: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1482: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1483: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1484: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1485: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1486: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1487: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1488: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1489: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1490: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1491: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1492: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1493: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1494: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1495: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1496: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1497: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1498: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
+    },
+    question_1499: {
+        type: Sequelize.BOOLEAN,  
+        defaultValue: false
     }
 })
 

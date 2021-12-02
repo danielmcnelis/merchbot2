@@ -44,7 +44,7 @@ const { client } = require('./static/clients.js')
 const { alchemycom, aliuscom, bindercom, botcom, boxcom, bracketcom, calccom, checklistcom, dailycom, dbcom, deckcom, dicecom, dropcom, flipcom, h2hcom, historycom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, packcom, pfpcom, populationcom, profcom, queuecom, rankcom, reducecom, referralcom, rolecom, specialcom, startcom, statscom, undocom, walletcom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
-const { abuser, galaxy, orange, robbed, king, beast, blue, bronze, cactus, cavebob, checkmark, com, skull, familiar, battery, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, hook, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, shrine, spellcaster, DRT, fiend, thunder, zombie, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, downward, upward, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare, draft } = require('./static/emojis.json')
+const { abuser, galaxy, orange, robbed, king, beast, blue, bronze, cactus, cavebob, checkmark, com, skull, familiar, battery, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, greenmark, hook, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, shrine, spellcaster, DRT, fiend, thunder, zombie, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, downward, upward, sup, tix, ult, wokeaf, yellow, green, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare, draft } = require('./static/emojis.json')
 const { adminRole, arenaRole, botRole, draftRole, expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')
@@ -4208,7 +4208,6 @@ if (cmd === `!resume`) {
 	} else if (game === 'Trivia') {
 		const triviaArr = Object.entries(trivia)
 		const questionsArr = getRandomSubset(triviaArr, 10)
-		console.log('questionsArr', questionsArr)
 		setTimeout(() => askQuestion(info, entries, questionsArr), 30000)
 		return message.channel.send(`<@&${role}>, Trivia will resume in 30 seconds.`)
 	}
@@ -5501,6 +5500,29 @@ if(checklistcom.includes(cmd)) {
 		order: [['card_code', 'ASC']]
 	})
 
+	const trips = valid_set_code ? await Inventory.findAll({
+		where: {
+			playerId: maid,
+			card_code: {
+				[Op.startsWith]: set_code
+			},
+			quantity: {
+				[Op.gte]: 3
+			}
+		},
+		include: [Print],
+		order: [['card_code', 'ASC']]
+	}) : await Inventory.findAll({ 
+		where: { 
+			playerId: maid,
+			quantity: {
+				[Op.gte]: 3
+			}
+		},
+		include: Print,
+		order: [['card_code', 'ASC']]
+	})
+
 	const allPrints = valid_set_code ? await Print.findAll({ 
 		where: {
 			set_code: set_code,
@@ -5518,6 +5540,7 @@ if(checklistcom.includes(cmd)) {
 	const results = []
 	const codes = []
 	const cards = inventory.map((card) => card.print.card_code)
+	const playsets = trips.map((card) => card.print.card_code)
 
 	for (let i = 0; i < allPrints.length; i++) {
 		const row = allPrints[i]
@@ -5533,7 +5556,7 @@ if(checklistcom.includes(cmd)) {
 			console.log(err)
 		}
 
-		const box_emoji = cards.includes(row.card_code) ? checkmark : emptybox
+		const box_emoji = playsets.includes(row.card_code) ? greenmark : cards.includes(row.card_code) ? checkmark : emptybox
 		const count = (code === 'CH2') ? await Inventory.count({ where: { printId: row.id } }) : true
 		results.push(`${box_emoji} ${eval(row.rarity)}${row.card_code} - ${count ? row.card_name : '???'}`) 
 	}

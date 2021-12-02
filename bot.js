@@ -5561,12 +5561,12 @@ if(checklistcom.includes(cmd)) {
 		results.push(`${box_emoji} ${eval(row.rarity)}${row.card_code} - ${count ? row.card_name : '???'}`) 
 	}
 
-	for (let i = 0; i < results.length; i += 30) {
-		if (results[i+31] && results[i+31].startsWith("\n")) {
-			message.author.send(results.slice(i, i+31))
+	for (let i = 0; i < results.length; i += 25) {
+		if (results[i+26] && results[i+26].startsWith("\n")) {
+			message.author.send(results.slice(i, i+26))
 			i++
 		} else {
-			message.author.send(results.slice(i, i+30))
+			message.author.send(results.slice(i, i+25))
 		}
 	}
 

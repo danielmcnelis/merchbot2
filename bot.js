@@ -5556,7 +5556,7 @@ if(checklistcom.includes(cmd)) {
 			console.log(err)
 		}
 
-		const box_emoji = playsets.includes(row.card_code) ? checkmark : cards.includes(row.card_code) ? greenmark : emptybox
+		const box_emoji = playsets.includes(row.card_code) ? tres : cards.includes(row.card_code) ? checkmark : emptybox
 		const count = (code === 'CH2') ? await Inventory.count({ where: { printId: row.id } }) : true
 		results.push(`${box_emoji} ${eval(row.rarity)}${row.card_code} - ${count ? row.card_name : '???'}`) 
 	}

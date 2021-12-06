@@ -6211,15 +6211,17 @@ if(cmd === `!dump`) {
 	if (mcid !== botSpamChannelId) return message.channel.send(`Please use this command in <#${botSpamChannelId}>.`)
 	const info = await Info.findOne({ where: { element: 'shop'} })
 	if (info.status === 'closed') return message.channel.send(`Sorry, you cannot dump cards while The Shop is closed.`)
-	const set_code = args.length ? args[0].toUpperCase() : 'DRT'
+	const set_code = args.length ? args[0].toUpperCase() : 'DRT'	
 	const set = await Set.findOne({where: { code: set_code }})
 	if (!set) return message.channel.send(`Sorry, I do not recognized the set code: "${set_code}".`)
+
 	const player = await Player.findOne({ where: { id: maid }, include: Wallet })
 	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	const merchbot_wallet = await Wallet.findOne({ where: { playerId: merchbotId } })
 	if (!merchbot_wallet) return message.channel.send(`That user is not in the database.`)
 	
-	const rarity = await getDumpRarity(message)
+	const inputRarity = getRarity(args[0])
+	const rarity = inputRarity || await getDumpRarity(message)
 	if (rarity === 'unrecognized') return message.channel.send(`Please specify a valid rarity.`)
 	if (!rarity) return
 
@@ -6231,7 +6233,15 @@ if(cmd === `!dump`) {
 	const excluded_prints = exclusions ? await getExcludedPrintIds(message, rarity, set, exclusions, fuzzyPrints) : null
 	if (excluded_prints === false) return
 	
-	const unfilteredInv = await Inventory.findAll({
+	const unfilteredInv = inputRarity ? await Inventory.findAll({
+		where: {
+			playerId: maid,
+			quantity: { [Op.gt]: quantityToKeep },
+			draft: false,
+			hidden: false
+		}, include: Print,
+		order: [["card_code", "ASC"]]
+	}) : await Inventory.findAll({
 		where: {
 			card_code: { [Op.startsWith]: set_code },
 			playerId: maid,

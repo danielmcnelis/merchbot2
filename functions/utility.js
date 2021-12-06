@@ -319,6 +319,17 @@ const getMedal = (stats, title = false) => {
     }
 }
 
+//GET RARITY
+const getRarity = (str = '') => {
+    const rarity = str.includes('com') ? 'com' :
+        str.includes('rar') ? 'rar' :
+        str.includes('sup') ? 'sup' :
+        str.includes('ult') ? 'ult' : 
+        str.includes('sec') || str.includes('scr') ? 'scr' :
+        false
+    
+    return rarity
+}
 
 //CAPITALIZE
 const capitalize = (str) => {
@@ -392,6 +403,7 @@ module.exports = {
     getRandomElement,
     generateRandomString,
     getRandomSubset,
+    getRarity,
     hasProfile,
     isAdmin,
     isAmbassador,

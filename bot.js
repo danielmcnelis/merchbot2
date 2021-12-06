@@ -6237,8 +6237,7 @@ if(cmd === `!dump`) {
 		where: {
 			playerId: maid,
 			quantity: { [Op.gt]: quantityToKeep },
-			draft: false,
-			hidden: false
+			draft: false
 		}, include: Print,
 		order: [["card_code", "ASC"]]
 	}) : await Inventory.findAll({

@@ -666,12 +666,12 @@ const postBids = async () => {
 }
 
 // ASK FOR DUMP CONFIRMATION
-const askForDumpConfirmation = async (message, set, cards, compensation) => {
+const askForDumpConfirmation = async (message, set, cards, compensation, count) => {
     const prompt = set && set.emoji === set.alt_emoji ? `${set.code} ${eval(set.emoji)}` :
     set && set.emoji !== set.alt_emoji ? `${set.code} ${eval(set.emoji)}${eval(set.alt_emoji)}` :
     ''
     
-    cards.unshift(`Are you sure you want to sell the following ${prompt} cards:`)
+    cards.unshift(`Are you sure you want to sell the following ${count} ${prompt} cards:`)
     for (let i = 0; i < cards.length; i+=30) {
         message.channel.send(cards.slice(i, i+30).join("\n"))
     }

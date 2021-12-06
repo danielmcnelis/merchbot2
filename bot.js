@@ -6271,7 +6271,7 @@ if(cmd === `!dump`) {
 		compensation += price
 	}
 
-	const dumpConfirmation = await askForDumpConfirmation(message, set, cards, compensation)
+	const dumpConfirmation = await askForDumpConfirmation(message, set, cards, compensation, count)
 	if (!dumpConfirmation) return
 
 	let m6success = false

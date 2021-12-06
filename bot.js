@@ -44,7 +44,7 @@ const { client } = require('./static/clients.js')
 const { alchemycom, aliuscom, bindercom, botcom, boxcom, bracketcom, calccom, checklistcom, dailycom, dbcom, deckcom, dicecom, dropcom, flipcom, h2hcom, historycom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, packcom, pfpcom, populationcom, profcom, queuecom, rankcom, reducecom, referralcom, rolecom, specialcom, startcom, statscom, undocom, walletcom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
-const { abuser, galaxy, orange, robbed, king, beast, blue, bronze, cactus, cavebob, checkmark, com, skull, familiar, battery, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, greenmark, hook, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, shrine, spellcaster, DRT, fiend, thunder, zombie, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, downward, upward, sup, tix, tres, ult, wokeaf, yellow, green, wut, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare, draft } = require('./static/emojis.json')
+const { abuser, aight, galaxy, orange, robbed, king, beast, blue, bonk, bronze, cactus, cavebob, checkmark, com, skull, familiar, battery, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, greenmark, hook, hmm, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, shrine, spellcaster, DRT, fiend, thunder, zombie, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, downward, upward, sup, tix, tres, ult, vince, wokeaf, yellow, green, waah, wut, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare, draft } = require('./static/emojis.json')
 const { adminRole, arenaRole, botRole, draftRole, expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')
@@ -267,20 +267,74 @@ if(cmd === `!stop`) return message.channel.send('🛑')
 //AJT
 if(cmd === `!ajt` || cmd === `!ajtbls`) return message.channel.send('🧑‍🌾')
 
-//CAMERON
-if(cmd === `!cam` || cmd === `!cameron`) return message.channel.send(cavebob)
+//ALISAE
+if(cmd === `!alisae`) return message.channel.send(stoned)
 
-//JAZZ
-if(cmd === `!jazz`) return message.channel.send(abuser)
-
-//RANDAGE
-if(cmd === `!randage`) return message.channel.send(lmf3dao)
+//ARETOS
+if(cmd === `!aretos`) return message.channel.send(hmm)
 
 //CALEB
 if(cmd === `!caleb`) return message.channel.send(robbed)
 
+//CAMERON
+if(cmd === `!cam` || cmd === `!cameron`) return message.channel.send(stare)
+
+//DYL
+if(cmd === `!dyl`) return message.channel.send(soldier)
+
+//FUSION
+if(cmd === `!fusion`) return message.channel.send('🐈')
+
+//INDICUD
+if(cmd === `!indicud` || cmd === `!indi`) return message.channel.send(fish)
+
+//JAZZ
+if(cmd === `!jazz`) return message.channel.send('🎷')
+
+//KIZARU
+if(cmd === `!kizaru`) return message.channel.send('🇮🇹')
+
+//LITO
+if(cmd === `!lito`) return message.channel.send(aight)
+
+//LIVD
+if(cmd === `!livd`) return message.channel.send(moai)
+
+//NB96
+if(cmd === `!nb96`) return message.channel.send(dragon)
+
+//PAYDRO
+if(cmd === `!paydro` || cmd === `!itspaydro18`) return message.channel.send(cavebob)
+
+//RANDAGE
+if(cmd === `!randage`) return message.channel.send(lmf3dao)
+
+//RIKKU
+if(cmd === `!rikku`) return message.channel.send(yes)
+
+//SCOOPS
+if(cmd === `!scoops` || cmd === `!jmoney`) return message.channel.send(vince)
+
+//STLF
+if(cmd === `!stlf`) return message.channel.send(waah)
+
+//SUPREME
+if(cmd === `!supreme`) return message.channel.send('💀')
+
+//SUPERB
+if(cmd === `!superb`) return message.channel.send(red)
+
+//VULDREAD
+if(cmd === `!vuldread`) return message.channel.send(bonk)
+
+//ZOIDBERG
+if(cmd === `!zoidberg`) return message.channel.send('🦞')
+
 //YELLOW
 if(cmd === `!yellow`) return message.channel.send('🟨')
+
+//YUNO
+if(cmd === `!yuno` || cmd === `!yunogasai666`) return message.channel.send(cultured)
 
 //OPERATION
 if(cmd === `!operation`) return message.channel.send('❄️☃️❄️☃️❄️')

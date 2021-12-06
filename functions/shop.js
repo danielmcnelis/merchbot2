@@ -743,7 +743,7 @@ const getDumpQuantity = async (message, rarity) => {
 
 
 // ASK FOR EXCLUSIONS
-const askForExclusions = async (message, rarity, set_code) => {
+const askForExclusions = async (message) => {
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send(`Do you want to exclude any cards?`)
     const collected = await msg.channel.awaitMessages(filter, {
@@ -771,7 +771,11 @@ const askForExclusions = async (message, rarity, set_code) => {
 // GET EXCLUSIONS
 const getExclusions = async (message, rarity, set) => {
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send(`Please provide a list of ${rarity === 'all' ? '' : eval(rarity)}${set.code} ${set.emoji === set.alt_emoji ? eval(set.emoji) : `${eval(set.emoji)} ${eval(set.alt_emoji)}`} cards you do not want to bulk sell.`)
+    const prompt = set && set.emoji === set.alt_emoji ? `${set.code} ${eval(set.emoji)}` :
+        set && set.emoji !== set.alt_emoji ? `${set.code} ${eval(set.emoji)}${eval(set.alt_emoji)}` :
+        ''
+
+	const msg = await message.channel.send(`Please provide a list of ${rarity === 'all' ? '' : eval(rarity)}${prompt} cards you do not want to bulk sell.`)
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
         time: 60000
@@ -804,7 +808,8 @@ const getExcludedPrintIds = async (message, rarity, set, exclusions, fuzzyPrints
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) :
-                    card_name ? await Print.findOne({ where: { card_name: card_name, set_code: set.code }}) :
+                    card_name && set ? await Print.findOne({ where: { card_name: card_name, set_code: set.code }}) :
+                    card_name && !set ? await selectPrint(message, playerId, card_name) :
                     null
 		
         if (!print) {

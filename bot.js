@@ -6211,16 +6211,16 @@ if(cmd === `!dump`) {
 	if (mcid !== botSpamChannelId) return message.channel.send(`Please use this command in <#${botSpamChannelId}>.`)
 	const info = await Info.findOne({ where: { element: 'shop'} })
 	if (info.status === 'closed') return message.channel.send(`Sorry, you cannot dump cards while The Shop is closed.`)
+	const inputRarity = getRarity(args[0])
 	const set_code = args.length ? args[0].toUpperCase() : 'DRT'	
 	const set = await Set.findOne({where: { code: set_code }})
-	if (!set) return message.channel.send(`Sorry, I do not recognized the set code: "${set_code}".`)
+	if (!set && !inputRarity) return message.channel.send(`Sorry, I do not recognized the set code: "${set_code}".`)
 
 	const player = await Player.findOne({ where: { id: maid }, include: Wallet })
 	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
 	const merchbot_wallet = await Wallet.findOne({ where: { playerId: merchbotId } })
 	if (!merchbot_wallet) return message.channel.send(`That user is not in the database.`)
 	
-	const inputRarity = getRarity(args[0])
 	const rarity = inputRarity || await getDumpRarity(message)
 	if (rarity === 'unrecognized') return message.channel.send(`Please specify a valid rarity.`)
 	if (!rarity) return
@@ -6256,7 +6256,7 @@ if(cmd === `!dump`) {
 				rarity !== 'all' && excluded_prints.length ? unfilteredInv.filter((el) => !excluded_prints.includes(el.printId) && el.print.rarity === rarity) :
 				[]
 
-	if (!inv.length) return message.channel.send(`You do not have more than ${quantityToKeep} ${quantityToKeep === 1 ? 'copy' : 'copies'} of any ${rarity === 'all' ? '' : `${eval(rarity)} `}${set_code} ${eval(set_code)} cards.`)
+	if (!inv.length) return message.channel.send(`You do not have more than ${quantityToKeep} ${quantityToKeep === 1 ? 'copy' : 'copies'} of any ${rarity === 'all' ? '' : `${eval(rarity)} `}${set ? `${set_code} ${eval(set_code)}` : ''} cards.`)
 
 	const cards = []
 	let compensation = 0
@@ -6337,7 +6337,12 @@ if(cmd === `!dump`) {
 	await merchbot_wallet.save()
 
 	if (m6success) completeTask(message.channel, maid, 'm6')
-	return message.channel.send(`You sold ${count} ${rarity === 'all' ? '' : eval(rarity)}${set.code} ${set.emoji === set.alt_emoji ? eval(set.emoji) : `${eval(set.emoji)} ${eval(set.alt_emoji)}`} ${count === 1 ? 'card' : 'cards'} to The Shop for ${compensation}${stardust}.`)
+	
+	const prompt = set && set.emoji === set.alt_emoji ? `${set.code} ${eval(set.emoji)}` :
+	set && set.emoji !== set.alt_emoji ? `${set.code} ${eval(set.emoji)}${eval(set.alt_emoji)}` :
+	''
+
+	return message.channel.send(`You sold ${count} ${rarity === 'all' ? '' : eval(rarity)}${prompt} ${count === 1 ? 'card' : 'cards'} to The Shop for ${compensation}${stardust}.`)
 }
 
 //SELL

@@ -196,7 +196,6 @@ const createProfile = async (playerId, starter) => {
         await Binder.create({playerId})
         await Daily.create({playerId})
         await Diary.create({playerId})
-        await Knowledge.create({playerId})
         await Profile.create({
             playerId,
             starter,

@@ -44,7 +44,7 @@ const { client } = require('./static/clients.js')
 const { alchemycom, aliuscom, bindercom, botcom, boxcom, bracketcom, calccom, checklistcom, dailycom, dbcom, deckcom, dicecom, dropcom, flipcom, h2hcom, historycom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, packcom, pfpcom, populationcom, profcom, queuecom, rankcom, reducecom, referralcom, rolecom, specialcom, startcom, statscom, undocom, walletcom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
-const { abuser, aight, galaxy, orange, robbed, king, beast, blue, bonk, bronze, cactus, cavebob, checkmark, com, skull, familiar, battery, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, greenmark, hook, hmm, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, shrine, spellcaster, DRT, fiend, thunder, zombie, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, downward, upward, sup, tix, tres, ult, vince, wokeaf, yellow, green, waah, wut, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare, draft } = require('./static/emojis.json')
+const { abuser, aight, galaxy, orange, robbed, king, beast, blue, bonk, bronze, cactus, cavebob, checkmark, com, skull, familiar, battery, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, greenmark, hook, hmmm, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, shrine, spellcaster, DRT, fiend, thunder, zombie, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, downward, upward, sup, tix, tres, ult, vince, wokeaf, yellow, green, waah, wut, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare, draft } = require('./static/emojis.json')
 const { adminRole, arenaRole, botRole, draftRole, expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')
@@ -218,29 +218,8 @@ if(cmd === `!test`) {
 //FIX
 if(cmd === `!fix`) {
 	if (isJazz(message.member)) {
-		let count = 0
-		const playerIds = []
-		console.log('knowledges.length', knowledges.length)
-		for (let i = 0; i < knowledges.length; i++) {
-			const smarts = knowledges[i]
-			const keys = Object.keys(smarts)
-			const playerId = smarts.playerId
-			console.log('checking knowledge of playerId:', playerId)
-
-			for (let j = 0; j < keys.length; j++) {
-				const key = keys[j]
-				if (key.startsWith('question') && smarts[key] === true) {
-					const question = key.slice(key.indexOf("_") + 1)
-					console.log('question', question)
-					const k = await Knowledge.create({ question: question, playerId: playerId })
-					if (k) count++
-					console.log('count', count)
-					if (!playerIds.includes(playerId)) playerIds.push(playerId)
-				}
-			}
-		}
-
-		return message.channel.send(`Created ${count} Knowledge entries for ${playerIds.length} players in the MerchBot database.`)
+		createProfile('597846418320785464', 'warrior')
+		console.log('ok')
 	} else {
 		return message.channel.send('🛠️')
 	}
@@ -271,7 +250,7 @@ if(cmd === `!ajt` || cmd === `!ajtbls`) return message.channel.send('🧑‍🌾
 if(cmd === `!alisae`) return message.channel.send(stoned)
 
 //ARETOS
-if(cmd === `!aretos`) return message.channel.send(hmm)
+if(cmd === `!aretos`) return message.channel.send(hmmm)
 
 //CALEB
 if(cmd === `!caleb`) return message.channel.send(robbed)

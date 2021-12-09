@@ -6272,7 +6272,7 @@ if(cmd === `!dump`) {
 			quantity: { [Op.gt]: quantityToKeep },
 			draft: false
 		}, include: Print,
-		order: [["card_code", "ASC"]]
+		order: [[Print, 'market_price', 'DESC']]
 	}) : await Inventory.findAll({
 		where: {
 			card_code: { [Op.startsWith]: set_code },

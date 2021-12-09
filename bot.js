@@ -1487,7 +1487,7 @@ if(profcom.includes(cmd)) {
 	const member = message.mentions.users.first()
 	const avatar = member ? member.displayAvatarURL() : message.author.displayAvatarURL()
 	const day = parseInt(player.profile.start_date.slice(-2))
-	const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "November", "December"]
+	const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 	const month = months[parseInt(player.profile.start_date.slice(5, 7)) - 1]
 	const year = player.profile.start_date.slice(0, 4)
 	const deck_name = player.profile.starter === 'fish' ? `Fish's Ire` :
@@ -1574,7 +1574,7 @@ if(profcom.includes(cmd)) {
 		.addField('Diary Progress', `Easy Diary: ${easy_summary}\nMedium Diary: ${medium_summary}\nHard Diary: ${hard_summary}\nElite Diary: ${elite_summary}`)
 		.addField('Ranked Stats', `Best Medal: ${getMedal(player.best_stats, true)}\nWin Rate: ${win_rate}\nHighest Elo: ${player.best_stats.toFixed(2)}\nVanquished Foes: ${player.vanquished_foes}\nLongest Streak: ${player.longest_streak}`)
 		.addField('Arena Stats', `Beast Wins: ${player.profile.beast_wins} ${beasts}\nDinosaur Wins: ${player.profile.dinosaur_wins} ${dinosaurs}\nFish Wins: ${player.profile.fish_wins} ${fishes}\nPlant Wins: ${player.profile.plant_wins} ${plants}\nReptile Wins: ${player.profile.reptile_wins} ${reptiles}\nRock Wins: ${player.profile.rock_wins} ${rocks}\nDragon Wins: ${player.profile.dragon_wins} ${dragons}\nSpellcaster Wins: ${player.profile.spellcaster_wins} ${spellcasters}\nWarrior Wins: ${player.profile.warrior_wins} ${warriors}\nFiend Wins: ${player.profile.fiend_wins} ${fiends}\nThunder Wins: ${player.profile.thunder_wins} ${thunders}\nWarrior Wins: ${player.profile.zombie_wins} ${zombies}`)
-		.addField('Other Stats', `Net Worth: ${Math.floor(networth)}${starchips}\nTrade Partners: ${player.profile.trade_partners}\nTrivia Wins: ${player.profile.trivia_wins}\nTrivia Answers: ${correct_answers} out of 1500`)
+		.addField('Other Stats', `Net Worth: ${Math.floor(networth)}${starchips}\nTrade Partners: ${player.profile.trade_partners}\nTrivia Wins: ${player.profile.trivia_wins}\nTrivia Answers: ${correct_answers} out of 2000`)
 		.setImage(card_image)
 		.setFooter(quote)
 

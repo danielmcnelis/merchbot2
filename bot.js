@@ -4155,11 +4155,11 @@ if(joincom.includes(cmd)) {
 			return startDraft(fuzzyPrints)
 		} else if (game === 'Trivia') {
 			const tCount = await Trivia.count()
-			if (tCount === 3) {
+			if (tCount === 4) {
 				info.status = 'confirming'
 				await info.save()
 				return startTrivia()
-			} else if (tCount >= 4) {
+			} else if (tCount >= 5) {
 				entry.active = true
 				await entry.save()
 			}
@@ -4247,7 +4247,7 @@ if (cmd === `!resume`) {
 	} else if (game === 'Trivia') {
 		const triviaArr = Object.entries(trivia)
 		const questionsArr = getRandomSubset(triviaArr, 10)
-		setTimeout(() => askQuestion(info, entries, questionsArr), 30000)
+		setTimeout(() => askQuestion(info, questionsArr), 30000)
 		return message.channel.send(`<@&${role}>, Trivia will resume in 30 seconds.`)
 	}
 }

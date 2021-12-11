@@ -45,7 +45,7 @@ const startTrivia = async () => {
                     channel.send(`<@&${triviaRole}>, look alive bookworms! Trivia starts in 10 seconds. ${wut}\n\nP.S. Remember: answer questions **in your DMs**.`)
                 }, 1000)
                 return setTimeout(() => {
-                    return askQuestion(info, entries, questions)
+                    return askQuestion(info, questions)
                 }, 11000)
             }
         }, i * 5000)

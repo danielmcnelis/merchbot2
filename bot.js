@@ -4162,6 +4162,7 @@ if(joincom.includes(cmd)) {
 			} else if (tCount >= 5) {
 				entry.active = true
 				await entry.save()
+				message.member.roles.add(triviaRole)
 			}
 		}
 	} else {

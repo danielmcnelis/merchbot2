@@ -17,30 +17,26 @@ const startTrivia = async () => {
     channel.send(`Trivia players, please check your DMs!`)
     const entries = await Trivia.findAll({ include: Player })
 
-    getTriviaConfirmation(entries[0])
-    getTriviaConfirmation(entries[1])
-    getTriviaConfirmation(entries[2])
-    getTriviaConfirmation(entries[3])
+    for (let i = 0; i < entries.length; i++) {
+        getTriviaConfirmation(entries[i])
+    }
 
     const all_questions = Object.entries(trivia)
     const questions = getRandomSubset(all_questions, 10)
-
-    const info = await Info.findOne({ where: {
-        element: 'trivia'
-    }})
+    const info = await Info.findOne({ where: { element: 'trivia' }})
 
     for (let i = 1; i < 12; i ++) {
         setTimeout(async () => {
-            const count = await Trivia.count({ where: {
-                active: true
-            } })
-    
-            const active = await Info.count({ where: {
-                element: 'trivia',
-                status: 'active'
-            } })
+            const count = await Trivia.count({ where: { active: true }})
+            const active = await Info.count({ where: { element: 'trivia', status: 'active' }})
 
-            if (count === 4 && !active) {
+            if (count >= 4 && !active) {
+                const missing_entries = await Trivia.findAll({ where: { active: false }, include: Player })
+                for (let i = 0; i < missing_entries.length; i++) {
+                    const entry = missing_entries[i]
+                    await entry.destroy()
+                }
+            
                 info.round = 1
                 info.status = 'active'
                 await info.save()
@@ -56,16 +52,10 @@ const startTrivia = async () => {
     }
 
     setTimeout(async () => {
-        const count = await Trivia.count({ where: {
-            active: true
-        } })
+        const count = await Trivia.count({ where: { active: true }})
+        const active = await Info.count({ where: { element: 'trivia', status: 'active' }})
 
-        const active = await Info.count({ where: {
-            element: 'trivia',
-            status: 'active'
-        } })
-
-        if (count !== 4 && !active) {
+        if (count < 4 && !active) {
             const missing_entries = await Trivia.findAll({ 
                 where: { 
                     active: false
@@ -82,8 +72,14 @@ const startTrivia = async () => {
                 await entry.destroy()
             }
             
-            return channel.send(`Unfortunately, Trivia cannot begin without 5 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`)
-        } else if (count === 4 && !active) {
+            return channel.send(`Unfortunately, Trivia cannot begin without 4 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`)
+        } else if (count >= 4 && !active) {
+            const missing_entries = await Trivia.findAll({ where: { active: false }, include: Player })
+            for (let i = 0; i < missing_entries.length; i++) {
+                const entry = missing_entries[i]
+                await entry.destroy()
+            }
+
             info.round = 1
             info.status = 'active'
             await info.save()
@@ -92,7 +88,7 @@ const startTrivia = async () => {
                 channel.send(`<@&${triviaRole}>, look alive bookworms! Trivia starts in 10 seconds. ${wut}\n\nP.S. Remember: answer questions **in your DMs**.`)
             }, 1000)
             return setTimeout(() => {
-                return askQuestion(info, allTriviaEntries, questionsArr)
+                return askQuestion(info, questionsArr)
             }, 11000)
         }
     }, 61000)
@@ -166,7 +162,7 @@ const assignTriviaRoles = (entries) => {
     })
 }
 
-const askQuestion = async (info, entries, questionsArr) => {
+const askQuestion = async (info, questionsArr) => {
     const channel = client.channels.cache.get(triviaChannelId)
     const questionNumber = questionsArr[info.round - 1][0]
     const { question, answers, stringency } = questionsArr[info.round - 1][1]
@@ -175,65 +171,40 @@ const askQuestion = async (info, entries, questionsArr) => {
 
     channel.send(`${megaphone}  ------  Question #${info.round}  ------  ${dummy}\n${question}\n\n`)
     
-    getAnswer(entries[0], question, info.round)
-    getAnswer(entries[1], question, info.round)
-    getAnswer(entries[2], question, info.round)
-    getAnswer(entries[3], question, info.round)
+    const entries = await Trivia.findAll({ include: Player })
+    entries.forEach((entry) => {
+        getAnswer(entry, question, info.round)
+    })
 
     setTimeout(async() => {
         const updatedEntries = await Trivia.findAll({ include: Player})
+        let atLeastOneCorrect = false
 
-        const score_0 = await checkAnswer(updatedEntries[0].answer, fuzzyAnswers, stringency)
-        const score_1 = await checkAnswer(updatedEntries[1].answer, fuzzyAnswers, stringency)
-        const score_2 = await checkAnswer(updatedEntries[2].answer, fuzzyAnswers, stringency)
-        const score_3 = await checkAnswer(updatedEntries[3].answer, fuzzyAnswers, stringency)
-    
-        if (score_0 === true) updatedEntries[0].score++, await checkKnowledge(updatedEntries[0].playerId, questionNumber)
-        if (score_1 === true) updatedEntries[1].score++, await checkKnowledge(updatedEntries[1].playerId, questionNumber)
-        if (score_2 === true) updatedEntries[2].score++, await checkKnowledge(updatedEntries[2].playerId, questionNumber)
-        if (score_3 === true) updatedEntries[3].score++, await checkKnowledge(updatedEntries[3].playerId, questionNumber)
-    
-        await updatedEntries[0].save()
-        await updatedEntries[1].save()
-        await updatedEntries[2].save()
-        await updatedEntries[3].save()
+        for (let i = 0; i < updatedEntries.length; i++) {
+            const entry = updatedEntries[i]
+            const score = await checkAnswer(entry.answer, fuzzyAnswers, stringency)
+            if (score === true) { 
+                atLeastOneCorrect = true
+                entry.score++
+                await checkKnowledge(entry.playerId, questionNumber)
+            }
 
-        let name = updatedEntries[0].player.name
-        let timedOut = updatedEntries[0].answer === 'no answer' ? true : false
-        let answer = updatedEntries[0].answer
-        let score = score_0
-        channel.send(`${name}${timedOut ? ` did not answer in time. That's a shame. ${orange}` : ` said: ${answer}. ${score ? `Correct! ${cultured}` : `That ain't it! ${amongmfao}`}`}`)
+            await entry.save()
 
-        setTimeout(() => {
-            let name = updatedEntries[1].player.name
-            let timedOut = updatedEntries[1].answer === 'no answer' ? true : false
-            let answer = updatedEntries[1].answer
-            let score = score_1
-            channel.send(`${name}${timedOut ? ` did not answer in time. That's a shame. ${orange}` : ` said: ${answer}. ${score ? `Correct! ${cultured}` : `That ain't it! ${amongmfao}`}`}`)
-        }, 2000)
-
-        setTimeout(() => {
-            let name = updatedEntries[2].player.name
-            let timedOut = updatedEntries[2].answer === 'no answer' ? true : false
-            let answer = updatedEntries[2].answer
-            let score = score_2
-            channel.send(`${name}${timedOut ? ` did not answer in time. That's a shame. ${orange}` : ` said: ${answer}. ${score ? `Correct! ${cultured}` : `That ain't it! ${amongmfao}`}`}`)
-        }, 4000)
-
-        setTimeout(() => {
-            let name = updatedEntries[3].player.name
-            let timedOut = updatedEntries[3].answer === 'no answer' ? true : false
-            let answer = updatedEntries[3].answer
-            let score = score_3
-            channel.send(`${name}${timedOut ? ` did not answer in time. That's a shame. ${orange}` : ` said: ${answer}. ${score ? `Correct! ${cultured}` : `That ain't it! ${amongmfao}`}`}`)
-        }, 6000)
+            setTimeout(() => {
+                const name = entry.player.name
+                const timedOut = entry.answer === 'no answer' ? true : false
+                const answer = entry.answer
+                channel.send(`${name}${timedOut ? ` did not answer in time. That's a shame. ${orange}` : ` said: ${answer}. ${score ? `Correct! ${cultured}` : `That ain't it! ${amongmfao}`}`}`)
+            }, i * 2000)
+        }
         
-        if (!score_0 && !score_1 && !score_2 && !score_3) {
-            setTimeout(() => channel.send(`The correct answer is: **${answers[0]}**`), 8000)
+        if (!atLeastOneCorrect) {
+            setTimeout(() => channel.send(`The correct answer is: **${answers[0]}**`), updatedEntries.length * 2000)
         }
 
-        return setTimeout(() => postTriviaStandings(info, updatedEntries, questionsArr), 11000)
-    }, 21000)
+        return setTimeout(() => postTriviaStandings(info, updatedEntries, questionsArr), updatedEntries.length * 2000 + 3000)
+    }, 22000)
 }
 
 const checkAnswer = async (answer, fuzzyAnswers, stringency) => {
@@ -244,11 +215,9 @@ const checkAnswer = async (answer, fuzzyAnswers, stringency) => {
 }
 
 const checkKnowledge = async (playerId, questionNumber) => {
-    console.log('checking knowledge')
     const question = questionNumber.slice(questionNumber.indexOf("_") + 1)
     const count = await Knowledge.count({ where: { question: question, playerId: playerId } })
     if (!count) {
-        console.log('new knowledge for', playerId, 'on question', question, '!!!')
         await Knowledge.create({ 
             question: question, 
             playerId: playerId
@@ -273,7 +242,7 @@ const postTriviaStandings = async (info, entries, questions) => {
     await info.save()
 
     return setTimeout(() => {
-        if (info.round <= 10) return askQuestion(info, entries, questions)
+        if (info.round <= 10) return askQuestion(info, questions)
         else return endTrivia(info, entries)
     }, 10000)
 }

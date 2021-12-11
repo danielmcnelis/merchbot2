@@ -4134,15 +4134,15 @@ if(joincom.includes(cmd)) {
 	const alreadyIn = await eval(game).count({ where: { playerId: maid} })
 	const info = await Info.findOne({ where: { element: game.toLowerCase() } })
 	if (!info) return message.channel.send(`Could not find game-mode: "${game}".`)
-	if (info.status !== 'pending') return message.channel.send(`Sorry, ${ game === 'Trivia' ? 'Trivia' : `the ${game}` } already started.`)
+	if (info.status !== 'pending' && game !== 'Trivia') return message.channel.send(`Sorry, the ${game} already started.`)
 
 	if (!alreadyIn) {
 		const count = await eval(game).count()
-		if (game === 'Arena' && count >= 4 || game === 'Draft' && count >= 4 || game === 'Trivia' && count >= 4) {
-			return message.channel.send(`Sorry, ${player.name}, ${ game === 'Trivia' ? 'Trivia' : `the ${game}` } is full.`)
+		if (game === 'Arena' && count >= 4 || game === 'Draft' && count >= 4) {
+			return message.channel.send(`Sorry, ${player.name}, the ${game} is full.`)
 		} 
 
-		await eval(game).create({ playerId: maid })
+		const entry = await eval(game).create({ playerId: maid })
 		message.channel.send(`You joined the ${game} queue.`)
 		
 		if (game === 'Arena' && count === 3) {
@@ -4153,10 +4153,16 @@ if(joincom.includes(cmd)) {
 			info.status = 'confirming'
 			await info.save()
 			return startDraft(fuzzyPrints)
-		} else if (game === 'Trivia' && count === 3) {
-			info.status = 'confirming'
-			await info.save()
-			return startTrivia()
+		} else if (game === 'Trivia') {
+			const tCount = await Trivia.count()
+			if (tCount === 3) {
+				info.status = 'confirming'
+				await info.save()
+				return startTrivia()
+			} else if (tCount >= 4) {
+				entry.active = true
+				await entry.save()
+			}
 		}
 	} else {
 		return message.channel.send(`You were already in the ${game} queue.`)
@@ -6282,7 +6288,7 @@ if(cmd === `!dump`) {
 		order: [["card_code", "ASC"]]
 	})
 
-	const inv = rarity === 'all' && !excluded_prints ? unfilteredInv :
+	const inv = rarity === 'all'  && !excluded_prints ? unfilteredInv :
 				rarity === 'all' && excluded_prints.length ? unfilteredInv.filter((el) => !excluded_prints.includes(el.printId) ) :
 				rarity !== 'all' && !excluded_prints ? unfilteredInv.filter((el) => el.print.rarity === rarity) :
 				rarity !== 'all' && excluded_prints.length ? unfilteredInv.filter((el) => !excluded_prints.includes(el.printId) && el.print.rarity === rarity) :

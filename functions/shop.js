@@ -935,6 +935,71 @@ const getVoucher = async (message) => {
 }
 
 
+// GET TRIBE
+const getVoucher = async (message, player) => {
+    const options = [
+        `(1) Beast ${beast}`,
+        `(2) Rock ${rock}`,
+        `(3) Plant ${plant}`,
+        `(4) Fish ${fish}`,
+        `(5) Dinosaur ${dinosaur}`,
+        `(6) Reptile ${reptile}`,
+        `(7) Warrior ${warrior}`,
+        `(8) Spellcaster ${spellcaster}`,
+        `(9) Dragon ${dragon}`,
+        `(10) Zombie ${zombie}`,
+        `(11) Fiend ${fiend}`,
+        `(12) Thunder ${thunder}`
+    ]
+
+    const filter = m => m.author.id === player.id
+	const msg = await message.channel.send(`${player.name}, which Tribe did you battle alongside?\n${options.join("\n")}`)
+    const collected = await msg.channel.awaitMessages(filter, {
+		max: 1,
+        time: 30000
+    }).then(async collected => {
+		const response = collected.first().content.toLowerCase()
+        let voucher
+        if(response.includes('10') || response.includes('zom')) {
+            voucher = 'skull'
+        } else if(response.includes('11') || response.includes('fiend')) {
+            voucher = 'familiar'
+        } else if(response.includes('12') || response.includes('thunder')) {
+            voucher = 'battery'
+        } else if(response.includes('1') || response.includes('beast')) {
+            voucher = 'mushroom'
+        } else if(response.includes('2') || response.includes('rock')) {
+            voucher = 'moai'
+        }else if(response.includes('3') || response.includes('plan')) {
+            voucher = 'rose'
+        } else if(response.includes('4') || response.includes('fish')) {
+            voucher = 'hook'
+        } else if(response.includes('5') || response.includes('dino')) {
+            voucher = 'egg'
+        } else if(response.includes('6') || response.includes('rep')) {
+            voucher = 'cactus'
+        } else if(response.includes('7') || response.includes('war')) {
+            voucher = 'swords'
+        } else if(response.includes('8') || response.includes('cast')) {
+            voucher = 'orb'
+        } else if(response.includes('9') || response.includes('drag')) {
+            voucher = 'gem'
+        } else {
+            message.channel.send(`You did not select a valid option.`)
+            return false
+        }
+
+        return voucher
+    }).catch(err => {
+		console.log(err)
+        message.channel.send(`Sorry, time's up.`)
+        return false
+	})
+
+    return collected
+}
+
+
 // GET BARTER CARD
 const getBarterCard = async (message, voucher, medium_complete) => {
     const wares = {
@@ -1185,8 +1250,9 @@ module.exports = {
     getExclusions,
     getExcludedPrintIds,
     getMidnightCountdown,
-    getTradeInCard,
     getShopCountdown,
+    getTradeInCard,
+    getTribe,
     getVoucher,
     openShop,
     postBids,

@@ -29,7 +29,7 @@ const { askForAdjustConfirmation, collectNicknames, getNewMarketPrice, askForSet
 const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard, getResetConfirmation } = require('./functions/profile.js')
 const { fetchAllCardNames, fetchAllUniquePrintNames, findCard, search } = require('./functions/search.js')
 const { addSheet, makeSheet, writeToSheet } = require('./functions/sheets.js')
-const { applyPriceDecay, getBarterCard, getBarterQuery, getVoucher, getTradeInCard, getBarterDirection, askForBarterConfirmation, checkShopShouldBe, getMidnightCountdown, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop, clearDailies  } = require('./functions/shop.js')
+const { applyPriceDecay, getBarterCard, getBarterQuery, getVoucher, getTribe, getTradeInCard, getBarterDirection, askForBarterConfirmation, checkShopShouldBe, getMidnightCountdown, getShopCountdown, openShop, closeShop, askForDumpConfirmation, checkShopOpen, getDumpRarity, askForExclusions, getExclusions, getExcludedPrintIds, getDumpQuantity, postBids, updateShop, clearDailies  } = require('./functions/shop.js')
 const { getNewStatus } = require('./functions/status.js')
 const { askForDBName, checkChallongePairing, findNextMatch, findNextOpponent, findOtherPreReqMatch, findNoShowOpponent, generateSheetData, getDeckList, getDeckName, getMatches, getTournament, getTournamentType, putMatchResult, postParticipant, removeParticipant, seed, selectTournament } = require('./functions/tournament.js')
 const { processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
@@ -3057,7 +3057,41 @@ if (losscom.includes(cmd)) {
 		message.channel.send(`${losingPlayer.name} (+3${starchips}), your Arena loss to ${winner.user.username} (+5${starchips}) has been recorded.`)
 		return checkArenaProgress(info)
 	} else if (!hasArenaRole && game === 'Arena') {
-		return message.channel.send(`You do not have the Arena Players role. Please report your loss in the appropriate channel.`)
+		const voucher = await getTribe(message, winningPlayer)
+		if (!voucher) return message.channel.send(`Please have ${winningPlayer.name} specify their tribe.`)
+		const origStatsWinner = winningPlayer.arena_stats
+		const origStatsLoser = losingPlayer.arena_stats
+		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
+		
+		winningPlayer.arena_stats += delta
+		winningPlayer.arena_backup = origStatsWinner
+		winningPlayer.arena_wins++
+		await winningPlayer.save()
+
+		losingPlayer.arena_stats -= delta
+		losingPlayer.arena_backup = origStatsLoser
+		losingPlayer.arena_losses++
+		await losingPlayer.save()
+	
+		winningPlayer.wallet.starchips += 3
+		winningPlayer.wallet[voucher]++
+		await winningPlayer.wallet.save()
+
+		losingPlayer.wallet.starchips += 2
+		await losingPlayer.wallet.save()
+
+		await Match.create({ 
+			game_mode: "arena",
+			winner_name: winningPlayer.name,
+			winnerId: winningPlayer.id,
+			loser_name: losingPlayer.name,
+			loserId: losingPlayer.id,
+			delta: delta,
+			chipsWinner: 3,
+			chipsLoser: 2
+		})
+
+		message.channel.send(`${losingPlayer.name} (+2${starchips}), your Arena loss to ${winner.user.username} (+3${starchips}, +1${eval(voucher)}) has been recorded.`)
 	} else if (hasArenaRole && game !== 'Arena') {
 		return message.channel.send(`You have the Arena Players role. Please report your Arena loss in <#${arenaChannelId}>, or get a Moderator to help you.`)
 	} else if (hasDraftRole && game === 'Draft') {

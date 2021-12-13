@@ -936,7 +936,7 @@ const getVoucher = async (message) => {
 
 
 // GET TRIBE
-const getVoucher = async (message, player) => {
+const getTribe = async (message, player) => {
     const options = [
         `(1) Beast ${beast}`,
         `(2) Rock ${rock}`,

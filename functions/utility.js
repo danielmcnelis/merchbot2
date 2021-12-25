@@ -122,8 +122,12 @@ const resetPlayer = async (message, player) => {
     const diary = await Diary.findOne({ where: { playerId: player.id }})
     await diary.destroy()
 
-    const knowledge = await Knowledge.findAll({ where: { playerId: player.id }})
-    await knowledge.destroy()
+    const knowledges = await Knowledge.findAll({ where: { playerId: player.id }})
+    
+    for (let i = 0; i < knowledges.length; i++) {
+        const knowledge = knowledges[i]
+        await knowledge.destroy()
+    }
 
     const profile = await Profile.findOne({ where: { playerId: player.id }})
     await profile.destroy()

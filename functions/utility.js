@@ -114,13 +114,13 @@ const resetPlayer = async (message, player) => {
 
     console.log('DELETING ALL PLAYER PROFILE FIELDS NOW!')
     const binder = await Binder.findOne({ where: { playerId: player.id }})
-    await binder.destroy()
+    if (binder) await binder.destroy()
 
     const daily = await Daily.findOne({ where: { playerId: player.id }})
-    await daily.destroy()
+    if (daily) await daily.destroy()
 
     const diary = await Diary.findOne({ where: { playerId: player.id }})
-    await diary.destroy()
+    if (diary) await diary.destroy()
 
     const knowledges = await Knowledge.findAll({ where: { playerId: player.id }})
     
@@ -130,13 +130,13 @@ const resetPlayer = async (message, player) => {
     }
 
     const profile = await Profile.findOne({ where: { playerId: player.id }})
-    await profile.destroy()
+    if (profile) await profile.destroy()
 
     const wallet = await Wallet.findOne({ where: { playerId: player.id }})
-    await wallet.destroy()
+    if (wallet) await wallet.destroy()
 
     const wishlist = await Wishlist.findOne({ where: { playerId: player.id }})
-    await wishlist.destroy()
+    if (wishlist) await wishlist.destroy()
 
     console.log('SAVING RESET DATE!')
     const date = new Date()

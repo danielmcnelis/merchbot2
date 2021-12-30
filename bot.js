@@ -6329,7 +6329,7 @@ if(cmd === `!dump`) {
 				rarity !== 'all' && excluded_prints.length ? unfilteredInv.filter((el) => !excluded_prints.includes(el.printId) && el.print.rarity === rarity) :
 				[]
 
-	if (!inv.length) return message.channel.send(`You do not have more than ${quantityToKeep} ${quantityToKeep === 1 ? 'copy' : 'copies'} of any ${rarity === 'all' ? '' : `${eval(rarity)} `}${set ? `${set_code} ${eval(set_code)}` : ''} cards.`)
+	if (!inv.length) return message.channel.send(`You do not have more than ${quantityToKeep} ${quantityToKeep === 1 ? 'copy' : 'copies'} of any ${rarity === 'all' ? '' : `${eval(rarity)} `}${set ? `${set_code} ${eval(set.emoji)}` : ''} cards.`)
 
 	const cards = []
 	let compensation = 0

@@ -218,8 +218,7 @@ if(cmd === `!test`) {
 //FIX
 if(cmd === `!fix`) {
 	if (isJazz(message.member)) {
-		createProfile('597846418320785464', 'warrior')
-		console.log('ok')
+		applyPriceDecay()
 	} else {
 		return message.channel.send('🛠️')
 	}

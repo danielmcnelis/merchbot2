@@ -218,7 +218,7 @@ if(cmd === `!test`) {
 //FIX
 if(cmd === `!fix`) {
 	if (isJazz(message.member)) {
-		applyPriceDecay()
+		return
 	} else {
 		return message.channel.send('🛠️')
 	}
@@ -1301,7 +1301,7 @@ if(infocom.includes(cmd)) {
 		` Do **not** look up answers online -- doing so will get you banned from Trivia.` +
 		` After 10 rounds, players earn ${starchips} or ${stardust} for their performance.`+
 		`\n\nAs you play more Trivia, your Profile will keep a record of your acumen.`+
-		` There are 1000 total questions, so hit the books and then hit those keys! ${red}`)
+		` There are 2150 total questions, so hit the books and then hit those keys! ${red}`)
 	}
 		
 	if (mcid == draftChannelId) { 
@@ -1573,7 +1573,7 @@ if(profcom.includes(cmd)) {
 		.addField('Diary Progress', `Easy Diary: ${easy_summary}\nMedium Diary: ${medium_summary}\nHard Diary: ${hard_summary}\nElite Diary: ${elite_summary}`)
 		.addField('Ranked Stats', `Best Medal: ${getMedal(player.best_stats, true)}\nWin Rate: ${win_rate}\nHighest Elo: ${player.best_stats.toFixed(2)}\nVanquished Foes: ${player.vanquished_foes}\nLongest Streak: ${player.longest_streak}`)
 		.addField('Arena Stats', `Beast Wins: ${player.profile.beast_wins} ${beasts}\nDinosaur Wins: ${player.profile.dinosaur_wins} ${dinosaurs}\nFish Wins: ${player.profile.fish_wins} ${fishes}\nPlant Wins: ${player.profile.plant_wins} ${plants}\nReptile Wins: ${player.profile.reptile_wins} ${reptiles}\nRock Wins: ${player.profile.rock_wins} ${rocks}\nDragon Wins: ${player.profile.dragon_wins} ${dragons}\nSpellcaster Wins: ${player.profile.spellcaster_wins} ${spellcasters}\nWarrior Wins: ${player.profile.warrior_wins} ${warriors}\nFiend Wins: ${player.profile.fiend_wins} ${fiends}\nThunder Wins: ${player.profile.thunder_wins} ${thunders}\nWarrior Wins: ${player.profile.zombie_wins} ${zombies}`)
-		.addField('Other Stats', `Net Worth: ${Math.floor(networth)}${starchips}\nTrade Partners: ${player.profile.trade_partners}\nTrivia Wins: ${player.profile.trivia_wins}\nTrivia Answers: ${correct_answers} out of 2000`)
+		.addField('Other Stats', `Net Worth: ${Math.floor(networth)}${starchips}\nTrade Partners: ${player.profile.trade_partners}\nTrivia Wins: ${player.profile.trivia_wins}\nTrivia Answers: ${correct_answers} out of 2150`)
 		.setImage(card_image)
 		.setFooter(quote)
 

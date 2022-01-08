@@ -77,8 +77,8 @@ const search = async (query, fuzzyCards) => {
 
 //FETCH ALL CARDS
 const fetchAllCardNames = async () => {
-    const allCardNames = await Card.findAll().map(function(card) { return card.name })
-    return allCardNames
+    const allCardNames = await Card.findAll()
+    return allCardNames.map((card) => { return card.name })
 }
 
 //FETCH ALL CARDS

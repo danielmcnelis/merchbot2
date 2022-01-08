@@ -116,6 +116,7 @@ client.on('guildMemberRemove', member => client.channels.cache.get(welcomeChanne
 
 //COMMANDS
 client.on('message', async (message) => {
+	console.log('message', message)
     const mcid = message.channel.id
     if (
 		//no commands in DMs

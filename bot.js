@@ -4057,10 +4057,10 @@ if (rankcom.includes(cmd)) {
 		} 
 	} 
 
-	message.channel.send({ content: result.slice(0, 11)})
-	if (result.length > 11) message.channel.send({ content: result.slice(11, 41)})
-	if (result.length > 41) message.channel.send({ content: result.slice(41, 71)})
-	if (result.length > 71) message.channel.send({ content: result.slice(71)})
+	message.channel.send({ content: result.slice(0, 11).join('\n').toString() })
+	if (result.length > 11) message.channel.send({ content: result.slice(11, 41).join('\n').toString()})
+	if (result.length > 41) message.channel.send({ content: result.slice(41, 71).join('\n').toString()})
+	if (result.length > 71) message.channel.send({ content: result.slice(71).join('\n').toString()})
 	return
 }
     

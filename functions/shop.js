@@ -691,6 +691,7 @@ const askForDumpConfirmation = async (message, set, cards, compensation, count) 
         max: 1,
         time: 60000
     }).then(async collected => {
+        console.log('collected.first().content.toLowerCase()', collected.first().content.toLowerCase())
         if (yescom.includes(collected.first().content.toLowerCase())) {
             return true
         } else {
@@ -698,7 +699,7 @@ const askForDumpConfirmation = async (message, set, cards, compensation, count) 
             return false
         }  
     }).catch(err => {
-        console.log(err)
+        console.log('err', err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
     })

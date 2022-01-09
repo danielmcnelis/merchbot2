@@ -542,7 +542,7 @@ const updateShop = async () => {
     
         for (let i = 0; i < results.length; i += 10) {
            try {
-               shopChannel.send({ content: results.slice(i, i+10)})
+               shopChannel.send({ content: results.slice(i, i+10).join('\n').toString() })
            } catch (err) {
                console.log('err...', err)
            }
@@ -670,7 +670,7 @@ const postBids = async () => {
         }
     
         for (let i = 0; i < results.length; i += 10) {
-            shopChannel.send({ content: results.slice(i, i+10).join('\n') })
+            shopChannel.send({ content: results.slice(i, i+10).join('\n').toString() })
         }
     }, 9000)
 }

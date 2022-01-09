@@ -131,7 +131,7 @@ const awardPack = async (channel, playerId, set, num = 1) => {
             new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`) :
             false
 
-        member.send({ content: results.join('\n'), files: [attachment]})
+        member.send({ content: results.join('\n').toString(), files: [attachment]})
     }
 
     channel.send({ content: `<@${playerId}> was awarded ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'}. Congratulations!`})
@@ -271,10 +271,10 @@ const awardPacksToShop = async (num, core = true) => {
     
         for (let i = 0; i < results.length; i += 30) {
             if (results[i+30] && results[i+30].includes(set.emoji)) {
-                botSpamChannel.send({ content: results.slice(i, i+31)})
+                botSpamChannel.send({ content: results.slice(i, i+31).join('\n').toString()})
                 i++
             } else {
-                botSpamChannel.send({ content: results.slice(i, i+30)})
+                botSpamChannel.send({ content: results.slice(i, i+30).join('\n').toString()})
             }
         }
     }

@@ -1752,7 +1752,7 @@ if (cmd === `!shop`) {
 			}
 
 			message.channel.send({ content: `I messaged you the ${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? ` ${eval(set.alt_emoji)}` : ''} Price List.`})
-			for (let i = 0 ; i < results.length; i+=10) message.author.send({ content: results.slice(i, i+10)})
+			for (let i = 0 ; i < results.length; i+=10) message.author.send({ content: results.slice(i, i+10).join('\n').toString()})
 			return
 		} else if (rarity) {
 			const prints = await Print.findAll({ where: { rarity: rarity, draft: false }, order: [['market_price', 'DESC']] })
@@ -1768,7 +1768,7 @@ if (cmd === `!shop`) {
 			}
 
 			message.channel.send({ content: `I messaged you the ${eval(rarity)} Price List.`})
-			for (let i = 0 ; i < results.length; i+=10) message.author.send({ content: results.slice(i, i+10)})
+			for (let i = 0 ; i < results.length; i+=10) message.author.send({ content: results.slice(i, i+10).join('\n').toString()})
 			return
 		}
 
@@ -1799,7 +1799,7 @@ if (cmd === `!shop`) {
 			}
 		}
 
-		return message.channel.send({ content: results.join('\n')})
+		return message.channel.send({ content: results.join('\n').join('\n').toString()})
 	}
 }
 
@@ -1861,7 +1861,7 @@ if (populationcom.includes(cmd)) {
 		results.push(`${ygocard} --- Population Stats --- ${ygocard}\n${card}\nTotal Population: ${total}\nAvg ${eval(print.rarity)} ${print.set_code} ${eval(set.emoji)} Pop: ${avg_eq_pop}\nShop Inventory: ${shop_percent}`)
 	}
 	
-	return message.channel.send({ content: results.join('\n\n')})
+	return message.channel.send({ content: results.join('\n').toString()})
 }
 
 //COUNT
@@ -1912,7 +1912,7 @@ if(cmd === `!count`) {
 		`\n- ${count} ${count === 1 ? 'Pack' : 'Packs'} of ORF ${ORF}` +
 		`\n- ${count} ${count === 1 ? 'Pack' : 'Packs'} of DOC ${DOC}`
 	)
-	return message.channel.send({ content: results.join("\n")})
+	return message.channel.send({ content: results.join('\n').toString()})
 }
 
 
@@ -2138,7 +2138,7 @@ if (historycom.includes(cmd)) {
 	}
 
 	message.channel.send({ content: `I messaged you the trade history for ${card}.`})
-	for (let i = 0 ; i < results.length; i++) message.author.send({ content: results[i]})
+	for (let i = 0 ; i < results.length; i++) message.author.send({ content: results[i].join('\n').toString()})
 	return
 }
 
@@ -2605,7 +2605,7 @@ if(walletcom.includes(cmd)) {
 	if (wallet.familiar) results.push(`Familiars: ${wallet.familiar} ${familiar}`)
 	if (wallet.battery) results.push(`Batteries: ${wallet.battery} ${battery}`)
 
-	return message.channel.send({ content: results.join('\n')})
+	return message.channel.send({ content: results.join('\n').toString()})
 }
 
 //STATS
@@ -4073,7 +4073,7 @@ if(queuecom.includes(cmd)) {
 		queue.forEach((row) => {
 			results.push(row.player.name)
 		})
-		return message.channel.send({ content: results.join("\n")})
+		return message.channel.send({ content: results.join('\n').toString() })
 	} else if (message.channel === client.channels.cache.get(draftChannelId)) {
 		const queue = await Draft.findAll({ where: { active: false }, include: Player })
 		if (!queue.length) return message.channel.send({ content: `The Draft queue is empty.`})
@@ -4081,7 +4081,7 @@ if(queuecom.includes(cmd)) {
 		queue.forEach((row) => {
 			results.push(row.player.name)
 		})
-		return message.channel.send({ content: results.join("\n")})
+		return message.channel.send({ content: results.join('\n').toString() })
 	} else if (message.channel === client.channels.cache.get(triviaChannelId)) {
 		const queue = await Trivia.findAll({ include: Player })
 		if (!queue.length) return message.channel.send({ content: `The Trivia queue is empty.`})
@@ -4089,7 +4089,7 @@ if(queuecom.includes(cmd)) {
 		queue.forEach((row) => {
 			results.push(row.player.name)
 		})
-		return message.channel.send({ content: results.join("\n")})
+		return message.channel.send({ content: results.join('\n').toString() })
 	} else {
 		return message.channel.send({ content: `Try using **${cmd}** in channels like: <#${arenaChannelId}> or <#${triviaChannelId}>.`})
 	}
@@ -4529,7 +4529,7 @@ if (bracketcom.includes(cmd)) {
 		)
 	}
 
-	return message.channel.send({ content: results.join('\n\n')})
+	return message.channel.send({ content: results.join('\n\n').toString() })
 }
 
 
@@ -5532,10 +5532,10 @@ if(invcom.includes(cmd)) {
 
 	for (let i = 0; i < results.length; i += 30) {
 		if (results[i+31] && results[i+31].startsWith("\n")) {
-			message.author.send({ content: results.slice(i, i+31)})
+			message.author.send({ content: results.slice(i, i+31).join('\n').toString()})
 			i++
 		} else {
-			message.author.send({ content: results.slice(i, i+30)})
+			message.author.send({ content: results.slice(i, i+30).join('\n').toString()})
 		}
 	}
 
@@ -5635,10 +5635,10 @@ if(checklistcom.includes(cmd)) {
 
 	for (let i = 0; i < results.length; i += 20) {
 		if (results[i+21] && results[i+21].startsWith("\n")) {
-			message.author.send({ content: results.slice(i, i+21)})
+			message.author.send({ content: results.slice(i, i+21).join('\n').toString()})
 			i++
 		} else {
-			message.author.send({ content: results.slice(i, i+20)})
+			message.author.send({ content: results.slice(i, i+20).join('\n').toString()})
 		}
 	}
 
@@ -5805,7 +5805,7 @@ if(packcom.includes(cmd)) {
 			const attachment =  canvas && context ?
 				new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`) :
 				false
-			message.author.send({ content: results.join("\n"), files: [attachment] })
+			message.author.send({ content: results.join('\n').toString(), files: [attachment] })
 		}
 
 		wallet[set.currency] -= (Math.round(set.unit_price * discount) * num)
@@ -6047,7 +6047,7 @@ if(specialcom.includes(cmd)) {
 			const attachment =  canvas && context ?
 				new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`) :
 				false
-			message.author.send({ content: results.join("\n"), files: [attachment]})
+			message.author.send({ content: results.join('\n').toString(), files: [attachment]})
 		}
 
 		wallet[set.currency] -= set.spec_price
@@ -6250,7 +6250,7 @@ if(boxcom.includes(cmd)) {
 				new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`) :
 				false
 		
-			message.author.send({ content: results.join("\n"), files: [attachment] })
+			message.author.send({ content: results.join('\n').toString(), files: [attachment] })
 		}
 
 		player.wallet[set.currency] -= (Math.round(set.box_price * discount))

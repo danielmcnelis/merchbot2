@@ -378,10 +378,10 @@ const sendInventories = async (entries, round) => {
 
         for (let j = 0; j < results.length; j += 30) {
             if (results[j+31] && results[j+31].startsWith("\n")) {
-                member.send({ content: results.slice(j, j+31).join('\n')})
+                member.send({ content: results.slice(j, j+31).join('\n').toString()})
                 j++
             } else {
-                member.send({ content: results.slice(j, j+30).join('\n')})
+                member.send({ content: results.slice(j, j+30).join('\n').toString()})
             }
         }
 

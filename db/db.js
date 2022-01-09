@@ -1,7 +1,6 @@
 
 const Sequelize = require('sequelize')
 const { pgPassword } = require('../secrets.json')
-const { pgPassword } = require('../secrets.json')
 
 const db = new Sequelize(
   'merchbot',

@@ -108,22 +108,22 @@ const collectNicknames = async (message, card_name) => {
 
 //SELECT PRINT
 const selectPrint = async (message, playerId, card_name, private = false, inInv = false, inAuc = false) => {
-    const prints = inInv ? await Print.findAll({ 
+    const prints = inInv ? [...await Print.findAll({ 
         where: { card_name: card_name },
         order: [['createdAt', 'ASC']]
-    }).filter(async (p) => {
+    })].filter(async (p) => {
         const count = await Inventory.count({ where: { playerId: playerId, card_code: p.card_code, quantity: { [Op.gt]: 0 } }})
         if (count && !p.draft && !p.hidden) return p
-    }) : inAuc ? await Print.findAll({ 
+    }) : inAuc ? [...await Print.findAll({ 
         where: { card_name: card_name },
         order: [['createdAt', 'ASC']]
-    }).filter(async (p) => {
+    })].filter(async (p) => {
         const count = await Auction.count({ where: { card_code: p.card_code }})
         if (count && !p.draft && !p.hidden) return p
-    }) : await Print.findAll({ 
+    }) : [...await Print.findAll({ 
         where: { card_name: card_name },
         order: [['createdAt', 'ASC']]
-    }).filter((p) => !p.draft && !p.hidden)
+    })].filter((p) => !p.draft && !p.hidden)
 
     const channel = private ? message.author : message.channel
 

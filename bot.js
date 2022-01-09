@@ -176,7 +176,7 @@ if(cmd === `!test`) {
 		const rarities = []
 		const commons = await Print.findAll({ where: { set_code: 'DRT', rarity: 'com' }})
 		const rares = await Print.findAll({ where: { set_code: 'DRT', rarity: 'rar' }})
-		const supers = await Print.findAll({ where: { set_code: 'DRT', rarity: 'sup' }}).filter((p) => !p.card_code.includes('-SE'))
+		const supers = [...await Print.findAll({ where: { set_code: 'DRT', rarity: 'sup' }})].filter((p) => !p.card_code.includes('-SE'))
 		const ultras = await Print.findAll({ where: { set_code: 'DRT', rarity: 'ult' }})
 		const secrets = await Print.findAll({ where: { set_code: 'DRT', rarity: 'scr' }})
 	

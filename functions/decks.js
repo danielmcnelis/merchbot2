@@ -22,7 +22,7 @@ const getShopDeck = async (message, deck = '') => {
     if(deck.includes('war')) return 'warrior'
     if(deck.includes('rep')) return 'reptile'
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`Please select a deck:\n(1) Reptile's Charm\n(2) Warrior's Legend\n(3) Dragon's Inferno\n(4) Spellcaster's Art\n(5) Dinosaur's Power\n(6) Plant's Harmony\n(7) Fish's Ire\n(8) Rock's Foundation`)
+	const msg = await message.channel.send({ content: `Please select a deck:\n(1) Reptile's Charm\n(2) Warrior's Legend\n(3) Dragon's Inferno\n(4) Spellcaster's Art\n(5) Dinosaur's Power\n(6) Plant's Harmony\n(7) Fish's Ire\n(8) Rock's Foundation`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
@@ -37,11 +37,11 @@ const getShopDeck = async (message, deck = '') => {
         else if(response.includes('plant') || response.includes('6')) deck = 'plant'
         else if(response.includes('fish') || response.includes('7')) deck = 'fish'
         else if(response.includes('rock') || response.includes('8')) deck = 'rock'
-        else message.channel.send(`Please specify a valid deck.`)
+        else message.channel.send({ content: `Please specify a valid deck.`})
         return deck
 	}).catch(err => {
 		console.log(err)
-        message.channel.send(`Sorry, time's up.`)
+        message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
@@ -226,13 +226,13 @@ const saveAllYDK = async () => {
 //CHECK DECK LIST
 const checkDeckList = async (client, message, member, formatName, formatEmoji, formatDate, formatList) => {  
     const filter = m => m.author.id === member.user.id
-    const msg = await member.user.send(`Please provide a duelingbook.com/deck link for the ${formatName} Format ${formatEmoji} deck you would like to check for legality.`);
+    const msg = await member.user.send({ content: `Please provide a duelingbook.com/deck link for the ${formatName} Format ${formatEmoji} deck you would like to check for legality.`})
     const collected = await msg.channel.awaitMessages(filter, {
         max: 1,
         time: 180000
     }).then(async collected => {
         if (collected.first().content.startsWith("https://www.duelingbook.com/deck") || collected.first().content.startsWith("www.duelingbook.com/deck") || collected.first().content.startsWith("duelingbook.com/deck")) {		
-            message.author.send('Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.')
+            message.author.send({ content: 'Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.'})
 
             const url = collected.first().content
             const issues = await saveYDK(message.author, url, formatDate, formatList)
@@ -244,16 +244,16 @@ const checkDeckList = async (client, message, member, formatName, formatEmoji, f
                 if (issues['limitedCards'].length) response += `\n\nThe following cards are limited:\n${issues['limitedCards'].join('\n')}`
                 if (issues['semiLimitedCards'].length) response += `\n\nThe following cards are semi-limited:\n${issues['semiLimitedCards'].join('\n')}`
             
-                return message.author.send(response)
+                return message.author.send({ content: response })
             } else {
-                return message.author.send(`Your ${formatName} Format ${formatEmoji} deck is perfectly legal. You are good to go! ${soldier}`)
+                return message.author.send({ content: `Your ${formatName} Format ${formatEmoji} deck is perfectly legal. You are good to go! ${soldier}`})
             }
         } else {
-            return message.author.send("Sorry, I only accept duelingbook.com/deck links.")      
+            return message.author.send({ content: "Sorry, I only accept duelingbook.com/deck links." })      
         }
     }).catch(err => {
         console.log(err)
-        return message.author.send(`Sorry, time's up. If you wish to try again, go back to the Discord server and use the **!check** command.`)
+        return message.author.send({ content: `Sorry, time's up. If you wish to try again, go back to the Discord server and use the **!check** command.` })
     })
 }
 

@@ -82,9 +82,9 @@ client.on('ready', async () => {
 		}
 	}, 1000 * 60 * 10)
 
-	if (!shopShouldBe) return client.channels.cache.get(staffChannelId).send(`<@&${adminRole}>, The Shop status could not be read from the database.`)
-	if (!shopOpen && shopShouldBe === 'open') client.channels.cache.get(staffChannelId).send(`<@&${modRole}>, The Shop is unexpectedly closed.`)
-	if (shopOpen && shopShouldBe === 'closed') client.channels.cache.get(staffChannelId).send(`<@&${modRole}>, The Shop is unexpectedly open.`)
+	if (!shopShouldBe) return client.channels.cache.get(staffChannelId).send({ content: `<@&${adminRole}>, The Shop status could not be read from the database.`})
+	if (!shopOpen && shopShouldBe === 'open') client.channels.cache.get(staffChannelId).send({ content: `<@&${modRole}>, The Shop is unexpectedly closed.`})
+	if (shopOpen && shopShouldBe === 'closed') client.channels.cache.get(staffChannelId).send({ content: `<@&${modRole}>, The Shop is unexpectedly open.`})
 
 	if (shopShouldBe === 'closed') {
 		return setTimeout(() => openShop(), shopCountdown)
@@ -102,21 +102,20 @@ client.on('guildMemberAdd', async (member) => {
 
     if (await isNewUser(userId)) {
         createPlayer(userId, member.user.username, member.user.tag) 
-        return channel.send(`${member} Welcome to the Forged in Chaos ${FiC} Discord server! Go to <#${botSpamChannelId}> and type **!start** to begin playing. ${legend}`)
+        return channel.send({ content: `${member} Welcome to the Forged in Chaos ${FiC} Discord server! Go to <#${botSpamChannelId}> and type **!start** to begin playing. ${legend}`})
     } else {
 		const player = await Player.findOne({ where: { id: userId }})
 		if (player.stats >= 530) member.roles.add(expertRole)
 		else member.roles.add(noviceRole)
-        return channel.send(`${member} Welcome back to the Forged in Chaos ${FiC} Discord server! We missed you. ${soldier}`)
+        return channel.send({ content: `${member} Welcome back to the Forged in Chaos ${FiC} Discord server! We missed you. ${soldier}`})
     }
 })
     
 //GOODBYE
-client.on('guildMemberRemove', member => client.channels.cache.get(welcomeChannelId).send(`Oh dear. ${member.user.username} has left the server. ${sad}`))
+client.on('guildMemberRemove', member => client.channels.cache.get(welcomeChannelId).send({ content: `Oh dear. ${member.user.username} has left the server. ${sad}`}))
 
 //COMMANDS
-client.on('message', async (message) => {
-	console.log('message', message)
+client.on('messageCreate', async (message) => {
     const mcid = message.channel.id
     if (
 		//no commands in DMs
@@ -159,15 +158,15 @@ client.on('message', async (message) => {
 
 //CARD SEARCH USING CURLY BRACKETS
 if (!message.content.startsWith("!") && message.content.includes(`{`) && message.content.includes(`}`)) { 
-	if (message.member.roles.cache.some(role => role.id === triviaRole)) return message.channel.send(`You cannot search for cards while playing Trivia.`)
+	if (message.member.roles.cache.some(role => role.id === triviaRole)) return message.channel.send({ content: `You cannot search for cards while playing Trivia.`})
 	const query = message.content.slice(message.content.indexOf('{') + 1, message.content.indexOf('}'))
 	const cardEmbed = await search(query, fuzzyCards)
-	if (!cardEmbed) return message.channel.send(`Could not find card: "${query}".`)
-	else return message.channel.send(cardEmbed)
+	if (!cardEmbed) return message.channel.send({ content: `Could not find card: "${query}".`})
+	else return message.channel.send({ embeds: [cardEmbed] })
 }
 
 //PING 
-if (cmd === `!ping`) return message.channel.send('🏓')
+if (cmd === `!ping`) return message.channel.send({ content: '🏓'})
 
 //TEST
 if(cmd === `!test`) {
@@ -209,9 +208,9 @@ if(cmd === `!test`) {
 		console.log(`Results from a trial of 10,000 wagers at ${x}sd:\n${rarities}`)
 	
 		const expected_value = Math.round(results.reduce((a, b) => a + b) / results.length)
-		return message.channel.send(`In 10,000 random trials the average market value of a random DRT ${eval(DRT)} card from a ${x}${stardust} wager was ${expected_value}${stardust}.`)
+		return message.channel.send({ content: `In 10,000 random trials the average market value of a random DRT ${eval(DRT)} card from a ${x}${stardust} wager was ${expected_value}${stardust}.`})
 	} else {
-		return message.channel.send('🧪')
+		return message.channel.send({ content: '🧪'})
 	}
 }
 
@@ -220,117 +219,117 @@ if(cmd === `!fix`) {
 	if (isJazz(message.member)) {
 		return
 	} else {
-		return message.channel.send('🛠️')
+		return message.channel.send({ content: '🛠️'})
 	}
 }
 
 //DING
-if(cmd === `!ding`) return message.channel.send('🚪')
+if(cmd === `!ding`) return message.channel.send({ content: '🚪'})
 
 //HI
-if(cmd === `!hi`) return message.channel.send('👋')
+if(cmd === `!hi`) return message.channel.send({ content: '👋'})
 
 //WHAT
-if(cmd === `!what`) return message.channel.send('❓')
+if(cmd === `!what`) return message.channel.send({ content: '❓'})
 
 //5MIN
-if(cmd === `!5min`) return message.channel.send(fishstare)
+if(cmd === `!5min`) return message.channel.send({ content: fishstare })
 
 //SHIT
-if(cmd === `!shit`) return message.channel.send('💩')
+if(cmd === `!shit`) return message.channel.send({ content: '💩' })
 
 //STOP
-if(cmd === `!stop`) return message.channel.send('🛑')
+if(cmd === `!stop`) return message.channel.send({ content: '🛑' })
 
 //AJT
-if(cmd === `!ajt` || cmd === `!ajtbls`) return message.channel.send('🧑‍🌾')
+if(cmd === `!ajt` || cmd === `!ajtbls`) return message.channel.send({ content: '🧑‍🌾' })
 
 //ALISAE
-if(cmd === `!alisae`) return message.channel.send(stoned)
+if(cmd === `!alisae`) return message.channel.send({ content: stoned })
 
 //ARETOS
-if(cmd === `!aretos`) return message.channel.send(hmmm)
+if(cmd === `!aretos`) return message.channel.send({ content: hmmm })
 
 //CALEB
-if(cmd === `!caleb`) return message.channel.send(robbed)
+if(cmd === `!caleb`) return message.channel.send({ content: robbed })
 
 //CAMERON
-if(cmd === `!cam` || cmd === `!cameron`) return message.channel.send(stare)
+if(cmd === `!cam` || cmd === `!cameron`) return message.channel.send({ content: stare })
 
 //DYL
-if(cmd === `!dyl`) return message.channel.send(soldier)
+if(cmd === `!dyl`) return message.channel.send({ content: soldier })
 
 //FUSION
-if(cmd === `!fusion`) return message.channel.send('🐈')
+if(cmd === `!fusion`) return message.channel.send({ content: '🐈' })
 
 //INDICUD
-if(cmd === `!indicud` || cmd === `!indi`) return message.channel.send(fish)
+if(cmd === `!indicud` || cmd === `!indi`) return message.channel.send({ content: fish })
 
 //JAZZ
-if(cmd === `!jazz`) return message.channel.send('🎷')
+if(cmd === `!jazz`) return message.channel.send({ content: '🎷' })
 
 //KIZARU
-if(cmd === `!kizaru`) return message.channel.send('🇮🇹')
+if(cmd === `!kizaru`) return message.channel.send({ content: '🇮🇹' })
 
 //LITO
-if(cmd === `!lito`) return message.channel.send(aight)
+if(cmd === `!lito`) return message.channel.send({ content: aight })
 
 //LIVD
-if(cmd === `!livd`) return message.channel.send(moai)
+if(cmd === `!livd`) return message.channel.send({ content: moai })
 
 //NB96
-if(cmd === `!nb96`) return message.channel.send(dragon)
+if(cmd === `!nb96`) return message.channel.send({ content: dragon })
 
 //PAYDRO
-if(cmd === `!paydro` || cmd === `!itspaydro18`) return message.channel.send(cavebob)
+if(cmd === `!paydro` || cmd === `!itspaydro18`) return message.channel.send({ content: cavebob })
 
 //RANDAGE
-if(cmd === `!randage`) return message.channel.send(lmf3dao)
+if(cmd === `!randage`) return message.channel.send({ content: lmf3dao })
 
 //RIKKU
-if(cmd === `!rikku`) return message.channel.send(yes)
+if(cmd === `!rikku`) return message.channel.send({ content: yes })
 
 //SCOOPS
-if(cmd === `!scoops` || cmd === `!jmoney`) return message.channel.send(vince)
+if(cmd === `!scoops` || cmd === `!jmoney`) return message.channel.send({ content: vince })
 
 //STLF
-if(cmd === `!stlf`) return message.channel.send(waah)
+if(cmd === `!stlf`) return message.channel.send({ content: waah })
 
 //SUPREME
-if(cmd === `!supreme`) return message.channel.send('💀')
+if(cmd === `!supreme`) return message.channel.send({ content: '💀' })
 
 //SUPERB
-if(cmd === `!superb`) return message.channel.send(red)
+if(cmd === `!superb`) return message.channel.send({ content: red })
 
 //VULDREAD
-if(cmd === `!vuldread`) return message.channel.send(bonk)
+if(cmd === `!vuldread`) return message.channel.send({ content: bonk })
 
 //ZOIDBERG
-if(cmd === `!zoidberg`) return message.channel.send('🦞')
+if(cmd === `!zoidberg`) return message.channel.send({ content: '🦞' })
 
 //YELLOW
-if(cmd === `!yellow`) return message.channel.send('🟨')
+if(cmd === `!yellow`) return message.channel.send({ content: '🟨' })
 
 //YUNO
-if(cmd === `!yuno` || cmd === `!yunogasai666`) return message.channel.send(cultured)
+if(cmd === `!yuno` || cmd === `!yunogasai666`) return message.channel.send({ content: cultured })
 
 //OPERATION
-if(cmd === `!operation`) return message.channel.send('❄️☃️❄️☃️❄️')
+if(cmd === `!operation`) return message.channel.send({ content: '❄️☃️❄️☃️❄️' })
 
 //IMPORT_DATA
 if (cmd === `!import_card_data`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isJazz(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
 	const { data } = await axios.get('https://db.ygoprodeck.com/api/v7/cardinfo.php?misc=Yes')
 	fs.writeFile("./static/ygoprodeck.json", JSON.stringify(data), (err) => { 
 		if (err) console.log(err)
 	})
 
-	return message.channel.send(`Successfully imported the latest data from ygoprodeck.com.`)
+	return message.channel.send({ content: `Successfully imported the latest data from ygoprodeck.com.`})
 }
 
 //IMPORT_PRINT_IMAGES
 if (cmd === `!import_print_images`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isJazz(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
 	const allPrints = await Print.findAll({ order: [["card_name", "ASC"]] })
 
 	for (let i = 0; i <= allPrints.length; i++) {
@@ -358,12 +357,12 @@ if (cmd === `!import_print_images`) {
 		console.log(`success = ${!!success} for ${card.image_file}`)
 	}
 
-	return message.channel.send(`Successfully imported high quality images for Forged in Chaos cards from YGOPRODeck.`)
+	return message.channel.send({ content: `Successfully imported high quality images for Forged in Chaos cards from YGOPRODeck.`})
 }
 
 //IMPORT_ALL_IMAGES
 if (cmd === `!import_all_images`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isJazz(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
 	const file_names = fs.readdirSync('./public/card_images')
 	const all_cards = await Card.findAll()
 	let count = 0
@@ -390,12 +389,12 @@ if (cmd === `!import_all_images`) {
 		}
 	}
 
-	return message.channel.send(`Successfully downloaded ${successes} out of ${count} images from YGOPRODeck.com!`)
+	return message.channel.send({ content: `Successfully downloaded ${successes} out of ${count} images from YGOPRODeck.com!`})
 }
 
 //UPDATE CARDS
 if (cmd === `!update_cards`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isJazz(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
 	const cards = await Card.findAll()
 	const cardNames = cards.map((c) => c.name)
 
@@ -403,7 +402,7 @@ if (cmd === `!update_cards`) {
 		if (!cardNames.includes(c.name)) return c
 	})
 
-	if (!newCards.length) return message.channel.send(`Could not find any new Yu-Gi-Oh! cards on YGOPRODeck.com.`)
+	if (!newCards.length) return message.channel.send({ content: `Could not find any new Yu-Gi-Oh! cards on YGOPRODeck.com.`})
 
 	let created = 0
 
@@ -487,13 +486,13 @@ if (cmd === `!update_cards`) {
 		created++
 	}	
 
-	if (!created) return message.channel.send(`Could not find any new Yu-Gi-Oh! cards on YGOPRODeck.com.`)
-	return message.channel.send(`You added ${created} new cards from YGOPRODeck.com to the Format Library database.`)
+	if (!created) return message.channel.send({ content: `Could not find any new Yu-Gi-Oh! cards on YGOPRODeck.com.`})
+	return message.channel.send({ content: `You added ${created} new cards from YGOPRODeck.com to the Format Library database.`})
 }
 
 //FIX CARDS 
 if (cmd === `!fix_cards`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isJazz(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
 	const ygoprodeckCards = ygoprodeck.data
 	let updated = 0
 	
@@ -516,12 +515,12 @@ if (cmd === `!fix_cards`) {
 	}
 
 	console.log('ygoprodeckCards.length', ygoprodeckCards.length)
-	return message.channel.send(`You fixed the information for ${updated} cards in the Format Library database.`)
+	return message.channel.send({ content: `You fixed the information for ${updated} cards in the Format Library database.`})
 }
 
 //NEW SET
 if (cmd === `!new_set`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isJazz(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
 	
 	const set = {
 		code: "DRT",
@@ -552,13 +551,13 @@ if (cmd === `!new_set`) {
 	}
 
 	await Set.create(set)
-	message.channel.send(`I created a new set: ${set.name} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? ` ${eval(set.alt_emoji)}` : ''}.`)
+	message.channel.send({ content: `I created a new set: ${set.name} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? ` ${eval(set.alt_emoji)}` : ''}.`})
 }
 
 
 //KONAMI
 if (cmd === `!konami`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isJazz(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
 	const prints = await Print.findAll()
 
 	for (let i = 0; i < prints.length; i++) {
@@ -595,9 +594,9 @@ if (cmd === `!konami`) {
 
 //INIT
 if (cmd === `!init`) {
-	if (!isJazz(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isJazz(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
 	const count = await Info.count()
-	if (count) return message.channel.send(`The game has already been initialized.`)
+	if (count) return message.channel.send({ content: `The game has already been initialized.`})
 
 	await Info.create({
 		element: "shop",
@@ -672,28 +671,28 @@ if (cmd === `!init`) {
 	await Set.create(DOC)
 	await Set.create(APC)
 
-	message.channel.send(`I created 3 sets (SS1, DOC, APC). Please reset the bot for these changes to take full effect.`)
+	message.channel.send({ content: `I created 3 sets (SS1, DOC, APC). Please reset the bot for these changes to take full effect.`})
 
-	if (!(await isNewUser(merchbotId))) return message.channel.send(`The Shop has already been initiated.`)
+	if (!(await isNewUser(merchbotId))) return message.channel.send({ content: `The Shop has already been initiated.`})
 	await createPlayer(merchbotId, 'MerchBot', 'MerchBot#1002')
 	await createProfile(merchbotId, 'none')
 
-	return message.channel.send(`You initialized The Shop!`)
+	return message.channel.send({ content: `You initialized The Shop!`})
 }
 
 //ALIUS 
 if (aliuscom.includes(cmd)) {
-	if (!isAmbassador(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isAmbassador(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
 	const query = args.join(' ')
-	if (!query) return message.channel.send(`Please specify a card.`)
+	if (!query) return message.channel.send({ content: `Please specify a card.`})
 	const card_name = await findCard(query, fuzzyPrints)
-	if (!card_name) return message.channel.send(`Could not find card: "${query}".`)
+	if (!card_name) return message.channel.send({ content: `Could not find card: "${query}".`})
 	const card = await Card.findOne({ where: { name: card_name }})
-	if (!card) return message.channel.send(`I could not find "${card_name}" in the Format Library database.`)
+	if (!card) return message.channel.send({ content: `I could not find "${card_name}" in the Format Library database.`})
 
 	const new_nicknames = await collectNicknames(message, card_name)
 	const values = [...new_nicknames.values()]
-	if (!values.length) return message.channel.send(`Sorry, time's up.`)
+	if (!values.length) return message.channel.send({ content: `Sorry, time's up.`})
 
 	for (let i = 0; i < values.length; i++) {
 		const alius = values[i].content.toLowerCase()
@@ -701,7 +700,7 @@ if (aliuscom.includes(cmd)) {
 		if (old_nick) console.log('old_nick.card_name', old_nick.card_name)
 	
 		if (old_nick) {
-			message.channel.send(`"${alius}" was previously used for ${old_nick.card_name}.`)
+			message.channel.send({ content: `"${alius}" was previously used for ${old_nick.card_name}.`})
 			await old_nick.destroy()
 		} 
 
@@ -711,10 +710,10 @@ if (aliuscom.includes(cmd)) {
 				card_name
 			})
 			
-			message.channel.send(`Created an alius for ${card_name}: ${alius}`)
+			message.channel.send({ content: `Created an alius for ${card_name}: ${alius}`})
 		} catch (err) {
 			console.log(err)
-			message.channel.send(`"${alius}" was already being used for ${card_name}.`)
+			message.channel.send({ content: `"${alius}" was already being used for ${card_name}.`})
 		}
 	}
 }
@@ -722,36 +721,36 @@ if (aliuscom.includes(cmd)) {
 //NICKNAMES
 if (nicknamecom.includes(cmd)) {
 	const query = args.join(' ')
-	if (!query) return message.channel.send(`Please specify a card.`)
+	if (!query) return message.channel.send({ content: `Please specify a card.`})
 	const card_name = await findCard(query, fuzzyCards)
-	if (!card_name) return message.channel.send(`Could not find card: "${query}".`)
+	if (!card_name) return message.channel.send({ content: `Could not find card: "${query}".`})
 	const card = await Card.findOne({ where: { name: card_name }})
-	if (!card) return message.channel.send(`I could not find "${card_name}" in the Format Library database.`)
+	if (!card) return message.channel.send({ content: `I could not find "${card_name}" in the Format Library database.`})
 
 	const allNicknames = await Nickname.findAll({ where: { card_name: card_name } })
-	if (!allNicknames) return message.channel.send(`Could not find any nicknames for: ${card_name}.`)
+	if (!allNicknames) return message.channel.send({ content: `Could not find any nicknames for: ${card_name}.`})
 	const names_only =  allNicknames.map((nick) => nick.alius )
 	
-	return message.channel.send(`Nicknames for ${card_name}:\n${names_only.sort().join("\n")}`)
+	return message.channel.send({ content: `Nicknames for ${card_name}:\n${names_only.sort().join("\n")}`})
 }
 
 //PRINT 
 if (cmd === `!print`) {
-	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isAdmin(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
 	const info = await Info.findOne({ where: { element: 'set_to_print' }})
 	const set_code = info ? info.status : null
 	let set = set_code ? await Set.findOne({ where: { code: set_code }}) : await askForSetToPrint(message)
-	if (!set) return message.channel.send(`Could not find set.`)
+	if (!set) return message.channel.send({ content: `Could not find set.`})
 	const currentCount = await Print.count({ where: { set_code: set.code }})
 	if (currentCount >= set.size) set = await askForSetToPrint(message)
-	if (!set) return message.channel.send(`Could not find set.`)
+	if (!set) return message.channel.send({ content: `Could not find set.`})
 	
 	const query = args.join(' ')
-	if (!query) return message.channel.send(`Please specify a card you would like to print.`)
+	if (!query) return message.channel.send({ content: `Please specify a card you would like to print.`})
 	const card_name = await findCard(query, fuzzyCards)
-	if (!card_name) return message.channel.send(`Could not find card: "${query}".`)
+	if (!card_name) return message.channel.send({ content: `Could not find card: "${query}".`})
 	const card = await Card.findOne({ where: { name: card_name }})
-	if (!card) return message.channel.send(`I could not find "${card_name}" in the Format Library database.`)
+	if (!card) return message.channel.send({ content: `I could not find "${card_name}" in the Format Library database.`})
 
 	const currentPrints = await Print.findAll({ where: { set_code: set.code }, order: [["card_slot", "DESC"]]})
 	const card_slot = currentPrints.length ? currentPrints[0].card_slot + 1 : set.type === 'core' ? 0 : 1
@@ -786,7 +785,7 @@ if (cmd === `!print`) {
 	}
 
 	const rarity = set.type === 'core' ? rarity_matrix[card_slot] : await askForRarity(message, set, currentPrints)
-	if (!rarity) return message.channel.send(`Something is wrong with the rarity.`)
+	if (!rarity) return message.channel.send({ content: `Something is wrong with the rarity.`})
 
 	const market_price = rarity === 'com' ? 9 :
 		rarity === 'rar' ? 40 :
@@ -827,7 +826,7 @@ if (cmd === `!print`) {
 	await Print.create(print)
 
 
-	return message.channel.send(`Created a new print: ${eval(rarity)}${card_code} - ${card_name} - ${stardust}${market_price}`)
+	return message.channel.send({ content: `Created a new print: ${eval(rarity)}${card_code} - ${card_name} - ${stardust}${market_price}`})
 }
  
 
@@ -835,7 +834,7 @@ if (cmd === `!print`) {
 if (pfpcom.includes(cmd)) {
 	const user = message.mentions.users.first()
 	const avatar = user ? user.displayAvatarURL() : message.author.displayAvatarURL()
-	return message.channel.send(avatar)
+	return message.channel.send({ content: avatar })
 }
 
 
@@ -845,17 +844,17 @@ if (dbcom.includes(cmd)) {
 	const playerId = user ? user.id : maid
 	const player = await Player.findOne({ where: { id: playerId } })
 
-	if (user && player.duelingBook) return message.channel.send(`${player.name}'s DuelingBook name is: ${player.duelingBook}.`)
-	if (user && !player.duelingBook) return message.channel.send(`${player.name} does not have a DuelingBook name in our database.`)
+	if (user && player.duelingBook) return message.channel.send({ content: `${player.name}'s DuelingBook name is: ${player.duelingBook}.` })
+	if (user && !player.duelingBook) return message.channel.send({ content: `${player.name} does not have a DuelingBook name in our database.` })
 
 	if (args.length) {
 		player.duelingBook = args.join(' ')
 		await player.save()
-		return message.channel.send(`Your DuelingBook username has been set to: ${player.duelingBook}.`)
+		return message.channel.send({ content: `Your DuelingBook username has been set to: ${player.duelingBook}.` })
 	} else if (player.duelingBook) {
-		return message.channel.send(`Your DuelingBook username is: ${player.duelingBook}.`)
+		return message.channel.send({ content: `Your DuelingBook username is: ${player.duelingBook}.` })
 	} else {
-		return message.channel.send(`You do not have a DuelingBook username registered to our database. Please use the command **!db** followed by your DuelingBook username to register it.`)
+		return message.channel.send({ content: `You do not have a DuelingBook username registered to our database. Please use the command **!db** followed by your DuelingBook username to register it.` })
 	}
 }
 
@@ -865,16 +864,16 @@ if(startcom.includes(cmd)) {
 	if ( message.channel === client.channels.cache.get(tournamentChannelId) && isMod(message.member) ) {
 		const tournaments = await Tournament.findAll({ where: { state: 'pending' }, order: [['createdAt', 'ASC']] })
 		const tournament = await selectTournament(message, tournaments, maid)
-		if (!tournament) return message.channel.send(`Error: Could not find pending tournament.`)
+		if (!tournament) return message.channel.send({ content: `Error: Could not find pending tournament.`})
         const { name, id, url } = tournament
 		const unregistered = await Entry.findAll({ where: { participantId: null, tournamentId: id } })
-        if (unregistered.length) return message.channel.send('One of more players has not been signed up. Please check the Database.')
+        if (unregistered.length) return message.channel.send({ content: 'One of more players has not been signed up. Please check the Database.'})
 		const entries = await Entry.findAll({ where: { tournamentId: id } })
 		const set = await Set.findOne({ where: { code: 'CH2' } })
-		if (!entries.length || !set) return message.channel.send(`Error: missing needed information.`)
+		if (!entries.length || !set) return message.channel.send({ content: `Error: missing needed information.`})
 		const { sheet1Data, sheet2Data } = await generateSheetData()
 		const success = await seed(message, id)
-		if (!success) return message.channel.send(`Error seeding tournament. Please try again or start it manually.`)
+		if (!success) return message.channel.send({ content: `Error seeding tournament. Please try again or start it manually.`})
 
 		const { status } = await axios({
 			method: 'post',
@@ -889,7 +888,7 @@ if(startcom.includes(cmd)) {
 			await writeToSheet(spreadsheetId, 'Summary', 'RAW', sheet2Data)
 			//await uploadDeckFolder(name)
 			
-			message.channel.send(`Please wait while I open some pack(s)... ${blue}`)
+			message.channel.send({ content: `Please wait while I open some pack(s)... ${blue}`})
 			for (let i = 0; i < entries.length; i++) {
 				const playerId = entries[i].playerId
 				const wallet = await Wallet.findOne({ where: { playerId: playerId }})
@@ -898,13 +897,13 @@ if(startcom.includes(cmd)) {
 				await awardPack(message.channel, playerId, set, 1)
 			}
 	
-			return message.channel.send(`Let's go! Your tournament is starting now: https://challonge.com/${url} ${FiC}`)
+			return message.channel.send({ content: `Let's go! Your tournament is starting now: https://challonge.com/${url} ${FiC}`})
 		} else {
-			return message.channel.send(`Error: could not access Challonge.com.`)
+			return message.channel.send({ content: `Error: could not access Challonge.com.`})
 		}
 	} else {
 		if(await isNewUser(maid)) await createPlayer(maid, message.author.username, message.author.tag)
-		if(await hasProfile(maid)) return message.channel.send("You already received your first Starter Deck.")
+		if(await hasProfile(maid)) return message.channel.send({ content: "You already received your first Starter Deck."})
 	
 		const set1 = await Set.findOne({ where: { code: 'DOC' }})
 		const set2 = await Set.findOne({ where: { code: 'ORF' }})
@@ -912,10 +911,10 @@ if(startcom.includes(cmd)) {
 		const set4 = await Set.findOne({ where: { code: 'FON' }})
 		const set5 = await Set.findOne({ where: { code: 'DRT' }})
 
-		if (!set1 || !set2 || !set3 || !set4 || !set5) return message.channel.send(`Could not find sets: "DOC", "ORF", "TEB", "FON", or "DRT".`)
+		if (!set1 || !set2 || !set3 || !set4 || !set5) return message.channel.send({ content: `Could not find sets: "DOC", "ORF", "TEB", "FON", or "DRT".`})
 	
 		const filter = m => m.author.id === maid
-		await message.channel.send(`Greetings, champ! Which deck would you like to start?\n- (1) Reptile\'s Charm ${reptile}\n- (2) Warrior\'s Legend ${warrior}`)
+		await message.channel.send({ content: `Greetings, champ! Which deck would you like to start?\n- (1) Reptile\'s Charm ${reptile}\n- (2) Warrior\'s Legend ${warrior}`})
 		
 		message.channel.awaitMessages(filter, {
 			max: 1,
@@ -930,16 +929,16 @@ if(startcom.includes(cmd)) {
 				starter = 'warrior'
 			}
 	
-			if (!starter) return message.channel.send('You did not select a valid Starter Deck. Please type **!start** to try again.')
+			if (!starter) return message.channel.send({ content: 'You did not select a valid Starter Deck. Please type **!start** to try again.'})
 	
 			await awardStarterDeck(maid, starter)
 			await createProfile(maid, starter)
 			message.member.roles.add(fpRole)
 			message.member.roles.add(noviceRole)
-			message.channel.send(`Excellent choice, ${message.author.username}! ${legend}` +
+			message.channel.send({ content: `Excellent choice, ${message.author.username}! ${legend}` +
 			`\nYou received a copy of ${starter === "reptile" ? `Reptile's Charm ${reptile}` : `Warrior's Legend ${warrior}`} and the **Forged Players** role! ${wokeaf}` +
 			`\nPlease wait while I open some packs... ${blue}`
-			)
+			})
 	
 			await awardPack(message.channel, maid, set1, 24)
 			await awardPack(message.channel, maid, set2, 24)
@@ -948,19 +947,19 @@ if(startcom.includes(cmd)) {
 			await awardPack(message.channel, maid, set5, 24)
 			await completeTask(message.channel, maid, 'e1')
 			await completeTask(message.channel, maid, 'm4', 4000)
-			return message.channel.send(`I wish you luck on your journey, new duelist! ${master}`)
+			return message.channel.send({ content: `I wish you luck on your journey, new duelist! ${master}`})
 		}).catch(err => {
 			console.log(err)
-			return message.channel.send(`Sorry, time's up.`)
+			return message.channel.send({ content: `Sorry, time's up.`})
 		})
 	}
 }
 
 //MUTE 
 if(cmd === `!mute`) {
-	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isMod(message.member)) return message.channel.send({ content: "You do not have permission to do that."})
 	const member = message.mentions.members.first()
-	if (!member) return message.channel.send(`Please tag the user you wish to mute.`)
+	if (!member) return message.channel.send({ content: `Please tag the user you wish to mute.`})
 	const player = await Player.findOne({ where: { id: member.user.id }})
 	if (!player) await createPlayer(member.user.id, member.user.username, member.user.tag, muted = true)
 
@@ -971,17 +970,17 @@ if(cmd === `!mute`) {
 		}
 
 		member.roles.add(muteRole)
-		return message.channel.send(`${member.user.username} now has the Mute role.`)
+		return message.channel.send({ content: `${member.user.username} now has the Mute role.`})
 	} else {
-		return message.channel.send(`That user is already muted.`)
+		return message.channel.send({ content: `That user is already muted.`})
 	}
 }
 
 //UNMUTE 
 if(cmd === `!unmute`) {
-	if (!isAdmin(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isAdmin(message.member)) return message.channel.send({ content: "You do not have permission to do that."})
 	const member = message.mentions.members.first()
-	if (!member) return message.channel.send(`Please tag the user you wish to mute.`)
+	if (!member) return message.channel.send({ content: `Please tag the user you wish to mute.`})
 	const player = await Player.findOne({ where: { id: member.user.id }})
 	if (!player) await createPlayer(member.user.id, member.user.username, member.user.tag, muted = false)
 
@@ -992,9 +991,9 @@ if(cmd === `!unmute`) {
 		}
 
 		member.roles.remove(muteRole)
-		return message.channel.send(`${member.user.username} no longer has the Mute role.`)
+		return message.channel.send({ content: `${member.user.username} no longer has the Mute role.`})
 	} else {
-		return message.channel.send(`That user was not muted.`)
+		return message.channel.send({ content: `That user was not muted.`})
 	}
 }
     
@@ -1002,10 +1001,10 @@ if(cmd === `!unmute`) {
 if (rolecom.includes(cmd)) {
 	if (!message.member.roles.cache.some(role => role.id === fpRole)) {
 		message.member.roles.add(fpRole)
-		return message.channel.send(`You now have the Forged Players role.`)
+		return message.channel.send({ content: `You now have the Forged Players role.`})
 	} else {
 		message.member.roles.remove(fpRole)
-		return message.channel.send(`You no longer have the Forged Players role.`)
+		return message.channel.send({ content: `You no longer have the Forged Players role.`})
 	}
 }
 
@@ -1099,8 +1098,8 @@ if (botcom.includes(cmd)) {
 			+ `\n!ref (@user) - Send a referral bonus to another player.`
 		)
 	
-	message.author.send(botEmbed)
-	return message.channel.send("I messaged you the MerchBot User Manual.")
+	message.author.send({ embeds: [botEmbed]})
+	return message.channel.send({ content: "I messaged you the MerchBot User Manual." })
 }
 
 //MOD USER GUIDE 
@@ -1116,7 +1115,7 @@ if (cmd === `!mod`) {
 		rank === 1 ? 'Ambassador' :
 		null
 	
-	if (!rank) return message.channel.send("You do not have permission to do that.")
+	if (!rank) return message.channel.send({ content: "You do not have permission to do that."})
 	const botEmbed = new Discord.MessageEmbed()
 		.setColor('#8062cc')
 		.setTitle(`MerchBot - ${position} User Manual`)
@@ -1166,14 +1165,14 @@ if (cmd === `!mod`) {
 		)
 	}
 		
-	message.author.send(botEmbed)
-	return message.channel.send(`I messaged you the ${position} User Manual.`)
+	message.author.send({ embeds: [botEmbed]})
+	return message.channel.send({ content: `I messaged you the ${position} User Manual.`})
 }
 
 //INFO
 if(infocom.includes(cmd)) {
 	if (mcid == duelRequestsChannelId) { 
-		return message.channel.send(`${master} --- Ranked Play --- ${master}`+ 
+		return message.channel.send({ content: `${master} --- Ranked Play --- ${master}`+ 
 		`\nThis is a Constructed Format based on the cards that you own.`+
 		` You can check your Inventory with the **!inv** command.`+
 		` After you build a deck, go to <#${duelRequestsChannelId}> and tag **@Forged Players** to find an opponent.`+
@@ -1184,11 +1183,11 @@ if(infocom.includes(cmd)) {
 		`\n\nDisclaimer: Logs exist and admins can view inventories.`+
 		` Playing with cards you don't own will not be tolerated.`+
 		`\n\nIn addition, you must follow the ${FiC} Forbidden and Limited List.`+
-		` Type **!banlist** to view it.`)
+		` Type **!banlist** to view it.`})
 	}
 
 	if (mcid == marketPlaceChannelId) { 
-		return message.channel.send(`${merchant} --- Market Place --- ${merchant}`+ 
+		return message.channel.send({ content: `${merchant} --- Market Place --- ${merchant}`+ 
 		`\nTo get the cards you need in Forged in Chaos, you need to buy, sell, and trade.`+
 		`\n\nPut cards in your Binder with **!bind**,`+
 		` add cards to your Wishlist with **!wish**,`+
@@ -1199,20 +1198,20 @@ if(infocom.includes(cmd)) {
 		// ` Sick of using Discord? Visit the Shop online at https://forgedinchaos.com.`+
 		`\n\nOn Tuesday and Friday nights, the Shop closes and opens some packs to restock.`+
 		` During the Night, players use the **!bid** command in private.`+
-		` The next Day, the Shop opens and the cards are sold to the highest bidders!`)
+		` The next Day, the Shop opens and the cards are sold to the highest bidders!`})
 	}
 
 	if (mcid == tournamentChannelId) { 
-		return message.channel.send(`${legend} --- Tournaments --- ${legend}`+ 
+		return message.channel.send({ content: `${legend} --- Tournaments --- ${legend}`+ 
 		`\nTo sign up for a Tournament, simply come to the <#${tournamentChannelId}> and use the **!join** command.`+
 		` The Tournament Organizer will handle the rest, so keep an eye out for their instructions.`+
 		`\n\nThe tournament entry fee is 50${stardust}` +
 		` Each participant gets a Chaos Pack just for entering.`+
-		` If you do well, you can win additional Chaos Packs and other prizes.`)
+		` If you do well, you can win additional Chaos Packs and other prizes.`})
 	}
 
 	if (mcid == arenaChannelId) { 
-		message.channel.send(
+		message.channel.send({ content: 
 			`${beast}  ${dinosaur}  ${dragon}  ${fiend}  ${fish}  ${plant}  --- The Arena ---  ${reptile}  ${rock}  ${spellcaster}  ${thunder}  ${warrior}  ${zombie}`+ 
 			`\nIn this channel, you get to test out the game's most powerful cards.`+
 			` Simply align yourself with a Tribe and wage war at their side.`+
@@ -1225,9 +1224,9 @@ if(infocom.includes(cmd)) {
 			`\n\nThe Champion of the Arena walks away with an ${ult}Arena Prize Card according to their Tribe!`+
 			` Everyone else receives Vouchers for their wins.`+
 			` You can use **!barter** to exchange Vouchers for APCs.`
-		)
+		})
 
-		return message.channel.send(
+		return message.channel.send({ content: 
 			`Once you complete the Medium Diary, extended bartering is available for the following cards:` +
 			`\n${ult}DOC-180 - Peropero Cerperus - 10 ${mushroom}` +
 			`\n${ult}TEB-135 - Green Baboon, Defender of the Forest - 10 ${mushroom}` +
@@ -1248,11 +1247,11 @@ if(infocom.includes(cmd)) {
 			`\n${ult}TEB-137 - Shaddoll Dragon - 10 ${orb}` +
 			`\n${ult}DOC-175 - Breaker the Magical Warrior - 10 ${orb}` +
 			`\n${ult}TEB-141 - Dragon Ravine - 10 ${gem}`
-		)
+		})
 	}
 
 	if (mcid == gauntletChannelId) { 
-		return message.channel.send(`${gloveEmoji} --- The Gauntlet --- ${gloveEmoji}`+ 
+		return message.channel.send({ content: `${gloveEmoji} --- The Gauntlet --- ${gloveEmoji}`+ 
 		`\nThe Gauntlet is the ultimate test of endurance and technical play.`+
 		` In this 2-Player game-mode, you're asked to succeed with Starter Decks from every generation of Forged`+
 		` from Fish's Ire ${fish} to Spellcaster's Art ${spellcaster}.`
@@ -1268,11 +1267,11 @@ if(infocom.includes(cmd)) {
 		` Losers must report in the <#639907734589800458> channel with the **!loss** command.`+
 		` Winners receive 4" + starchip + " while losers receive 2" + starchip + ".`+
 		` The winner of each leg receives a random Starter Deck " + ultEmoji + " from that generation.`+
-		` Whoever wins the most legs wins the Gauntlet, and receives an additional 10" + starchip + ".`)
+		` Whoever wins the most legs wins the Gauntlet, and receives an additional 10" + starchip + ".`})
 	}
 
 	if (mcid == pauperChannelId) { 
-		return message.channel.send(`${com} --- Pauper Format --- ${rar}`+ 
+		return message.channel.send({ content: `${com} --- Pauper Format --- ${rar}`+ 
 		`\nIn this channel, the rich and the poor fight on an even playing field!`+
 		` This is a constructed format using cards in your Inventory.`+
 		` However, only cards that were **originally printed** as commons ${com} are allowed in this format.`+
@@ -1281,16 +1280,16 @@ if(infocom.includes(cmd)) {
 		` Winners receive 4${starchips}, losers receive 2${starchips}.`+
 		` To report a loss, type **!loss @opponent**.`+
 		` These games do not affect your ranking for Tournaments, Diary tasks, etc.` +
-		`\n\nDo you have what it takes to become a master budget player? ${cavebob}`)
+		`\n\nDo you have what it takes to become a master budget player? ${cavebob}`})
 	}
 
 	if (mcid == keeperChannelId) { 
-		return message.channel.send(`${fire} --- Keeper of the Forge --- ${fire}`+ 
+		return message.channel.send({ content: `${fire} --- Keeper of the Forge --- ${fire}`+ 
 		`\nIn this channel, you get to `+
-		` woof.`)	}
+		` woof.`})	}
 
 	if (mcid == triviaChannelId) { 
-		return message.channel.send(`${stoned} --- Trivia Center --- ${stoned}`+ 
+		return message.channel.send({ content: `${stoned} --- Trivia Center --- ${stoned}`+ 
 		`\nThe King of Games must also be a student of the game.`+
 		` That means being familiar with the old Champions and their decks,`+
 		` as well as historically important cards.`+
@@ -1301,15 +1300,15 @@ if(infocom.includes(cmd)) {
 		` Do **not** look up answers online -- doing so will get you banned from Trivia.` +
 		` After 10 rounds, players earn ${starchips} or ${stardust} for their performance.`+
 		`\n\nAs you play more Trivia, your Profile will keep a record of your acumen.`+
-		` There are 2150 total questions, so hit the books and then hit those keys! ${red}`)
+		` There are 2150 total questions, so hit the books and then hit those keys! ${red}`})
 	}
 		
 	if (mcid == draftChannelId) { 
-		return message.channel.send(`${puzzle} --- Draft Room --- ${puzzle}`+ 
-		`\nIn this channel,`)
+		return message.channel.send({ content: `${puzzle} --- Draft Room --- ${puzzle}`+ 
+		`\nIn this channel,`})
 	}
 
-	return message.channel.send(`Use this command in channels such as <#${duelRequestsChannelId}>, <#${marketPlaceChannelId}>, <#${tournamentChannelId}>, <#${arenaChannelId}> and <#${triviaChannelId}> to learn how those parts of the game work.`)
+	return message.channel.send({ content: `Use this command in channels such as <#${duelRequestsChannelId}>, <#${marketPlaceChannelId}>, <#${tournamentChannelId}>, <#${arenaChannelId}> and <#${triviaChannelId}> to learn how those parts of the game work.`})
 }
 
 
@@ -1318,21 +1317,21 @@ if(deckcom.includes(cmd)) {
 	if (mcid === arenaChannelId) {
 		const deck = await getArenaSample(message, args[0])
 		if (!deck) return
-		if (!arenas.decks[deck]) return message.channel.send(`I do not recognize that tribe.`)
+		if (!arenas.decks[deck]) return message.channel.send({ content: `I do not recognize that tribe.`})
 
-		return message.channel.send(`Arena ${capitalize(deck)} ${eval(deck)} Deck (staples in the side):\n<${arenas.decks[deck].url}>\n${arenas.decks[deck].screenshot}`)
+		return message.channel.send({ content: `Arena ${capitalize(deck)} ${eval(deck)} Deck (staples in the side):\n<${arenas.decks[deck].url}>\n${arenas.decks[deck].screenshot}`})
 	} else {
 		const player = await Player.findOne( { where: { id: maid }, include: [Diary, Wallet] })
 		const wallet = player.wallet
 		const diary = player.diary
 		
 		const merchbot_wallet = await Wallet.findOne( { where: { playerId: merchbotId } })
-		if (!wallet || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+		if (!wallet || !merchbot_wallet) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
 
 		const deck = await getShopDeck(message, args[0])
 		const valid_decks = ["reptile", "warrior", "dragon", "spellcaster", "dinosaur", "plant", "fish", "rock"]
 		if (!deck) return
-		if (!valid_decks.includes(deck)) return message.channel.send(`Sorry, I do not have that deck for sale.`)
+		if (!valid_decks.includes(deck)) return message.channel.send({ content: `Sorry, I do not have that deck for sale.`})
 
 		const set = await Set.findOne({ where: { 
 			code: decks[deck].set_code
@@ -1341,18 +1340,18 @@ if(deckcom.includes(cmd)) {
 		const hard_complete = diary.h1 && diary.h2 && diary.h3 && diary.h4 && diary.h5 && diary.h6 && diary.h7 && diary.h8
 		const discount = hard_complete && set.currency === 'stardust' ? (1 / 1.1) : 1
 
-		if (!set) return message.channel.send(`Could not find set with code "${decks[deck].set_code}".`)
-		if (!set.for_sale) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} ${eval(set.alt_emoji)} is not available.`)
+		if (!set) return message.channel.send({ content: `Could not find set with code "${decks[deck].set_code}".`})
+		if (!set.for_sale) return message.channel.send({ content: `Sorry, ${set.name} ${eval(set.emoji)} ${eval(set.alt_emoji)} is not available.`})
 		const money = wallet[set.currency]
-		if (money < set.unit_price * discount) return message.channel.send(`Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${decks[deck].name} ${eval(deck)} costs ${set.unit_price * discount}${eval(set.currency)}.`)
+		if (money < set.unit_price * discount) return message.channel.send({ content: `Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${decks[deck].name} ${eval(deck)} costs ${set.unit_price * discount}${eval(set.currency)}.`})
 
 		const filter = m => m.author.id === message.author.id
-		const msg = await message.channel.send(`${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.unit_price * discount}${eval(set.currency)} on a copy of ${decks[deck].name} ${eval(deck)}?`)
+		const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.unit_price * discount}${eval(set.currency)} on a copy of ${decks[deck].name} ${eval(deck)}?`})
 		const collected = await msg.channel.awaitMessages(filter, {
 			max: 1,
 			time: 15000
 		}).then(async collected => {
-			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 			const code = deck === 'reptile' || deck === 'warrior' ? 'SS4' :
 				deck === 'dragon' || deck === 'spellcaster' ? 'SS3' :
 				deck === 'plant' || deck === 'dinosaur' ? 'SS2' :
@@ -1363,22 +1362,22 @@ if(deckcom.includes(cmd)) {
 			set.unit_sales++
 			await set.save()
 			await awardStarterDeck(maid, deck)
-			return message.channel.send(`Thank you for your purchase! I updated your Inventory with a copy of ${decks[deck].name} ${eval(deck)}.`)
+			return message.channel.send({ content: `Thank you for your purchase! I updated your Inventory with a copy of ${decks[deck].name} ${eval(deck)}.`})
 		}).catch(err => {
 			console.log(err)
-			return message.channel.send(`Sorry, time's up.`)
+			return message.channel.send({ content: `Sorry, time's up.`})
 		})
 	}
 }
 
 //EDIT
 if(cmd == `!edit`) {
-	if (mcid !== botSpamChannelId) return message.channel.send(`Please use this command in <#${botSpamChannelId}>.`)
+	if (mcid !== botSpamChannelId) return message.channel.send({ content: `Please use this command in <#${botSpamChannelId}>.`})
 	const profile = await Profile.findOne({ where: { playerId: maid } })
-	if (!profile) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!profile) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
 	const wantsToChangeColor = await askToChangeProfile(message, 'color')
 	const color = wantsToChangeColor ? await getFavoriteColor(message) : ''
-	if (color === 'unrecognized') message.channel.send(`Sorry, I do not recognize that color.`)
+	if (color === 'unrecognized') message.channel.send({ content: `Sorry, I do not recognize that color.`})
 	
 	const wantsToChangeQuote = await askToChangeProfile(message, 'quote')
 	const new_quote = wantsToChangeQuote ? await getFavoriteQuote(message) : null
@@ -1394,17 +1393,17 @@ if(cmd == `!edit`) {
 	if (new_card && new_card !== 'none') profile.card = new_card
 	await profile.save()
 	if (new_card === 'not found') return
-	if (!color.startsWith("#") && !new_quote && !new_card) return message.channel.send(`Not a problem. Have a nice day.`)
+	if (!color.startsWith("#") && !new_quote && !new_card) return message.channel.send({ content: `Not a problem. Have a nice day.`})
 
-	return message.channel.send(`Your profile has been updated!`)
+	return message.channel.send({ content: `Your profile has been updated!`})
 }
 
 //CALCULATE
 if(calccom.includes(cmd)) {
-	if (!args.length) return message.channel.send(`Please specify a valid set code.`)
+	if (!args.length) return message.channel.send({ content: `Please specify a valid set code.`})
 	const set_code = args[0].toUpperCase()
 	const set = await Set.findOne({ where: { code: set_code } })
-	if(!set) return message.channel.send(`I do not recognize the set code: "${set_code}"`)	
+	if(!set) return message.channel.send({ content: `I do not recognize the set code: "${set_code}"`})	
 
 	if (set.type === 'core' || set.type === 'mini' || set.type === 'tour') {
 		const commons = [...await Print.findAll({ where: { set_code: set_code, rarity: "com" } })].map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
@@ -1426,9 +1425,9 @@ if(calccom.includes(cmd)) {
 		const avgPackPrice = avgBoxPrice / set.packs_per_box
 
 		if (set.type === 'core') {
-			return message.channel.send(`The average trade-in value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Pack is ${avgPackPrice.toFixed(2)}${stardust} and a Box is ${avgBoxPrice.toFixed(2)}${stardust}.`)
+			return message.channel.send({ content: `The average trade-in value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Pack is ${avgPackPrice.toFixed(2)}${stardust} and a Box is ${avgBoxPrice.toFixed(2)}${stardust}.`})
 		} else {
-			return message.channel.send(`The average trade-in value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Pack is ${avgPackPrice.toFixed(2)}${stardust}.`)
+			return message.channel.send({ content: `The average trade-in value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Pack is ${avgPackPrice.toFixed(2)}${stardust}.`})
 		}
 	} else if (set.type === 'starter_deck') {
 		const prints = await Print.findAll({ where: { set_code: set_code }})
@@ -1454,17 +1453,17 @@ if(calccom.includes(cmd)) {
 			deck2Price += (d2quantity * Math.ceil(0.7 * market_price))
 		}
 
-		return message.channel.send(`The trade-in value of ${decks[deck1].name} ${eval(set.emoji)} is ${Math.round(deck1Price * 100) / 100}${stardust} and ${decks[deck2].name} ${eval(set.alt_emoji)} is ${Math.round(deck2Price * 100) / 100}${stardust}.`)		
+		return message.channel.send({ content: `The trade-in value of ${decks[deck1].name} ${eval(set.emoji)} is ${Math.round(deck1Price * 100) / 100}${stardust} and ${decks[deck2].name} ${eval(set.alt_emoji)} is ${Math.round(deck2Price * 100) / 100}${stardust}.`})		
 	} else if (set.type === 'promo') {
 		const prints = [...await Print.findAll({ where: { set_code: set_code }})].map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
 		const avgPrice = prints.length ? prints.reduce((a, b) => a + b) / prints.length : 0
-		return message.channel.send(`The average trade-in value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Promo is ${avgPrice.toFixed(2)}${stardust}.`)
+		return message.channel.send({ content: `The average trade-in value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Promo is ${avgPrice.toFixed(2)}${stardust}.`})
 	}
 }
 
 //PROFILE
 if(profcom.includes(cmd)) {
-	if (mcid !== generalChannelId && mcid !== botSpamChannelId) return message.channel.send(`Please use this command in <#${botSpamChannelId}> or <#${generalChannelId}>.`)
+	if (mcid !== generalChannelId && mcid !== botSpamChannelId) return message.channel.send({ content: `Please use this command in <#${botSpamChannelId}> or <#${generalChannelId}>.`})
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const player = await Player.findOne({ 
 		where: { 
@@ -1473,8 +1472,8 @@ if(profcom.includes(cmd)) {
 		include: [Arena, Diary, Draft, Gauntlet, Profile, Trivia, Wallet]
 	})
 
-	if (!player && maid === playerId) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
-	if (!player && maid !== playerId) return message.channel.send(`That user is not in the database.`)
+	if (!player && maid === playerId) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
+	if (!player && maid !== playerId) return message.channel.send({ content: `That user is not in the database.`})
 
 	const inventory = await Inventory.findAll({ 
 		where: { 
@@ -1577,36 +1576,36 @@ if(profcom.includes(cmd)) {
 		.setImage(card_image)
 		.setFooter(quote)
 
-	return message.channel.send(profileEmbed)
+	return message.channel.send({ embeds: [profileEmbed] })
 }
 
 //REFERRAL
 if(referralcom.includes(cmd)) {
 	const player = await Player.findOne({ where: { id: maid }, include: [Diary, Profile]})
-	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!player) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
 	const diary = player.diary
 	const profile = player.profile
-	if (!profile || !diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
-	if (player.last_reset) return message.channel.send(`You cannot give a referral after resetting your account.`)
-	if (profile.referral) return message.channel.send(`You already gave a referral.`)
+	if (!profile || !diary) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
+	if (player.last_reset) return message.channel.send({ content: `You cannot give a referral after resetting your account.`})
+	if (profile.referral) return message.channel.send({ content: `You already gave a referral.`})
 
 	const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
-	if (!easy_complete) return message.channel.send(`You must complete your Easy Diary before you are allowed to give a referral.`)
+	if (!easy_complete) return message.channel.send({ content: `You must complete your Easy Diary before you are allowed to give a referral.`})
 
-	if (!args.length) return message.channel.send(`No player specified.`)
+	if (!args.length) return message.channel.send({ content: `No player specified.`})
 	const referrer = message.mentions.users.first() ? message.mentions.users.first().id : null
-	if (!referrer || referrer.length < 17 || referrer.length > 18) return message.channel.send(`No player specified.`)
+	if (!referrer || referrer.length < 17 || referrer.length > 18) return message.channel.send({ content: `No player specified.`})
 
 	const referringPlayer = await Player.findOne({ where: { id: referrer }, include: Wallet })
-	if (!referringPlayer) return message.channel.send(`That person is not in the database.`)
+	if (!referringPlayer) return message.channel.send({ content: `That person is not in the database.`})
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`Are you sure you want to give a referral to ${referringPlayer.name}?`)
+	const msg = await message.channel.send({ content: `Are you sure you want to give a referral to ${referringPlayer.name}?`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
 	}).then(async collected => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 
 		referringPlayer.wallet.starchips += 15
 		await referringPlayer.wallet.save()
@@ -1614,10 +1613,10 @@ if(referralcom.includes(cmd)) {
 		profile.referral = true
 		await profile.save()
 
-		return message.channel.send(`Okay! <@${referringPlayer.id}> was awarded 15${starchips} for a referral.`)
+		return message.channel.send({ content: `Okay! <@${referringPlayer.id}> was awarded 15${starchips} for a referral.`})
 	}).catch(err => {
 		console.log(err)
-		return message.channel.send(`Sorry, time's up.`)
+		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }
 
@@ -1683,7 +1682,7 @@ if (cmd === `!shop`) {
 				null
 		}
 	
-		return message.channel.send(`The Shop ${merchant} is ${shopStatus} ${shopEmoji}. It will ${nextAction} in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes, on ${dayShopReverts} at ${hourShopReverts} ET. ${nextEmoji}`)
+		return message.channel.send({ content: `The Shop ${merchant} is ${shopStatus} ${shopEmoji}. It will ${nextAction} in ${hoursLeftInPeriod} hours and ${minsLeftInPeriod} minutes, on ${dayShopReverts} at ${hourShopReverts} ET. ${nextEmoji}`})
 	} else {
 		const query = args.join(' ')
 		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
@@ -1752,8 +1751,8 @@ if (cmd === `!shop`) {
 				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv && inv.quantity ? inv.quantity : 'Out of Stock'}`)
 			}
 
-			message.channel.send(`I messaged you the ${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? ` ${eval(set.alt_emoji)}` : ''} Price List.`)
-			for (let i = 0 ; i < results.length; i+=10) message.author.send(results.slice(i, i+10))
+			message.channel.send({ content: `I messaged you the ${set.code} ${eval(set.emoji)}${set.emoji !== set.alt_emoji ? ` ${eval(set.alt_emoji)}` : ''} Price List.`})
+			for (let i = 0 ; i < results.length; i+=10) message.author.send({ content: results.slice(i, i+10)})
 			return
 		} else if (rarity) {
 			const prints = await Print.findAll({ where: { rarity: rarity, draft: false }, order: [['market_price', 'DESC']] })
@@ -1768,14 +1767,14 @@ if (cmd === `!shop`) {
 				results.push(`${selling_price}${stardust}| ${buying_price}${stardust} - ${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv && inv.quantity ? inv.quantity : 'Out of Stock'}`)
 			}
 
-			message.channel.send(`I messaged you the ${eval(rarity)} Price List.`)
-			for (let i = 0 ; i < results.length; i+=10) message.author.send(results.slice(i, i+10))
+			message.channel.send({ content: `I messaged you the ${eval(rarity)} Price List.`})
+			for (let i = 0 ; i < results.length; i+=10) message.author.send({ content: results.slice(i, i+10)})
 			return
 		}
 
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 		const prints = valid_card_code ? await Print.findAll({ where: { card_code: card_code, draft: false }, order: [['createdAt', 'ASC']]}) : card_name ? await Print.findAll({ where: { card_name: card_name }, order: [['createdAt', 'ASC']]}) : null
-		if (!prints || !prints.length) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+		if (!prints || !prints.length) return message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
 		const results = []
 
 		for (let i = 0; i < prints.length; i++) {
@@ -1800,20 +1799,20 @@ if (cmd === `!shop`) {
 			}
 		}
 
-		return message.channel.send(results.join('\n'))
+		return message.channel.send({ content: results.join('\n')})
 	}
 }
 
 
 //POPULATION
 if (populationcom.includes(cmd)) {
-	if (!args.length) return message.channel.send(`Please specify a card.`)
+	if (!args.length) return message.channel.send({ content: `Please specify a card.`})
 	const query = args.join(' ')
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const card_name = await findCard(query, fuzzyPrints)
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	const prints = valid_card_code ? await Print.findAll({ where: { card_code: card_code }, order: [['createdAt', 'ASC']]}) : card_name ? await Print.findAll({ where: { card_name: card_name }, order: [['createdAt', 'ASC']]}) : null
-	if (!prints || !prints.length) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+	if (!prints || !prints.length) return message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
 	const results = []
 
 	for (let i = 0; i < prints.length; i++) {
@@ -1862,7 +1861,7 @@ if (populationcom.includes(cmd)) {
 		results.push(`${ygocard} --- Population Stats --- ${ygocard}\n${card}\nTotal Population: ${total}\nAvg ${eval(print.rarity)} ${print.set_code} ${eval(set.emoji)} Pop: ${avg_eq_pop}\nShop Inventory: ${shop_percent}`)
 	}
 	
-	return message.channel.send(results.join('\n\n'))
+	return message.channel.send({ content: results.join('\n\n')})
 }
 
 //COUNT
@@ -1913,7 +1912,7 @@ if(cmd === `!count`) {
 		`\n- ${count} ${count === 1 ? 'Pack' : 'Packs'} of ORF ${ORF}` +
 		`\n- ${count} ${count === 1 ? 'Pack' : 'Packs'} of DOC ${DOC}`
 	)
-	return message.channel.send(results.join("\n"))
+	return message.channel.send({ content: results.join("\n")})
 }
 
 
@@ -2008,9 +2007,9 @@ if(cmd === `!chart`) {
 		[zombieWins, `${zombie} - ${zombieWins} - ${zombies}`]
 	].sort((a, b) => b[0] - a[0]).map((e) => e[1])
 
-	message.channel.send(`There have been ${totalWinners} Arena winners. Conquest breakdown:`)
-	message.channel.send(arr.slice(0, 6).join("\n"))
-	return message.channel.send(arr.slice(6).join("\n"))
+	message.channel.send({ content: `There have been ${totalWinners} Arena winners. Conquest breakdown:`})
+	message.channel.send({ content: arr.slice(0, 6).join("\n")})
+	return message.channel.send({ content: arr.slice(6).join("\n")})
 }
 
 
@@ -2021,7 +2020,7 @@ if (historycom.includes(cmd)) {
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	const card_name = await findCard(query, fuzzyPrints)
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-	if (!print || print.draft || print.hidden) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+	if (!print || print.draft || print.hidden) return message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 	const item = print.card_code
 
@@ -2032,7 +2031,7 @@ if (historycom.includes(cmd)) {
 		order: [['createdAt', 'DESC']]
 	})
 
-	if (!trades.length) return message.channel.send(`There have been no trades involving ${card}.`)
+	if (!trades.length) return message.channel.send({ content: `There have been no trades involving ${card}.`})
 
 	const transaction_ids = trades.slice(0, 10).map((t) => t.transaction_id)
 	const summaries = []
@@ -2138,8 +2137,8 @@ if (historycom.includes(cmd)) {
 		results.push(`**Trade ${i+1}** - ${days ? days : 'Earlier Today'} ${days === 0 ? '' : days === 1 ? 'Day Ago' : 'Days Ago'}\n${summary.p1_name} received:\n${summary.p1_receives.join("\n")}\n${summary.p2_name} received:\n${summary.p2_receives.join("\n")}`)
 	}
 
-	message.channel.send(`I messaged you the trade history for ${card}.`)
-	for (let i = 0 ; i < results.length; i++) message.author.send(results[i])
+	message.channel.send({ content: `I messaged you the trade history for ${card}.`})
+	for (let i = 0 ; i < results.length; i++) message.author.send({ content: results[i]})
 	return
 }
 
@@ -2147,7 +2146,7 @@ if (historycom.includes(cmd)) {
 if(cmd === `!trades`) {
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const player = await Player.findOne({ where: { id: playerId } })
-	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!player) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
 
 	const cutoff = player.last_reset ? player.last_reset : player.createdAt
 	
@@ -2156,7 +2155,7 @@ if(cmd === `!trades`) {
 		createdAt: { [Op.gte]: cutoff }
 	}})
 
-	if (!trades.length) return message.channel.send(`You have not made any trades.`)
+	if (!trades.length) return message.channel.send({ content: `You have not made any trades.`})
 	const partnerIds = []
 	const partnerNames = []
 
@@ -2176,50 +2175,50 @@ if(cmd === `!trades`) {
 	}
 
 	partnerNames.sort()
-	message.channel.send(`I messaged you your trading summary.`)
-	return message.author.send(`You have traded with ${partnerNames.length} players:\n${partnerNames.join("\n")}`)
+	message.channel.send({ content: `I messaged you your trading summary.`})
+	return message.author.send({ content: `You have traded with ${partnerNames.length} players:\n${partnerNames.join("\n")}`})
 }
 
 // RNG
 if(cmd === `!rng`) {
 	const num = parseInt(args[0])
-	if(isNaN(num) || num < 1) return message.channel.send(`Please specify an upper limit.`)
+	if(isNaN(num) || num < 1) return message.channel.send({ content: `Please specify an upper limit.`})
 	const result = Math.floor((Math.random() * num) + 1)
-	return message.channel.send(`You rolled a **${result}** with a ${num}-sided die.`)
+	return message.channel.send({ content: `You rolled a **${result}** with a ${num}-sided die.`})
 }
 
 // DICE
 if(dicecom.includes(cmd)) {
 	const result = Math.floor((Math.random() * 6) + 1)
-	return message.channel.send(`You rolled a **${result}** with a 6-sided die.`)
+	return message.channel.send({ content: `You rolled a **${result}** with a 6-sided die.`})
 }
 
 // FLIP
 if(flipcom.includes(cmd)) {
 	 const coin = Math.floor((Math.random() * 2)) === 0 ? 'Heads' : 'Tails'
-	 return message.channel.send(`Your coin flip landed on: **${coin}**!`)
+	 return message.channel.send({ content: `Your coin flip landed on: **${coin}**!`})
 }
 
 //DAIRY
-if(cmd === `!dairy`) return message.channel.send('🐮')
+if(cmd === `!dairy`) return message.channel.send({ content: '🐮'})
 
 //SHIP
-if(cmd === `!ship`) return message.channel.send('🚢')
+if(cmd === `!ship`) return message.channel.send({ content: '🚢'})
 
 //POOP
-if(cmd === `!poop`) return message.channel.send('💩')
+if(cmd === `!poop`) return message.channel.send({ content: '💩'})
 
 //WALL-E
-if(cmd === `!walley` || cmd === `!walle`) return message.channel.send('🤖')
+if(cmd === `!walley` || cmd === `!walle`) return message.channel.send({ content: '🤖'})
 
 
 //DIARY
 if(cmd === `!diary`) {
 	const user = message.mentions.users.first()
 	const playerId = user ? user.id : maid
-	if (playerId !== maid && !isAdmin(message.member) && !isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (playerId !== maid && !isAdmin(message.member) && !isMod(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
 	const diary = await Diary.findOne({ where: { playerId: playerId } })
-	if (!diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!diary) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
 	const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
 	const medium_complete = diary.m1 && diary.m2 && diary.m3 && diary.m4 && diary.m5 && diary.m6 && diary.m7 && diary.m8 && diary.m9 && diary.m10
 	const hard_complete = diary.h1 && diary.h2 && diary.h3 && diary.h4 && diary.h5 && diary.h6 && diary.h7 && diary.h8
@@ -2239,7 +2238,7 @@ if(cmd === `!diary`) {
 		else if(input === 'm' || input.startsWith('me') || input.startsWith('mo')) { diary_to_display = 'Medium'; bonuses = diaries.Medium.bonuses }
 		else if(input === 'h' || input.startsWith('ha')) { diary_to_display = 'Hard'; bonuses = diaries.Hard.bonuses }
 		else if(input === 'l' || input.startsWith('el')) { diary_to_display = 'Elite'; bonuses = diaries.Elite.bonuses }
-		else return message.channel.send(`I do not recognize the "${input}" Diary.`)
+		else return message.channel.send({ content: `I do not recognize the "${input}" Diary.`})
 		//else if(input === 's' || input.startsWith('ma')) { diary_to_display = 'Master'; bonuses = diaries.Master.bonuses }
 	} else if (!diary_to_display) {
 		//if (elite_complete) { diary_to_display = 'Master'; bonuses = diaries.Master.bonuses }
@@ -2323,16 +2322,16 @@ if(cmd === `!diary`) {
 		.addField(`${score === 100 ? `${checkmark} `: ''}${diary_to_display} Diary - ${score}% Complete${score === 100 ? ` ${checkmark}` : ''}`, `${tasks.join("\n")}`)
 		.addField(`${score === 100 ? `${legend} Bonus - Active ${legend}` : `Bonus`}`,`${bonuses.join("\n")}`)
 
-	message.author.send(diaryEmbed);
-	return message.channel.send(`I messaged you ${playerId === maid ? 'the' : `that player's`} ${diary_to_display} Diary. ${leatherbound}`)
+	message.author.send({ embeds: [diaryEmbed] })
+	return message.channel.send({ content: `I messaged you ${playerId === maid ? 'the' : `that player's`} ${diary_to_display} Diary. ${leatherbound}`})
 }
 
 //BINDER
 if(bindercom.includes(cmd)) {
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const binder = await Binder.findOne({ where: { playerId }, include: Player})
-	if (!binder && playerId === maid) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
-	if (!binder && playerId !== maid) return message.channel.send(`That user is not in the database.`)
+	if (!binder && playerId === maid) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
+	if (!binder && playerId !== maid) return message.channel.send({ content: `That user is not in the database.`})
 
 	if (!args.length || playerId !== maid) {
 		const prints = []
@@ -2346,8 +2345,8 @@ if(bindercom.includes(cmd)) {
 		prints.sort((a, b) => b.market_price - a.market_price)
 		const results = prints.map((print) => `${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
 
-		if (!results.length) return message.channel.send(`${playerId === maid ? 'Your' : `${binder.player.name}'s`} binder is empty.`)
-		else return message.channel.send(`**${binder.player.name}'s Binder**\n${results.join('\n')}`)
+		if (!results.length) return message.channel.send({ content: `${playerId === maid ? 'Your' : `${binder.player.name}'s`} binder is empty.`})
+		else return message.channel.send({ content: `**${binder.player.name}'s Binder**\n${results.join('\n')}`})
 	}
 
 	if (args[0] === 'e' || args[0] === 'clear' || args[0] === 'empty') {
@@ -2371,7 +2370,7 @@ if(bindercom.includes(cmd)) {
 		binder.slot_18 = null
 
 		await binder.save()
-		return message.channel.send(`Your binder has been emptied.`)
+		return message.channel.send({ content: `Your binder has been emptied.`})
 	}
 
 	const inputs = args.join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim())
@@ -2384,12 +2383,12 @@ if(bindercom.includes(cmd)) {
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name, private = false, inInv = true) : null
 		
 		if (!print && !card_name) {
-			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+			message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
 			continue
 		}
 
 		if (!print && card_name) {
-			message.channel.send(`You do not have any copies of ${card_name}.`)
+			message.channel.send({ content: `You do not have any copies of ${card_name}.`})
 			continue
 		} 
 		
@@ -2403,7 +2402,7 @@ if(bindercom.includes(cmd)) {
 			if (binder[key] === print.card_code) {
 				binder[key] = null
 				await binder.save()
-				message.channel.send(`You removed ${card} from your binder.`)
+				message.channel.send({ content: `You removed ${card} from your binder.`})
 				foundCopy = true
 				break
 			}
@@ -2420,7 +2419,7 @@ if(bindercom.includes(cmd)) {
 		})
 
 		if (!inv) {
-			message.channel.send(`You do not have any copies of ${card}.`)
+			message.channel.send({ content: `You do not have any copies of ${card}.`})
 			continue
 		} 
 
@@ -2431,14 +2430,14 @@ if(bindercom.includes(cmd)) {
 				success = true
 				binder[`slot_${i + 1}`] = print.card_code
 				await binder.save()
-				message.channel.send(`You added ${card} to your binder.`)
+				message.channel.send({ content: `You added ${card} to your binder.`})
 				completeTask(message.channel, maid, 'e7')
 			} else {
 				i++
 			}
 		}
 
-		if (!success) return message.channel.send(`Your binder is full. Please remove a card or empty it to make room.`)
+		if (!success) return message.channel.send({ content: `Your binder is full. Please remove a card or empty it to make room.`})
 	}
 
 	return 
@@ -2446,7 +2445,7 @@ if(bindercom.includes(cmd)) {
 
 //SEARCH
 if(cmd === `!search`) {
-	if (!args.length) return message.channel.send(`Please specify a card to search for.`)
+	if (!args.length) return message.channel.send({ content: `Please specify a card to search for.`})
 	const allBinders = await Binder.findAll({ include: Player })
 	const allWishlists = await Wishlist.findAll({ include: Player })
 	
@@ -2460,7 +2459,7 @@ if(cmd === `!search`) {
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	const card_name = await findCard(query, fuzzyPrints)
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-	if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+	if (!print) return message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 
 	const binderResults = []
@@ -2481,15 +2480,15 @@ if(cmd === `!search`) {
 	binderResults.sort()
 	wishlistResults.sort()
 
-	return message.channel.send(`Search results for ${card}:\n**Binders:**\n${binderResults.length ? binderResults.join('\n') : 'N/A'}\n\n**Wishlists:**\n${wishlistResults.length ? wishlistResults.join('\n') : 'N/A'}`)
+	return message.channel.send({ content: `Search results for ${card}:\n**Binders:**\n${binderResults.length ? binderResults.join('\n') : 'N/A'}\n\n**Wishlists:**\n${wishlistResults.length ? wishlistResults.join('\n') : 'N/A'}`})
 }
 
 //WISHLIST
 if(wishlistcom.includes(cmd)) {
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const wishlist = await Wishlist.findOne({ where: { playerId }, include: Player})
-	if (!wishlist && playerId === maid) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
-	if (!wishlist && playerId !== maid) return message.channel.send(`That user is not in the database.`)
+	if (!wishlist && playerId === maid) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
+	if (!wishlist && playerId !== maid) return message.channel.send({ content: `That user is not in the database.`})
 
 	if (!args.length || playerId !== maid) {
 		const prints = []
@@ -2504,8 +2503,8 @@ if(wishlistcom.includes(cmd)) {
 		prints.sort((a, b) => b.market_price - a.market_price)
 		const results = prints.map((print) => `${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
 
-		if (!results.length) return message.channel.send(`${playerId === maid ? 'Your' : `${wishlist.player.name}'s`} wishlist is empty.`)
-		else return message.channel.send(`**${wishlist.player.name}'s Wishlist**\n${results.join('\n')}`)
+		if (!results.length) return message.channel.send({ content: `${playerId === maid ? 'Your' : `${wishlist.player.name}'s`} wishlist is empty.`})
+		else return message.channel.send({ content: `**${wishlist.player.name}'s Wishlist**\n${results.join('\n')}`})
 	}
 
 	if (args[0] === 'e' || args[0] === 'clear' || args[0] === 'empty') {
@@ -2529,7 +2528,7 @@ if(wishlistcom.includes(cmd)) {
 		wishlist.slot_18 = null
 
 		await wishlist.save()
-		return message.channel.send(`Your wishlist has been emptied.`)
+		return message.channel.send({ content: `Your wishlist has been emptied.`})
 	}
 	
 	const inputs = args.join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim())
@@ -2540,7 +2539,7 @@ if(wishlistcom.includes(cmd)) {
 		const card_name = await findCard(query, fuzzyPrints)
 		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
 		if (!print) {
-			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+			message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
 			continue
 		}
 		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
@@ -2553,7 +2552,7 @@ if(wishlistcom.includes(cmd)) {
 			if (wishlist[key] === print.card_code) {
 				wishlist[key] = null
 				await wishlist.save()
-				message.channel.send(`You removed ${card} from your wishlist.`)
+				message.channel.send({ content: `You removed ${card} from your wishlist.`})
 				foundCopy = true
 				break
 			}
@@ -2568,13 +2567,13 @@ if(wishlistcom.includes(cmd)) {
 				success = true
 				wishlist[`slot_${i + 1}`] = print.card_code
 				await wishlist.save()
-				message.channel.send(`You added ${card} to your wishlist.`)
+				message.channel.send({ content: `You added ${card} to your wishlist.`})
 			} else {
 				i++
 			}
 		}
 
-		if (!success) return message.channel.send(`Your wishlist is full. Please remove a card or empty it to make room.`)
+		if (!success) return message.channel.send({ content: `Your wishlist is full. Please remove a card or empty it to make room.`})
 	}
 
 	return
@@ -2584,8 +2583,8 @@ if(wishlistcom.includes(cmd)) {
 if(walletcom.includes(cmd)) {
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
 	const wallet = await Wallet.findOne({ where: { playerId }, include: Player})
-	if (!wallet && playerId === maid) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
-	if (!wallet && playerId !== maid) return message.channel.send(`That user is not in the database.`)
+	if (!wallet && playerId === maid) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
+	if (!wallet && playerId !== maid) return message.channel.send({ content: `That user is not in the database.`})
 
 	const results = [`${FiC} --- ${wallet.player.name}'s Wallet --- ${FiC}`]
 	results.push(`Starchips: ${wallet.starchips}${starchips}`)
@@ -2606,7 +2605,7 @@ if(walletcom.includes(cmd)) {
 	if (wallet.familiar) results.push(`Familiars: ${wallet.familiar} ${familiar}`)
 	if (wallet.battery) results.push(`Batteries: ${wallet.battery} ${battery}`)
 
-	return message.channel.send(results.join('\n'))
+	return message.channel.send({ content: results.join('\n')})
 }
 
 //STATS
@@ -2617,8 +2616,8 @@ if (statscom.includes(cmd)) {
 		include: [Profile, Wallet] 
 	})
 
-	if (!player && maid === playerId) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
-	if (!player && maid !== playerId) return message.channel.send(`That user is not in the database.`)
+	if (!player && maid === playerId) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
+	if (!player && maid !== playerId) return message.channel.send({ content: `That user is not in the database.`})
 
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
 	: message.channel === client.channels.cache.get(pauperChannelId) ? "Pauper"
@@ -2643,7 +2642,7 @@ if (statscom.includes(cmd)) {
 		const medal = getMedal(player.stats, title = true)		
 		if (playerId === maid) completeTask(message.channel, maid, 'e4')
 		
-		return message.channel.send(
+		return message.channel.send({ content: 
 			`${FiC} --- Ranked Stats --- ${FiC}`
 			+ `\nName: ${player.name}`
 			+ `\nMedal: ${medal}`
@@ -2653,7 +2652,7 @@ if (statscom.includes(cmd)) {
 			+ `\nElo Rating: ${player.stats.toFixed(2)}`
 			+ `\nWins: ${player.wins}, Losses: ${player.losses}`
 			+ `\nWin Rate: ${player.wins || player.losses ? `${(100 * player.wins / (player.wins + player.losses)).toFixed(2)}%` : 'N/A'}`
-		)
+		})
 	} else if (game === 'Market') {
 		const transformed_wallets = []
 		const filtered_players = active_players.filter((player) => player.wallet && player.id !== merchbotId)
@@ -2674,7 +2673,7 @@ if (statscom.includes(cmd)) {
 		const iCount = await Inventory.count({ where: { playerId: playerId, quantity: { [Op.gt]: 0 }, draft: false } })
 		const tCount = await Trade.count({ where: { [Op.or]: [ { senderId: playerId }, { receiverId: playerId }] } })
 
-		return message.channel.send(
+		return message.channel.send({ content: 
 			`${king} --- Marketplace Stats --- ${king}`
 			+ `\nName: ${player.name}`
 			+ `\nRanking: ${rank}`
@@ -2682,7 +2681,7 @@ if (statscom.includes(cmd)) {
 			+ `\nPrints: ${iCount} out of ${pCount} ${ygocard}`
 			+ `\nTrades: ${tCount} ${robbed}`
 			+ `\nPartners: ${player.profile.trade_partners} ${merchant}`
-		)
+		})
 	} else if (game === 'Trivia') {
 		const transformed_knowledges = []
 
@@ -2706,12 +2705,12 @@ if (statscom.includes(cmd)) {
 		const rank = index !== null ? `#${index + 1} out of ${transformed_knowledges.length}` : `N/A`
 		const smarts = transformed_knowledges[index][1]
 		
-		return message.channel.send(
+		return message.channel.send({ content: 
 			`${no} --- Trivia Stats --- ${yes}`
 			+ `\nName: ${player.name}`
 			+ `\nRanking: ${rank}`
 			+ `\nCorrectly Answered: ${smarts} ${stoned}`
-		)
+		})
 	} else if (game === 'Arena') {
 		const filtered_players = active_players.filter((player) => player.arena_wins || player.arena_losses)
 		const sorted_players = filtered_players.sort((a, b) => {
@@ -2727,7 +2726,7 @@ if (statscom.includes(cmd)) {
 		const p = player.profile
 		const victories = getArenaVictories(p)
 
-		return message.channel.send(
+		return message.channel.send({ content: 
 			`${shrine} --- Arena Stats --- ${shrine}`
 			+ `\nName: ${player.name}`
 			+ `\nRanking: ${rank}`
@@ -2748,7 +2747,7 @@ if (statscom.includes(cmd)) {
 			+ `\nElo Rating: ${player.arena_stats.toFixed(2)}`
 			+ `\nWins: ${player.arena_wins}, Losses: ${player.arena_losses}`
 			+ `\nWin Rate: ${player.arena_wins || player.arena_losses ? `${(100 * player.arena_wins / (player.arena_wins + player.arena_losses)).toFixed(2)}%` : 'N/A'}`
-		)
+		})
 	} else if (game === 'Pauper') {
 		const filtered_players = active_players.filter((player) => player.pauper_wins || player.pauper_losses)
 		const sorted_players = filtered_players.sort((a, b) => b.pauper_stats - a.pauper_stats)
@@ -2756,7 +2755,7 @@ if (statscom.includes(cmd)) {
 		const rank = index !== null ? `#${index + 1} out of ${sorted_players.length}` : `N/A`
 		const medal = getMedal(player.pauper_stats, title = true)
 
-		return message.channel.send(
+		return message.channel.send({ content: 
 			`${com} --- Pauper Stats --- ${com}`
 			+ `\nName: ${player.name}`
 			+ `\nMedal: ${medal}`
@@ -2764,7 +2763,7 @@ if (statscom.includes(cmd)) {
 			+ `\nElo Rating: ${player.pauper_stats.toFixed(2)}`
 			+ `\nWins: ${player.pauper_wins}, Losses: ${player.pauper_losses}`
 			+ `\nWin Rate: ${player.pauper_wins || player.pauper_losses ? `${(100 * player.pauper_wins / (player.pauper_wins + player.pauper_losses)).toFixed(2)}%` : 'N/A'}`
-		)
+		})
 	} else if (game === 'Draft') {
 		const filtered_players = active_players.filter((player) => player.draft_wins || player.draft_losses)
 		const sorted_players = filtered_players.sort((a, b) => b.draft_stats - a.draft_stats)
@@ -2772,7 +2771,7 @@ if (statscom.includes(cmd)) {
 		const rank = index !== null ? `#${index + 1} out of ${sorted_players.length}` : `N/A`
 		const medal = getMedal(player.draft_stats, title = true)
 
-		return message.channel.send(
+		return message.channel.send({ content: 
 			`${draft} --- Draft Stats --- ${draft}`
 			+ `\nName: ${player.name}`
 			+ `\nMedal: ${medal}`
@@ -2780,25 +2779,25 @@ if (statscom.includes(cmd)) {
 			+ `\nElo Rating: ${player.draft_stats.toFixed(2)}`
 			+ `\nWins: ${player.draft_wins}, Losses: ${player.draft_losses}`
 			+ `\nWin Rate: ${player.draft_wins || player.draft_losses ? `${(100 * player.draft_wins / (player.draft_wins + player.draft_losses)).toFixed(2)}%` : 'N/A'}`
-		)
+		})
 	}
 }
 
 //LOSS
 if (losscom.includes(cmd)) {
 	const oppo = message.mentions.users.first() ? message.mentions.users.first().id : null	
-	if (!oppo) return message.channel.send(`No player specified.`)
-	if (oppo === maid) return message.channel.send(`You cannot lose a match to yourself.`)
+	if (!oppo) return message.channel.send({ content: `No player specified.`})
+	if (oppo === maid) return message.channel.send({ content: `You cannot lose a match to yourself.`})
 
 	const winner = message.guild.members.cache.get(oppo)
 	const loser = message.guild.members.cache.get(maid)
 	const winningPlayer = await Player.findOne({ where: { id: oppo }, include: [Diary, Wallet] })
 	const losingPlayer = await Player.findOne({ where: { id: maid }, include: [Diary, Wallet] })
 
-	if (winner.roles.cache.some(role => role.id === botRole)) return message.channel.send(`Sorry, Bots do not play Forged in Chaos... *yet*.`)
-	if (oppo.length < 17 || oppo.length > 18) return message.channel.send(`To report a loss, type **!loss @opponent**.`)
-	if (!losingPlayer) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
-	if (!winningPlayer) return message.channel.send(`That user is not in the database.`)
+	if (winner.roles.cache.some(role => role.id === botRole)) return message.channel.send({ content: `Sorry, Bots do not play Forged in Chaos... *yet*.`})
+	if (oppo.length < 17 || oppo.length > 18) return message.channel.send({ content: `To report a loss, type **!loss @opponent**.`})
+	if (!losingPlayer) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
+	if (!winningPlayer) return message.channel.send({ content: `That user is not in the database.`})
 	
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
 	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
@@ -2819,12 +2818,12 @@ if (losscom.includes(cmd)) {
 
 	if (hasTourRole && game === 'Tournament') {
 		const losingEntry = await Entry.findOne({ where: { playerId: losingPlayer.id }, include: Player })
-		if (!losingEntry) return message.channel.send(`You are not an active member of any tournaments.`)
+		if (!losingEntry) return message.channel.send({ content: `You are not an active member of any tournaments.`})
 
 		const winningEntry = await Entry.findOne({ where: { playerId: winningPlayer.id }, include: Player })
-		if (!winningEntry) return message.channel.send(`That person is not an active member of any tournaments.`)
+		if (!winningEntry) return message.channel.send({ content: `That person is not an active member of any tournaments.`})
 		const tournamentId = losingEntry.tournamentId
-		if (tournamentId !== winningEntry.tournamentId) return message.channel.send(`Sorry, you are not in the same tournament as ${winningPlayer.name}.`)
+		if (tournamentId !== winningEntry.tournamentId) return message.channel.send({ content: `Sorry, you are not in the same tournament as ${winningPlayer.name}.`})
 
 		const tournament = await Tournament.findOne({ 
 			where: { 
@@ -2832,9 +2831,9 @@ if (losscom.includes(cmd)) {
 			}
 		})
 
-		if (!tournament) return message.channel.send(`Sorry I could not find your tournament in the database.`)
-		if (tournament.state === 'pending') return message.channel.send(`Sorry, ${tournament.name} has not started yet.`)
-		if (tournament.state !== 'underway') return message.channel.send(`Sorry, ${tournament.name} is not underway.`)
+		if (!tournament) return message.channel.send({ content: `Sorry I could not find your tournament in the database.`})
+		if (tournament.state === 'pending') return message.channel.send({ content: `Sorry, ${tournament.name} has not started yet.`})
+		if (tournament.state !== 'underway') return message.channel.send({ content: `Sorry, ${tournament.name} is not underway.`})
 		const matchesArr = await getMatches(tournamentId)
 		let matchId = false
 		let scores = false
@@ -2849,7 +2848,7 @@ if (losscom.includes(cmd)) {
 		}
 		
 		const success = await putMatchResult(tournamentId, matchId, winningEntry.participantId, scores)
-		if (!success) return message.channel.send(`Error: could not update bracket for ${tournament.name}.`)
+		if (!success) return message.channel.send({ content: `Error: could not update bracket for ${tournament.name}.`})
 
 		losingEntry.losses++
 		await losingEntry.save()
@@ -2935,15 +2934,15 @@ if (losscom.includes(cmd)) {
 		if (winningPlayer.current_streak >= 3) completeTask(message.channel, winningPlayer.id, 'm2', 5000) 
 		if (winningPlayer.vanquished_foes >= 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
 		if (winningPlayer.current_streak >= 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
-		if (daily_bonus) setTimeout(() => message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned an additional +3${starchips} for your first ranked win of the day! ${legend}`), 2000)
+		if (daily_bonus) setTimeout(() => message.channel.send({ content: `<@${winningPlayer.id}>, Congrats! You earned an additional +3${starchips} for your first ranked win of the day! ${legend}`}), 2000)
 		if (pack_bonus) setTimeout(async () => {
 			const set1 = await Set.findOne({ where: { code: 'DOC' }})
 			const set2 = await Set.findOne({ where: { code: 'TEB' }})
 			await awardPack(message.channel, winningPlayer.id, set1)
 			await awardPack(message.channel, winningPlayer.id, set2)
-			message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned a bonus pack of DOC ${DOC} and TEB ${TEB} for your second ranked win of the day! ${god}`)
+			message.channel.send({ content: `<@${winningPlayer.id}>, Congrats! You earned a bonus pack of DOC ${DOC} and TEB ${TEB} for your second ranked win of the day! ${god}`})
 		}, 2000)
-		message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your Tournament loss to ${winningPlayer.name} (+${chipsWinner + diary_bonus}${starchips}) has been recorded.`)
+		message.channel.send({ content: `${losingPlayer.name} (+${chipsLoser}${starchips}), your Tournament loss to ${winningPlayer.name} (+${chipsWinner + diary_bonus}${starchips}) has been recorded.`})
 		
 		const updatedMatchesArr = await getMatches(tournamentId)
 		const winnerNextMatch = findNextMatch(updatedMatchesArr, matchId, winningEntry.participantId)
@@ -2968,35 +2967,35 @@ if (losscom.includes(cmd)) {
 		const loserWaitingOnP2 = loserMatchWaitingOn && loserMatchWaitingOn.p1 && loserMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournamentId, participantId: loserMatchWaitingOn.p2 }, include: Player }) : null
 
 		setTimeout(() => {
-			if (loserEliminated) return message.channel.send(`${losingPlayer.name}, You are eliminated from the tournament. Better luck next time!`)
-			else if (loserNextOpponent) return message.channel.send(`New Match: <@${losingPlayer.id}> vs. <@${loserNextOpponent.playerId}>. Good luck to both duelists.`)
+			if (loserEliminated) return message.channel.send({ content: `${losingPlayer.name}, You are eliminated from the tournament. Better luck next time!`})
+			else if (loserNextOpponent) return message.channel.send({ content: `New Match: <@${losingPlayer.id}> vs. <@${loserNextOpponent.playerId}>. Good luck to both duelists.`})
 			else if (loserMatchWaitingOn && loserWaitingOnP1 && loserWaitingOnP2) {
-				return message.channel.send(`${losingPlayer.name}, You are waiting for the result of ${loserWaitingOnP1.name} vs ${loserWaitingOnP2.name}.`)
+				return message.channel.send({ content: `${losingPlayer.name}, You are waiting for the result of ${loserWaitingOnP1.name} vs ${loserWaitingOnP2.name}.`})
 			}
-			else return message.channel.send(`${losingPlayer.name}, You are waiting for multiple matches to finish. Grab a snack and stay hydrated.`)
+			else return message.channel.send({ content: `${losingPlayer.name}, You are waiting for multiple matches to finish. Grab a snack and stay hydrated.`})
 		}, 2000)
 
 		setTimeout(() => {
-			if (!winnerNextMatch) return message.channel.send(`<@${winningPlayer.id}>, You won the tournament! Congratulations on your stellar performance! ${FiC}`)
-			else if (winnerNextOpponent) return message.channel.send(`New Match: <@${winningPlayer.id}> vs. <@${winnerNextOpponent.playerId}>. Good luck to both duelists.`)
+			if (!winnerNextMatch) return message.channel.send({ content: `<@${winningPlayer.id}>, You won the tournament! Congratulations on your stellar performance! ${FiC}`})
+			else if (winnerNextOpponent) return message.channel.send({ content: `New Match: <@${winningPlayer.id}> vs. <@${winnerNextOpponent.playerId}>. Good luck to both duelists.`})
 			else if (winnerMatchWaitingOn && winnerWaitingOnP1 && winnerWaitingOnP2) {
-				return message.channel.send(`${winningPlayer.name}, You are waiting for the result of ${winnerWaitingOnP1.name} vs ${winnerWaitingOnP2.name}.`)
+				return message.channel.send({ content: `${winningPlayer.name}, You are waiting for the result of ${winnerWaitingOnP1.name} vs ${winnerWaitingOnP2.name}.`})
 			}
-			else return message.channel.send(`${winningPlayer.name}, You are waiting for multiple matches to finish. Grab a snack and stay hydrated.`)
+			else return message.channel.send({ content: `${winningPlayer.name}, You are waiting for multiple matches to finish. Grab a snack and stay hydrated.`})
 		}, 4000)
 
 		return
 	} else if (!hasTourRole && game === 'Tournament') {
-		return message.channel.send(`You do not have the Tournament Players role. Please report your loss in the appropriate channel.`)
+		return message.channel.send({ content: `You do not have the Tournament Players role. Please report your loss in the appropriate channel.`})
 	} else if (hasArenaRole && game === 'Arena') {
 		const losingContestant = await Arena.findOne({ where: { playerId: maid }})
-		if (!losingContestant) return message.channel.send(`You are not in the current Arena.`)
+		if (!losingContestant) return message.channel.send({ content: `You are not in the current Arena.`})
 		const winningContestant = await Arena.findOne({ where: { playerId: oppo }})
-		if (!winningContestant) return message.channel.send(`That player is not your Arena opponent.`)
-		if (!losingContestant.is_playing || !winningContestant.is_playing) return message.channel.send(`Your match result was already recorded for this round of the Arena.`)
+		if (!winningContestant) return message.channel.send({ content: `That player is not your Arena opponent.`})
+		if (!losingContestant.is_playing || !winningContestant.is_playing) return message.channel.send({ content: `Your match result was already recorded for this round of the Arena.`})
 
 		const info = await Info.findOne({ where: { element: 'arena' } })
-		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
+		if (!info) return message.channel.send({ content: `Error: could not find game: "arena".`})
 		
 		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"]] :
             info.round === 2 ? [["P1", "P3"], ["P2", "P4"]] :
@@ -3013,7 +3012,7 @@ if (losscom.includes(cmd)) {
 			}
 		}
 
-		if (!correct_pairing) return message.channel.send(`That player is not your Arena opponent.`)
+		if (!correct_pairing) return message.channel.send({ content: `That player is not your Arena opponent.`})
 
 		const origStatsWinner = winningPlayer.arena_stats
 		const origStatsLoser = losingPlayer.arena_stats
@@ -3053,11 +3052,11 @@ if (losscom.includes(cmd)) {
 			chipsLoser: 3
 		})
 
-		message.channel.send(`${losingPlayer.name} (+3${starchips}), your Arena loss to ${winner.user.username} (+5${starchips}) has been recorded.`)
+		message.channel.send({ content: `${losingPlayer.name} (+3${starchips}), your Arena loss to ${winner.user.username} (+5${starchips}) has been recorded.`})
 		return checkArenaProgress(info)
 	} else if (!hasArenaRole && game === 'Arena') {
 		const voucher = await getTribe(message, winningPlayer)
-		if (!voucher) return message.channel.send(`Please have ${winningPlayer.name} specify their tribe.`)
+		if (!voucher) return message.channel.send({ content: `Please have ${winningPlayer.name} specify their tribe.`})
 		const origStatsWinner = winningPlayer.arena_stats
 		const origStatsLoser = losingPlayer.arena_stats
 		const delta = 20 * (1 - (1 - 1 / ( 1 + (Math.pow(10, ((origStatsWinner - origStatsLoser) / 400))))))
@@ -3090,18 +3089,18 @@ if (losscom.includes(cmd)) {
 			chipsLoser: 2
 		})
 
-		message.channel.send(`${losingPlayer.name} (+2${starchips}), your Arena loss to ${winner.user.username} (+3${starchips}, +1${eval(voucher)}) has been recorded.`)
+		message.channel.send({ content: `${losingPlayer.name} (+2${starchips}), your Arena loss to ${winner.user.username} (+3${starchips}, +1${eval(voucher)}) has been recorded.`})
 	} else if (hasArenaRole && game !== 'Arena') {
-		return message.channel.send(`You have the Arena Players role. Please report your Arena loss in <#${arenaChannelId}>, or get a Moderator to help you.`)
+		return message.channel.send({ content: `You have the Arena Players role. Please report your Arena loss in <#${arenaChannelId}>, or get a Moderator to help you.`})
 	} else if (hasDraftRole && game === 'Draft') {
 		const losingContestant = await Draft.findOne({ where: { playerId: maid }})
-		if (!losingContestant) return message.channel.send(`You are not in the current Draft.`)
+		if (!losingContestant) return message.channel.send({ content: `You are not in the current Draft.`})
 		const winningContestant = await Draft.findOne({ where: { playerId: oppo }})
-		if (!winningContestant) return message.channel.send(`That player is not your Draft opponent.`)
-		if (!losingContestant.is_playing || !winningContestant.is_playing) return message.channel.send(`Your match result was already recorded for this round of the Draft.`)
+		if (!winningContestant) return message.channel.send({ content: `That player is not your Draft opponent.`})
+		if (!losingContestant.is_playing || !winningContestant.is_playing) return message.channel.send({ content: `Your match result was already recorded for this round of the Draft.`})
 
 		const info = await Info.findOne({ where: { element: 'draft' } })
-		if (!info) return message.channel.send(`Error: could not find game: "draft".`)
+		if (!info) return message.channel.send({ content: `Error: could not find game: "draft".`})
 		
 		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"]] :
             info.round === 2 ? [["P1", "P3"], ["P2", "P4"]] :
@@ -3118,7 +3117,7 @@ if (losscom.includes(cmd)) {
 			}
 		}
 
-		if (!correct_pairing) return message.channel.send(`That player is not your Draft opponent.`)
+		if (!correct_pairing) return message.channel.send({ content: `That player is not your Draft opponent.`})
 
 		const origStatsWinner = winningPlayer.draft_stats
 		const origStatsLoser = losingPlayer.draft_stats
@@ -3158,12 +3157,12 @@ if (losscom.includes(cmd)) {
 			chipsLoser: 8
 		})
 
-		message.channel.send(`${losingPlayer.name} (+8${starchips}), your Draft loss to ${winner.user.username} (+15${starchips}) has been recorded.`)
+		message.channel.send({ content: `${losingPlayer.name} (+8${starchips}), your Draft loss to ${winner.user.username} (+15${starchips}) has been recorded.`})
 		return checkDraftProgress(info)
 	} else if (!hasDraftRole && game === 'Draft') {
-		return message.channel.send(`You do not have the Draft Players role. Please report your loss in the appropriate channel.`)
+		return message.channel.send({ content: `You do not have the Draft Players role. Please report your loss in the appropriate channel.`})
 	} else if (hasDraftRole && game !== 'Draft') {
-		return message.channel.send(`You have the Draft Players role. Please report your Draft loss in <#${draftChannelId}>, or get a Moderator to help you.`)
+		return message.channel.send({ content: `You have the Draft Players role. Please report your Draft loss in <#${draftChannelId}>, or get a Moderator to help you.`})
 	} else if (!hasArenaRole && !hasDraftRole && game === 'Pauper') {
 		const origStatsWinner = winningPlayer.pauper_stats
 		const origStatsLoser = losingPlayer.pauper_stats
@@ -3196,7 +3195,7 @@ if (losscom.includes(cmd)) {
 			chipsLoser: 2
 		})
 
-		return message.channel.send(`${losingPlayer.name} (+2${starchips}), your Pauper loss to ${winningPlayer.name} (+4${starchips}) has been recorded.`)
+		return message.channel.send({ content: `${losingPlayer.name} (+2${starchips}), your Pauper loss to ${winningPlayer.name} (+4${starchips}) has been recorded.`})
 	} else if (!hasArenaRole && game === 'Ranked') {
 		const diary = winningPlayer.diary
 		const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
@@ -3282,37 +3281,37 @@ if (losscom.includes(cmd)) {
 		if (winningPlayer.current_streak === 3) completeTask(message.channel, winningPlayer.id, 'm2', 5000) 
 		if (winningPlayer.vanquished_foes === 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
 		if (winningPlayer.current_streak === 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
-		if (daily_bonus) setTimeout(() => message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned an additional +3${starchips} for winning your 1st Ranked Match of the day! ${legend}`), 2000)
+		if (daily_bonus) setTimeout(() => message.channel.send({ content: `<@${winningPlayer.id}>, Congrats! You earned an additional +3${starchips} for winning your 1st Ranked Match of the day! ${legend}`}), 2000)
 		if (pack_bonus) setTimeout(async () => {
 			const set1 = await Set.findOne({ where: { code: 'DOC' }})
 			const set2 = await Set.findOne({ where: { code: 'TEB' }})
 			await awardPack(message.channel, winningPlayer.id, set1)
 			await awardPack(message.channel, winningPlayer.id, set2)
-			message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned a bonus pack of  DOC ${DOC} and TEB ${TEB} for your second ranked win of the day! ${god}`)
+			message.channel.send({ content: `<@${winningPlayer.id}>, Congrats! You earned a bonus pack of  DOC ${DOC} and TEB ${TEB} for your second ranked win of the day! ${god}`})
 		}, 2000)
-		return message.channel.send(`${losingPlayer.name} (+${chipsLoser}${starchips}), your loss to ${winningPlayer.name} (+${chipsWinner + diary_bonus}${starchips}) has been recorded.`)
+		return message.channel.send({ content: `${losingPlayer.name} (+${chipsLoser}${starchips}), your loss to ${winningPlayer.name} (+${chipsWinner + diary_bonus}${starchips}) has been recorded.`})
 	}
 }
 
 //MANUAL
 if (manualcom.includes(cmd)) {
-	if (!isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isMod(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
 
 	const usersMap = message.mentions.users
 	const userIds = [...usersMap.keys()]	
 	const winnerId = message.mentions.users.first() ? message.mentions.users.first().id : args.length > 0 ? args[0]	: null
 	const loserId = userIds.length > 1 ? userIds[1] : args.length > 1 ? args[1] : null	
-	if (!winnerId || !loserId) return message.channel.send(`Please specify 2 players.`)
-	if (winnerId === loserId) return message.channel.send(`Please specify 2 different players.`)
+	if (!winnerId || !loserId) return message.channel.send({ content: `Please specify 2 players.`})
+	if (winnerId === loserId) return message.channel.send({ content: `Please specify 2 different players.`})
 
 	const winner = message.guild.members.cache.get(winnerId)
 	const loser = message.guild.members.cache.get(loserId)
 	const winningPlayer = await Player.findOne({ where: { id: winnerId }, include: [Diary, Wallet] })
 	const losingPlayer = await Player.findOne({ where: { id: loserId }, include: [Diary, Wallet] })
 
-	if ((winner && winner.roles.cache.some(role => role.id === botRole)) || (loser && loser.roles.cache.some(role => role.id === botRole))) return message.channel.send(`Sorry, Bots do not play Forged in Chaos... *yet*.`)
-	if (!losingPlayer && loser) return message.channel.send(`Sorry, ${loser.user.username} is not in the database.`)
-	if (!losingPlayer && !loser) return message.channel.send(`Sorry, I cannot find user ${loserId} in the database.`)
+	if ((winner && winner.roles.cache.some(role => role.id === botRole)) || (loser && loser.roles.cache.some(role => role.id === botRole))) return message.channel.send({ content: `Sorry, Bots do not play Forged in Chaos... *yet*.`})
+	if (!losingPlayer && loser) return message.channel.send({ content: `Sorry, ${loser.user.username} is not in the database.`})
+	if (!losingPlayer && !loser) return message.channel.send({ content: `Sorry, I cannot find user ${loserId} in the database.`})
 	if (!winningPlayer) (`Sorry, ${winner.user.username} was not in the database.`)
 
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
@@ -3322,15 +3321,15 @@ if (manualcom.includes(cmd)) {
 	: "Ranked"
 
 	if ((winner && winner.roles.cache.some(role => role.id === arenaRole)) || (loser && loser.roles.cache.some(role => role.id === arenaRole))) {
-		if (game !== "Arena") return message.channel.send(`Please report this loss in: <#${arenaChannelId}>`)
+		if (game !== "Arena") return message.channel.send({ content: `Please report this loss in: <#${arenaChannelId}>`})
 		
 		const losingContestant = await Arena.findOne({ where: { playerId: loserId }})
-		if (!losingContestant) return message.channel.send(`You are not in the current Arena.`)
+		if (!losingContestant) return message.channel.send({ content: `You are not in the current Arena.`})
 		const winningContestant = await Arena.findOne({ where: { playerId: winnerId }})
-		if (!winningContestant) return message.channel.send(`That player is not the correct Arena opponent.`)
+		if (!winningContestant) return message.channel.send({ content: `That player is not the correct Arena opponent.`})
 
 		const info = await Info.findOne({ where: { element: 'arena' } })
-		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
+		if (!info) return message.channel.send({ content: `Error: could not find game: "arena".`})
 	
 		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"]] :
             info.round === 2 ? [["P1", "P3"], ["P2", "P4"]] :
@@ -3347,7 +3346,7 @@ if (manualcom.includes(cmd)) {
 			}
 		}
 
-		if (!correct_pairing) return message.channel.send(`That player is not the correct Arena opponent.`)
+		if (!correct_pairing) return message.channel.send({ content: `That player is not the correct Arena opponent.`})
 		
 		const origStatsWinner = winningPlayer.arena_stats
 		const origStatsLoser = losingPlayer.arena_stats
@@ -3387,18 +3386,18 @@ if (manualcom.includes(cmd)) {
 			chipsLoser: 3
 		})
 
-		message.channel.send(`A manual Arena loss by ${losingPlayer.name} (+3${starchips}) to ${winningPlayer.name} (+5${starchips}) has been recorded.`)
+		message.channel.send({ content: `A manual Arena loss by ${losingPlayer.name} (+3${starchips}) to ${winningPlayer.name} (+5${starchips}) has been recorded.`})
 		return checkArenaProgress(info)
 	} else if ((winner && winner.roles.cache.some(role => role.id === draftRole)) || (loser && loser.roles.cache.some(role => role.id === draftRole))) {
-		if (game !== "Draft") return message.channel.send(`Please report this loss in: <#${draftChannelId}>`)
+		if (game !== "Draft") return message.channel.send({ content: `Please report this loss in: <#${draftChannelId}>`})
 		
 		const losingContestant = await Draft.findOne({ where: { playerId: loserId }})
-		if (!losingContestant) return message.channel.send(`You are not in the current Draft.`)
+		if (!losingContestant) return message.channel.send({ content: `You are not in the current Draft.`})
 		const winningContestant = await Draft.findOne({ where: { playerId: winnerId }})
-		if (!winningContestant) return message.channel.send(`That player is not the correct Draft opponent.`)
+		if (!winningContestant) return message.channel.send({ content: `That player is not the correct Draft opponent.`})
 
 		const info = await Info.findOne({ where: { element: 'draft' } })
-		if (!info) return message.channel.send(`Error: could not find game: "draft".`)
+		if (!info) return message.channel.send({ content: `Error: could not find game: "draft".`})
 	
 		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"]] :
             info.round === 2 ? [["P1", "P3"], ["P2", "P4"]] :
@@ -3415,7 +3414,7 @@ if (manualcom.includes(cmd)) {
 			}
 		}
 
-		if (!correct_pairing) return message.channel.send(`That player is not your Draft opponent.`)
+		if (!correct_pairing) return message.channel.send({ content: `That player is not your Draft opponent.`})
 		
 		const origStatsWinner = winningPlayer.arena_stats
 		const origStatsLoser = losingPlayer.arena_stats
@@ -3455,7 +3454,7 @@ if (manualcom.includes(cmd)) {
 			chipsLoser: 8
 		})
 
-		message.channel.send(`A manual Draft loss by ${losingPlayer.name} (+8${starchips}) to ${winningPlayer.name} (+15${starchips}) has been recorded.`)
+		message.channel.send({ content: `A manual Draft loss by ${losingPlayer.name} (+8${starchips}) to ${winningPlayer.name} (+15${starchips}) has been recorded.`})
 		return checkDraftProgress(info)
 	} else if (game === 'Pauper') {
 		winningPlayer.pauper_wins++
@@ -3481,7 +3480,7 @@ if (manualcom.includes(cmd)) {
 			chipsLoser: 2
 		})
 
-		return message.channel.send(`A manual Pauper loss by ${losingPlayer.name} (+1${starchips}) to ${winningPlayer.name} (+3${starchips}) has been recorded.`)
+		return message.channel.send({ content: `A manual Pauper loss by ${losingPlayer.name} (+1${starchips}) to ${winningPlayer.name} (+3${starchips}) has been recorded.`})
 	} else {
 		const diary = winningPlayer.diary
 		const easy_complete = diary.e1 && diary.e2 && diary.e3 && diary.e4 && diary.e5 && diary.e6 && diary.e7 && diary.e8 && diary.e9 && diary.e10 && diary.e11 && diary.e12
@@ -3567,43 +3566,43 @@ if (manualcom.includes(cmd)) {
 		if (winningPlayer.current_streak === 3) completeTask(message.channel, winningPlayer.id, 'm2', 5000) 
 		if (winningPlayer.vanquished_foes === 20) completeTask(message.channel, winningPlayer.id, 'h2', 5000) 
 		if (winningPlayer.current_streak === 10) completeTask(message.channel, winningPlayer.id, 'l2', 5000)
-		if (daily_bonus) setTimeout(() => message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned an additional +3${starchips} for winning your 1st Ranked Match of the day! ${legend}`), 2000)
+		if (daily_bonus) setTimeout(() => message.channel.send({ content: `<@${winningPlayer.id}>, Congrats! You earned an additional +3${starchips} for winning your 1st Ranked Match of the day! ${legend}`}), 2000)
 		if (pack_bonus) setTimeout(async () => {
 			const set = await Set.findOne({ where: { code: 'DOC' }})
 			await awardPack(message.channel, winningPlayer.id, set)
-			message.channel.send(`<@${winningPlayer.id}>, Congrats! You earned a bonus pack of ${set.code} ${eval(set.code)} for your second ranked win of the day! ${god}`)
+			message.channel.send({ content: `<@${winningPlayer.id}>, Congrats! You earned a bonus pack of ${set.code} ${eval(set.code)} for your second ranked win of the day! ${god}`})
 		}, 2000)
-		return message.channel.send(`A manual loss by ${losingPlayer.name} (+${chipsLoser}${starchips}) to ${winningPlayer.name} (+${chipsWinner + diary_bonus}${starchips}) has been recorded.`)		
+		return message.channel.send({ content: `A manual loss by ${losingPlayer.name} (+${chipsLoser}${starchips}) to ${winningPlayer.name} (+${chipsWinner + diary_bonus}${starchips}) has been recorded.`})		
 	}
 }
 
 //NO SHOW
 if (noshowcom.includes(cmd)) {
-	if (!isMod(message.member)) return message.channel.send('You do not have permission to do that.')
+	if (!isMod(message.member)) return message.channel.send({ content: 'You do not have permission to do that.'})
 	const noShowId = message.mentions.users.first() ? message.mentions.users.first().id : null	
 	const noShowMember = message.mentions.members.first() || null	
-	if (!noShowId) return message.channel.send("Please specify a player.")
-	if (!noShowMember) return message.channel.send("Could not find member in the server.")
+	if (!noShowId) return message.channel.send({ content: "Please specify a player."})
+	if (!noShowMember) return message.channel.send({ content: "Could not find member in the server."})
 	const noShowPlayer = await Player.findOne({ where: { id: noShowId } })
-	if (!noShowPlayer) return message.channel.send(`That user is not in the database.`)
+	if (!noShowPlayer) return message.channel.send({ content: `That user is not in the database.`})
 
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
 	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
 	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
 	: null
 
-	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannelId}>.`)
+	if (!game) return message.channel.send({ content: `Try using **${cmd}** in channels like: <#${arenaChannelId}>.`})
 	
 	if (game === 'Tournament') {
 		const noShowEntry = await Entry.findOne({ where: { playerId: noShowId }, include: [Player, Tournament] })
 	
 		if (!noShowEntry || !noShowMember.roles.cache.some(role => role.id === tourRole)) {
-			return message.channel.send(`Sorry, ${noShow.user.username} is not in the tournament.`)
+			return message.channel.send({ content: `Sorry, ${noShow.user.username} is not in the tournament.`})
 		} 
 	
 		const tournament = noShowEntry.tournament
-		if (tournament.state === 'pending') return message.channel.send(`Sorry, ${tournament.name} has not started yet.`)
-		if (tournament.state !== 'underway') return message.channel.send(`Sorry, ${tournament.name} is not underway.`)
+		if (tournament.state === 'pending') return message.channel.send({ content: `Sorry, ${tournament.name} has not started yet.`})
+		if (tournament.state !== 'underway') return message.channel.send({ content: `Sorry, ${tournament.name} is not underway.`})
 		
 		const matchesArr = await getMatches(tournament.id)
 		let matchId = false
@@ -3620,15 +3619,15 @@ if (noshowcom.includes(cmd)) {
 		}
 
 		const winningEntry = await Entry.findOne({ where: { participantId: winnerParticipantId, tournamentId: tournament.id }, include: Player })
-		if (!winningEntry) return message.channel.send(`Error: could not find opponent.`)
+		if (!winningEntry) return message.channel.send({ content: `Error: could not find opponent.`})
 
 		const success = await putMatchResult(tournament.id, matchId, winningEntry.participantId, scores)
-		if (!success) return message.channel.send(`Error: could not update bracket for ${tournament.name}.`)
+		if (!success) return message.channel.send({ content: `Error: could not update bracket for ${tournament.name}.`})
 
 		noShowEntry.losses++
 		await noShowEntry.save()
 		
-		message.channel.send(`${noShowEntry.player.name}, your Tournament loss to ${winningEntry.player.name} has been recorded as a no-show.`)
+		message.channel.send({ content: `${noShowEntry.player.name}, your Tournament loss to ${winningEntry.player.name} has been recorded as a no-show.`})
 		
 		const updatedMatchesArr = await getMatches(tournament.id)
 		const winnerNextMatch = findNextMatch(updatedMatchesArr, matchId, winningEntry.participantId)
@@ -3653,30 +3652,30 @@ if (noshowcom.includes(cmd)) {
 		const noShowWaitingOnP2 = noShowMatchWaitingOn && noShowMatchWaitingOn.p1 && noShowMatchWaitingOn.p2 ? await Entry.findOne({ where: { tournamentId: tournament.id, participantId: noShowMatchWaitingOn.p2 }, include: Player }) : null
 
 		setTimeout(() => {
-			if (noShowEliminated) return message.channel.send(`${noShowPlayer.name}, You are eliminated from the tournament. Better luck next time!`)
-			else if (noShowNextOpponent) return message.channel.send(`New Match: <@${noShowPlayer.id}> vs. <@${noShowNextOpponent.playerId}>. Good luck to both duelists.`)
+			if (noShowEliminated) return message.channel.send({ content: `${noShowPlayer.name}, You are eliminated from the tournament. Better luck next time!`})
+			else if (noShowNextOpponent) return message.channel.send({ content: `New Match: <@${noShowPlayer.id}> vs. <@${noShowNextOpponent.playerId}>. Good luck to both duelists.`})
 			else if (noShowMatchWaitingOn && noShowWaitingOnP1 && noShowWaitingOnP2) {
-				return message.channel.send(`${noShowPlayer.name}, You are waiting for the result of ${noShowWaitingOnP1.name} vs ${noShowWaitingOnP2.name}.`)
+				return message.channel.send({ content: `${noShowPlayer.name}, You are waiting for the result of ${noShowWaitingOnP1.name} vs ${noShowWaitingOnP2.name}.`})
 			}
-			else return message.channel.send(`${noShowPlayer.name}, You are waiting for multiple matches to finish. Grab a snack and stay hydrated.`)
+			else return message.channel.send({ content: `${noShowPlayer.name}, You are waiting for multiple matches to finish. Grab a snack and stay hydrated.`})
 		}, 2000)
 
 		setTimeout(() => {
-			if (!winnerNextMatch) return message.channel.send(`<@${winningEntry.playerId}>, You won the tournament! Congratulations on your stellar performance! ${FiC}`)
-			else if (winnerNextOpponent) return message.channel.send(`New Match: <@${winningEntry.playerId}> vs. <@${winnerNextOpponent.playerId}>. Good luck to both duelists.`)
+			if (!winnerNextMatch) return message.channel.send({ content: `<@${winningEntry.playerId}>, You won the tournament! Congratulations on your stellar performance! ${FiC}`})
+			else if (winnerNextOpponent) return message.channel.send({ content: `New Match: <@${winningEntry.playerId}> vs. <@${winnerNextOpponent.playerId}>. Good luck to both duelists.`})
 			else if (winnerMatchWaitingOn && winnerWaitingOnP1 && winnerWaitingOnP2) {
-				return message.channel.send(`${winningEntry.player.name}, You are waiting for the result of ${winnerWaitingOnP1.name} vs ${winnerWaitingOnP2.name}.`)
+				return message.channel.send({ content: `${winningEntry.player.name}, You are waiting for the result of ${winnerWaitingOnP1.name} vs ${winnerWaitingOnP2.name}.`})
 			}
-			else return message.channel.send(`${winningEntry.player.name}, You are waiting for multiple matches to finish. Grab a snack and stay hydrated.`)
+			else return message.channel.send({ content: `${winningEntry.player.name}, You are waiting for multiple matches to finish. Grab a snack and stay hydrated.`})
 		}, 4000)
 	} else if (game === 'Arena') {
-		if (!noShowMember.roles.cache.some(role => role.id === arenaRole)) return message.channel.send(`${noShowPlayer.name} does not appear to have the Arena Players role.`)
+		if (!noShowMember.roles.cache.some(role => role.id === arenaRole)) return message.channel.send({ content: `${noShowPlayer.name} does not appear to have the Arena Players role.`})
 			
 		const noShowContestant = await Arena.findOne({ where: { playerId: noShowId }})
-		if (!noShowContestant) return message.channel.send(`That player is not in the current Arena.`)
+		if (!noShowContestant) return message.channel.send({ content: `That player is not in the current Arena.`})
 
 		const info = await Info.findOne({ where: { element: 'arena' } })
-		if (!info) return message.channel.send(`Error: could not find game: "arena".`)
+		if (!info) return message.channel.send({ content: `Error: could not find game: "arena".`})
 
 		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"]] :
 			info.round === 2 ? [["P1", "P3"], ["P2", "P4"]] :
@@ -3696,13 +3695,13 @@ if (noshowcom.includes(cmd)) {
 			}
 		}
 
-		if (!PX) return message.channel.send(`Could not find Arena opponent. Please try **!manual**.`)
+		if (!PX) return message.channel.send({ content: `Could not find Arena opponent. Please try **!manual**.`})
 			
 		const winningContestant = await Arena.findOne({ where: { contestant: PX }})
-		if (!winningContestant) return message.channel.send(`Could not find Arena opponent. Please try **!manual**.`)
+		if (!winningContestant) return message.channel.send({ content: `Could not find Arena opponent. Please try **!manual**.`})
 			
 		const winningPlayer = await Player.findOne({ where: { id: winningContestant.playerId }, include: Wallet })
-		if (!winningPlayer) return message.channel.send(`Could not find Arena opponent in the database.`)
+		if (!winningPlayer) return message.channel.send({ content: `Could not find Arena opponent in the database.`})
 	
 		noShowContestant.is_playing = false
 		await noShowContestant.save()
@@ -3714,16 +3713,16 @@ if (noshowcom.includes(cmd)) {
 		winningContestant.is_playing = false
 		await winningContestant.save()
 
-		message.channel.send(`A no-show by ${noShowPlayer.name} (+0${starchips}) to ${winningPlayer.name} (+5${starchips}) has been recorded.`)
+		message.channel.send({ content: `A no-show by ${noShowPlayer.name} (+0${starchips}) to ${winningPlayer.name} (+5${starchips}) has been recorded.`})
 		return checkArenaProgress(info)
 	} else if (game === 'Draft') {
-		if (!noShowMember.roles.cache.some(role => role.id === draftRole)) return message.channel.send(`${noShowPlayer.name} does not appear to have the Draft Players role.`)
+		if (!noShowMember.roles.cache.some(role => role.id === draftRole)) return message.channel.send({ content: `${noShowPlayer.name} does not appear to have the Draft Players role.`})
 			
 		const noShowContestant = await Draft.findOne({ where: { playerId: noShowId }})
-		if (!noShowContestant) return message.channel.send(`That player is not in the current Draft.`)
+		if (!noShowContestant) return message.channel.send({ content: `That player is not in the current Draft.`})
 
 		const info = await Info.findOne({ where: { element: 'draft' } })
-		if (!info) return message.channel.send(`Error: could not find game: "draft".`)
+		if (!info) return message.channel.send({ content: `Error: could not find game: "draft".`})
 
 		const pairings = info.round === 1 ? [["P1", "P2"], ["P3", "P4"]] :
 			info.round === 2 ? [["P1", "P3"], ["P2", "P4"]] :
@@ -3743,13 +3742,13 @@ if (noshowcom.includes(cmd)) {
 			}
 		}
 
-		if (!PX) return message.channel.send(`Could not find Draft opponent. Please try **!manual**.`)
+		if (!PX) return message.channel.send({ content: `Could not find Draft opponent. Please try **!manual**.`})
 			
 		const winningContestant = await Draft.findOne({ where: { contestant: PX }})
-		if (!winningContestant) return message.channel.send(`Could not find Draft opponent. Please try **!manual**.`)
+		if (!winningContestant) return message.channel.send({ content: `Could not find Draft opponent. Please try **!manual**.`})
 			
 		const winningPlayer = await Player.findOne({ where: { id: winningContestant.playerId }, include: Wallet })
-		if (!winningPlayer) return message.channel.send(`Could not find Draft opponent in the database.`)
+		if (!winningPlayer) return message.channel.send({ content: `Could not find Draft opponent in the database.`})
 	
 		noShowContestant.is_playing = false
 		await noShowContestant.save()
@@ -3761,7 +3760,7 @@ if (noshowcom.includes(cmd)) {
 		winningContestant.is_playing = false
 		await winningContestant.save()
 
-		message.channel.send(`A no-show by ${noShowPlayer.name} (+0${starchips}) to ${winningPlayer.name} (+15${starchips}) has been recorded.`)
+		message.channel.send({ content: `A no-show by ${noShowPlayer.name} (+0${starchips}) to ${winningPlayer.name} (+15${starchips}) has been recorded.`})
 		return checkDraftProgress(info)
 	}
 	
@@ -3782,16 +3781,16 @@ if (h2hcom.includes(cmd)) {
 	const player1Id = message.mentions.users.first() ? message.mentions.users.first().id : null	
 	const player2Id = userIds.length > 1 ? userIds[1] : maid	
 
-	if (!player1Id) return message.channel.send("Please specify at least 1 other player.")
-	if (player1Id === player2Id) return message.channel.send(`Please specify 2 different players.`)
+	if (!player1Id) return message.channel.send({ content: "Please specify at least 1 other player."})
+	if (player1Id === player2Id) return message.channel.send({ content: `Please specify 2 different players.`})
 
 	const player1 = await Player.findOne({ where: { id: player1Id } })
 	const player2 = await Player.findOne({ where: { id: player2Id } })
 	
-	if (!player1 && player2Id === maid) return message.channel.send(`That user is not in the database.`)
-	if (!player1 && player2Id !== maid) return message.channel.send(`The first user is not in the database.`)
-	if (!player2 && player2Id === maid) return message.channel.send(`You are not in the database.`)
-	if (!player2 && player2Id !== maid) return message.channel.send(`The second user is not in the database.`)
+	if (!player1 && player2Id === maid) return message.channel.send({ content: `That user is not in the database.`})
+	if (!player1 && player2Id !== maid) return message.channel.send({ content: `The first user is not in the database.`})
+	if (!player2 && player2Id === maid) return message.channel.send({ content: `You are not in the database.`})
+	if (!player2 && player2Id !== maid) return message.channel.send({ content: `The second user is not in the database.`})
 
 	const p1Wins = game_mode !== 'ranked' ? await Match.count({ where: { winnerId: player1Id, loserId: player2Id, game_mode: game_mode } }) :
 		await Match.count({ where: { winnerId: player1Id, loserId: player2Id, [Op.or]: [{ game_mode: 'ranked' }, { game_mode: 'tournament' }] } })
@@ -3799,9 +3798,9 @@ if (h2hcom.includes(cmd)) {
 	const p2Wins = game_mode !== 'ranked' ? await Match.count({ where: { winnerId: player2Id, loserId: player1Id, game_mode: game_mode } }) :
 		await Match.count({ where: { winnerId: player2Id, loserId: player1Id, [Op.or]: [{ game_mode: 'ranked' }, { game_mode: 'tournament' }] } })
 	
-	return message.channel.send(`${eval(emoji)} --- H2H ${capitalize(game_mode)} Results --- ${eval(emoji)}`+
+	return message.channel.send({ content: `${eval(emoji)} --- H2H ${capitalize(game_mode)} Results --- ${eval(emoji)}`+
 	`\n${player1.name} has won ${p1Wins}x`+
-	`\n${player2.name} has won ${p2Wins}x`)
+	`\n${player2.name} has won ${p2Wins}x`})
 }
 
 //UNDO
@@ -3820,7 +3819,7 @@ if (undocom.includes(cmd)) {
 	const losingPlayer = await Player.findOne({ where: { id: loserId }, include: Wallet })
 	
 	const prompt = (isMod(message.member) ? '' : ' Please get a Moderator to help you.')
-	if (maid !== loserId && !isMod(message.member)) return message.channel.send(`You did not participate in the last recorded match.${prompt}`)
+	if (maid !== loserId && !isMod(message.member)) return message.channel.send({ content: `You did not participate in the last recorded match.${prompt}`})
 
 	if (game_mode === 'arena') {
 		const winningContestant = await Arena.findOne({ where: { playerId: winnerId }})
@@ -3846,7 +3845,7 @@ if (undocom.includes(cmd)) {
 		await losingPlayer.wallet.save()
 	
 		await lastMatch.destroy()
-		return message.channel.send(`The last Arena match in which ${winningPlayer.name} (-${lastMatch.chipsWinner}${starchips}) defeated ${losingPlayer.name} (-${lastMatch.chipsLoser}${starchips}) has been erased.`)
+		return message.channel.send({ content: `The last Arena match in which ${winningPlayer.name} (-${lastMatch.chipsWinner}${starchips}) defeated ${losingPlayer.name} (-${lastMatch.chipsLoser}${starchips}) has been erased.`})
 	} if (game_mode === 'pauper') {
 		winningPlayer.arena_wins--
 		await winningPlayer.save()
@@ -3861,12 +3860,12 @@ if (undocom.includes(cmd)) {
 		await losingPlayer.wallet.save()
 	
 		await lastMatch.destroy()
-		return message.channel.send(`The last Pauper match in which ${winningPlayer.name} (-${lastMatch.chipsWinner}${starchips}) defeated ${losingPlayer.name} (-${lastMatch.chipsLoser}${starchips}) has been erased.`)
+		return message.channel.send({ content: `The last Pauper match in which ${winningPlayer.name} (-${lastMatch.chipsWinner}${starchips}) defeated ${losingPlayer.name} (-${lastMatch.chipsLoser}${starchips}) has been erased.`})
 	} else {
-		if (!winningPlayer.backup && maid !== loserId) return message.channel.send(`${winningPlayer.name} has no backup stats.${prompt}`)
-		if (!winningPlayer.backup && maid === loserId) return message.channel.send(`Your last opponent, ${winningPlayer.name}, has no backup stats.${prompt}`)
-		if (!losingPlayer.backup && maid !== loserId) return message.channel.send(`${losingPlayer.name} has no backup stats.${prompt}`)
-		if (!losingPlayer.backup && maid === loserId) return message.channel.send(`You have no backup stats.${prompt}`)
+		if (!winningPlayer.backup && maid !== loserId) return message.channel.send({ content: `${winningPlayer.name} has no backup stats.${prompt}`})
+		if (!winningPlayer.backup && maid === loserId) return message.channel.send({ content: `Your last opponent, ${winningPlayer.name}, has no backup stats.${prompt}`})
+		if (!losingPlayer.backup && maid !== loserId) return message.channel.send({ content: `${losingPlayer.name} has no backup stats.${prompt}`})
+		if (!losingPlayer.backup && maid === loserId) return message.channel.send({ content: `You have no backup stats.${prompt}`})
 	
 		winningPlayer.stats = winningPlayer.backup
 		winningPlayer.backup = null
@@ -3886,7 +3885,7 @@ if (undocom.includes(cmd)) {
 		await losingPlayer.wallet.save()
 	
 		await lastMatch.destroy()
-		return message.channel.send(`The last match in which ${winningPlayer.name} (-${lastMatch.chipsWinner}${starchips}) defeated ${losingPlayer.name} (-${lastMatch.chipsLoser}${starchips}) has been erased.`)
+		return message.channel.send({ content: `The last match in which ${winningPlayer.name} (-${lastMatch.chipsWinner}${starchips}) defeated ${losingPlayer.name} (-${lastMatch.chipsLoser}${starchips}) has been erased.`})
 	}
 }
 
@@ -3900,8 +3899,8 @@ if (rankcom.includes(cmd)) {
 	: "Ranked"
 	
 	const x = parseInt(args[0]) || 10
-	if (x < 1) return message.channel.send("Please provide a number greater than 0.")
-	if (x > 100 || isNaN(x)) return message.channel.send("Please provide a number less than or equal to 100.")
+	if (x < 1) return message.channel.send({ content: "Please provide a number greater than 0."})
+	if (x > 100 || isNaN(x)) return message.channel.send({ content: "Please provide a number less than or equal to 100."})
 	const membersMap = await message.guild.members.fetch()
 	const memberIds = [...membersMap.keys()]
 	const result = []
@@ -3918,7 +3917,7 @@ if (rankcom.includes(cmd)) {
 		})
 	
 		const filtered_players = allPlayers.filter((player) => memberIds.includes(player.id))
-		if (x > filtered_players.length) return message.channel.send(`I need a smaller number. We only have ${filtered_players.length} Forged players.`)
+		if (x > filtered_players.length) return message.channel.send({ content: `I need a smaller number. We only have ${filtered_players.length} Forged players.`})
 		const topPlayers = filtered_players.slice(0, x)
 		for (let i = 0; i < x; i++) result[i+1] = `${(i+1)}. ${getMedal(topPlayers[i].stats)} ${topPlayers[i].name}`
 	} else if (game === 'Market') {
@@ -3927,7 +3926,7 @@ if (rankcom.includes(cmd)) {
 		
 		const allWallets = await Wallet.findAll({ where: { playerId: { [Op.not]: merchbotId } }, include: Player })
 		const filtered_wallets = allWallets.filter((wallet) => memberIds.includes(wallet.playerId))
-		if (x > filtered_wallets.length) return message.channel.send(`I need a smaller number. We only have ${filtered_wallets.length} Forged players.`)
+		if (x > filtered_wallets.length) return message.channel.send({ content: `I need a smaller number. We only have ${filtered_wallets.length} Forged players.`})
 		const transformed_wallets = []
 
 		for (let i = 0; i < filtered_wallets.length; i++) {
@@ -3960,7 +3959,7 @@ if (rankcom.includes(cmd)) {
 		})
 	
 		const filtered_players = players.filter((player) => memberIds.includes(player.id))
-		if (x > filtered_players.length) return message.channel.send(`I need a smaller number. We only have ${filtered_players.length} Arena players.`)
+		if (x > filtered_players.length) return message.channel.send({ content: `I need a smaller number. We only have ${filtered_players.length} Arena players.`})
 		
 		const sorted_players = filtered_players.sort((a, b) => {
 			const difference = getArenaVictories(b.profile) - getArenaVictories(a.profile)
@@ -3989,7 +3988,7 @@ if (rankcom.includes(cmd)) {
 		})
 	
 		const filtered_players = players.filter((player) => memberIds.includes(player.id))
-		if (x > filtered_players.length) return message.channel.send(`I need a smaller number. We only have ${filtered_players.length} Pauper players.`)
+		if (x > filtered_players.length) return message.channel.send({ content: `I need a smaller number. We only have ${filtered_players.length} Pauper players.`})
 		filtered_players.sort((a, b) => b.pauper_stats - a.pauper_stats) 
 
 		const topProfiles = filtered_players.slice(0, x)
@@ -4026,7 +4025,7 @@ if (rankcom.includes(cmd)) {
 		console.log('transformed_knowledges', transformed_knowledges)
 
 		const filtered_knowledges = transformed_knowledges.filter((p) => memberIds.includes(p[1]))
-		if (x > filtered_knowledges.length) return message.channel.send(`I need a smaller number. We only have ${filtered_knowledges.length} Trivia players.`)
+		if (x > filtered_knowledges.length) return message.channel.send({ content: `I need a smaller number. We only have ${filtered_knowledges.length} Trivia players.`})
 		filtered_knowledges.sort((a, b) => b[2] - a[2])
 		const topBookworms = filtered_knowledges.slice(0, x)
 
@@ -4047,7 +4046,7 @@ if (rankcom.includes(cmd)) {
 		})
 	
 		const filtered_players = players.filter((player) => memberIds.includes(player.id))
-		if (x > filtered_players.length) return message.channel.send(`I need a smaller number. We only have ${filtered_players.length} Draft players.`)
+		if (x > filtered_players.length) return message.channel.send({ content: `I need a smaller number. We only have ${filtered_players.length} Draft players.`})
 		filtered_players.sort((a, b) => b.draft_stats - a.draft_stats) 
 
 		const topProfiles = filtered_players.slice(0, x)
@@ -4058,10 +4057,10 @@ if (rankcom.includes(cmd)) {
 		} 
 	} 
 
-	message.channel.send(result.slice(0, 11))
-	if (result.length > 11) message.channel.send(result.slice(11, 41))
-	if (result.length > 41) message.channel.send(result.slice(41, 71))
-	if (result.length > 71) message.channel.send(result.slice(71))
+	message.channel.send({ content: result.slice(0, 11)})
+	if (result.length > 11) message.channel.send({ content: result.slice(11, 41)})
+	if (result.length > 41) message.channel.send({ content: result.slice(41, 71)})
+	if (result.length > 71) message.channel.send({ content: result.slice(71)})
 	return
 }
     
@@ -4069,30 +4068,30 @@ if (rankcom.includes(cmd)) {
 if(queuecom.includes(cmd)) {
 	if (message.channel === client.channels.cache.get(arenaChannelId)) {
 		const queue = await Arena.findAll({ include: Player })
-		if (!queue.length) return message.channel.send(`The Arena queue is empty.`)
+		if (!queue.length) return message.channel.send({ content: `The Arena queue is empty.`})
 		const results = []
 		queue.forEach((row) => {
 			results.push(row.player.name)
 		})
-		return message.channel.send(results.join("\n"))
+		return message.channel.send({ content: results.join("\n")})
 	} else if (message.channel === client.channels.cache.get(draftChannelId)) {
 		const queue = await Draft.findAll({ where: { active: false }, include: Player })
-		if (!queue.length) return message.channel.send(`The Draft queue is empty.`)
+		if (!queue.length) return message.channel.send({ content: `The Draft queue is empty.`})
 		const results = []
 		queue.forEach((row) => {
 			results.push(row.player.name)
 		})
-		return message.channel.send(results.join("\n"))
+		return message.channel.send({ content: results.join("\n")})
 	} else if (message.channel === client.channels.cache.get(triviaChannelId)) {
 		const queue = await Trivia.findAll({ include: Player })
-		if (!queue.length) return message.channel.send(`The Trivia queue is empty.`)
+		if (!queue.length) return message.channel.send({ content: `The Trivia queue is empty.`})
 		const results = []
 		queue.forEach((row) => {
 			results.push(row.player.name)
 		})
-		return message.channel.send(results.join("\n"))
+		return message.channel.send({ content: results.join("\n")})
 	} else {
-		return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannelId}> or <#${triviaChannelId}>.`)
+		return message.channel.send({ content: `Try using **${cmd}** in channels like: <#${arenaChannelId}> or <#${triviaChannelId}>.`})
 	}
 }
 
@@ -4100,7 +4099,7 @@ if(queuecom.includes(cmd)) {
 //JOIN
 if(joincom.includes(cmd)) {
 	const mention = message.mentions.members.first()
-    if (isMod(message.member) && mention) return message.channel.send(`Please type **!signup @user** to register someone else for the tournament.`)
+    if (isMod(message.member) && mention) return message.channel.send({ content: `Please type **!signup @user** to register someone else for the tournament.`})
         
 	const member = message.member
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
@@ -4109,20 +4108,20 @@ if(joincom.includes(cmd)) {
 	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
 	: null
 
-	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannelId}> or <#${triviaChannelId}>.`)
+	if (!game) return message.channel.send({ content: `Try using **${cmd}** in channels like: <#${arenaChannelId}> or <#${triviaChannelId}>.`})
 	
 	const player = await Player.findOne({ where: { id: maid }})
-	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!player) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
 
 	if (game === 'Tournament') {
         const tournaments = await Tournament.findAll({ where: { state: 'pending' }, order: [['createdAt', 'ASC']] })
         const count = await Tournament.count({ where: { state: 'underway' } })
         const tournament = await selectTournament(message, tournaments, maid)
-        if (!tournament && count) return message.channel.send(`Sorry, the tournament already started.`)
-        if (!tournament && !count) return message.channel.send(`There is no active tournament.`)
+        if (!tournament && count) return message.channel.send({ content: `Sorry, the tournament already started.`})
+        if (!tournament && !count) return message.channel.send({ content: `There is no active tournament.`})
         const entry = await Entry.findOne({ where: { playerId: maid, tournamentId: tournament.id } })
 		
-        message.channel.send(`Please check your DMs.`)
+        message.channel.send({ content: `Please check your DMs.`})
         const dbName = player.duelingBook ? player.duelingBook : await askForDBName(message.member, player)
         if (!dbName) return
         const deckListUrl = await getDeckList(message.member, player, tournament.name, resubmission = false)
@@ -4135,7 +4134,7 @@ if(joincom.includes(cmd)) {
 											
         if (!entry) {                                  
             const { participant } = await postParticipant(tournament, player)
-            if (!participant) return message.channel.send(`Error: Could not access tournament: ${tournament.name}`)
+            if (!participant) return message.channel.send({ content: `Error: Could not access tournament: ${tournament.name}`})
             
 			await Entry.create({
 				pilot: player.name,
@@ -4149,8 +4148,8 @@ if(joincom.includes(cmd)) {
 			})
 
 			member.roles.add(tourRole)
-			message.author.send(`Thanks! I have all the information we need from you. Good luck in the tournament!`)
-			return client.channels.cache.get(tournamentChannelId).send(`<@${player.id}> is now registered for ${tournament.name}!`)
+			message.author.send({ content: `Thanks! I have all the information we need from you. Good luck in the tournament!`})
+			return client.channels.cache.get(tournamentChannelId).send({ content: `<@${player.id}> is now registered for ${tournament.name}!`})
 		} else {
             await entry.update({
                 url: deckListUrl,
@@ -4159,24 +4158,24 @@ if(joincom.includes(cmd)) {
                 category: deckCategory
             })
     
-            message.author.send(`Thanks! I have your updated deck list for the tournament.`)
-            return client.channels.cache.get(tournamentChannelId).send(`<@${player.id}> resubmitted their deck list for ${tournament.name}!`)
+            message.author.send({ content: `Thanks! I have your updated deck list for the tournament.`})
+            return client.channels.cache.get(tournamentChannelId).send({ content: `<@${player.id}> resubmitted their deck list for ${tournament.name}!`})
         }
 	}
 
 	const alreadyIn = await eval(game).count({ where: { playerId: maid} })
 	const info = await Info.findOne({ where: { element: game.toLowerCase() } })
-	if (!info) return message.channel.send(`Could not find game-mode: "${game}".`)
-	if (info.status !== 'pending' && game !== 'Trivia') return message.channel.send(`Sorry, the ${game} already started.`)
+	if (!info) return message.channel.send({ content: `Could not find game-mode: "${game}".`})
+	if (info.status !== 'pending' && game !== 'Trivia') return message.channel.send({ content: `Sorry, the ${game} already started.`})
 
 	if (!alreadyIn) {
 		const count = await eval(game).count()
 		if (game === 'Arena' && count >= 4 || game === 'Draft' && count >= 4) {
-			return message.channel.send(`Sorry, ${player.name}, the ${game} is full.`)
+			return message.channel.send({ content: `Sorry, ${player.name}, the ${game} is full.`})
 		} 
 
 		const entry = await eval(game).create({ playerId: maid })
-		message.channel.send(`You joined the ${game} queue.`)
+		message.channel.send({ content: `You joined the ${game} queue.`})
 		
 		if (game === 'Arena' && count === 3) {
 			info.status = 'confirming'
@@ -4199,7 +4198,7 @@ if(joincom.includes(cmd)) {
 			}
 		}
 	} else {
-		return message.channel.send(`You were already in the ${game} queue.`)
+		return message.channel.send({ content: `You were already in the ${game} queue.`})
 	}
 }
 
@@ -4216,27 +4215,27 @@ if (cmd === `!reset`) {
 		const time_diff = player.last_reset ? date.getTime() - player.last_reset.getTime() : date.getTime() - player.createdAt.getTime()
 		const days = Math.floor(time_diff / (24 * 60 * 60 * 1000))
 		if (player.last_reset && days < 30) {
-			return message.channel.send(`Sorry, you cannot reset your account for another ${days === 29 ? 'day' : `${30 - days} days` }.`)
+			return message.channel.send({ content: `Sorry, you cannot reset your account for another ${days === 29 ? 'day' : `${30 - days} days` }.`})
 		} else {
 			const info = await Info.findOne({ where: { element: 'shop'} })
-			if (info.status === 'closed') return message.channel.send(`Sorry, you cannot reset your account while The Shop is closed.`)
+			if (info.status === 'closed') return message.channel.send({ content: `Sorry, you cannot reset your account while The Shop is closed.`})
 			const confirmation1 = await getResetConfirmation(message, attempt = 1)
 			if (!confirmation1) return
 			const confirmation2 = await getResetConfirmation(message, attempt = 2)
 			if (!confirmation2) return
 			const confirmation3 = await getResetConfirmation(message, attempt = 3)
 			if (!confirmation3) return
-			message.channel.send(`Resetting account. Please wait...`)
+			message.channel.send({ content: `Resetting account. Please wait...`})
 			return resetPlayer(message, player) 
 		}
 	} else {
-		if (!isAmbassador(message.member) ) return message.channel.send('You do not have permission to do that.')
+		if (!isAmbassador(message.member) ) return message.channel.send({ content: 'You do not have permission to do that.'})
 
 		const info = await Info.findOne({ where: { element: game.toLowerCase() }})
-		if (!info) return message.channel.send(`Could not find game-mode: "${game}".`)
+		if (!info) return message.channel.send({ content: `Could not find game-mode: "${game}".`})
 	
 		const entries = await eval(game).findAll()
-		if (!entries) return message.channel.send(`Could not find any entries for: "${game}".`)
+		if (!entries) return message.channel.send({ content: `Could not find any entries for: "${game}".`})
 	
 		if (game === 'Arena') {
 			resetArena(info, entries)
@@ -4246,63 +4245,63 @@ if (cmd === `!reset`) {
 			resetTrivia(info, entries)
 		}
 	
-		return message.channel.send(`${game === 'Trivia' ? 'Trivia' : `The ${game}`} has been reset.`)
+		return message.channel.send({ content: `${game === 'Trivia' ? 'Trivia' : `The ${game}`} has been reset.`})
 	}
 }
 
 //RESUME
 if (cmd === `!resume`) {
-	if (!isAmbassador(message.member)) return message.channel.send('You do not have permission to do that.')
+	if (!isAmbassador(message.member)) return message.channel.send({ content: 'You do not have permission to do that.'})
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
 	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
 	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
 	: null
 
-	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannelId}> or <#${triviaChannelId}>.`)
+	if (!game) return message.channel.send({ content: `Try using **${cmd}** in channels like: <#${arenaChannelId}> or <#${triviaChannelId}>.`})
 	const role = game === 'Trivia' ? triviaRole : game === 'Arena' ? arenaRole : null
 
 	const info = await Info.findOne({ where: { element: game.toLowerCase() }})
-	if (!info) return message.channel.send(`Could not find game-mode: "${game}".`)
+	if (!info) return message.channel.send({ content: `Could not find game-mode: "${game}".`})
 
 	const entries = await eval(game).findAll({ include: Player })
-	if (!entries) return message.channel.send(`Could not find any entries for: "${game}".`)
+	if (!entries) return message.channel.send({ content: `Could not find any entries for: "${game}".`})
 
 	if (game === 'Arena') {
 		startRound(info, entries)
-		return message.channel.send(`<@&${role}>, The Arena can now resume.`)
+		return message.channel.send({ content: `<@&${role}>, The Arena can now resume.`})
 	} if (game === 'Draft') {
 		if (info.status === 'drafting') {
 			setTimeout(async() => draftCards(fuzzyPrints), 30000)
-			return message.channel.send(`<@&${role}>, The Draft will resume in 30 seconds.`)
+			return message.channel.send({ content: `<@&${role}>, The Draft will resume in 30 seconds.`})
 		} else if (info.status === 'playing') {
 			startDraftRound(info, entries)
-			return message.channel.send(`<@&${role}>, The Draft can now resume.`)
+			return message.channel.send({ content: `<@&${role}>, The Draft can now resume.`})
 		}
 	} else if (game === 'Trivia') {
 		const triviaArr = Object.entries(trivia)
 		const questionsArr = getRandomSubset(triviaArr, 10)
 		setTimeout(() => askQuestion(info, questionsArr), 30000)
-		return message.channel.send(`<@&${role}>, Trivia will resume in 30 seconds.`)
+		return message.channel.send({ content: `<@&${role}>, Trivia will resume in 30 seconds.`})
 	}
 }
 
 //END
 if (cmd === `!end`) {
-	if (!isAmbassador(message.member)) return message.channel.send('You do not have permission to do that.')
+	if (!isAmbassador(message.member)) return message.channel.send({ content: 'You do not have permission to do that.'})
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
 	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
 	: message.channel === client.channels.cache.get(triviaChannelId) ? "Trivia"
 	: message.channel === client.channels.cache.get(draftChannelId) ? "Draft"
 	: "Tournament"
 
-	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${arenaChannelId}>, <#${tournamentChannelId}> or <#${triviaChannelId}>.`)
+	if (!game) return message.channel.send({ content: `Try using **${cmd}** in channels like: <#${arenaChannelId}>, <#${tournamentChannelId}> or <#${triviaChannelId}>.`})
 	const role = game === 'Trivia' ? triviaRole : game === 'Arena' ? arenaRole : game === 'Tournament' ? tourRole : null
 	
 	if (game === 'Tournament') {
-		if (!args.length) return message.channel.send(`Please specify the name of the tournament you wish to end.`)
+		if (!args.length) return message.channel.send({ content: `Please specify the name of the tournament you wish to end.`})
 		const name = args[0]
 		const tournament = await Tournament.findOne({ where: { name: { [Op.iLike]: name } } })
-		if (!tournament) return message.channel.send(`Could not find tournament: "${name}".`)
+		if (!tournament) return message.channel.send({ content: `Could not find tournament: "${name}".`})
 
 		const { status } = await axios({
 			method: 'post',
@@ -4326,18 +4325,18 @@ if (cmd === `!end`) {
 			}
 
 			await tournament.destroy()
-			return message.channel.send(`Congrats! The results of ${tournament.name} ${FiC} have been finalized.`)
+			return message.channel.send({ content: `Congrats! The results of ${tournament.name} ${FiC} have been finalized.`})
 		} else {
-			return message.channel.send(`Unable to finalize ${tournament.name} ${FiC} on Challonge.com.`)
+			return message.channel.send({ content: `Unable to finalize ${tournament.name} ${FiC} on Challonge.com.`})
 		}
 
 	}
 
 	const info = await Info.findOne({ where: { element: game.toLowerCase() }})
-	if (!info) return message.channel.send(`Could not find game-mode: "${game}".`)
+	if (!info) return message.channel.send({ content: `Could not find game-mode: "${game}".`})
 
 	const entries = await eval(game).findAll()
-	if (!entries) return message.channel.send(`Could not find any entries for: "${game}".`)
+	if (!entries) return message.channel.send({ content: `Could not find any entries for: "${game}".`})
 
 	if (game === 'Arena') {
 		endArena(info, entries)
@@ -4347,7 +4346,7 @@ if (cmd === `!end`) {
 		endTrivia(info, entries)
 	}
 
-	return message.channel.send(`${role ? `<@&${role}>, ` : ''} ${game === 'Trivia' ? 'Trivia has come to an end.' : `The ${game} has come to an end.`}`)
+	return message.channel.send({ content: `${role ? `<@&${role}>, ` : ''} ${game === 'Trivia' ? 'Trivia has come to an end.' : `The ${game} has come to an end.`}`})
 }
 
 //DROP
@@ -4360,13 +4359,13 @@ if(dropcom.includes(cmd)) {
 
 	const role = game === 'Arena' ? arenaRole : game === 'Trivia' ? triviaRole : game === 'Draft' ? draftRole : game === 'Tournament' ? tourRole : null
 
-	if (!game) return message.channel.send(
+	if (!game) return message.channel.send({ content: 
 		`Try using **${cmd}** in channels like: <#${arenaChannelId}>, <#${tournamentChannelId}>, <#${triviaChannelId}> or <#${draftChannelId}>.`
-		)
+	})
 	
 	if (game === 'Tournament') {
 		const entry = await Entry.findOne({ where: { playerId: maid }, include: [Player, Tournament]})
-		if (!entry) return message.channel.send(`You are not in any tournaments.`)
+		if (!entry) return message.channel.send({ content: `You are not in any tournaments.`})
 		const tournament = entry.tournament
 		return removeParticipant(message, message.member, entry, tournament, drop = true)
 	}
@@ -4376,23 +4375,23 @@ if(dropcom.includes(cmd)) {
 
 	if (info.status === 'pending' && entry) {
 		await entry.destroy()
-		return message.channel.send(`You are no longer in the ${game} queue.`)
+		return message.channel.send({ content: `You are no longer in the ${game} queue.`})
 	} else if (info.status === 'active' && entry) {
 		entry.active = false
 		await entry.save()
 		message.member.roles.remove(role)
-		return message.channel.send(`<@${maid}> dropped out of ${game === 'Trivia' ? '' : 'the '}${game}.`)
+		return message.channel.send({ content: `<@${maid}> dropped out of ${game === 'Trivia' ? '' : 'the '}${game}.`})
 	} else if (info.status === 'confirming' && entry) {
-		return message.channel.send(`You cannot drop during the confirmation process.`)
+		return message.channel.send({ content: `You cannot drop during the confirmation process.`})
 	} else {
-		return message.channel.send(`You were not in the ${game} queue.`)
+		return message.channel.send({ content: `You were not in the ${game} queue.`})
 	}
 }
 
 
 //REMOVE
 if (cmd.toLowerCase() === `!remove`) {
-	if (!isAmbassador(message.member)) return message.channel.send('You do not have permission to do that.')
+	if (!isAmbassador(message.member)) return message.channel.send({ content: 'You do not have permission to do that.'})
 	const member = message.mentions.members.first()
 	const playerId = member && member.user ? member.user.id : null
 	const game = message.channel === client.channels.cache.get(arenaChannelId) ? "Arena"
@@ -4401,12 +4400,12 @@ if (cmd.toLowerCase() === `!remove`) {
 	: message.channel === client.channels.cache.get(tournamentChannelId) ? "Tournament"
 	: null
 
-	if (!game) return message.channel.send(`Try using **${cmd}** in channels like: <#${tournamentChannelId}>, <#${arenaChannelId}> or <#${triviaChannelId}>.`)
-	if (!playerId) return message.channel.send(`Please specify the player you wish to remove from ${game !== 'Trivia' ? 'the' : ''} ${game}.`)
+	if (!game) return message.channel.send({ content: `Try using **${cmd}** in channels like: <#${tournamentChannelId}>, <#${arenaChannelId}> or <#${triviaChannelId}>.`})
+	if (!playerId) return message.channel.send({ content: `Please specify the player you wish to remove from ${game !== 'Trivia' ? 'the' : ''} ${game}.`})
 
 	if (game === 'Tournament') {
 		const entry = await Entry.findOne({ where: { playerId }, include: [Player, Tournament]})
-		if (!entry) return message.channel.send(`That user is not in a tournament.`)
+		if (!entry) return message.channel.send({ content: `That user is not in a tournament.`})
 		const tournament = entry.tournament
 
 		return removeParticipant(message, member, entry, tournament, drop = false)
@@ -4415,18 +4414,18 @@ if (cmd.toLowerCase() === `!remove`) {
 	const entry = await eval(game).findOne({ where: { playerId } })
 	if (entry) {
 		await entry.destroy()
-		return message.channel.send(`${member.user.username} has been removed from the ${game} queue.`)
+		return message.channel.send({ content: `${member.user.username} has been removed from the ${game} queue.`})
 	} else {
-		return message.channel.send(`${member.user.username} was not in the ${game} queue.`)
+		return message.channel.send({ content: `${member.user.username} was not in the ${game} queue.`})
 	}
 }
 
 //CREATE 
 if (cmd === `!create`) {
-	if (!isAdmin(message.member)) return message.channel.send('You do not have permission to do that.')
-	if (!args.length) return message.channel.send(`Please provide a name for the new tournament.`)
+	if (!isAdmin(message.member)) return message.channel.send({ content: 'You do not have permission to do that.'})
+	if (!args.length) return message.channel.send({ content: `Please provide a name for the new tournament.`})
 	const tournament_type = await getTournamentType(message)
-	if (!tournament_type) return message.channel.send(`Please select a valid tournament type.`)
+	if (!tournament_type) return message.channel.send({ content: `Please select a valid tournament type.`})
 	const str = generateRandomString(10, '0123456789abcdefghijklmnopqrstuvwxyz')
 	const name = args[0].replace(/[^\w\s]/gi, "_").replace(/ /g,'')
 	
@@ -4462,12 +4461,12 @@ if (cmd === `!create`) {
 				console.log(`made new directory: ./decks/${name}`)
 			})
 
-			return message.channel.send(
+			return message.channel.send({ content: 
 				`You created a new tournament:` + 
 				`\nName: ${data.tournament.name} ${FiC}` + 
 				`\nType: ${capitalize(data.tournament.tournament_type)}` +
 				`\nBracket: https://challonge.com/${data.tournament.url}`
-			)
+			})
 		} 
 	} catch (err) {
 		console.log(err)
@@ -4503,16 +4502,16 @@ if (cmd === `!create`) {
 					console.log(`made new directory: ./decks/${name}`)
 				})
 				
-				return message.channel.send(
+				return message.channel.send({ content: 
 					`You created a new tournament:` + 
 					`\nName: ${data.tournament.name} ${FiC}` + 
 					`\nType: ${capitalize(data.tournament.tournament_type)}` +
 					`\nBracket: https://challonge.com/${data.tournament.url}`
-				)
+				})
 			} 
 		} catch (err) {
 			console.log(err)
-			return message.channel.send(`Unable to create tournament on Challonge.com.`)
+			return message.channel.send({ content: `Unable to create tournament on Challonge.com.`})
 		}
 	}
 }
@@ -4530,18 +4529,18 @@ if (bracketcom.includes(cmd)) {
 		)
 	}
 
-	return message.channel.send(results.join('\n\n'))
+	return message.channel.send({ content: results.join('\n\n')})
 }
 
 
 //DESTROY
 if (cmd === `!destroy`) {
-	if (!isAdmin(message.member)) return message.channel.send('You do not have permission to do that.')
-	if (!args.length) return message.channel.send(`Please specify the name of the tournament you wish to destroy.`)
+	if (!isAdmin(message.member)) return message.channel.send({ content: 'You do not have permission to do that.'})
+	if (!args.length) return message.channel.send({ content: `Please specify the name of the tournament you wish to destroy.`})
 
 	const name = args[0]
 	const tournament = await Tournament.findOne({ where: { name: { [Op.iLike]: name } } })
-	if (!tournament) return message.channel.send(`Could not find tournament: "${name}".`)
+	if (!tournament) return message.channel.send({ content: `Could not find tournament: "${name}".`})
 	const tournamentId = tournament.id
 
 	try {
@@ -4567,12 +4566,12 @@ if (cmd === `!destroy`) {
 			}
 	
 			await tournament.destroy()
-			return message.channel.send(`Yikes! You deleted ${tournament.name} ${FiC} from your Challonge account.`)
+			return message.channel.send({ content: `Yikes! You deleted ${tournament.name} ${FiC} from your Challonge account.`})
 		} else {
-			return message.channel.send(`Unable to delete tournament from Challonge account.`)
+			return message.channel.send({ content: `Unable to delete tournament from Challonge account.`})
 		}
 	} catch (err) {
-		return message.channel.send(`Error: Unable to delete tournament from Challonge account.`)
+		return message.channel.send({ content: `Error: Unable to delete tournament from Challonge account.`})
 	}
 }
 
@@ -4580,31 +4579,31 @@ if (cmd === `!destroy`) {
 //GRIND
 if(cmd === `!grind`) {
 	const x = parseInt(args[0])
-	if (!x || isNaN(x)) return message.channel.send(`Please provide the number of ${starchips} that you wish to grind to ${stardust}.`)
-	if (x < 1) return message.channel.send(`You cannot grind less than 1${starchips}.`)
-	if (x % 1 !== 0) return message.channel.send(`You cannot grind part of a ${starchips}.`)
+	if (!x || isNaN(x)) return message.channel.send({ content: `Please provide the number of ${starchips} that you wish to grind to ${stardust}.`})
+	if (x < 1) return message.channel.send({ content: `You cannot grind less than 1${starchips}.`})
+	if (x % 1 !== 0) return message.channel.send({ content: `You cannot grind part of a ${starchips}.`})
 
 	const wallet = await Wallet.findOne({ where: { playerId: maid } })
-	if (!wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
-	if (x > wallet.starchips) return message.channel.send(`You only have ${wallet.starchips}${starchips}.`)
+	if (!wallet) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
+	if (x > wallet.starchips) return message.channel.send({ content: `You only have ${wallet.starchips}${starchips}.`})
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`Are you sure you want to grind ${x}${starchips} into ${x * 10}${stardust}?`)
+	const msg = await message.channel.send({ content: `Are you sure you want to grind ${x}${starchips} into ${x * 10}${stardust}?`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
 	}).then(async collected => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 
 		wallet.starchips -= x
 		wallet.stardust += x * 10
 		await wallet.save()
 
 		completeTask(message.channel, maid, 'e9')
-		return message.channel.send(`You ground ${x}${starchips} into ${x * 10}${stardust}.`)
+		return message.channel.send({ content: `You ground ${x}${starchips} into ${x * 10}${stardust}.`})
 	}).catch(err => {
 		console.log(err)
-		return message.channel.send(`Sorry, time's up.`)
+		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }
 
@@ -4612,13 +4611,13 @@ if(cmd === `!grind`) {
 if(dailycom.includes(cmd)) {
 	const daily = await Daily.findOne({ where: { playerId: maid }, include: Player })
 	const diary = await Diary.findOne({ where: { playerId: maid } })
-	if (!daily || !diary) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!daily || !diary) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
 
 	const date = new Date()
 	const hoursLeftInDay = date.getMinutes() === 0 ? 24 - date.getHours() : 23 - date.getHours()
 	const minsLeftInHour = date.getMinutes() === 0 ? 0 : 60 - date.getMinutes()
 
-	if (daily.last_check_in && isSameDay(daily.last_check_in, date)) return message.channel.send(`You already used **!daily** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
+	if (daily.last_check_in && isSameDay(daily.last_check_in, date)) return message.channel.send({ content: `You already used **!daily** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`})
 
 	const daysPassed = daily.last_check_in ? Math.round( ( date.setHours(0, 0, 0, 0) - daily.last_check_in.setHours(0, 0, 0, 0) ) / (1000*60*60*24) ) : 1
 
@@ -4631,7 +4630,7 @@ if(dailycom.includes(cmd)) {
 	})
 
 	const set = sets[0]
-	if (!set) return message.channel.send(`No core set found.`)
+	if (!set) return message.channel.send({ content: `No core set found.`})
 
 	const commons = [...await Print.findAll({ 
 		where: {
@@ -4689,7 +4688,7 @@ if(dailycom.includes(cmd)) {
 		card_code: yourCard
 	}})
 
-	if (!print.id) return message.channel.send(`Error: ${yourCard} does not exist in the Print database.`)
+	if (!print.id) return message.channel.send({ content: `Error: ${yourCard} does not exist in the Print database.`})
 
 	const card = await Card.findOne({ where: {
 		name: print.card_name
@@ -4728,7 +4727,7 @@ if(dailycom.includes(cmd)) {
 		daily.cobble_progress = 0
 		let num = master_complete ? 5 : elite_complete ? 4 : hard_complete ? 3 : medium_complete ? 2 : 1
 		if (num) setTimeout(async () => {
-			message.channel.send(`Oh look, ${daily.player.name}, you cobbled together a pack!`, {files:[`./public/packs/7outof7.png`]})
+			message.channel.send({ content: `Oh look, ${daily.player.name}, you cobbled together a pack!`, files:[`./public/packs/7outof7.png`]})
 			const gotSecret = await awardPack(message.channel, daily.playerId, set, num)
 			if (gotSecret) completeTask(message.channel, daily.playerId, 'm4')
 		}, 4000)
@@ -4736,7 +4735,7 @@ if(dailycom.includes(cmd)) {
 		daily.cobble_progress += daysPassed
 		if (easy_complete) {
 			setTimeout(() => {
-				message.channel.send(`Hey, ${daily.player.name}, keep cobblin', buddy.`, {files:[`./public/packs/${daily.cobble_progress}outof7.png`]})
+				message.channel.send({ content: `Hey, ${daily.player.name}, keep cobblin', buddy.`, files:[`./public/packs/${daily.cobble_progress}outof7.png`]})
 			}, 4000)
 		}
 	}
@@ -4752,28 +4751,28 @@ if(dailycom.includes(cmd)) {
 	if (background && canvas && context) context.drawImage(background, 0, 0, canvas.width, canvas.height)
 	const attachment = background && canvas && context ? new Discord.MessageAttachment(canvas.toBuffer(), `${card.name}.png`) : false
 
-	message.channel.send(`1... 2...`)
-	return setTimeout(() => message.channel.send(`${enthusiasm} ${daily.player.name} pulled ${eval(print.rarity)}${print.card_code} - ${print.card_name} from the grab bag! ${emoji}`, attachment), 2000)
+	message.channel.send({ content: `1... 2...`})
+	return setTimeout(() => message.channel.send({ content: `${enthusiasm} ${daily.player.name} pulled ${eval(print.rarity)}${print.card_code} - ${print.card_name} from the grab bag! ${emoji}`, files: [attachment] }), 2000)
 }
 
 
 //WAGER
 if(cmd === `!wager`) {
 	const player = await Player.findOne({ where: { id: maid }, include: [Daily, Wallet] })
-	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!player) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
 
 	const date = new Date()
 	const hoursLeftInDay = date.getMinutes() === 0 ? 24 - date.getHours() : 23 - date.getHours()
 	const minsLeftInHour = date.getMinutes() === 0 ? 0 : 60 - date.getMinutes()
 
-	if (player.daily.last_wager && isSameDay(player.daily.last_wager, date)) return message.channel.send(`You already used **!wager** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
+	if (player.daily.last_wager && isSameDay(player.daily.last_wager, date)) return message.channel.send({ content: `You already used **!wager** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`})
 
 	const x = parseInt(args[0])
-	if (!x || isNaN(x)) return message.channel.send(`Please specify the amount of ${stardust} you wish to wager.`)
-	if (x < 1) return message.channel.send(`You cannot wager less than 1${stardust}.`)
-	if (x > 1000) return message.channel.send(`You cannot wager more than 1000${stardust}.`)
-	if (x % 1 !== 0) return message.channel.send(`You cannot wager partial ${stardust}.`)
-	if (x > player.wallet.stardust) return message.channel.send(`You only have ${player.wallet.stardust}${stardust}.`)
+	if (!x || isNaN(x)) return message.channel.send({ content: `Please specify the amount of ${stardust} you wish to wager.`})
+	if (x < 1) return message.channel.send({ content: `You cannot wager less than 1${stardust}.`})
+	if (x > 1000) return message.channel.send({ content: `You cannot wager more than 1000${stardust}.`})
+	if (x % 1 !== 0) return message.channel.send({ content: `You cannot wager partial ${stardust}.`})
+	if (x > player.wallet.stardust) return message.channel.send({ content: `You only have ${player.wallet.stardust}${stardust}.`})
 
 	const sets = await Set.findAll({ 
 		where: { 
@@ -4784,15 +4783,15 @@ if(cmd === `!wager`) {
 	})
 
 	const set = sets[0]
-	if (!set) return message.channel.send(`No core set found.`)
+	if (!set) return message.channel.send({ content: `No core set found.`})
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`Are you sure you want to wager ${x}${stardust} on a random ${set.code} ${eval(set.emoji)} card?`)
+	const msg = await message.channel.send({ content: `Are you sure you want to wager ${x}${stardust} on a random ${set.code} ${eval(set.emoji)} card?`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
 	}).then(async collected => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 
 		player.wallet.stardust -= x
 		await player.wallet.save()
@@ -4863,11 +4862,11 @@ if(cmd === `!wager`) {
 		const enthusiasm = rarity === "com" ? `Ho-Hum.` : rarity === "rar" ? `Not bad.` : rarity === 'sup' ? `Cool beans!` : rarity === 'ult' ? `Now *that's* based!` : `Holy $#%t balls!`
 		const emoji = rarity === "com" ? cavebob : rarity === "rar" ? stoned : rarity === 'sup' ? blue : rarity === 'ult' ? wokeaf : koolaid
 	
-		message.channel.send(`1... 2...`)
-		return setTimeout(() => message.channel.send(`${enthusiasm} ${player.name} won ${eval(print.rarity)}${print.card_code} - ${print.card_name} off their wager! ${emoji}`, attachment), 2000)
+		message.channel.send({ content: `1... 2...`})
+		return setTimeout(() => message.channel.send({ content: `${enthusiasm} ${player.name} won ${eval(print.rarity)}${print.card_code} - ${print.card_name} off their wager! ${emoji}`, files: [attachment] }), 2000)
 	}).catch(err => {
 		console.log(err)
-		return message.channel.send(`Sorry, time's up.`)
+		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }
 
@@ -4885,7 +4884,7 @@ if(alchemycom.includes(cmd)) {
 	const elite_complete = diary.l1 && diary.l2 && diary.l3 && diary.l4 && diary.l5 && diary.l6
 	//const master_complete = diary.s1 && diary.s2 && diary.s3 && diary.s4
 
-	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!player) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
 	
 	const date = new Date()
 	const hoursLeftInDay = date.getMinutes() === 0 ? 24 - date.getHours() : 23 - date.getHours()
@@ -4908,19 +4907,19 @@ if(alchemycom.includes(cmd)) {
 			(daily.alchemy_4 || !hard_complete) &&
 			(daily.alchemy_5 || !elite_complete)
 		)
-	) return message.channel.send(`You exhausted your alchemic powers for the day. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
+	) return message.channel.send({ content: `You exhausted your alchemic powers for the day. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`})
 
 	const query = args.join(" ")
 	
-	if (!args[0]) return message.channel.send(`Please specify the card you wish to transmute into ${starchips}.`)
+	if (!args[0]) return message.channel.send({ content: `Please specify the card you wish to transmute into ${starchips}.`})
 	
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const card_name = await findCard(query, fuzzyPrints)
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name, private = false, inInv = true) : null
-	if (!print && !card_name) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
-	if (print.set_code === 'FPC') return message.channel.send(`You cannot use alchemy on FPCs.`)
+	if (!print && !card_name) return message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
+	if (print.set_code === 'FPC') return message.channel.send({ content: `You cannot use alchemy on FPCs.`})
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 	const value = print.rarity === 'com' ? 1 : print.rarity === 'rar' ? 2 : print.rarity === 'sup' ? 4 : print.rarity === 'ult' ? 8 : 16 
 
@@ -4932,15 +4931,15 @@ if(alchemycom.includes(cmd)) {
 		}
 	})
 
-	if (!inv) return message.channel.send(`You do not have any copies of ${card}.`)
+	if (!inv) return message.channel.send({ content: `You do not have any copies of ${card}.`})
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`Are you sure you want to transmute ${card} into ${value}${starchips}?`)
+	const msg = await message.channel.send({ content: `Are you sure you want to transmute ${card} into ${value}${starchips}?`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
 	}).then(async collected => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		inv.quantity--
 		await inv.save()
@@ -4966,10 +4965,10 @@ if(alchemycom.includes(cmd)) {
 		await daily.save()
 
 		completeTask(message.channel, maid, 'e5')
-		return message.channel.send(`You transmuted ${card} into ${value}${starchips}!`)
+		return message.channel.send({ content: `You transmuted ${card} into ${value}${starchips}!`})
 	}).catch(err => {
 		console.log(err)
-		return message.channel.send(`Sorry, time's up.`)
+		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }
 
@@ -4981,25 +4980,25 @@ if(reducecom.includes(cmd)) {
 	const wallet = player.wallet
 	const daily = player.daily
 
-	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!player) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
 	
 	const date = new Date()
 	const hoursLeftInDay = date.getMinutes() === 0 ? 24 - date.getHours() : 23 - date.getHours()
 	const minsLeftInHour = date.getMinutes() === 0 ? 0 : 60 - date.getMinutes()
 
-	if (daily.last_reduce && isSameDay(daily.last_reduce, date)) return message.channel.send(`You exhausted your reductive powers for the day. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
+	if (daily.last_reduce && isSameDay(daily.last_reduce, date)) return message.channel.send({ content: `You exhausted your reductive powers for the day. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`})
 
 	const query = args.join(" ")
 	
-	if (!args[0]) return message.channel.send(`Please specify the card you wish to break down into ${forgestone}.`)
+	if (!args[0]) return message.channel.send({ content: `Please specify the card you wish to break down into ${forgestone}.`})
 	
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const card_name = await findCard(query, fuzzyPrints)
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name, private = false, inInv = true) : null
-	if (!print && !card_name) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
-	if (print.set_code === 'FPC') return message.channel.send(`You cannot use reduce on FPCs.`)
+	if (!print && !card_name) return message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
+	if (print.set_code === 'FPC') return message.channel.send({ content: `You cannot use reduce on FPCs.`})
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 	const value = print.rarity === 'com' ? 1 : print.rarity === 'rar' ? 2 : print.rarity === 'sup' ? 4 : print.rarity === 'ult' ? 8 : 16 
 
@@ -5011,15 +5010,15 @@ if(reducecom.includes(cmd)) {
 		}
 	})
 
-	if (!inv) return message.channel.send(`You do not have any copies of ${card}.`)
+	if (!inv) return message.channel.send({ content: `You do not have any copies of ${card}.`})
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`Are you sure you want to reduce ${card} into ${value}${forgestone}?`)
+	const msg = await message.channel.send({ content: `Are you sure you want to reduce ${card} into ${value}${forgestone}?`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
 	}).then(async collected => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		inv.quantity--
 		await inv.save()
@@ -5032,10 +5031,10 @@ if(reducecom.includes(cmd)) {
 		daily.last_reduce = date
 		await daily.save()
 
-		return message.channel.send(`You broke down ${card} into ${value}${forgestone}!`)
+		return message.channel.send({ content: `You broke down ${card} into ${value}${forgestone}!`})
 	}).catch(err => {
 		console.log(err)
-		return message.channel.send(`Sorry, time's up.`)
+		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }
 
@@ -5044,10 +5043,10 @@ if(reducecom.includes(cmd)) {
 
 //WRITE
 if(cmd === `!write`) {
-	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isMod(message.member)) return message.channel.send({ content: "You do not have permission to do that."})
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : null	
-	if (playerId === maid) return message.channel.send(`You cannot cross off your own Diary achievements.`)
-	if (!playerId) return message.channel.send(`Please @ mention a user to write in their Diary.`)
+	if (playerId === maid) return message.channel.send({ content: `You cannot cross off your own Diary achievements.`})
+	if (!playerId) return message.channel.send({ content: `Please @ mention a user to write in their Diary.`})
 
 	const achievement = args[1] ? args[1].toLowerCase() : null
 	const valid_tasks = [
@@ -5057,23 +5056,23 @@ if(cmd === `!write`) {
 		"l1", "l2", "l3", "l4", "l5", "l6",
 	]
 
-	if (!achievement) return message.channel.send(`Please specify an achievement (E4, M7, H1, L2, etc.)`)
-	if (!valid_tasks.includes(achievement)) return message.channel.send(`Sorry, ${achievement.toUpperCase()} is not a valid task.`)
+	if (!achievement) return message.channel.send({ content: `Please specify an achievement (E4, M7, H1, L2, etc.)`})
+	if (!valid_tasks.includes(achievement)) return message.channel.send({ content: `Sorry, ${achievement.toUpperCase()} is not a valid task.`})
 
 	const diary = await Diary.findOne({ where: { playerId: playerId } })
-	if (!diary) return message.channel.send(`That user is not in the database.`)
+	if (!diary) return message.channel.send({ content: `That user is not in the database.`})
 
-	if (diary[achievement] === true) return message.channel.send(`That user already completed task ${achievement.toUpperCase()}.`)
+	if (diary[achievement] === true) return message.channel.send({ content: `That user already completed task ${achievement.toUpperCase()}.`})
 	else if (diary[achievement] === false) return completeTask(message.channel, playerId, achievement)
 }
 
 
 //BURN
 if(cmd === `!burn`) {
-	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isMod(message.member)) return message.channel.send({ content: "You do not have permission to do that."})
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : null	
-	if (playerId === maid) return message.channel.send(`You cannot undo achievements from your own Diary.`)
-	if (!playerId) return message.channel.send(`Please @ mention a user to burn a hole in their Diary.`)
+	if (playerId === maid) return message.channel.send({ content: `You cannot undo achievements from your own Diary.`})
+	if (!playerId) return message.channel.send({ content: `Please @ mention a user to burn a hole in their Diary.`})
 
 	const achievement = args[1] ? args[1].toLowerCase() : null
 	const valid_tasks = [
@@ -5083,40 +5082,40 @@ if(cmd === `!burn`) {
 		"l1", "l2", "l3", "l4", "l5", "l6",
 	]
 
-	if (!achievement) return message.channel.send(`Please specify an achievement (E4, M7, H1, L2, etc.)`)
-	if (!valid_tasks.includes(achievement)) return message.channel.send(`Sorry, ${achievement.toUpperCase()} is not a valid task.`)
+	if (!achievement) return message.channel.send({ content: `Please specify an achievement (E4, M7, H1, L2, etc.)`})
+	if (!valid_tasks.includes(achievement)) return message.channel.send({ content: `Sorry, ${achievement.toUpperCase()} is not a valid task.`})
 	const difficulty = achievement.startsWith('e') ? 'Easy' : achievement.startsWith('m') ? 'Medium' : achievement.startsWith('h') ? 'Hard' : 'Elite'
 
 	const diary = await Diary.findOne({ where: { playerId: playerId }, include: Player })
-	if (!diary) return message.channel.send(`That user is not in the database.`)
+	if (!diary) return message.channel.send({ content: `That user is not in the database.`})
 
-	if (diary[achievement] === false) return message.channel.send(`That user has not completed task:\n**${diaries[difficulty][achievement]}**.`)
+	if (diary[achievement] === false) return message.channel.send({ content: `That user has not completed task:\n**${diaries[difficulty][achievement]}**.`})
 	else if (diary[achievement] === true) {
 		diary[achievement] = false
 		await diary.save()
-		return message.channel.send(`You undid an achievement in ${diary.player.name}'s Diary:\n**${diaries[difficulty][achievement]}**`)
+		return message.channel.send({ content: `You undid an achievement in ${diary.player.name}'s Diary:\n**${diaries[difficulty][achievement]}**`})
 	}
 }
 
 
 //AWARD
 if(cmd === `!award`) {
-	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isMod(message.member)) return message.channel.send({ content: "You do not have permission to do that."})
 	const recipient = message.mentions.users.first() ? message.mentions.users.first().id : null	
-	if (!recipient) return message.channel.send(`Please @ mention a user to award.`)
-	if (recipient === maid) return message.channel.send(`You cannot give an award to yourself.`)
+	if (!recipient) return message.channel.send({ content: `Please @ mention a user to award.`})
+	if (recipient === maid) return message.channel.send({ content: `You cannot give an award to yourself.`})
 
 	const player = await Player.findOne({ 
 		where: { id: recipient },
 		include: Wallet
 	})
 
-	if (!player) return message.channel.send(`That user is not in the database.`)
+	if (!player) return message.channel.send({ content: `That user is not in the database.`})
 
 	const quantity = parseInt(args[1]) ? parseInt(args[1]) : 1
-	if (quantity < 1) return message.channel.send(`Sorry, ${quantity} is not a valid quantity.`)
+	if (quantity < 1) return message.channel.send({ content: `Sorry, ${quantity} is not a valid quantity.`})
 	const query = parseInt(args[1]) ? args.slice(2).join(" ").toLowerCase() : args.slice(1).join(" ").toLowerCase()
-	if (!quantity || !query) return message.channel.send(`Please specify the query you wish to award.`)
+	if (!quantity || !query) return message.channel.send({ content: `Please specify the query you wish to award.`})
 
 	let set_code = query.includes('chaospack') || query.includes('chaos pack') || query === 'ch2' ? 'CH2' :
 		query === 'ch1' ? 'CH1' :
@@ -5128,19 +5127,19 @@ if(cmd === `!award`) {
 
 	if (set_code) {
 		const set = await Set.findOne({ where: { code: set_code } })
-		if (!set) return message.channel.send(`Could not find set: "${set_code}".`)
+		if (!set) return message.channel.send({ content: `Could not find set: "${set_code}".`})
 		const filter = m => m.author.id === message.author.id
-		const msg = await message.channel.send(`Are you sure you want to award ${quantity} ${set_code} ${eval(set.emoji)} ${quantity > 1 ? 'Packs' : 'Pack'} to ${player.name}?`)
+		const msg = await message.channel.send({ content: `Are you sure you want to award ${quantity} ${set_code} ${eval(set.emoji)} ${quantity > 1 ? 'Packs' : 'Pack'} to ${player.name}?`})
 		const collected = await msg.channel.awaitMessages(filter, {
 			max: 1,
 			time: 15000
 		}).then(async collected => {
-			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
-			message.channel.send(`Please wait while I open your ${quantity > 1 ? 'packs' : 'pack'}... ${blue}`)			
+			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
+			message.channel.send({ content: `Please wait while I open your ${quantity > 1 ? 'packs' : 'pack'}... ${blue}`})			
 			return awardPack(message.channel, recipient, set, quantity)
 		}).catch(err => {
 			console.log(err)
-			return message.channel.send(`Sorry, time's up.`)
+			return message.channel.send({ content: `Sorry, time's up.`})
 		})
 
 		return
@@ -5170,16 +5169,16 @@ if(cmd === `!award`) {
 	const card_name = query && !walletField && !valid_set_code && !valid_card_code ? await findCard(query, fuzzyPrints) : null
 	const print = !walletField && valid_card_code ? await Print.findOne({ where: { card_code } }) : !walletField && card_name ? await selectPrint(message, maid, card_name) : null
 
-	if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the item: "${query}".`)
+	if (!print && !walletField) return message.channel.send({ content: `Sorry, I do not recognize the item: "${query}".`})
 	const award = walletField ? `${eval(walletField)}` : ` ${eval(print.rarity)}${print.card_code} - ${print.card_name}` 
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`Are you sure you want to award ${quantity}${award} to ${player.name}?`)
+	const msg = await message.channel.send({ content: `Are you sure you want to award ${quantity}${award} to ${player.name}?`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
 	}).then(async collected => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		if (walletField) {
 			player.wallet[walletField] += quantity
@@ -5212,31 +5211,31 @@ if(cmd === `!award`) {
 			if (await checkCoreSetComplete(recipient, 3)) completeTask(message.channel, recipient, 'l3', 5000)	
 		}
 	
-		return message.channel.send(`${player.name} was awarded ${quantity}${award}. Congratulations!`)
+		return message.channel.send({ content: `${player.name} was awarded ${quantity}${award}. Congratulations!`})
 	}).catch(err => {
 		console.log(err)
-		return message.channel.send(`Sorry, time's up.`)
+		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }
 
 //STEAL
 if(cmd === `!steal`) {
-	if (!isMod(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isMod(message.member)) return message.channel.send({ content: "You do not have permission to do that."})
 	const target = message.mentions.users.first() ? message.mentions.users.first().id : null	
-	if (target === maid) return message.channel.send(`You cannot steal something from yourself.`)
-	if (!target || isNaN(target) || target.length < 17) return message.channel.send(`Please @ mention a user to steal from.`)
+	if (target === maid) return message.channel.send({ content: `You cannot steal something from yourself.`})
+	if (!target || isNaN(target) || target.length < 17) return message.channel.send({ content: `Please @ mention a user to steal from.`})
 
 	const player = await Player.findOne({ 
 		where: { id: target },
 		include: Wallet
 	})
 
-	if (!player) return message.channel.send(`That user is not in the database.`)
+	if (!player) return message.channel.send({ content: `That user is not in the database.`})
 
 	const quantity = parseInt(args[1]) ? parseInt(args[1]) : 1
-	if (quantity < 1) return message.channel.send(`Sorry, ${quantity} is not a valid quantity.`)
+	if (quantity < 1) return message.channel.send({ content: `Sorry, ${quantity} is not a valid quantity.`})
 	const query = parseInt(args[1]) ? args.slice(2).join(" ") : args.slice(1).join(" ")	
-	if (!quantity || !query) return message.channel.send(`Please specify the item you wish to steal.`)
+	if (!quantity || !query) return message.channel.send({ content: `Please specify the item you wish to steal.`})
 
 	let walletField
 	if (query === 'sc' || query === 'starchip' || query === 'starchips' || query === 'chip' || query === 'chips') walletField = 'starchips'
@@ -5263,16 +5262,16 @@ if(cmd === `!steal`) {
 	const print = !walletField && valid_card_code ? await Print.findOne({ where: { card_code } }) : !walletField && card_name ? await selectPrint(message, maid, card_name) : null
 	if (card_name && !print) return
 
-	if (!print && !walletField) return message.channel.send(`Sorry, I do not recognize the item: "${query}".`)
+	if (!print && !walletField) return message.channel.send({ content: `Sorry, I do not recognize the item: "${query}".`})
 	const loot = walletField ? `${eval(walletField)}` : ` ${eval(print.rarity)}${print.card_code} - ${print.card_name}` 
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`Are you sure you want to steal ${quantity}${loot} from ${player.name}?`)
+	const msg = await message.channel.send({ content: `Are you sure you want to steal ${quantity}${loot} from ${player.name}?`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
 	}).then(async collected => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		if (walletField) {
 			player.wallet[walletField] -= quantity
@@ -5285,9 +5284,9 @@ if(cmd === `!steal`) {
 			}})
 	
 			if (!inv) {
-				return message.channel.send(`Sorry, ${player.name} does not have an inventory slot for${loot}.`)
+				return message.channel.send({ content: `Sorry, ${player.name} does not have an inventory slot for${loot}.`})
 			} else if (inv.quantity < quantity) {
-				return message.channel.send(`Sorry, ${player.name} only has ${inv.quantity}${loot}.`)
+				return message.channel.send({ content: `Sorry, ${player.name} only has ${inv.quantity}${loot}.`})
 			} else {
 				inv.quantity -= quantity
 				await inv.save()
@@ -5300,19 +5299,19 @@ if(cmd === `!steal`) {
 			}})
 	
 			if (!inv) {
-				return message.channel.send(`Sorry, ${player.name} does not have any${loot}.`)
+				return message.channel.send({ content: `Sorry, ${player.name} does not have any${loot}.`})
 			} else if (inv.quantity < quantity) {
-				return message.channel.send(`Sorry, ${player.name} only has ${inv.quantity}${loot}.`)
+				return message.channel.send({ content: `Sorry, ${player.name} only has ${inv.quantity}${loot}.`})
 			} else {
 				inv.quantity -= quantity
 				await inv.save()
 			}
 		}
 	
-		return message.channel.send(`Yikes! You stole ${quantity}${loot} from ${player.name}.`)
+		return message.channel.send({ content: `Yikes! You stole ${quantity}${loot} from ${player.name}.`})
 	}).catch(err => {
 		console.log(err)
-		return message.channel.send(`Sorry, time's up.`)
+		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }
 
@@ -5321,7 +5320,7 @@ if(cmd === `!steal`) {
     // This is needed when matches are directly added or deleted using postgreSQL.
     // It's also required after using the !combine command, but the bot will remind you to do it.
 if (cmd === `!recalc`) {
-	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isAdmin(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
 	const players = await Player.findAll()
     const matches = await Match.findAll({
             where: {
@@ -5331,7 +5330,7 @@ if (cmd === `!recalc`) {
             }, order: [['createdAt', 'ASC']]
         })
 
-	message.channel.send(`Recalculating data for ${matches.length} matches. Please wait...`)
+	message.channel.send({ content: `Recalculating data for ${matches.length} matches. Please wait...`})
 	for (let i = 0; i < players.length; i++) {
 		const player = players[i]
 		player.stats = 500
@@ -5348,14 +5347,14 @@ if (cmd === `!recalc`) {
 	for (let i = 0; i < matches.length; i++) {
 		const match = matches[i]
 		await recalculate(match, i+1)	
-		if (i + 1 === matches.length) return message.channel.send(`Recalculation complete!`)
+		if (i + 1 === matches.length) return message.channel.send({ content: `Recalculation complete!`})
 	} 
 }
 
 //CENSUS
 if (cmd === `!census`) {
-	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
-	message.channel.send(`One moment please.`)
+	if (!isAdmin(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
+	message.channel.send({ content: `One moment please.`})
 	const membersMap = await message.guild.members.fetch()
 	const memberIds = [...membersMap.keys()]
 	let update_count = 0
@@ -5376,13 +5375,13 @@ if (cmd === `!census`) {
 			await createPlayer(id, name, tag)
 		}
 
-		if (i + 1 === memberIds.length) return message.channel.send(`Census complete! You added ${create_count} ${create_count === 1 ? 'player' : 'players'} to the database and updated ${update_count} ${update_count === 1 ? 'other' : 'others'}.`)
+		if (i + 1 === memberIds.length) return message.channel.send({ content: `Census complete! You added ${create_count} ${create_count === 1 ? 'player' : 'players'} to the database and updated ${update_count} ${update_count === 1 ? 'other' : 'others'}.`})
 	}
 }
 
 //GRINDALL
 if(cmd === `!grindall`) {
-	if (!isAdmin(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (!isAdmin(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
 	const confirmation_1 = await askForGrindAllConfirmation(message, 0)
 	if (!confirmation_1) return
 	const confirmation_2 = await askForGrindAllConfirmation(message, 1)
@@ -5400,7 +5399,7 @@ if(cmd === `!grindall`) {
 		await wallet.save()
 	}
 
-	return message.channel.send(`Every player's ${starchips}s have been ground into ${stardust}!`)
+	return message.channel.send({ content: `Every player's ${starchips}s have been ground into ${stardust}!`})
 
 
 }
@@ -5408,11 +5407,11 @@ if(cmd === `!grindall`) {
 //INVENTORY
 if(invcom.includes(cmd)) { 
 	const playerId = message.mentions.users.first() ? message.mentions.users.first().id : maid	
-	if (playerId !== maid && !isMod(message.member)) return message.channel.send(`You do not have permission to do that.`)
+	if (playerId !== maid && !isMod(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
 
 	const draft = !!(message.channel === client.channels.cache.get(draftChannelId))
 	const player = await Player.findOne({ where: { id: playerId }})
-	if (!player) return message.channel.send(playerId === maid ? `You are not in the database. Type **!start** to begin the game.` : `That person is not in the database.`)
+	if (!player) return message.channel.send({ content: playerId === maid ? `You are not in the database. Type **!start** to begin the game.` : `That person is not in the database.`})
 
 	const query = playerId === maid ? args.join(' ') : args.length > 1 ? args.slice(1).join(' ') : ''
 	const set_code = query.toUpperCase()
@@ -5426,7 +5425,7 @@ if(invcom.includes(cmd)) {
 
 	if (valid_set_code) {
 		const set = await Set.findOne({ where: { code: set_code } })
-		if (!set) return message.channel.send(`Could not find set: ${set_code}.`)
+		if (!set) return message.channel.send({ content: `Could not find set: ${set_code}.`})
 		results.push(`${eval(set.emoji)} --- ${set.name} --- ${eval(set.alt_emoji)}`)
 
 		const invs = await Inventory.findAll({
@@ -5528,27 +5527,27 @@ if(invcom.includes(cmd)) {
 			if (row.print.set_code !== 'HIDDEN') results.push(`${eval(row.print.rarity)}${row.card_code} - ${row.print.card_name} - ${row.quantity}`) 
 		}
 	} else {
-		return message.channel.send(`Sorry, I do not recognize: "${query}".`)
+		return message.channel.send({ content: `Sorry, I do not recognize: "${query}".`})
 	}
 
 	for (let i = 0; i < results.length; i += 30) {
 		if (results[i+31] && results[i+31].startsWith("\n")) {
-			message.author.send(results.slice(i, i+31))
+			message.author.send({ content: results.slice(i, i+31)})
 			i++
 		} else {
-			message.author.send(results.slice(i, i+30))
+			message.author.send({ content: results.slice(i, i+30)})
 		}
 	}
 
 	if (playerId === maid) completeTask(message.channel, maid, 'e2')
-	return message.channel.send(`I messaged you the Inventory you requested.`)
+	return message.channel.send({ content: `I messaged you the Inventory you requested.`})
 }
 
 //CHECKLIST
 if(checklistcom.includes(cmd)) {
 	const set_code = args.length ? args[0].toUpperCase() : null
 	const valid_set_code = !!(set_code && set_code.length === 3 && await Set.count({where: { code: set_code }}))
-	if (set_code && !valid_set_code) return message.channel.send(`Sorry, I do not recognize the set code: "${set_code}".`)
+	if (set_code && !valid_set_code) return message.channel.send({ content: `Sorry, I do not recognize the set code: "${set_code}".`})
 
 	const inventory = valid_set_code ? await Inventory.findAll({
 		where: {
@@ -5607,8 +5606,8 @@ if(checklistcom.includes(cmd)) {
 		order: [['card_code', 'ASC']]
 	})
 
-	if (!inventory) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
-	if (!allPrints) return message.channel.send(`Sorry, something is wrong with the database.`)
+	if (!inventory) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
+	if (!allPrints) return message.channel.send({ content: `Sorry, something is wrong with the database.`})
 
 	const results = []
 	const codes = []
@@ -5636,14 +5635,14 @@ if(checklistcom.includes(cmd)) {
 
 	for (let i = 0; i < results.length; i += 20) {
 		if (results[i+21] && results[i+21].startsWith("\n")) {
-			message.author.send(results.slice(i, i+21))
+			message.author.send({ content: results.slice(i, i+21)})
 			i++
 		} else {
-			message.author.send(results.slice(i, i+20))
+			message.author.send({ content: results.slice(i, i+20)})
 		}
 	}
 
-	return message.channel.send(`I messaged you the Checklist you requested.`)
+	return message.channel.send({ content: `I messaged you the Checklist you requested.`})
 }
 
 //PACK
@@ -5657,7 +5656,7 @@ if(packcom.includes(cmd)) {
 		} 
 	}
 
-	if (num < 1) return message.channel.send(`You cannot buy less than 1 Pack.`)
+	if (num < 1) return message.channel.send({ content: `You cannot buy less than 1 Pack.`})
 
 	for (let i = 0; i < args.length; i++) {
 		if (!isFinite(args[i])) {
@@ -5667,8 +5666,8 @@ if(packcom.includes(cmd)) {
 	}
 
 	const set = await Set.findOne({ where: { code: code }})
-	if (!set) return message.channel.send(`Could not find set code: ${code}.`)
-	if (!set.for_sale) return message.channel.send(`Sorry, ${code} ${eval(set.emoji)} Packs are not available.`)
+	if (!set) return message.channel.send({ content: `Could not find set code: ${code}.`})
+	if (!set.for_sale) return message.channel.send({ content: `Sorry, ${code} ${eval(set.emoji)} Packs are not available.`})
 
 	const commons = [...await Print.findAll({ 
 		where: {
@@ -5715,22 +5714,22 @@ if(packcom.includes(cmd)) {
 	const daily = player.daily
 	const diary = player.diary
 	const merchbot_wallet = await Wallet.findOne( { where: { playerId: merchbotId } })
-	if (!daily || !diary || !wallet || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!daily || !diary || !wallet || !merchbot_wallet) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
 	const hard_complete = diary.h1 && diary.h2 && diary.h3 && diary.h4 && diary.h5 && diary.h6 && diary.h7 && diary.h8
     const discount = hard_complete && set.currency === 'stardust' ? (1 / 1.1) : 1
 
 	const money = wallet[set.currency]
-	if (money < (Math.round(set.unit_price * discount) * num)) return message.channel.send(`Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${num > 1 ? `${num} ` : ''}${set.name} ${eval(set.emoji)} Packs cost ${Math.round(set.unit_price * discount) * num}${eval(set.currency)}.`)
+	if (money < (Math.round(set.unit_price * discount) * num)) return message.channel.send({ content: `Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${num > 1 ? `${num} ` : ''}${set.name} ${eval(set.emoji)} Packs cost ${Math.round(set.unit_price * discount) * num}${eval(set.currency)}.`})
 	
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.unit_price * discount) * num}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`)
+	const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.unit_price * discount) * num}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
 	}).then(async collected => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
-		message.channel.send(`Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}.`)
+		message.channel.send({ content: `Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}.`})
 		
 		let gotSecret = false
 		const boxes = Math.floor(num / set.packs_per_box)
@@ -5762,7 +5761,7 @@ if(packcom.includes(cmd)) {
 					card_code: yourPack[i]
 				}})
 
-				if (!print.id) return message.channel.send(`Error: ${yourPack[i]} does not exist in the Print database.`)
+				if (!print.id) return message.channel.send({ content: `Error: ${yourPack[i]} does not exist in the Print database.`})
 				results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
 
 				const card = await Card.findOne({ where: {
@@ -5806,7 +5805,7 @@ if(packcom.includes(cmd)) {
 			const attachment =  canvas && context ?
 				new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`) :
 				false
-			message.author.send(results.join("\n"), attachment)
+			message.author.send({ content: results.join("\n"), files: [attachment] })
 		}
 
 		wallet[set.currency] -= (Math.round(set.unit_price * discount) * num)
@@ -5826,7 +5825,7 @@ if(packcom.includes(cmd)) {
 		return
 	}).catch(err => {
 		console.log(err)
-		return message.channel.send(`Sorry, time's up.`)
+		return message.channel.send({ content: `Sorry, time's up.` })
 	})
 }
 
@@ -5835,8 +5834,8 @@ if(packcom.includes(cmd)) {
 if(specialcom.includes(cmd)) {
 	let code = args[0] || 'TEB'
 	const set = await Set.findOne({ where: { code: code }})
-	if (!set) return message.channel.send(`Could not find set code: ${code}.`)
-	if (!set.specs_for_sale) return message.channel.send(`Sorry, ${code} ${eval(set.emoji)} Special Editions are not available.`)
+	if (!set) return message.channel.send({ content: `Could not find set code: ${code}.` })
+	if (!set.specs_for_sale) return message.channel.send({ content: `Sorry, ${code} ${eval(set.emoji)} Special Editions are not available.` })
 
 	const commons = [...await Print.findAll({ 
 		where: {
@@ -5892,19 +5891,19 @@ if(specialcom.includes(cmd)) {
 	})].map((p) => p.card_code)
 
 	const wallet = await Wallet.findOne( { where: { playerId: maid }, include: Player })
-	if (!wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!wallet) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
 	const money = wallet[set.currency]
-	if (money < (set.spec_price)) return message.channel.send(`Sorry, ${wallet.player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Special Editions cost ${set.spec_price}${eval(set.currency)}.`)
+	if (money < (set.spec_price)) return message.channel.send({ content: `Sorry, ${wallet.player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Special Editions cost ${set.spec_price}${eval(set.currency)}.`})
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`${wallet.player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.spec_price}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Special Edition?`)
+	const msg = await message.channel.send({ content: `${wallet.player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.spec_price}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Special Edition?`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
 	}).then(async collected => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
-		message.channel.send(`Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Special Edition.`)
+		message.channel.send({ content: `Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Special Edition.`})
 		let gotSecret = false
 
 		const your_spec_1 = getRandomElement(specials.slice(0, 2))
@@ -5979,11 +5978,11 @@ if(specialcom.includes(cmd)) {
 			new Discord.MessageAttachment(promos_canvas.toBuffer(), `specials.png`) :
 			false
 
-		message.author.send(
+		message.author.send({ content: 
 			`${eval(set.emoji)} - ${set.name} Special Edition - ${eval(set.alt_emoji)}`
 			+ `\n${eval(spec_print_1.rarity)}${spec_print_1.card_code} - ${spec_print_1.card_name}`
 			+ `\n${eval(spec_print_2.rarity)}${spec_print_2.card_code} - ${spec_print_2.card_name}`
-		, promos_attachment)
+		, files: [promos_attachment] })
 
 		const odds = []
 		for (let i = 0; i < set.supers_per_box; i++) odds.push("supers")
@@ -6004,7 +6003,7 @@ if(specialcom.includes(cmd)) {
 					card_code: yourPack[i]
 				}})
 
-				if (!print.id) return message.channel.send(`Error: ${yourPack[i]} does not exist in the Print database.`)
+				if (!print.id) return message.channel.send({ content: `Error: ${yourPack[i]} does not exist in the Print database.`})
 				results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
 
 				const card = await Card.findOne({ where: {
@@ -6048,7 +6047,7 @@ if(specialcom.includes(cmd)) {
 			const attachment =  canvas && context ?
 				new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`) :
 				false
-			message.author.send(results.join("\n"), attachment)
+			message.author.send({ content: results.join("\n"), files: [attachment]})
 		}
 
 		wallet[set.currency] -= set.spec_price
@@ -6064,19 +6063,19 @@ if(specialcom.includes(cmd)) {
 		return
 	}).catch(err => {
 		console.log(err)
-		return message.channel.send(`Sorry, time's up.`)
+		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }
 
 //BOX
 if(boxcom.includes(cmd)) {
 	const code = args[0] || 'DRT'
-	if (code.startsWith('SS')) return message.channel.send(`Sorry, Starter Series cards are not sold by the box.`)
+	if (code.startsWith('SS')) return message.channel.send({ content: `Sorry, Starter Series cards are not sold by the box.`})
 	const set = await Set.findOne({ where: { code: code.toUpperCase() }})
-	if (!set) return message.channel.send(`There is no coreset with the code "${code.toUpperCase()}".`)
-	if (!set.box_price) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} is not sold by the box.`)
-	if (!set.for_sale) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} are not available.`)
-	if (!set.packs_per_box) return message.channel.send(`Sorry, ${set.name} ${eval(set.emoji)} is experiencing a glitch in the database. Please get an Admin to help you.`)
+	if (!set) return message.channel.send({ content: `There is no coreset with the code "${code.toUpperCase()}".`})
+	if (!set.box_price) return message.channel.send({ content: `Sorry, ${set.name} ${eval(set.emoji)} is not sold by the box.`})
+	if (!set.for_sale) return message.channel.send({ content: `Sorry, ${set.name} ${eval(set.emoji)} are not available.`})
+	if (!set.packs_per_box) return message.channel.send({ content: `Sorry, ${set.name} ${eval(set.emoji)} is experiencing a glitch in the database. Please get an Admin to help you.`})
 
 	const player = await Player.findOne( { where: { id: maid }, include: [Daily, Diary, Wallet] })
 	const diary = player.diary
@@ -6084,15 +6083,15 @@ if(boxcom.includes(cmd)) {
     const discount = hard_complete && set.currency === 'stardust' ? (1 / 1.1) : 1
 
 	const merchbot_wallet = await Wallet.findOne( { where: { playerId: merchbotId } })
-	if (!player || !merchbot_wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!player || !merchbot_wallet) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
 	const money = player.wallet[set.currency]
-	if (money < Math.round(set.box_price * discount)) return message.channel.send(`Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Boxes cost ${Math.round(set.box_price * discount)}${eval(set.currency)}.`)
+	if (money < Math.round(set.box_price * discount)) return message.channel.send({ content: `Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Boxes cost ${Math.round(set.box_price * discount)}${eval(set.currency)}.`})
 	
 
 	const date = new Date()
 	const hoursLeftInDay = date.getMinutes() === 0 ? 24 - date.getHours() : 23 - date.getHours()
 	const minsLeftInHour = date.getMinutes() === 0 ? 0 : 60 - date.getMinutes()
-	if (player.daily.last_box && isSameDay(player.daily.last_box, date)) return message.channel.send(`You already purchased a Box today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
+	if (player.daily.last_box && isSameDay(player.daily.last_box, date)) return message.channel.send({ content: `You already purchased a Box today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`})
 
 	const commons = [...await Print.findAll({ 
 		where: {
@@ -6135,14 +6134,14 @@ if(boxcom.includes(cmd)) {
 	})].map((p) => p.card_code)
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.box_price * discount)}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`)
+	const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.box_price * discount)}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
 	}).then(async collected => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send(`No problem. Have a nice day.`)
+		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
-		message.channel.send(`Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Box.`)
+		message.channel.send({ content: `Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Box.`})
 		const num = set.packs_per_box
 		for (let j = 0; j < num; j++) {
 			const images = []
@@ -6251,7 +6250,7 @@ if(boxcom.includes(cmd)) {
 				new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`) :
 				false
 		
-			message.author.send(results.join("\n"), attachment)
+			message.author.send({ content: results.join("\n"), files: [attachment] })
 		}
 
 		player.wallet[set.currency] -= (Math.round(set.box_price * discount))
@@ -6275,31 +6274,31 @@ if(boxcom.includes(cmd)) {
 		return
 	}).catch(err => {
 		console.log(err)
-		return message.channel.send(`Sorry, time's up.`)
+		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }
 
 //DUMP
 if(cmd === `!dump`) {
-	if (mcid !== botSpamChannelId) return message.channel.send(`Please use this command in <#${botSpamChannelId}>.`)
+	if (mcid !== botSpamChannelId) return message.channel.send({ content: `Please use this command in <#${botSpamChannelId}>.`})
 	const info = await Info.findOne({ where: { element: 'shop'} })
-	if (info.status === 'closed') return message.channel.send(`Sorry, you cannot dump cards while The Shop is closed.`)
+	if (info.status === 'closed') return message.channel.send({ content: `Sorry, you cannot dump cards while The Shop is closed.`})
 	const inputRarity = getRarity(args[0])
 	const set_code = args.length ? args[0].toUpperCase() : 'DRT'	
 	const set = await Set.findOne({where: { code: set_code }})
-	if (!set && !inputRarity) return message.channel.send(`Sorry, I do not recognized the set code: "${set_code}".`)
+	if (!set && !inputRarity) return message.channel.send({ content: `Sorry, I do not recognized the set code: "${set_code}".`})
 
 	const player = await Player.findOne({ where: { id: maid }, include: Wallet })
-	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!player) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
 	const merchbot_wallet = await Wallet.findOne({ where: { playerId: merchbotId } })
-	if (!merchbot_wallet) return message.channel.send(`That user is not in the database.`)
+	if (!merchbot_wallet) return message.channel.send({ content: `That user is not in the database.`})
 	
 	const rarity = inputRarity || await getDumpRarity(message)
-	if (rarity === 'unrecognized') return message.channel.send(`Please specify a valid rarity.`)
+	if (rarity === 'unrecognized') return message.channel.send({ content: `Please specify a valid rarity.`})
 	if (!rarity) return
 
 	const quantityToKeep = await getDumpQuantity(message, rarity, set_code)
-	if (!quantityToKeep && quantityToKeep !== 0) return message.channel.send(`Please specify a valid quanity.`)
+	if (!quantityToKeep && quantityToKeep !== 0) return message.channel.send({ content: `Please specify a valid quanity.`})
 
 	const wish_to_exclude = await askForExclusions(message)
 	const exclusions = wish_to_exclude ? await getExclusions(message, rarity, set) : null
@@ -6328,7 +6327,7 @@ if(cmd === `!dump`) {
 				rarity !== 'all' && excluded_prints.length ? unfilteredInv.filter((el) => !excluded_prints.includes(el.printId) && el.print.rarity === rarity) :
 				[]
 
-	if (!inv.length) return message.channel.send(`You do not have more than ${quantityToKeep} ${quantityToKeep === 1 ? 'copy' : 'copies'} of any ${rarity === 'all' ? '' : `${eval(rarity)} `}${set ? `${set_code} ${eval(set.emoji)}` : ''} cards.`)
+	if (!inv.length) return message.channel.send({ content: `You do not have more than ${quantityToKeep} ${quantityToKeep === 1 ? 'copy' : 'copies'} of any ${rarity === 'all' ? '' : `${eval(rarity)} `}${set ? `${set_code} ${eval(set.emoji)}` : ''} cards.`})
 
 	const cards = []
 	let compensation = 0
@@ -6414,15 +6413,15 @@ if(cmd === `!dump`) {
 	set && set.emoji !== set.alt_emoji ? `${set.code} ${eval(set.emoji)}${eval(set.alt_emoji)}` :
 	''
 
-	return message.channel.send(`You sold ${count} ${rarity === 'all' ? '' : eval(rarity)}${prompt} ${count === 1 ? 'card' : 'cards'} to The Shop for ${compensation}${stardust}.`)
+	return message.channel.send({ content: `You sold ${count} ${rarity === 'all' ? '' : eval(rarity)}${prompt} ${count === 1 ? 'card' : 'cards'} to The Shop for ${compensation}${stardust}.`})
 }
 
 //SELL
 if(cmd === `!sell`) {
-	if (!args.length) return message.channel.send(`Please specify the card(s) you wish to sell.`)
+	if (!args.length) return message.channel.send({ content: `Please specify the card(s) you wish to sell.`})
 	const sellerId = maid
 	const buyerId = message.mentions.users.first() ? message.mentions.users.first().id : merchbotId	
-	if (buyerId === sellerId) return message.channel.send(`You cannot sell cards to yourself.`)
+	if (buyerId === sellerId) return message.channel.send({ content: `You cannot sell cards to yourself.`})
 	const shopSale = !!(buyerId === merchbotId)
 
 	const sellingPlayer = await Player.findOne({ 
@@ -6435,17 +6434,17 @@ if(cmd === `!sell`) {
 		include: Wallet
 	})
 
-	if (!sellingPlayer) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
-	if (!buyingPlayer) return message.channel.send(`That user is not in the database.`)
+	if (!sellingPlayer) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
+	if (!buyingPlayer) return message.channel.send({ content: `That user is not in the database.`})
 
 	const line_items = message.mentions.users.first() ? args.slice(1).join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim()) :
 														args.join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim())
-	if (!shopSale && line_items.length > 1) return message.channel.send(`You cannot sell different cards to a player in the same transaction.`)
+	if (!shopSale && line_items.length > 1) return message.channel.send({ content: `You cannot sell different cards to a player in the same transaction.`})
 
 	const invoice = shopSale ? await getInvoiceMerchBotSale(message, line_items, sellingPlayer, fuzzyPrints) : await getInvoiceP2PSale(message, line_item = line_items[0], buyingPlayer, sellingPlayer, fuzzyPrints)
 	if (!invoice) return
 
-	if (invoice.total_price > buyingPlayer.wallet.stardust) return message.channel.send(`Sorry, ${buyingPlayer.name} only has ${buyingPlayer.wallet.stardust} and ${invoice.quantities[0] > 1 ? `${invoice.quantities[0]} copies of ` : ''}${invoice.cards[0]} costs ${invoice.total_price}${stardust}.`)
+	if (invoice.total_price > buyingPlayer.wallet.stardust) return message.channel.send({ content: `Sorry, ${buyingPlayer.name} only has ${buyingPlayer.wallet.stardust} and ${invoice.quantities[0] > 1 ? `${invoice.quantities[0]} copies of ` : ''}${invoice.cards[0]} costs ${invoice.total_price}${stardust}.`})
 
 	const sellerConfirmation = await getSellerConfirmation(message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = false)
 	if (!sellerConfirmation) return
@@ -6460,20 +6459,20 @@ if(cmd === `!sell`) {
 
 	if (shopSale) {
 		if (invoice.m6success === true) completeTask(message.channel, maid, 'm6')
-		return message.channel.send(`You sold ${invoice.cards.length > 1 ? `the following to The Shop for ${invoice.total_price}${stardust}:\n${invoice.cards.join('\n')}` : `${invoice.cards[0]} to The Shop for ${invoice.total_price}${stardust}`}.`)
+		return message.channel.send({ content: `You sold ${invoice.cards.length > 1 ? `the following to The Shop for ${invoice.total_price}${stardust}:\n${invoice.cards.join('\n')}` : `${invoice.cards[0]} to The Shop for ${invoice.total_price}${stardust}`}.`})
 	} else {
 		if (await checkCoreSetComplete(buyerId, 1)) completeTask(message.channel, buyerId, 'h4', 4000)
 		if (await checkCoreSetComplete(buyerId, 3)) completeTask(message.channel, buyerId, 'l3', 5000)
-		return message.channel.send(`${sellingPlayer.name} sold ${invoice.card} to ${buyingPlayer.name} for ${invoice.total_price}${stardust}.`)
+		return message.channel.send({ content: `${sellingPlayer.name} sold ${invoice.card} to ${buyingPlayer.name} for ${invoice.total_price}${stardust}.`})
 	}
 }
 
 //BUY
 if(cmd === `!buy`) {
-	if (!args.length) return message.channel.send(`Please specify the card(s) you wish to buy.`)
+	if (!args.length) return message.channel.send({ content: `Please specify the card(s) you wish to buy.`})
 	const buyerId = maid
 	const sellerId = message.mentions.users.first() ? message.mentions.users.first().id : merchbotId	
-	if (buyerId === sellerId) return message.channel.send(`You cannot buy cards from yourself.`)
+	if (buyerId === sellerId) return message.channel.send({ content: `You cannot buy cards from yourself.`})
 	const shopSale = !!(sellerId === merchbotId)
 	const info = await Info.findOne({ where: { element: 'shop'} })
 
@@ -6487,17 +6486,17 @@ if(cmd === `!buy`) {
 		include: [Diary, Wallet]
 	})
 
-	if (!buyingPlayer) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
-	if (!sellingPlayer) return message.channel.send(`That user is not in the database.`)
+	if (!buyingPlayer) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
+	if (!sellingPlayer) return message.channel.send({ content: `That user is not in the database.`})
 
 	const line_item = message.mentions.users.first() ? args.slice(1).join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim()) :
 														args.join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim())
-	if (line_item.length > 1) return message.channel.send(`You cannot buy different cards in the same transaction.`)
+	if (line_item.length > 1) return message.channel.send({ content: `You cannot buy different cards in the same transaction.`})
 
 	const invoice = shopSale ? await getInvoiceMerchBotPurchase(message, line_item, buyingPlayer, fuzzyPrints) : await getInvoiceP2PSale(message, line_item[0], buyingPlayer, sellingPlayer, fuzzyPrints)
 	if (!invoice) return
 
-	if (invoice.total_price > buyingPlayer.wallet.stardust) return message.channel.send(`Sorry, you only have ${buyingPlayer.wallet.stardust}${stardust} and ${invoice.cards[0]} costs ${invoice.total_price}${stardust}.`)
+	if (invoice.total_price > buyingPlayer.wallet.stardust) return message.channel.send({ content: `Sorry, you only have ${buyingPlayer.wallet.stardust}${stardust} and ${invoice.cards[0]} costs ${invoice.total_price}${stardust}.`})
 
 	const buyerConfirmation = await getBuyerConfirmation(message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = false)
 	if (!buyerConfirmation) return
@@ -6512,11 +6511,11 @@ if(cmd === `!buy`) {
 
 	if (shopSale) {
 		completeTask(message.channel, buyerId, 'e10')
-		return message.channel.send(`You bought ${invoice.cards.length > 1 ? `the following from The Shop for ${invoice.total_price}${stardust}:\n${invoice.cards.join('\n')}` : `${invoice.cards[0]} from The Shop for ${invoice.total_price}${stardust}`}.`)
+		return message.channel.send({ content: `You bought ${invoice.cards.length > 1 ? `the following from The Shop for ${invoice.total_price}${stardust}:\n${invoice.cards.join('\n')}` : `${invoice.cards[0]} from The Shop for ${invoice.total_price}${stardust}`}.`})
 	} else {
 		if (await checkCoreSetComplete(buyerId, 1)) completeTask(message.channel, buyerId, 'h4', 4000)
 		if (await checkCoreSetComplete(buyerId, 3)) completeTask(message.channel, buyerId, 'l3', 5000)
-		return message.channel.send(`${buyingPlayer.name} bought ${invoice.card} from ${sellingPlayer.name} for ${invoice.total_price}${stardust}.`)
+		return message.channel.send({ content: `${buyingPlayer.name} bought ${invoice.card} from ${sellingPlayer.name} for ${invoice.total_price}${stardust}.`})
 	}
 }
 
@@ -6530,7 +6529,7 @@ if(cmd === `!barter`) {
 	const diary = player.diary
 	const wallet = player.wallet
 	const medium_complete = diary.m1 && diary.m2 && diary.m3 && diary.m4 && diary.m5 && diary.m6 && diary.m7 && diary.m8 && diary.m9 && diary.m10
-	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!player) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
 
 	const direction = await getBarterDirection(message)
 	if (!direction) return
@@ -6546,28 +6545,28 @@ if(cmd === `!barter`) {
 		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	
 		print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-		if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+		if (!print) return message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
 		if (
 			print.set_code === 'APC' || 
 			print.set_code === 'FPC' ||  
 			print.set_code.startsWith('SS') || 
 			print.set_code.startsWith('CH')
-		) return message.channel.send(`You cannot barter for ${print.set_code} cards.`)
+		) return message.channel.send({ content: `You cannot barter for ${print.set_code} cards.`})
 
 		price = print.rarity === 'com' ? 4 : print.rarity === 'rar' ? 8 : print.rarity === 'sup' ? 16 : print.rarity === 'ult' ? 32 : 64
 	} else {
 		const selected_option = direction === 'get_card' ? await getBarterCard(message, voucher, medium_complete) : await getTradeInCard(message, medium_complete)
-		if (!selected_option) return message.channel.send(`You did not select a valid option.`)
+		if (!selected_option) return message.channel.send({ content: `You did not select a valid option.`})
 		if (!voucher) voucher = selected_option[3]
 	
 		price = selected_option[0]
 		print = await Print.findOne({ where: { card_code: selected_option[1] } })
-		if (!print) return message.channel.send(`Could not find card: "${selected_option[1]}".`)
+		if (!print) return message.channel.send({ content: `Could not find card: "${selected_option[1]}".`})
 	}
 
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 
-	if (direction === 'get_card' && wallet[voucher] < price) return message.channel.send(`Sorry, you only have ${wallet[voucher]} ${eval(voucher)} and ${card} costs ${price} ${eval(voucher)}.`)
+	if (direction === 'get_card' && wallet[voucher] < price) return message.channel.send({ content: `Sorry, you only have ${wallet[voucher]} ${eval(voucher)} and ${card} costs ${price} ${eval(voucher)}.`})
 
 	const inv = await Inventory.findOne({ where: {
 		printId: print.id,
@@ -6575,7 +6574,7 @@ if(cmd === `!barter`) {
 		playerId: maid 
 	}})
 
-	if (direction === 'get_vouchers' && (!inv || inv.quantity < 1)) return message.channel.send(`Sorry, you do not have any copies of ${card}.`)
+	if (direction === 'get_vouchers' && (!inv || inv.quantity < 1)) return message.channel.send({ content: `Sorry, you do not have any copies of ${card}.`})
 
 	const confirmation = await askForBarterConfirmation(message, voucher, card, price, direction)
 	if (!confirmation) return
@@ -6603,7 +6602,7 @@ if(cmd === `!barter`) {
 		wallet[voucher] += price
 		await wallet.save()
 	} else {
-		return message.channel.send(`Something went wrong. You do not appear to have any copies of ${card}.`)
+		return message.channel.send({ content: `Something went wrong. You do not appear to have any copies of ${card}.`})
 	}
 
 	if (direction === 'get_card' && print.set_code === 'APC' && inv && inv.quantity >= 3 ) completeTask(message.channel, maid, 'h5')
@@ -6611,7 +6610,7 @@ if(cmd === `!barter`) {
 	if (direction === 'get_card' && print.set_code !== 'APC' && await checkCoreSetComplete(maid, 3)) completeTask(message.channel, maid, 'l3', 3000)
 	const response = direction === 'get_card' ? `Thanks! You exchanged ${price} ${eval(voucher)} for a copy of ${card}.` :
 				`Thanks! You exchanged a copy of ${card} for ${price} ${eval(voucher)}.`
-	return message.channel.send(response)
+	return message.channel.send({ content: response })
 }
 
 
@@ -6621,15 +6620,15 @@ if(cmd === `!bid`) {
 		where: { id: maid }, 
 		include: [Bid, Wallet],
 		order: [[Bid, 'amount', 'DESC']]})
-	if (!player) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!player) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
 
 	const info = await Info.findOne({ where: { element: 'shop' }})
-	if (info.status !== 'closed') return message.channel.send(`Bidding is only available when The Shop is closed..`)
+	if (info.status !== 'closed') return message.channel.send({ content: `Bidding is only available when The Shop is closed..`})
 
     const count = await Auction.count()
-    if (!count) return message.channel.send(`Sorry, there are no singles up for auction tonight.`)
+    if (!count) return message.channel.send({ content: `Sorry, there are no singles up for auction tonight.`})
     
-	message.channel.send(`Please check your DMs.`)
+	message.channel.send({ content: `Please check your DMs.`})
 
 	if (player.bids.length === 3) {
 		return askForBidCancellation(message, player, fuzzyPrints)
@@ -6645,43 +6644,43 @@ if(cmd === `!trade`) {
 	if (mcid !== botSpamChannelId &&
 		mcid !== marketPlaceChannelId &&
 		mcid !== gutterChannelId
-	) return message.channel.send(`Please use this command in <#${botSpamChannelId}> or <#${marketPlaceChannelId}>.`)
+	) return message.channel.send({ content: `Please use this command in <#${botSpamChannelId}> or <#${marketPlaceChannelId}>.`})
 
 	const initiatorId = maid
 	const recieverId = message.mentions.users.first() ? message.mentions.users.first().id : null
-	if (!recieverId) return message.channel.send(`Please tag the user you want to trade with.`)
-	if (recieverId === initiatorId) return message.channel.send(`You cannot trade cards with yourself.`)
-	if (!(args.length >= 2)) return message.channel.send(`Please specify the card(s) you wish to trade.`)	
+	if (!recieverId) return message.channel.send({ content: `Please tag the user you want to trade with.`})
+	if (recieverId === initiatorId) return message.channel.send({ content: `You cannot trade cards with yourself.`})
+	if (!(args.length >= 2)) return message.channel.send({ content: `Please specify the card(s) you wish to trade.`})	
 	
 	const initiatingPlayer = await Player.findOne({ 
 		where: { id: initiatorId },
 		include: Wallet
 	})
 
-	if (!initiatingPlayer) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
+	if (!initiatingPlayer) return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`})
 
 	const receivingPlayer = await Player.findOne({ 
 		where: { id: recieverId },
 		include: Wallet
 	})
 
-	if (!receivingPlayer) return message.channel.send(`That user is not in the database.`)
+	if (!receivingPlayer) return message.channel.send({ content: `That user is not in the database.`})
 
 	const initiator_side = args.slice(1).join(' ').replace(/\s+/g, ' ').split(";").map((el) => el.trim())
 	const initiatorSummary = await getTradeSummary(message, initiator_side, initiatingPlayer, fuzzyPrints)
 	if (!initiatorSummary) return
 	const initiator_confirmation = await getInitiatorConfirmation(message, initiatorSummary.cards, receivingPlayer)
-	if (!initiator_confirmation) return message.channel.send(`No problem. Have a nice day.`)
+	if (!initiator_confirmation) return message.channel.send({ content: `No problem. Have a nice day.`})
 
 	const receiver_side = await getReceiverSide(message, initiatorSummary.cards, receivingPlayer)
 	if (!receiver_side) return
 	const receiverSummary = await getTradeSummary(message, receiver_side, receivingPlayer, fuzzyPrints)
 	if (!receiverSummary) return
 	const receiver_confirmation = await getReceiverConfirmation(message, receiverSummary.cards, receivingPlayer)
-	if (!receiver_confirmation) return setTimeout(() => message.channel.send(`Sorry, ${initiatingPlayer.name}, this trade has been rejected.`), 2000)
+	if (!receiver_confirmation) return setTimeout(() => message.channel.send({ content: `Sorry, ${initiatingPlayer.name}, this trade has been rejected.`}), 2000)
 	
 	const final_confirmation = await getFinalConfirmation(message, receiverSummary.cards, initiatingPlayer)
-	if (!final_confirmation) return setTimeout(() => message.channel.send(`Sorry, ${receivingPlayer.name}, this trade has been rejected.`), 2000)
+	if (!final_confirmation) return setTimeout(() => message.channel.send({ content: `Sorry, ${receivingPlayer.name}, this trade has been rejected.`}), 2000)
 
 	const lastTrade = await Trade.findAll({ order: [['createdAt', 'DESC']]})
 	const transaction_id = lastTrade.length ? parseInt(lastTrade[0].transaction_id) + 1 : 1
@@ -6748,16 +6747,16 @@ if(cmd === `!trade`) {
 	if (await checkCoreSetComplete(receivingPlayer.id, 1)) completeTask(message.channel, receivingPlayer.id, 'h4', 8000)
 	if (await checkCoreSetComplete(receivingPlayer.id, 3)) completeTask(message.channel, receivingPlayer.id, 'l3', 9000)
 	
-	message.channel.send(`${receivingPlayer.name} received:\n${initiatorSummary.cards.join("\n")}\n...and...`)
-	return setTimeout(() => message.channel.send(`${initiatingPlayer.name} received:\n${receiverSummary.cards.join("\n")}\n...Trade complete!`), 3000)
+	message.channel.send({ content: `${receivingPlayer.name} received:\n${initiatorSummary.cards.join("\n")}\n...and...`})
+	return setTimeout(() => message.channel.send({ content: `${initiatingPlayer.name} received:\n${receiverSummary.cards.join("\n")}\n...Trade complete!`}), 3000)
 }
 
 //GAUNTLET
 if(cmd === `!challenge` || cmd === `!gauntlet`) {
-	if(mcid !== "639907734589800458") { return message.channel.send("This command is not valid outside of the <#639907734589800458> channel.") }
+	if(mcid !== "639907734589800458") { return message.channel.send({ content: "This command is not valid outside of the <#639907734589800458> channel."}) }
 
 	var person1 = message.channel.members.find('id', maid);
-	if(!person1) { return message.channel.send("<@" + maid + ">You are not cached in the server, so you cannot play in the Gauntlet. Please change your visibility to \"Online\" to cache yourself."); }
+	if(!person1) { return message.channel.send({ content: "<@" + maid + ">You are not cached in the server, so you cannot play in the Gauntlet. Please change your visibility to \"Online\" to cache yourself."}) }
 
 	let rawdata = fs.readFileSync('sds023.json');
 	let gauntletdata = fs.readFileSync('room.json');
@@ -6778,88 +6777,88 @@ if(cmd === `!challenge` || cmd === `!gauntlet`) {
 	//if (status['gauntlet'] == 'confirming') { return message.reply("The Gauntlet confirmation process is currently underway. Please wait."); }
 
 	if (marr.length > 1) { rMem = marr[1].replace(/[\\<>@#&!]/g, ""); }
-	if (marr.length == 1) { return message.channel.send("\nIf you wish to challenge another player please provide:\n- an @ mention\n\n Example: **!gauntlet @Jazz**"); }
+	if (marr.length == 1) { return message.channel.send({ content: "\nIf you wish to challenge another player please provide:\n- an @ mention\n\n Example: **!gauntlet @Jazz**"}) }
 
-	if(!(rawdata.includes(maid))) { return message.channel.send(`You are not in the database. Type **!start** to begin the game.`) }
+	if(!(rawdata.includes(maid))) { return message.channel.send({ content: `You are not in the database. Type **!start** to begin the game.`}) }
 
 	if(maid === mb) { return; }
-	if(rMem == maid) { return message.channel.send("You cannot challenge yourself to the Gauntlet."); }
-	if(rMem == mb) { return message.channel.send ("You cannot challenge me to the Gauntlet."); } 
+	if(rMem == maid) { return message.channel.send({ content: "You cannot challenge yourself to the Gauntlet."}); }
+	if(rMem == mb) { return message.channel.send({ content: "You cannot challenge me to the Gauntlet."}) } 
 
 	if(args.length !== 0) {
 		if(args[0].toLowerCase() == 'queue' || args[0].toLowerCase() == 'q') {
-			if(arrc.length == 0) { return message.channel.send("The Gauntlet queue is empty."); }
-		else { return message.channel.send(arrc.sort()); }}}
+			if(arrc.length == 0) { return message.channel.send({ content: "The Gauntlet queue is empty."}); }
+		else { return message.channel.send({ content: arrc.sort()}) }}}
 
-	if(gauntletdata.includes(maid)) { return message.channel.send("You are already fighting in the Gauntlet against " + names[room[maid]] + "."); }
-	if(gauntletdata.includes(rMem)) { return message.channel.send("That player is already fighting in the Gauntlet against " + names[room[rMem]] + "."); }
+	if(gauntletdata.includes(maid)) { return message.channel.send({ content: "You are already fighting in the Gauntlet against " + names[room[maid]] + "."}); }
+	if(gauntletdata.includes(rMem)) { return message.channel.send({ content: "That player is already fighting in the Gauntlet against " + names[room[rMem]] + "."}); }
 
 	var person2 = message.channel.members.find('id', rMem);
-	if(!person2) { return message.channel.send("<@" + rMem + ">, You are not cached in the server, so you cannot play in the Gauntlet. Please change your visibility to \"Online\" to cache yourself."); }
+	if(!person2) { return message.channel.send({ content: "<@" + rMem + ">, You are not cached in the server, so you cannot play in the Gauntlet. Please change your visibility to \"Online\" to cache yourself."}); }
 
 	return Merch.data.getGauntletConfirmation(client, message, maid, rMem);
 }
 
 //CLEAR
 if(cmd === `!clear`) {
-	if (!isAdmin(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isAdmin(message.member)) return message.channel.send({ content: "You do not have permission to do that."})
     return message.channel.bulkDelete(100)
 }
 
 //CLEAR
 if(cmd === `!clear_all`) {
-	if (!isJazz(message.member)) return message.channel.send("You do not have permission to do that.")
+	if (!isJazz(message.member)) return message.channel.send({ content: "You do not have permission to do that."})
     return setInterval(() => message.channel.bulkDelete(100), 5000) 
 }
 
 //OPEN
 if(cmd === `!open`) {
-	if (!isJazz(message.member)) return message.channel.send("You do not have permission to do that.")
-	message.channel.send(`Opening the shop now.`)
+	if (!isJazz(message.member)) return message.channel.send({ content: "You do not have permission to do that."})
+	message.channel.send({ content: `Opening the shop now.`})
 	return openShop()
 }
 
 //CLOSE
 if(cmd === `!close`) {
-	if (!isJazz(message.member)) return message.channel.send("You do not have permission to do that.")
-	message.channel.send(`Closing the shop now.`)
+	if (!isJazz(message.member)) return message.channel.send({ content: "You do not have permission to do that."})
+	message.channel.send({ content: `Closing the shop now.`})
 	return closeShop()
 }
 
 //ADJUST
 if(cmd === `!adjust`) {
-	if (!isAdmin(message.member)) return message.channel.send("You do not have permission to do that.")
-	if (!args.length) return message.channel.send(`Please specify the card you wish to adjust.`)
+	if (!isAdmin(message.member)) return message.channel.send({ content: "You do not have permission to do that."})
+	if (!args.length) return message.channel.send({ content: `Please specify the card you wish to adjust.`})
 	
 	const query = args.join(' ')	
 	const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
 	const card_name = await findCard(query, fuzzyPrints)
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name) : null
-	if (!print) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+	if (!print) return message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 
 	const confirmation = await askForAdjustConfirmation(message, card, print.market_price)
-	if (!confirmation) return message.channel.send(`No problem. Have a nice day.`)
+	if (!confirmation) return message.channel.send({ content: `No problem. Have a nice day.`})
 
 	const newPrice = await getNewMarketPrice(message)
-	if (!newPrice) return message.channel.send(`Sorry, you did not specify a valid price.`)
+	if (!newPrice) return message.channel.send({ content: `Sorry, you did not specify a valid price.`})
 
 	print.market_price = newPrice
 	await print.save()
 
-	return message.channel.send(`The market price of ${card} has been adjusted to ${newPrice}${stardust}.`)
+	return message.channel.send({ content: `The market price of ${card} has been adjusted to ${newPrice}${stardust}.`})
 }
 
 //MOVE
 if(cmd === `!move`) {
-	if (!isAdmin(message.member)) return message.channel.send("You do not have permission to do that.")
-	if (!args.length) return message.channel.send(`Please specify the card you wish to move on the Forbidden & Limited list.`)
+	if (!isAdmin(message.member)) return message.channel.send({ content: "You do not have permission to do that."})
+	if (!args.length) return message.channel.send({ content: `Please specify the card you wish to move on the Forbidden & Limited list.`})
 	
 	const query = args.join(' ')
 	const card_name = await findCard(query, fuzzyPrints)
 	const card = card_name ? await Card.findOne({ where: { name: card_name }}) : null
-	if (!card) return message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+	if (!card) return message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
 	let konami_code = card.konami_code
 	while (konami_code.length < 8) konami_code = '0' + konami_code
 	
@@ -6871,7 +6870,7 @@ if(cmd === `!move`) {
 	const old_status = status ? status.current : 'unlimited'
 	const new_status = await getNewStatus(message, card, old_status)
 	if (!new_status) return
-	if (new_status === 'do not change') return message.channel.send(`Okay, ${card_name} will remain ${old_status}.`)
+	if (new_status === 'do not change') return message.channel.send({ content: `Okay, ${card_name} will remain ${old_status}.`})
 	else {
 		if (status) {
 			status.current = new_status
@@ -6891,7 +6890,7 @@ if(cmd === `!move`) {
 			await print.save()
 		}
 
-		return message.channel.send(`Okay, ${card_name} has been moved from "${old_status}" to "${new_status}".`)
+		return message.channel.send({ content: `Okay, ${card_name} has been moved from "${old_status}" to "${new_status}".`})
 	}
 }
 
@@ -6905,15 +6904,15 @@ if (listcom.includes(cmd)) {
 	const limitedNames = limited.length ? limited.map((card) => card.name).sort() : [`N/A`]
 	const semi_limitedNames = semi_limited.length ? semi_limited.map((card) => card.name).sort() : [`N/A`]
 
-	message.author.send(`**~ ${FiC} - FORBIDDEN & LIMITED LIST ${FiC} ~**` +
+	message.author.send({ content: `**~ ${FiC} - FORBIDDEN & LIMITED LIST ${FiC} ~**` +
 	`\n\n**The following cards are forbidden:**` + 
 	`\n${forbiddenNames.join('\n')}` + 
 	`\n\n**The following cards are limited:**` + 
 	`\n${limitedNames.join('\n')}` + 
 	`\n\n**The following cards are semi-limited:**` + 
-	`\n${semi_limitedNames.join('\n')}`)	
+	`\n${semi_limitedNames.join('\n')}`})	
 
-	return message.channel.send(`I messaged you the Forbidden & Limited list. ${FiC}`)
+	return message.channel.send({ content: `I messaged you the Forbidden & Limited list. ${FiC}`})
 }
 
 })

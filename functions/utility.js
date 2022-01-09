@@ -55,7 +55,7 @@ const resetPlayer = async (message, player) => {
 			}
 		})
 
-        if (!merchbot_inv) return message.channel.send(`Database error: Could not find or create MerchBot Inventory for: ${card_code}.`)
+        if (!merchbot_inv) return message.channel.send({ content: `Database error: Could not find or create MerchBot Inventory for: ${card_code}.`})
 
         if (merchbot_inv.quantity <= 0) {
             const auction = await Auction.findOne({ where: { card_code: card_code, printId: printId }})
@@ -148,7 +148,7 @@ const resetPlayer = async (message, player) => {
     player.last_reset = date
     await player.save()
 
-    return message.channel.send(`Your account has been successfully reset. All your cards and progress have been wiped.`)
+    return message.channel.send({ content: `Your account has been successfully reset. All your cards and progress have been wiped.`})
 }
 
 //GET RANDOM STRING

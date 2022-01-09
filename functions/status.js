@@ -14,7 +14,7 @@ const getNewStatus = async (message, card, old_status) => {
     }
 
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`${card.name} is currently ${old_status}. Please select a new status:\n${filteredOptions.join("\n")}`)
+	const msg = await message.channel.send({ content: `${card.name} is currently ${old_status}. Please select a new status:\n${filteredOptions.join("\n")}`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 30000
@@ -30,7 +30,7 @@ const getNewStatus = async (message, card, old_status) => {
         } else if(response.includes('4')) {
             index = 3
         } else {
-            message.channel.send(`You did not select a valid option.`)
+            message.channel.send({ content: `You did not select a valid option.`})
             return false
         }
 
@@ -38,7 +38,7 @@ const getNewStatus = async (message, card, old_status) => {
         return selected_option.slice(4)
 	}).catch(err => {
 		console.log(err)
-        message.channel.send(`Sorry, time's up.`)
+        message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 

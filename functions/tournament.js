@@ -16,7 +16,7 @@ const askForDBName = async (member, player, override = false, error = false, att
     const greeting = override ? '' : 'Hi! '
     const prompt = error ? `I think you're getting ahead of yourself. First, I need ${pronoun} DuelingBook name.`
     : `${greeting}This appears to be ${player.name}'s first tournament in our system. Can you please provide ${pronoun} DuelingBook name?`
-	const msg = await member.user.send(prompt)
+	const msg = await member.user.send({ content: prompt})
 
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
@@ -25,7 +25,7 @@ const askForDBName = async (member, player, override = false, error = false, att
         const dbName = collected.first().content
         if (dbName.includes("duelingbook.com/deck") || dbName.includes("imgur.com")) {
             if (attempt >= 3) {
-                member.user.send(`Sorry, time's up. Go back to the server and try again.`)
+                member.user.send({ content: `Sorry, time's up. Go back to the server and try again.`})
                 return false
             } else {
                 return askForDBName(member, player, override, true, attempt++)
@@ -34,12 +34,12 @@ const askForDBName = async (member, player, override = false, error = false, att
             await player.update({
                 duelingBook: dbName
             })
-            member.user.send(`Thanks! I saved ${pronoun} DuelingBook name as: ${dbName}. If that's wrong, go back to the server and type **!db name**.`)
+            member.user.send({ content: `Thanks! I saved ${pronoun} DuelingBook name as: ${dbName}. If that's wrong, go back to the server and type **!db name**.`})
             return dbName
         }
     }).catch((err) => {
         console.log(err)
-        member.user.send(`Sorry, time's up. Go back to the server and try again.`)
+        member.user.send({ content: `Sorry, time's up. Go back to the server and try again.`})
         return false
     })
 
@@ -50,18 +50,18 @@ const askForDBName = async (member, player, override = false, error = false, att
 const getDeckList = async (member, player, tournamentName, override = false) => {            
     const filter = m => m.author.id === member.user.id
     const pronoun = override ? `${player.name}'s` : 'your'
-    const msg = await member.user.send(`Please provide a duelingbook.com/deck link for ${pronoun} tournament deck.`);
+    const msg = await member.user.send({ content: `Please provide a duelingbook.com/deck link for ${pronoun} tournament deck.`});
     const collected = await msg.channel.awaitMessages(filter, {
         max: 1,
         time: 180000
     }).then(async (collected) => {
         const url = collected.first().content
         if (url.includes("www.duelingbook.com/deck")) {		
-            member.send('Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.')
+            member.send({ content: 'Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.'})
             const issues = await saveYDK(player, url, tournamentName)
 
             if (override) {
-                member.send(`Thanks, ${member.user.username}, I saved a copy of ${pronoun} deck. ${soldier}`)
+                member.send({ content: `Thanks, ${member.user.username}, I saved a copy of ${pronoun} deck. ${soldier}`})
                 return url
             } else if (issues['illegalCards'].length || issues['forbiddenCards'].length || issues['limitedCards'].length || issues['semiLimitedCards'].length) {
                 let response = `I'm sorry, ${member.user.username}, ${pronoun} deck is not legal. ${orange}`
@@ -71,25 +71,25 @@ const getDeckList = async (member, player, tournamentName, override = false) => 
                 if (issues['semiLimitedCards'].length) response += `\n\nThe following cards are semi-limited:\n${issues['semiLimitedCards'].join('\n')}`
                 response += `\n\nPlease edit ${pronoun} deck and try again once it's legal. If you believe this message is in error, contact the Tournament Organizer.`
             
-                member.send(response)
+                member.send({ content: response})
                 return false
             } else if (issues['unrecognizedCards'].length) {
                 let response = `I'm sorry, ${member.user.username}, the following card IDs were not found in our database:\n${issues['unrecognizedCards'].join('\n')}`
                 response += `\n\nThese cards are either alternate artwork, new to the TCG, OCG only, or incorrect in our database. Please contact the Tournament Organizer or the Admin if you can't resolve this.`
                 
-                member.send(response)
+                member.send({ content: response})
                 return false
              } else {
-                member.send(`Thanks, ${member.user.username}, ${pronoun} deck is perfectly legal. ${soldier}`)
+                member.send({ content: `Thanks, ${member.user.username}, ${pronoun} deck is perfectly legal. ${soldier}`})
                 return url
             }
         } else {
-            member.send("Sorry, I only accept duelingbook.com/deck links.")
+            member.send({ content: "Sorry, I only accept duelingbook.com/deck links."})
             return false
         }
     }).catch((err) => {
         console.log(err)
-        member.send(`Sorry, time's up. Go back to the server and try again.`)
+        member.send({ content: `Sorry, time's up. Go back to the server and try again.`})
         return false
     })
 
@@ -100,22 +100,22 @@ const getDeckList = async (member, player, tournamentName, override = false) => 
 //DIRECT SIGN UP
 const directSignUp = async (message, player, resubmission = false) => {            
     const filter = m => m.author.id === member.user.id
-    const msg = await message.author.send(`Please provide a duelingbook.com/deck link for ${player.name}'s tournament deck.`);
+    const msg = await message.author.send({ content: `Please provide a duelingbook.com/deck link for ${player.name}'s tournament deck.`});
     const collected = await msg.channel.awaitMessages(filter, {
         max: 1,
         time: 60000
     }).then(async collected => {
         const url = collected.first().content
         if (url.includes("duelingbook.com/deck")) {		
-            message.author.send(`Thanks, ${message.author.username}, I now have the link to ${player.name}'s tournament deck. ${soldier}`)
+            message.author.send({ content: `Thanks, ${message.author.username}, I now have the link to ${player.name}'s tournament deck. ${soldier}`})
             return url
         } else {
-            message.author.send("Sorry, I only accept duelingbook.com/deck links.")
+            message.author.send({ content: "Sorry, I only accept duelingbook.com/deck links."})
             return false
         }
     }).catch(err => {
         console.log(err)
-        member.user.send(`Sorry, time's up. To try again, go back to the Discord server type **!join**.`)
+        member.user.send({ content: `Sorry, time's up. To try again, go back to the Discord server type **!join**.`})
         return false
     })
 
@@ -125,7 +125,7 @@ const directSignUp = async (message, player, resubmission = false) => {
 //GET DECK NAME
 const getDeckName = async (member, player, override = false) => {
     const pronoun = override ? `${player.name}'s` : 'your'
-	const msg = await member.send(`Please provide the common name for ${pronoun} deck (i.e. Chaos Control, Chaos Turbo, Warrior, etc.).`)
+	const msg = await member.send({ content: `Please provide the common name for ${pronoun} deck (i.e. Chaos Control, Chaos Turbo, Warrior, etc.).`})
     const filter = m => m.author.id === member.user.id
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
@@ -135,7 +135,7 @@ const getDeckName = async (member, player, override = false) => {
         return response
     }).catch(err => {    
         console.log(err)
-        member.send(`Sorry, time's up.`)
+        member.send({ content: `Sorry, time's up.`})
         return false
     })
 
@@ -174,7 +174,7 @@ const seed = async (message, tournamentId) => {
                 }
             })
 
-            message.channel.send(`${name} is now the ${i+1} seed.`)
+            message.channel.send({ content: `${name} is now the ${i+1} seed.`})
             count++
         } catch (err) {
             console.log(err)
@@ -190,14 +190,14 @@ const selectTournament = async (message, tournaments, playerId) => {
     if (tournaments.length === 1) return tournaments[0]
     const options = tournaments.map((tournament, index) => `(${index + 1}) ${tournament.name}`)
     const filter = m => m.author.id === playerId
-    const msg = await message.channel.send(`Please select a tournament:\n${options.join('\n')}`)
+    const msg = await message.channel.send({ content: `Please select a tournament:\n${options.join('\n')}`})
     const collected = await msg.channel.awaitMessages(filter, {
         max: 1,
         time: 15000
     }).then(collected => {
         const num = parseInt(collected.first().content.match(/\d+/))
         if (!num || !tournaments[num - 1]) {
-            message.channel.send(`Sorry, ${collected.first().content} is not a valid option.`)
+            message.channel.send({ content: `Sorry, ${collected.first().content} is not a valid option.`})
             return null
         }
         else return tournaments[num - 1]
@@ -223,26 +223,26 @@ const removeParticipant = async (message, member, entry, tournament, drop = fals
             member.roles.remove(tourRole)
         
             if (drop) {
-                return message.channel.send(`I removed you from the tournament. Better luck next time!`)
+                return message.channel.send({ content: `I removed you from the tournament. Better luck next time!`})
             } else {
-                return message.channel.send(`${member.user.username} has been removed from the tournament.`)
+                return message.channel.send({ content: `${member.user.username} has been removed from the tournament.`})
             }
         } else if (!success && drop) {
             console.log(1)
-            return message.channel.send(`Hmm... I don't see you in the participants list.`)
+            return message.channel.send({ content: `Hmm... I don't see you in the participants list.`})
         } else if (!success && !drop) {
             console.log(1)
-            return message.channel.send(`I could not find ${member.user.username} in the participants list.`)
+            return message.channel.send({ content: `I could not find ${member.user.username} in the participants list.`})
         }
 
     } catch (err) {
         console.log(err)
         if (drop) {
             console.log(2)
-            return message.channel.send(`Hmm... I don't see you in the participants list.`)
+            return message.channel.send({ content: `Hmm... I don't see you in the participants list.`})
         } else {
             console.log(2)
-            return message.channel.send(`I could not find ${member.user.username} in the participants list.`)
+            return message.channel.send({ content: `I could not find ${member.user.username} in the participants list.`})
         }
     }   
 
@@ -415,7 +415,7 @@ const findNoShowOpponent = (match, noShowParticipantId) => {
 const getTournamentType = async (message) => {
     let tournamentType
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`What type of tournament is this?\n(1) Single Elimination\n(2) Double Elimination\n(3) Swiss\n(4) Round Robin`)
+	const msg = await message.channel.send({ content: `What type of tournament is this?\n(1) Single Elimination\n(2) Double Elimination\n(3) Swiss\n(4) Round Robin`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 30000
@@ -428,7 +428,7 @@ const getTournamentType = async (message) => {
         else return 
 	}).catch(err => {
 		console.log(err)
-        message.channel.send(`Sorry, time's up.`)
+        message.channel.send({ content: `Sorry, time's up.`})
 	})
 
     return tournamentType

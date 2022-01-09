@@ -14,7 +14,7 @@ const awardPack = async (channel, playerId, set, num = 1) => {
 	const member = channel.guild.members.cache.get(playerId)
 
     if (!set) set = await Set.findOne({ where: { code: 'DRT' } })
-    if (!set) return channel.send(`Could not find set.`)
+    if (!set) return channel.send({ content: `Could not find set.`})
 
 	const commons = [...await Print.findAll({ 
 		where: {
@@ -86,7 +86,7 @@ const awardPack = async (channel, playerId, set, num = 1) => {
                 card_code: yourPack[i]
             }})
     
-            if (!print.id) return message.channel.send(`${card} does not exist in the Print database.`)
+            if (!print.id) return message.channel.send({ content: `${card} does not exist in the Print database.`})
             results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
     
             const card = await Card.findOne({ where: {
@@ -131,10 +131,10 @@ const awardPack = async (channel, playerId, set, num = 1) => {
             new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`) :
             false
 
-        member.send(results.join('\n'), attachment)
+        member.send({ content: results.join('\n'), files: [attachment]})
     }
 
-    channel.send(`<@${playerId}> was awarded ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'}. Congratulations!`)
+    channel.send({ content: `<@${playerId}> was awarded ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'}. Congratulations!`})
     return gotSecret
 }
 
@@ -150,7 +150,7 @@ const awardPacksToShop = async (num, core = true) => {
             type: 'mini'
         }, order: [["createdAt", "DESC"]]})
                 
-    if (!sets.length) return botSpamChannel.send(`No ${core ? 'core' : 'mini'} sets found.`)
+    if (!sets.length) return botSpamChannel.send({ content: `No ${core ? 'core' : 'mini'} sets found.`})
     const set_1 = sets[0]
     const set_2 = sets[1] ? sets[1] : null
 
@@ -227,7 +227,7 @@ const awardPacksToShop = async (num, core = true) => {
                     card_code: yourPack[i]
                 }})
         
-                if (!print.id) return botSpamChannel.send(`${card} does not exist in the Print database.`)
+                if (!print.id) return botSpamChannel.send({ content: `${card} does not exist in the Print database.`})
                 results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
         
                 const inv = await Inventory.findOne({ where: { 
@@ -267,14 +267,14 @@ const awardPacksToShop = async (num, core = true) => {
         }
     
     
-        botSpamChannel.send(`<@${merchbotId}> opened ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'} of ${set.name} ${eval(set.emoji)}!`)
+        botSpamChannel.send({ content: `<@${merchbotId}> opened ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'} of ${set.name} ${eval(set.emoji)}!`})
     
         for (let i = 0; i < results.length; i += 30) {
             if (results[i+30] && results[i+30].includes(set.emoji)) {
-                botSpamChannel.send(results.slice(i, i+31))
+                botSpamChannel.send({ content: results.slice(i, i+31)})
                 i++
             } else {
-                botSpamChannel.send(results.slice(i, i+30))
+                botSpamChannel.send({ content: results.slice(i, i+30)})
             }
         }
     }

@@ -15,7 +15,7 @@ const merchbotId = '584215266586525696'
 //GET INITIATOR CONFIRMATION
 const getInitiatorConfirmation = async (message, cards, player) => {
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(cards.length > 1 ? `Are you sure you want to trade the following to ${player.name}?\n${cards.join("\n")}` : `Are you sure you want to trade ${cards[0]} to ${player.name}?`)
+	const msg = await message.channel.send({ content: cards.length > 1 ? `Are you sure you want to trade the following to ${player.name}?\n${cards.join("\n")}` : `Are you sure you want to trade ${cards[0]} to ${player.name}?`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
@@ -24,7 +24,7 @@ const getInitiatorConfirmation = async (message, cards, player) => {
 		else return true
 	}).catch(err => {
 		console.log(err)
-		message.channel.send(`Sorry, time's up.`)
+		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
@@ -35,20 +35,20 @@ const getInitiatorConfirmation = async (message, cards, player) => {
 //GET RECEIVER SIDE
 const getReceiverSide = async (message, cards, player) => {
     const filter = m => m.author.id === player.id
-	const msg = await message.channel.send(`${player.name}, you are you being offered:\n${cards.join("\n")}\n\nWhat do you wish to trade in return?`)
+	const msg = await message.channel.send({ content: `${player.name}, you are you being offered:\n${cards.join("\n")}\n\nWhat do you wish to trade in return?`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 60000
 	}).then(collected => {
 		if (collected.first().content.startsWith('!')) {
-			message.channel.send(`Please do not respond with bot commands. Simply type what you would like to trade.`)
+			message.channel.send({ content: `Please do not respond with bot commands. Simply type what you would like to trade.`})
 			return false
 		} else {
 			return collected.first().content.split(';')
 		}
 	}).catch(err => {
 		console.log(err)
-		message.channel.send(`Sorry, time's up.`)
+		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
@@ -59,20 +59,20 @@ const getReceiverSide = async (message, cards, player) => {
 //GET RECEIVER CONFIRMATION
 const getReceiverConfirmation = async (message, cards, player) => {
     const filter = m => m.author.id === player.id
-	const msg = await message.channel.send(cards.length > 1 ? `Are you sure you want to trade the following to ${message.author.username}?\n${cards.join("\n")}` : `Are you sure you want to trade ${cards[0]} to ${message.author.username}?`)
+	const msg = await message.channel.send({ content: cards.length > 1 ? `Are you sure you want to trade the following to ${message.author.username}?\n${cards.join("\n")}` : `Are you sure you want to trade ${cards[0]} to ${message.author.username}?`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
 	}).then(async collected => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) {
-			message.channel.send(`No problem. Have a nice day.`)
+			message.channel.send({ content: `No problem. Have a nice day.`})
 			return false
 		} else {
 			return true
 		}
 	}).catch(err => {
 		console.log(err)
-		message.channel.send(`Time's up.`)
+		message.channel.send({ content: `Time's up.`})
         return false
 	})
 
@@ -82,21 +82,21 @@ const getReceiverConfirmation = async (message, cards, player) => {
 //GET FINAL CONFIRMATION
 const getFinalConfirmation = async (message, cards, player) => {
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`${player.name}, you will receive:\n${cards.join("\n")}\n\nDo you accept this trade?`)
+	const msg = await message.channel.send({ content: `${player.name}, you will receive:\n${cards.join("\n")}\n\nDo you accept this trade?`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
 	}).then(async collected => {
 		const response = collected.first().content.toLowerCase()
 		if (!yescom.includes(response)) {
-			message.channel.send(`No problem. Have a nice day.`)
+			message.channel.send({ content: `No problem. Have a nice day.`})
 			return false
 		} else {
 			return true
 		}
 	}).catch(err => {
 		console.log(err)
-		message.channel.send(`Time's up.`)
+		message.channel.send({ content: `Time's up.`})
         return false
 	})
 
@@ -119,13 +119,13 @@ const getTradeSummary = async (message, inputs, player, fuzzyPrints) => {
 		if (!args.length) continue
 		const quantity = isFinite(args[0]) ? parseInt(args[0]) : 1
 		if (quantity < 1) {
-			message.channel.send(`Sorry, ${quantity} is not a valid quantity.`)
+			message.channel.send({ content: `Sorry, ${quantity} is not a valid quantity.`})
 			return false
 		} 
 		const query = isFinite(args[0]) ? args.slice(1).join(' ') : args.join(' ')
 
 		if (!query) {
-			message.channel.send(`Please specify the card(s) you wish to trade.`)
+			message.channel.send({ content: `Please specify the card(s) you wish to trade.`})
 			return false
 		}
 
@@ -152,18 +152,18 @@ const getTradeSummary = async (message, inputs, player, fuzzyPrints) => {
 		null
 
 		if (card_name && !print) {
-			message.channel.send(`You do not have any copies of ${card_name}.`)
+			message.channel.send({ content: `You do not have any copies of ${card_name}.`})
 			return false
 		} else if (!print && !walletField) {
-			message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+			message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
 			return false
 		} else if (print && print.set_code === 'FPC') {
-			message.channel.send(`You cannot trade prize cards.`)
+			message.channel.send({ content: `You cannot trade prize cards.`})
 			return false
 		}
 
 		if (inputs.length === 1 && walletField === 'stardust') {
-			message.channel.send(`You cannot trade only ${stardust}. Please use **!buy** or **!sell** for this transaction.`)
+			message.channel.send({ content: `You cannot trade only ${stardust}. Please use **!buy** or **!sell** for this transaction.`})
 			return false
 		}
 
@@ -179,14 +179,14 @@ const getTradeSummary = async (message, inputs, player, fuzzyPrints) => {
 		}) : null
 	
 		if (!inv && !wallet[walletField]) {
-			message.channel.send(
+			message.channel.send({ content: 
 				`You do not have any ${walletField ? '' : 'copies of '} ${card}.`
-			)
+			})
 			return false
 		} 
 	
 		if (inv && inv.quantity < quantity || wallet && wallet[walletField] < quantity) {
-			message.channel.send(`You only have ${inv ? inv.quantity : wallet[walletField]} ${card}.`)
+			message.channel.send({ content: `You only have ${inv ? inv.quantity : wallet[walletField]} ${card}.`})
 			return false
 		}
 	

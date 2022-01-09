@@ -7,7 +7,7 @@ const { Message } = require('discord.js')
 
 const awardCard = async (channel, playerId, card_code, quantity = 1) => {
     const print = await Print.findOne({ where: { card_code }})
-    if (!print) return channel.send(`Could not find print: "${card_code}".`)
+    if (!print) return channel.send({ content: `Could not find print: "${card_code}".`})
     const card = `${eval(print.rarity)}${card_code} - ${print.card_name}`
 
     const inv = await Inventory.findOne({
@@ -32,7 +32,7 @@ const awardCard = async (channel, playerId, card_code, quantity = 1) => {
     }
 
     if (print.set_code === 'APC' && ((inv && inv.quantity >= 3) || quantity >=3 )) completeTask(channel, playerId, 'h5')
-    return channel.send(`<@${playerId}> was awarded ${quantity} ${card}. Congratulations!`)
+    return channel.send({ content: `<@${playerId}> was awarded ${quantity} ${card}. Congratulations!`})
 }
 
 module.exports = {

@@ -18,16 +18,16 @@ const decks = require('../static/decks.json')
 // OPEN SHOP
 const openShop = async () => {
 	const shop = await Info.findOne({ where: { element: 'shop' }})
-	if (!shop) return client.channels.cache.get(botSpamChannelId).send(`Could not find game element: "shop".`)
+	if (!shop) return client.channels.cache.get(botSpamChannelId).send({ content: `Could not find game element: "shop".`})
 
 	if (shop.status === 'open') {
-		return client.channels.cache.get(botSpamChannelId).send(`The Shop ${merchant} was already open. ${open}`)
+		return client.channels.cache.get(botSpamChannelId).send({ content: `The Shop ${merchant} was already open. ${open}`})
 	} else {
 		shop.status = 'open'
 		await shop.save()
         await processBids()
         updateShop()
-        client.channels.cache.get(announcementsChannelId).send(`Good morning, <@&${fpRole}>, The Shop ${merchant} is now open! ${open}`)
+        client.channels.cache.get(announcementsChannelId).send({ content: `Good morning, <@&${fpRole}>, The Shop ${merchant} is now open! ${open}`})
         const shopCountdown = getShopCountdown()
 		return setTimeout(() => closeShop(), shopCountdown)
 	} 
@@ -36,9 +36,9 @@ const openShop = async () => {
 // CLOSE SHOP
 const closeShop = async () => {
     const shop = await Info.findOne({ where: { element: 'shop' }})
-	if (!shop) return client.channels.cache.get(botSpamChannelId).send(`Could not find game element: "shop".`)
+	if (!shop) return client.channels.cache.get(botSpamChannelId).send({ content: `Could not find game element: "shop".`})
 	if (shop.status === 'closed') {
-		return client.channels.cache.get(botSpamChannelId).send(`The Shop ${merchant} was already closed. ${closed}`)
+		return client.channels.cache.get(botSpamChannelId).send({ content: `The Shop ${merchant} was already closed. ${closed}`})
 	} else {
 		shop.status = 'closed'
 		await shop.save()
@@ -50,7 +50,7 @@ const closeShop = async () => {
         }
 
         await restock()
-		client.channels.cache.get(announcementsChannelId).send(`Good evening, <@&${fpRole}>, The Shop ${merchant} is now closed! ${closed}`)
+		client.channels.cache.get(announcementsChannelId).send({ content: `Good evening, <@&${fpRole}>, The Shop ${merchant} is now closed! ${closed}`})
         const shopCountdown = getShopCountdown()
         return setTimeout(() => openShop(), shopCountdown)
 	} 
@@ -280,11 +280,11 @@ const processBids = async () => {
          } })
 
         if (!inv) {
-            announcementsChannel.send(`${wallet.player.name} placed a ${bid.amount}${stardust} bid on ${print.card_name} but they were outbid.`)
+            announcementsChannel.send({ content: `${wallet.player.name} placed a ${bid.amount}${stardust} bid on ${print.card_name} but they were outbid.`})
             continue
         }
         if (wallet.stardust < bid.amount) {
-            announcementsChannel.send(`${wallet.player.name} would have won ${print.card_name} for ${bid.amount}${stardust} but they are too poor.`) 
+            announcementsChannel.send({ content: `${wallet.player.name} would have won ${print.card_name} for ${bid.amount}${stardust} but they are too poor.`}) 
             continue
         }
         
@@ -320,7 +320,7 @@ const processBids = async () => {
         if (print.rarity !== 'com' && print.rarity !== 'rar') completeTask(botSpamChannel, wallet.player.id, 'm5')
         if (print.rarity === 'scr') completeTask(botSpamChannel, wallet.player.id, 'm4', 4000)
         if (print.set_code === 'APC' && winnerInv && winnerInv.quantity >= 3) completeTask(botSpamChannel, wallet.player.id, 'h5', 4000)
-        announcementsChannel.send(`<@${wallet.player.id}> won a copy of ${eval(print.rarity)}${print.card_code} - ${print.card_name} for ${bid.amount}${stardust}. Congratulations!`) 
+        announcementsChannel.send({ content: `<@${wallet.player.id}> won a copy of ${eval(print.rarity)}${print.card_code} - ${print.card_name} for ${bid.amount}${stardust}. Congratulations!`}) 
     }
 
     const allAuctions = await Auction.findAll()
@@ -375,8 +375,8 @@ const restock = async () => {
     const mini_count = Math.ceil(weightedCount * 3 / 32)
     const corePacksAwarded = await awardPacksToShop(core_count, core = true)
     const miniPacksAwarded = await awardPacksToShop(mini_count, core = false)
-    if (!corePacksAwarded) client.channels.cache.get(shopChannelId).send(`Error awarding ${core_count} packs to shop.`)
-    if (!miniPacksAwarded) client.channels.cache.get(shopChannelId).send(`Error awarding ${mini_count} packs to shop.`)
+    if (!corePacksAwarded) client.channels.cache.get(shopChannelId).send({ content: `Error awarding ${core_count} packs to shop.`})
+    if (!miniPacksAwarded) client.channels.cache.get(shopChannelId).send({ content: `Error awarding ${mini_count} packs to shop.`})
     else return postBids()
 }
 
@@ -474,6 +474,8 @@ const updateShop = async () => {
             `Good day, The Shop ${merchant} is open. ${open}`,
             `\n${master} --- Core Products --- ${master}`
         ]
+
+        console.log('results', results)
     
         const setsForSale = await Set.findAll({ 
             where: { 
@@ -538,7 +540,13 @@ const updateShop = async () => {
             results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(print.rarity)}${inv.card_code} - ${print.card_name} - ${inv.quantity}${print.frozen ? " - ❄️" : print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}${excluded ? ` - ${no}` : ''}`) 
         }
     
-        for (let i = 0; i < results.length; i += 10) shopChannel.send(results.slice(i, i+10))
+        for (let i = 0; i < results.length; i += 10) {
+           try {
+               shopChannel.send({ content: results.slice(i, i+10)})
+           } catch (err) {
+               console.log('err...', err)
+           }
+        }
     }, 9000)
 }
 
@@ -661,7 +669,9 @@ const postBids = async () => {
             results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(print.rarity)}${inv.card_code} - ${print.card_name} - ${inv.quantity}${print.frozen ? " - ❄️" : print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}`) 
         }
     
-        for (let i = 0; i < results.length; i += 10) shopChannel.send(results.slice(i, i+10))
+        for (let i = 0; i < results.length; i += 10) {
+            shopChannel.send({ content: results.slice(i, i+10).join('\n') })
+        }
     }, 9000)
 }
 
@@ -673,10 +683,10 @@ const askForDumpConfirmation = async (message, set, cards, compensation, count) 
     
     cards.unshift(`Are you sure you want to sell the following ${count} ${prompt} cards:`)
     for (let i = 0; i < cards.length; i+=30) {
-        message.channel.send(cards.slice(i, i+30).join("\n"))
+        message.channel.send({ content: cards.slice(i, i+30).join("\n")})
     }
     const filter = m => m.author.id === message.author.id
-    const msg = await message.channel.send(`To The Shop for ${compensation}${stardust}?`)
+    const msg = await message.channel.send({ content: `To The Shop for ${compensation}${stardust}?`})
     const collected = await msg.channel.awaitMessages(filter, {
         max: 1,
         time: 60000
@@ -684,12 +694,12 @@ const askForDumpConfirmation = async (message, set, cards, compensation, count) 
         if (yescom.includes(collected.first().content.toLowerCase())) {
             return true
         } else {
-            message.channel.send(`No problem. Have a nice day.`)
+            message.channel.send({ content: `No problem. Have a nice day.`})
             return false
         }  
     }).catch(err => {
         console.log(err)
-        message.channel.send(`Sorry, time's up.`)
+        message.channel.send({ content: `Sorry, time's up.`})
         return false
     })
 
@@ -700,7 +710,7 @@ const askForDumpConfirmation = async (message, set, cards, compensation, count) 
 const getDumpRarity = async (message) => {
     let rarity
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send(`What rarity would you like to bulk sell?\n(1) all\n(2) common\n(3) rare\n(4) super\n(5) ultra\n(6) secret`)
+	const msg = await message.channel.send({ content: `What rarity would you like to bulk sell?\n(1) all\n(2) common\n(3) rare\n(4) super\n(5) ultra\n(6) secret`})
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
         time: 15000
@@ -715,7 +725,7 @@ const getDumpRarity = async (message) => {
         else rarity = 'unrecognized'
     }).catch(err => {
 		console.log(err)
-        return message.channel.send(`Sorry, time's up.`)
+        return message.channel.send({ content: `Sorry, time's up.`})
 	})
 
     return rarity
@@ -724,7 +734,7 @@ const getDumpRarity = async (message) => {
 // GET DUMP QUANTITY
 const getDumpQuantity = async (message, rarity) => {
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send(`How many of each ${rarity === 'all' ? 'card' : eval(rarity)} do you want to keep?`)
+	const msg = await message.channel.send({ content: `How many of each ${rarity === 'all' ? 'card' : eval(rarity)} do you want to keep?`})
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
         time: 15000
@@ -738,7 +748,7 @@ const getDumpQuantity = async (message, rarity) => {
 
     }).catch(err => {
 		console.log(err)
-        message.channel.send(`Sorry, time's up.`)
+        message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
@@ -750,7 +760,7 @@ const getDumpQuantity = async (message, rarity) => {
 // ASK FOR EXCLUSIONS
 const askForExclusions = async (message) => {
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send(`Do you want to exclude any cards?`)
+	const msg = await message.channel.send({ content: `Do you want to exclude any cards?`})
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
         time: 15000
@@ -761,7 +771,7 @@ const askForExclusions = async (message) => {
         } else if (nocom.includes(response)) {
             return false
         } else {
-            message.channel.send(`I'll take that as a yes.`)
+            message.channel.send({ content: `I'll take that as a yes.`})
             return true
         }
     }).catch(err => {
@@ -780,21 +790,21 @@ const getExclusions = async (message, rarity, set) => {
         set && set.emoji !== set.alt_emoji ? `${set.code} ${eval(set.emoji)}${eval(set.alt_emoji)}` :
         ''
 
-	const msg = await message.channel.send(`Please provide a list of ${rarity === 'all' ? '' : eval(rarity)}${prompt} cards you do not want to bulk sell.`)
+	const msg = await message.channel.send({ content: `Please provide a list of ${rarity === 'all' ? '' : eval(rarity)}${prompt} cards you do not want to bulk sell.`})
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
         time: 60000
     }).then(async collected => {
 		const response = collected.first().content.toLowerCase()
         if (response.startsWith('!')) {
-            message.channel.send(`Please do not respond with bot commands. Simply type what you would like to exclude.`)
+            message.channel.send({ content: `Please do not respond with bot commands. Simply type what you would like to exclude.`})
             return false
         } else {
             return collected.first().content.split(';')
         }
     }).catch(err => {
 		console.log(err)
-        message.channel.send(`Sorry, time's up.`)
+        message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
@@ -818,12 +828,12 @@ const getExcludedPrintIds = async (message, rarity, set, exclusions, fuzzyPrints
                     null
 		
         if (!print) {
-            message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+            message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
             return false
         }
 
         if (print.setId !== set.id || (rarity !== 'all' && print.rarity !== rarity)) {
-            message.channel.send(`Sorry, "${query}" A.K.A. ${print.card_name} is not a ${rarity === 'all' ? '' : eval(rarity)}${set.code} ${set.emoji === set.alt_emoji ? eval(set.emoji) : eval(set.emoji), eval(set.alt_emoji)} card.`)
+            message.channel.send({ content: `Sorry, "${query}" A.K.A. ${print.card_name} is not a ${rarity === 'all' ? '' : eval(rarity)}${set.code} ${set.emoji === set.alt_emoji ? eval(set.emoji) : eval(set.emoji), eval(set.alt_emoji)} card.`})
             return false
         }
 
@@ -841,7 +851,7 @@ const getBarterDirection = async (message) => {
     ]
 
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send(`What would you like to **receive** in this exchange?\n${options.join("\n")}`)
+	const msg = await message.channel.send({ content: `What would you like to **receive** in this exchange?\n${options.join("\n")}`})
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
         time: 15000
@@ -853,14 +863,14 @@ const getBarterDirection = async (message) => {
         } else if(response.includes('2') || response.includes('vouch')) {
             direction = 'get_vouchers'
         } else {
-            message.channel.send(`You did not select a valid option.`)
+            message.channel.send({ content: `You did not select a valid option.`})
             return false
         }
 
         return direction
     }).catch(err => {
 		console.log(err)
-        message.channel.send(`Sorry, time's up.`)
+        message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
@@ -886,7 +896,7 @@ const getVoucher = async (message) => {
     ]
 
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send(`Which Voucher would you like to exchange?\n${options.join("\n")}`)
+	const msg = await message.channel.send({ content: `Which Voucher would you like to exchange?\n${options.join("\n")}`})
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
         time: 15000
@@ -920,14 +930,14 @@ const getVoucher = async (message) => {
         } else if(response.includes('9') || response.includes('orb')) {
             voucher = 'orb'
         } else {
-            message.channel.send(`You did not select a valid option.`)
+            message.channel.send({ content: `You did not select a valid option.`})
             return false
         }
 
         return voucher
     }).catch(err => {
 		console.log(err)
-        message.channel.send(`Sorry, time's up.`)
+        message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
@@ -953,7 +963,7 @@ const getTribe = async (message, player) => {
     ]
 
     const filter = m => m.author.id === player.id
-	const msg = await message.channel.send(`${player.name}, which Tribe did you battle alongside?\n${options.join("\n")}`)
+	const msg = await message.channel.send({ content: `${player.name}, which Tribe did you battle alongside?\n${options.join("\n")}`})
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
         time: 30000
@@ -985,14 +995,14 @@ const getTribe = async (message, player) => {
         } else if(response.includes('9') || response.includes('drag')) {
             voucher = 'gem'
         } else {
-            message.channel.send(`You did not select a valid option.`)
+            message.channel.send({ content: `You did not select a valid option.`})
             return false
         }
 
         return voucher
     }).catch(err => {
 		console.log(err)
-        message.channel.send(`Sorry, time's up.`)
+        message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
@@ -1086,7 +1096,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
     const cards = options.map((o) => o[2])
     
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send(`Which card would you like to barter for?\n${cards.join("\n")}`)
+	const msg = await message.channel.send({ content: `Which card would you like to barter for?\n${cards.join("\n")}`})
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
         time: 15000
@@ -1109,7 +1119,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
         return selected_option
     }).catch(err => {
 		console.log(err)
-        message.channel.send(`Sorry, time's up.`)
+        message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
@@ -1121,7 +1131,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
 // GET BARTER QUERY
 const getBarterQuery = async (message) => {
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send(`Which card would you like to exchange ${forgestone} for?`)
+	const msg = await message.channel.send({ content: `Which card would you like to exchange ${forgestone} for?`})
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
         time: 15000
@@ -1130,7 +1140,7 @@ const getBarterQuery = async (message) => {
         return response
     }).catch(err => {
 		console.log(err)
-        message.channel.send(`Sorry, time's up.`)
+        message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
@@ -1158,7 +1168,7 @@ const getTradeInCard = async (message, medium_complete) => {
     const cards = options.map((o) => o[2])
 
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send(`Which card would you like to trade-in?\n${cards.join("\n")}`)
+	const msg = await message.channel.send({ content: `Which card would you like to trade-in?\n${cards.join("\n")}`})
     const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
         time: 15000
@@ -1190,7 +1200,7 @@ const getTradeInCard = async (message, medium_complete) => {
         } else if(response.includes('9') || response.includes('APC-009') || response.includes('drag') || response.includes('cata')) {
             index = 8
         } else {
-            message.channel.send(`You did not select a valid option.`)
+            message.channel.send({ content: `You did not select a valid option.`})
             return false
         }
 
@@ -1198,7 +1208,7 @@ const getTradeInCard = async (message, medium_complete) => {
         return selected_option
     }).catch(err => {
 		console.log(err)
-        message.channel.send(`Sorry, time's up.`)
+        message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
@@ -1212,7 +1222,7 @@ const askForBarterConfirmation = async (message, voucher, card, price, direction
         `Are you sure you want to exchange a copy of ${card} for ${price} ${eval(voucher)}?`
         
     const filter = m => m.author.id === message.author.id
-    const msg = await message.channel.send(prompt)
+    const msg = await message.channel.send({ content: prompt })
     const collected = await msg.channel.awaitMessages(filter, {
         max: 1,
         time: 15000
@@ -1220,12 +1230,12 @@ const askForBarterConfirmation = async (message, voucher, card, price, direction
         if (yescom.includes(collected.first().content.toLowerCase())) {
             return true
         } else {
-            message.channel.send(`No problem. Have a nice day.`)
+            message.channel.send({ content: `No problem. Have a nice day.`})
             return false
         }  
     }).catch(err => {
         console.log(err)
-        message.channel.send(`Sorry, time's up.`)
+        message.channel.send({ content: `Sorry, time's up.`})
         return false
     })
 

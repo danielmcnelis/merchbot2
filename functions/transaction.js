@@ -22,12 +22,12 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlay
     const sellerId = sellingPlayer.id
 
 	const filter = m => m.author.id === sellerId
-	const msg = await message.channel.send(
+	const msg = await message.channel.send({ content: 
         `${mention ? `<@${sellerId}>, Do you agree` : 'Are you sure you want'} ` +
         `to sell${cards.length > 1 ? `:\n${cards.join('\n')}\nT` : ` ${cards[0]} t`}o ` +
         `${shopSale ? 'The Shop' : buyingPlayer.name} ` + 
         `for ${invoice.total_price}${stardust}?`
-    )
+    })
 
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
@@ -37,12 +37,12 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlay
 		if (yescom.includes(response)) {
 			return true
 		} else {
-			message.channel.send(`No problem. Have a nice day.`)
+			message.channel.send({ content: `No problem. Have a nice day.`})
 			return false
 		}
 	}).catch(err => {
 		console.log(err)
-		message.channel.send(`Sorry, time's up.`)
+		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
@@ -55,7 +55,7 @@ const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlaye
     const buyerId = buyingPlayer.id
 
 	const filter = m => m.author.id === buyerId
-	const msg = await message.channel.send(`${mention ? `<@${buyerId}>, Do you agree` : 'Are you sure you want'} to buy${cards.length > 1 ? `:\n${cards.join('\n')}\nF` : ` ${cards[0]} f`}rom ${sellingPlayer.id === merchbotId ? 'The Shop' : sellingPlayer.name} for ${invoice.total_price}${stardust}?`)
+	const msg = await message.channel.send({ content: `${mention ? `<@${buyerId}>, Do you agree` : 'Are you sure you want'} to buy${cards.length > 1 ? `:\n${cards.join('\n')}\nF` : ` ${cards[0]} f`}rom ${sellingPlayer.id === merchbotId ? 'The Shop' : sellingPlayer.name} for ${invoice.total_price}${stardust}?`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
@@ -64,12 +64,12 @@ const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlaye
 		if (yescom.includes(response)) {
 			return true
 		} else {
-			message.channel.send(`No problem. Have a nice day.`)
+			message.channel.send({ content: `No problem. Have a nice day.`})
 			return false
 		}
 	}).catch(err => {
 		console.log(err)
-		message.channel.send(`Sorry, time's up.`)
+		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
@@ -96,12 +96,12 @@ const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer, fuzzyP
         const query = isFinite(args[0]) ? args.slice(1).join(' ') : args.slice(0).join(' ')	
 
         if (quantity < 1) {
-            message.channel.send(`Sorry, ${quantity} is not a valid quantity.`)
+            message.channel.send({ content: `Sorry, ${quantity} is not a valid quantity.`})
             return false
         }
     
 		if (!query) {
-            message.channel.send(`Please specify the cards you wish to sell.`)
+            message.channel.send({ content: `Please specify the cards you wish to sell.`})
             return false
         }
 
@@ -114,13 +114,13 @@ const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer, fuzzyP
                     null
 
         if (card_name && !print) {
-            message.channel.send(`You do not have any copies of ${card_name}.`)
+            message.channel.send({ content: `You do not have any copies of ${card_name}.`})
             return false
         } else if (!print) {
-            message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+            message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
             return false
         } else if (print.set_code === 'FPC') {
-			message.channel.send(`You cannot buy or sell prize cards.`)
+			message.channel.send({ content: `You cannot buy or sell prize cards.`})
 			return false
 		}
 
@@ -128,7 +128,7 @@ const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer, fuzzyP
 		const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 
         if (card_codes.includes(card_code)) {
-            message.channel.send(`You cannot list ${card} more than once.`)
+            message.channel.send({ content: `You cannot list ${card} more than once.`})
             return false
         }
 
@@ -151,17 +151,17 @@ const getInvoiceMerchBotSale = async (message, line_items, sellingPlayer, fuzzyP
         const auction = await Auction.findOne({ where: { printId: print.id }})
 
         if ((auction || !merchbotInv) && shopIsClosed) {
-            message.channel.send(`Sorry, you cannot sell ${card} until the current auction is over.`)
+            message.channel.send({ content: `Sorry, you cannot sell ${card} until the current auction is over.`})
             return false
         }
 
 		if (!sellerInv) {
-            message.channel.send(`You do not have any copies of ${card}.`)
+            message.channel.send({ content: `You do not have any copies of ${card}.`})
             return false
         }
 
 		if (sellerInv.quantity < quantity) {
-            message.channel.send(`You only have ${sellerInv.quantity} ${sellerInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`)
+            message.channel.send({ content: `You only have ${sellerInv.quantity} ${sellerInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`})
             return
         } 
 	
@@ -210,12 +210,12 @@ const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer, fuz
     const query = isFinite(args[0]) ? args.slice(1).join(' ') : args.slice(0).join(' ')	
 
     if (quantity < 1) {
-        message.channel.send(`Sorry, ${quantity} is not a valid quantity.`)
+        message.channel.send({ content: `Sorry, ${quantity} is not a valid quantity.`})
         return false
     }
 
     if (!query) {
-        message.channel.send(`Please specify the card you wish to buy.`)
+        message.channel.send({ content: `Please specify the card you wish to buy.`})
         return false
     } 
 
@@ -228,10 +228,10 @@ const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer, fuz
                 null
     
     if (card_name && !print) {
-        message.channel.send(`You do not have any copies of ${card_name}.`)
+        message.channel.send({ content: `You do not have any copies of ${card_name}.`})
         return false
     } else if (!print) {
-        message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+        message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
         return false
     }
 
@@ -239,7 +239,7 @@ const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer, fuz
     const auction = await Auction.findOne({ where: { printId: print.id }})
 
     if (auction) {
-        message.channel.send(`Sorry, ${card} will not be available until the ${shopIsClosed ? 'current auction is over' : 'next auction'}.`)
+        message.channel.send({ content: `Sorry, ${card} will not be available until the ${shopIsClosed ? 'current auction is over' : 'next auction'}.`})
         return false
     }
 
@@ -260,17 +260,17 @@ const getInvoiceMerchBotPurchase = async (message, line_items, buyingPlayer, fuz
     })
 
     if (buyerInv && (buyerInv.quantity + quantity > 3) || quantity > 3 ) {
-        message.channel.send(`You cannot buy more than 3 copies of a card from The Shop.`)
+        message.channel.send({ content: `You cannot buy more than 3 copies of a card from The Shop.`})
         return false
     } 
 
     if (!merchbotInv) {
-        message.channel.send(`Sorry, ${card} is out of stock.`)
+        message.channel.send({ content: `Sorry, ${card} is out of stock.`})
         return false
     } 
 
     if (merchbotInv.quantity < quantity) {
-        message.channel.send(`Sorry, I only have ${merchbotInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`)
+        message.channel.send({ content: `Sorry, I only have ${merchbotInv.quantity > 1 ? 'copies' : 'copy'} of ${card}.`})
         return
     } 
 
@@ -307,29 +307,29 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
     let m4success
 
     if (quantity < 1) {
-        message.channel.send(`Sorry, ${quantity} is not a valid quantity.`)
+        message.channel.send({ content: `Sorry, ${quantity} is not a valid quantity.`})
         return false
     }
 
     if (!total_price) {
-        message.channel.send(`Please specify your ${authorIsSeller ? 'asking price' : 'offer price'} at the end of the command.`)
+        message.channel.send({ content: `Please specify your ${authorIsSeller ? 'asking price' : 'offer price'} at the end of the command.`})
         return false
     }
 
     if (total_price < 1) {
-        message.channel.send(`You cannot pay less than 1${stardust} for any items.`)
+        message.channel.send({ content: `You cannot pay less than 1${stardust} for any items.`})
         return false
     }
 
 	if (buyingPlayer.wallet.stardust < total_price && buyerId !== merchbotId) {
-        message.channel.send(`Sorry, ${authorIsSeller ? `${buyingPlayer.name} only has` : 'You only have'} ${buyingPlayer.wallet.stardust}${stardust}.`)
+        message.channel.send({ content: `Sorry, ${authorIsSeller ? `${buyingPlayer.name} only has` : 'You only have'} ${buyingPlayer.wallet.stardust}${stardust}.`})
         return false
     } 
 
     const query = isFinite(args[0]) ? args.slice(1, -1).join(' ') : args.slice(0, -1).join(' ')
 
     if (!query) {
-        message.channel.send(`Please specify the card(s) you wish to ${authorIsSeller ? 'sell' : 'buy'}.`)
+        message.channel.send({ content: `Please specify the card(s) you wish to ${authorIsSeller ? 'sell' : 'buy'}.`})
         return false
     } 
 
@@ -356,15 +356,15 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
                 null
     
     if (card_name && !print && !walletField) {
-        message.channel.send(`You do not have any copies of ${card_name}.`)
+        message.channel.send({ content: `You do not have any copies of ${card_name}.`})
         return false
     } else if (!print && !walletField) {
-        message.channel.send(`Sorry, I do not recognize the card: "${query}".`)
+        message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
         return false
     }
 
 	if (print && Math.ceil(print.market_price * 0.7) * quantity > total_price) {
-        message.channel.send(`Sorry, you cannot ${authorIsSeller ? 'sell cards to' : 'buy cards from'} other players for less than what The Shop will pay for them.`)
+        message.channel.send({ content: `Sorry, you cannot ${authorIsSeller ? 'sell cards to' : 'buy cards from'} other players for less than what The Shop will pay for them.`})
         return false
     }
 
@@ -389,12 +389,12 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
     }})
 
     if ((!sellerInv && print) && (!sellerWallet && walletField)) {
-        message.channel.send(`${authorIsSeller ? `You do not have any ${walletField ? '' : 'copies of '}` : shopSale ? 'Sorry, ' : `${buyingPlayer.name} does not have any${walletField ? '' : 'copies of '}`}${card}${shopSale ? ' is Out of Stock' : ''}.`)
+        message.channel.send({ content: `${authorIsSeller ? `You do not have any ${walletField ? '' : 'copies of '}` : shopSale ? 'Sorry, ' : `${buyingPlayer.name} does not have any${walletField ? '' : 'copies of '}`}${card}${shopSale ? ' is Out of Stock' : ''}.`})
         return false
     } 
 
     if (sellerInv && sellerInv.quantity < quantity || sellerWallet && sellerWallet[walletField] < quantity) {
-        message.channel.send(`${authorIsSeller ? 'You only have' : `${sellingPlayer.name} only has` } ${sellerInv ? `${sellerInv.quantity} ${card}` : `${sellerWallet[walletField]} ${eval(walletField)}`}.`)
+        message.channel.send({ content: `${authorIsSeller ? 'You only have' : `${sellingPlayer.name} only has` } ${sellerInv ? `${sellerInv.quantity} ${card}` : `${sellerWallet[walletField]} ${eval(walletField)}`}.`})
         return false
     }
 
@@ -423,7 +423,7 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
     const buyerId = buyingPlayer.id
 
     if (!total_price || !cards.length || !quantities.length || !prints.length || !sellerInvs.length || !buyerId) {
-        message.channel.send(`Error processing MerchBot Sale: missing needed information.`)
+        message.channel.send({ content: `Error processing MerchBot Sale: missing needed information.`})
         return false
     }
 
@@ -466,7 +466,7 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
 		})
 
         if (!buyerInv) {
-            message.channel.send(`Database error: Could not find or create Buyer Inventory for: ${print.card_name}.`)
+            message.channel.send({ content: `Database error: Could not find or create Buyer Inventory for: ${print.card_name}.`})
         }
 
         const auction = await Auction.findOne({ where: { printId: print.id }})
@@ -515,7 +515,7 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
     const buyerWallet = buyingPlayer.wallet
 
     if (!total_price || !card || !quantity || !((print && sellerInv) || walletField) || !buyerId || !sellerId || !buyerWallet || !sellerWallet) {
-        message.channel.send(`Error processing P2P Sale: missing needed information.`)
+        message.channel.send({ content: `Error processing P2P Sale: missing needed information.`})
         return false
     }
 
@@ -553,7 +553,7 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
         })
 
         if (!buyerInv) {
-            message.channel.send(`Database error: Could not find Buyer Inventory for: ${print.card_name}.`)
+            message.channel.send({ content: `Database error: Could not find Buyer Inventory for: ${print.card_name}.`})
         }
 
         buyerInv.quantity += quantity
@@ -586,7 +586,7 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
         sellerWallet.stardust += total_price
         await sellerWallet.save()
     } else {
-        message.channel.send(`Error processing P2P Sale: missing needed information.`)
+        message.channel.send({ content: `Error processing P2P Sale: missing needed information.`})
         return false
     }
  

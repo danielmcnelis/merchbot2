@@ -18,7 +18,7 @@ const askForGrindAllConfirmation = async (message, index = 0) => {
         `Mr. <@${message.author.id}>.\nMR. <@${message.author.id}>.\n\nThis is the FINAL prompt. If you answer "y" you are DONE.\n\nAre you 100%, no, NO, **1000%** sure you *WANT* to **GRIND EVERYONE'S** ${starchips}s into ${stardust}???`
     ]
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`${prompts[index]}`)
+	const msg = await message.channel.send({ content: `${prompts[index]}`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 15000
@@ -26,12 +26,12 @@ const askForGrindAllConfirmation = async (message, index = 0) => {
         const response = collected.first().content.toLowerCase()
 		if (yescom.includes(response)) return true
         else {
-            message.channel.send(`Not a problem. Have a nice day.`)
+            message.channel.send({ content: `Not a problem. Have a nice day.`})
             return false
         }
 	}).catch(err => {
 		console.log(err)
-		message.channel.send(`Sorry, time's up.`)
+		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 

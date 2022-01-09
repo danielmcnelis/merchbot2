@@ -109,9 +109,9 @@ const completeTask = async (channel, playerId, task, milliseconds = 2000) => {
         const task_num = task.slice(1)
         const full_text = diaries[difficulty][task]
         const task_text_only = full_text.slice(full_text.indexOf(") ") + 2)
-        channel.send(`<@${playerId}>, Congrats! You earned ${reward}${starchips} for completing Task #${task_num} in the ${difficulty} Diary${leatherbound}!` +
+        channel.send({ content: `<@${playerId}>, Congrats! You earned ${reward}${starchips} for completing Task #${task_num} in the ${difficulty} Diary${leatherbound}!` +
             `\n${legend} ${task_text_only} ${legend}`
-        )
+    })
         return checkDiaryComplete(channel, playerId, diary, difficulty)
     }, milliseconds)
 }
@@ -133,8 +133,8 @@ const checkDiaryComplete = async (channel, playerId, diary, difficulty) => {
         )
     ) {
         return setTimeout(async () => {
-            channel.send(`<@${playerId}>, Congrats! You completed your ${difficulty} Diary${leatherbound}!`)
-            channel.send(`\n${blue} ${koolaid} ${legend} ${cavebob} ${cultured}`)
+            channel.send({ content: `<@${playerId}>, Congrats! You completed your ${difficulty} Diary${leatherbound}!`})
+            channel.send({ content: `\n${blue} ${koolaid} ${legend} ${cavebob} ${cultured}`})
 
             const gotSecret = await awardPack(channel, playerId, null)
 			if (gotSecret) await completeTask(channel, playerId, 'm4')

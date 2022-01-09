@@ -26,7 +26,7 @@ const getArenaSample = async (message, query) => {
     if (query && query.includes('war')) return 'warrior'
     if (query && query.includes('zom')) return 'zombie'
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send(`Please select a tribe:\n(1) Beast\n(2) Dinosaur\n(3) Dragon\n(4) Fiend\n(5) Fish\n(6) Plant\n(7) Reptile\n(8) Rock\n(9) Spellcaster\n(10) Thunder\n(11) Warrior\n(12) Zombie`)
+	const msg = await message.channel.send({ content: `Please select a tribe:\n(1) Beast\n(2) Dinosaur\n(3) Dragon\n(4) Fiend\n(5) Fish\n(6) Plant\n(7) Reptile\n(8) Rock\n(9) Spellcaster\n(10) Thunder\n(11) Warrior\n(12) Zombie`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 10000
@@ -45,11 +45,11 @@ const getArenaSample = async (message, query) => {
         else if(response.includes('rep') || response.includes('7')) tribe = 'reptile'
         else if(response.includes('rock') || response.includes('8')) tribe = 'rock'
         else if(response.includes('spell') || response.includes('cast') || response.includes('9')) tribe = 'spellcaster'
-        else message.channel.send(`Please specify a valid tribe.`)
+        else message.channel.send({ content: `Please specify a valid tribe.`})
         return tribe
 	}).catch(err => {
 		console.log(err)
-        message.channel.send(`Sorry, time's up.`)
+        message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
@@ -59,7 +59,7 @@ const getArenaSample = async (message, query) => {
 //START ARENA
 const startArena = async() => {
     const channel = client.channels.cache.get(arenaChannelId)
-    channel.send(`Arena players, please check your DMs!`)
+    channel.send({ content: `Arena players, please check your DMs!`})
     const allArenaEntries = await Arena.findAll({ include: Player })
     const contestants = shuffleArray(["P1", "P2", "P3", "P4"])
 
@@ -89,7 +89,7 @@ const startArena = async() => {
                 await info.save()
                 assignArenaRoles(allArenaEntries)
                 setTimeout(() => {
-                    channel.send(`<@&${arenaRole}>, square-up gamers! The Arena starts in 10 seconds. ${cavebob}\n\nP.S. If you aren't playing within 5 minutes of this message, **it's a game loss**!`)
+                    channel.send({ content: `<@&${arenaRole}>, square-up gamers! The Arena starts in 10 seconds. ${cavebob}\n\nP.S. If you aren't playing within 5 minutes of this message, **it's a game loss**!`})
                 }, 1000)
                 return setTimeout(() => {
                     return startRound(info)
@@ -125,14 +125,14 @@ const startArena = async() => {
                 await entry.destroy()
             }
             
-            return channel.send(`Unfortunately, The Arena cannot begin without 4 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`)
+            return channel.send({ content: `Unfortunately, The Arena cannot begin without 4 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`})
         } else if (count === 4 && !active) {
             info.round = 1
             info.status = 'active'
             await info.save()
             assignArenaRoles(allArenaEntries)
             setTimeout(() => {
-                channel.send(`<@&${arenaRole}>, square-up gamers! The Arena starts in 10 seconds. ${cavebob}\n\nP.S. If you aren't playing within 5 minutes of this message, **it's a game loss**!`)
+                channel.send({ content: `<@&${arenaRole}>, square-up gamers! The Arena starts in 10 seconds. ${cavebob}\n\nP.S. If you aren't playing within 5 minutes of this message, **it's a game loss**!`})
             }, 1000)
             return setTimeout(() => {
                 return startRound(info)
@@ -149,7 +149,7 @@ const getConfirmation = async (arena_entry, contestant) => {
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
-	const msg = await member.send(`Please confirm your participation in the Arena by selecting a tribe:\n(1) Beast\n(2) Dinosaur\n(3) Dragon\n(4) Fiend\n(5) Fish\n(6) Plant\n(7) Reptile\n(8) Rock\n(9) Spellcaster\n(10) Thunder\n(11) Warrior\n(12) Zombie`)
+	const msg = await member.send({ content: `Please confirm your participation in the Arena by selecting a tribe:\n(1) Beast\n(2) Dinosaur\n(3) Dragon\n(4) Fiend\n(5) Fish\n(6) Plant\n(7) Reptile\n(8) Rock\n(9) Spellcaster\n(10) Thunder\n(11) Warrior\n(12) Zombie`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 60000
@@ -168,28 +168,28 @@ const getConfirmation = async (arena_entry, contestant) => {
         else if(response.includes('rep') || response.includes('7')) tribe = 'reptile'
         else if(response.includes('rock') || response.includes('8')) tribe = 'rock'
         else if(response.includes('spell') || response.includes('cast') || response.includes('9')) tribe = 'spellcaster'
-        else message.channel.send(`Please specify a valid tribe.`)
+        else message.channel.send({ content: `Please specify a valid tribe.`})
 
         const count = await Info.count({ where: {
             element: 'arena',
             status: 'confirming'
         } })
 
-        if (!count) return member.send(`Sorry, time expired.`)
+        if (!count) return member.send({ content: `Sorry, time expired.`})
 
         if (tribe) {
             arena_entry.active = true
             arena_entry.tribe = tribe
             arena_entry.contestant = contestant
             await arena_entry.save()
-            member.send(`Thanks! This is your Arena deck (staples in the side). You may cut it down to 40 cards:\n${decks[tribe].url}\n${decks[tribe].screenshot}`)
-            return channel.send(`${member.user.username} confirmed their participation in the Arena!`)
+            member.send({ content: `Thanks! This is your Arena deck (staples in the side). You may cut it down to 40 cards:\n${decks[tribe].url}\n${decks[tribe].screenshot}`})
+            return channel.send({ content: `${member.user.username} confirmed their participation in the Arena!`})
         } else {
             return getConfirmation(arena_entry)
         }
 	}).catch(err => {
 		console.log(err)
-        return member.send(`Sorry, time's up.`)
+        return member.send({ content: `Sorry, time's up.`})
 	})
 }
 
@@ -213,7 +213,7 @@ const startRound = async (info, entries) => {
         const wallet = await Wallet.findOne({ where: { playerId: entries[1].playerId }})
         wallet[voucher] += quantity
         await wallet.save()
-        channel.send(`<@${entries[1].playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`)
+        channel.send({ content: `<@${entries[1].playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
         
         const tribe = entries[0].tribe
         const playerId = entries[0].playerId
@@ -222,11 +222,11 @@ const startRound = async (info, entries) => {
         await profile.save()
         await awardCard(channel, playerId, prizes[tribe])
 
-        channel.send(`Congratulations to <@${playerId}> on a brilliant victory` +
+        channel.send({ content: `Congratulations to <@${playerId}> on a brilliant victory` +
             ` with the ${capitalize(tribe)} ${eval(tribe)} deck.` +
             ` ${victories[tribe]}` +
             ` You truly deserve the ${apcs[tribe]}!`
-        )
+    })
 
         completeTask(channel, playerId, 'm10', 12000)
         if (await check6TribesComplete(playerId, 1)) completeTask(channel, playerId, 'h8', 4000)
@@ -242,7 +242,7 @@ const startRound = async (info, entries) => {
                 const wallet = await Wallet.findOne({ where: { playerId: entry.playerId }})
                 wallet[voucher] += quantity
                 await wallet.save()
-                channel.send(`<@${entry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`)
+                channel.send({ content: `<@${entry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
             }
 
             const tribe = entries[0].tribe
@@ -252,11 +252,11 @@ const startRound = async (info, entries) => {
             await profile.save()
             await awardCard(channel, playerId, prizes[tribe])
 
-            channel.send(`Congratulations to <@${playerId}> on a brilliant victory` +
+            channel.send({ content: `Congratulations to <@${playerId}> on a brilliant victory` +
                 ` with the ${capitalize(tribe)} ${eval(tribe)} deck.` +
                 ` ${victories[tribe]}` +
                 ` You truly deserve the ${apcs[tribe]}!`
-            )
+        })
 
             completeTask(channel, playerId, 'm10', 12000)
             if (await check6TribesComplete(playerId, 1)) completeTask(channel, playerId, 'h8', 4000)
@@ -271,7 +271,7 @@ const startRound = async (info, entries) => {
                 const wallet = await Wallet.findOne({ where: { playerId: entry.playerId }})
                 wallet[voucher] += quantity
                 await wallet.save()
-                channel.send(`<@${entry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`)
+                channel.send({ content: `<@${entry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
                 const member = guild.members.cache.get(entry.playerId)
                 member.roles.remove(arenaRole)
                 entry.score = 0
@@ -288,7 +288,7 @@ const startRound = async (info, entries) => {
             const match = `${eval(entries[0].tribe)} <@${entries[0].playerId}> ${eval(entries[0].tribe)}` +
             ` vs ${eval(entries[1].tribe)} <@${entries[1].playerId}> ${eval(entries[1].tribe)}`
 
-            return channel.send(`${title}\n${match}`)
+            return channel.send({ content: `${title}\n${match}`})
         } else {
         //3 way tie
             for (let i = 0; i < entries.length; i++) {
@@ -298,10 +298,10 @@ const startRound = async (info, entries) => {
                 const wallet = await Wallet.findOne({ where: { playerId: entry.playerId }})
                 wallet[voucher] += quantity
                 await wallet.save()
-                channel.send(`<@${entry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`)
+                channel.send({ content: `<@${entry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
             }
 
-            channel.send(`The shadows grew long over the battlefield, and the gladiators had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena.`)
+            channel.send({ content: `The shadows grew long over the battlefield, and the gladiators had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena.`})
             return endArena(info, entries)
         }
     } else {
@@ -310,7 +310,7 @@ const startRound = async (info, entries) => {
         const P3 = await Arena.findOne({ where: { contestant: "P3" }, include: Player})
         const P4 = await Arena.findOne({ where: { contestant: "P4" }, include: Player})
     
-        if (!P1 || !P2 || !P3 || !P4) return channel.send(`Critical error. Missing contestant in the database.`)
+        if (!P1 || !P2 || !P3 || !P4) return channel.send({ content: `Critical error. Missing contestant in the database.`})
     
         const pairings = info.round === 1 ? [[P1, P2], [P3, P4]] :
             info.round === 2 ? [[P1, P3], [P2, P4]] :
@@ -333,7 +333,7 @@ const startRound = async (info, entries) => {
             }
         })
 
-        return channel.send(`${title}\n${matches.join("\n")}`)
+        return channel.send({ content: `${title}\n${matches.join("\n")}`})
     }
 }
 
@@ -341,11 +341,11 @@ const startRound = async (info, entries) => {
 const forfeit = async (winnerId, loserId) => {
         const channel = client.channels.cache.get(arenaChannelId)
         const info = await Info.findOne({ where: { element: 'arena' } })
-		if (!info) return channel.send(`Error: could not find game: "arena".`)
+		if (!info) return channel.send({ content: `Error: could not find game: "arena".`})
 
 		const losingPlayer = await Player.findOne({ where: { id: loserId }, include: [Arena, Wallet] })
 		const winningPlayer = await Player.findOne({ where: { id: winnerId }, include: [Arena, Wallet] })
-		if (!winningPlayer || !losingPlayer) return channel.send(`Could not process forfeiture.`)
+		if (!winningPlayer || !losingPlayer) return channel.send({ content: `Could not process forfeiture.`})
 		
 		winningPlayer.wallet.starchips += 5
 		await winningPlayer.wallet.save()
@@ -357,7 +357,7 @@ const forfeit = async (winnerId, loserId) => {
 		winningPlayer.arena.is_playing = false
 		await winningPlayer.arena.save()
 
-		channel.send(`${losingPlayer.name} (+0${starchips}), your Arena loss to ${winningPlayer.name} (+5${starchips}) has been recorded.`)
+		channel.send({ content: `${losingPlayer.name} (+0${starchips}), your Arena loss to ${winningPlayer.name} (+5${starchips}) has been recorded.`})
 		return checkArenaProgress(info) 
 }
 
@@ -365,11 +365,11 @@ const forfeit = async (winnerId, loserId) => {
 const doubleForfeit = async (player1Id, player2Id) => {
     const channel = client.channels.cache.get(arenaChannelId)
     const info = await Info.findOne({ where: { element: 'arena' } })
-    if (!info) return channel.send(`Error: could not find game: "arena".`)
+    if (!info) return channel.send({ content: `Error: could not find game: "arena".`})
 
     const contestant1 = await Player.findOne({ where: { id: player1Id }, include: Player })
     const contestant2 = await Player.findOne({ where: { id: player2Id }, include: Player })
-    if (!contestant1 || !contestant2) return channel.send(`Could not process double forfeiture.`)
+    if (!contestant1 || !contestant2) return channel.send({ content: `Could not process double forfeiture.`})
     
     contestant1.is_playing = false
     await contestant1.save()
@@ -377,7 +377,7 @@ const doubleForfeit = async (player1Id, player2Id) => {
     contestant2.is_playing = false
     await contestant2.save()
 
-    channel.send(`The double Arena forfeiture between ${contestant1.player.name} (+0${starchips}) and ${contestant2.player.name} (+0${starchips}) has been recorded.`)
+    channel.send({ content: `The double Arena forfeiture between ${contestant1.player.name} (+0${starchips}) and ${contestant2.player.name} (+0${starchips}) has been recorded.`})
     return checkArenaProgress(info) 
 }
 
@@ -399,7 +399,7 @@ const postStandings = async (info, entries) => {
     info.round++
     await info.save()
 
-    channel.send(`${title}\n${standings.join("\n")}`)
+    channel.send({ content: `${title}\n${standings.join("\n")}`})
     
     return setTimeout(() => {
         startRound(info, entries)
@@ -442,7 +442,7 @@ const resetArena = async (info, entries) => {
 //CHECK ARENA PROGRESS
 const checkArenaProgress = async (info) => {
     const entries = await Arena.findAll({ include: Player, order: [["score", "DESC"]]})
-    if (!entries) return channel.send(`Critical error. Missing entries in the database.`) 
+    if (!entries) return channel.send({ content: `Critical error. Missing entries in the database.`}) 
 
     if (info.round === 4) {
         info.round = 5

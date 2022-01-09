@@ -14,7 +14,7 @@ const { Message } = require('discord.js')
 
 const startTrivia = async () => {
     const channel = client.channels.cache.get(triviaChannelId)
-    channel.send(`Trivia players, please check your DMs!`)
+    channel.send({ content: `Trivia players, please check your DMs!`})
     const entries = await Trivia.findAll({ include: Player })
 
     for (let i = 0; i < entries.length; i++) {
@@ -42,7 +42,7 @@ const startTrivia = async () => {
                 await info.save()
                 assignTriviaRoles(entries)
                 setTimeout(() => {
-                    channel.send(`<@&${triviaRole}>, look alive bookworms! Trivia starts in 10 seconds. ${wut}\n\nP.S. Remember: answer questions **in your DMs**.`)
+                    channel.send({ content: `<@&${triviaRole}>, look alive bookworms! Trivia starts in 10 seconds. ${wut}\n\nP.S. Remember: answer questions **in your DMs**.`})
                 }, 1000)
                 return setTimeout(() => {
                     return askQuestion(info, questions)
@@ -72,7 +72,7 @@ const startTrivia = async () => {
                 await entry.destroy()
             }
             
-            return channel.send(`Unfortunately, Trivia cannot begin without 4 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`)
+            return channel.send({ content: `Unfortunately, Trivia cannot begin without 4 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`})
         } else if (count >= 4 && !active) {
             const missing_entries = await Trivia.findAll({ where: { active: false }, include: Player })
             for (let i = 0; i < missing_entries.length; i++) {
@@ -85,7 +85,7 @@ const startTrivia = async () => {
             await info.save()
             assignTriviaRoles(entries)
             setTimeout(() => {
-                channel.send(`<@&${triviaRole}>, look alive bookworms! Trivia starts in 10 seconds. ${wut}\n\nP.S. Remember: answer questions **in your DMs**.`)
+                channel.send({ content: `<@&${triviaRole}>, look alive bookworms! Trivia starts in 10 seconds. ${wut}\n\nP.S. Remember: answer questions **in your DMs**.`})
             }, 1000)
             return setTimeout(() => {
                 return askQuestion(info, questionsArr)
@@ -101,7 +101,7 @@ const getTriviaConfirmation = async (trivia_entry) => {
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
-	const msg = await member.send(`Do you still wish to play Trivia?`)
+	const msg = await member.send({ content: `Do you still wish to play Trivia?`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 60000
@@ -113,20 +113,20 @@ const getTriviaConfirmation = async (trivia_entry) => {
             status: 'confirming'
         } })
 
-        if (!count) return member.send(`Sorry, time expired.`)
+        if (!count) return member.send({ content: `Sorry, time expired.`})
 
         if(yescom.includes(response)) {
             trivia_entry.active = true
             await trivia_entry.save()
-            member.send(`Thanks! Trivia will be starting very soon.`)
-            return channel.send(`${member.user.username} confirmed their participation in Trivia!`)
+            member.send({ content: `Thanks! Trivia will be starting very soon.`})
+            return channel.send({ content: `${member.user.username} confirmed their participation in Trivia!`})
         } else {
-            member.send(`Okay, sorry to see you go!`)
-            return channel.send(`Oof. ${member.user.username} ducked out of Trivia!`)
+            member.send({ content: `Okay, sorry to see you go!`})
+            return channel.send({ content: `Oof. ${member.user.username} ducked out of Trivia!`})
         }
 	}).catch(err => {
 		console.log(err)
-        return member.send(`Sorry, time's up.`)
+        return member.send({ content: `Sorry, time's up.`})
 	})
 }
 
@@ -137,7 +137,7 @@ const getAnswer = async (entry, question, round) => {
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
-	const msg = await member.send(`${megaphone}  ------  Question #${round}  ------  ${dummy}\n${question}`)
+	const msg = await member.send({ content: `${megaphone}  ------  Question #${round}  ------  ${dummy}\n${question}`})
 	const collected = await msg.channel.awaitMessages(filter, {
 		max: 1,
 		time: 20000
@@ -145,12 +145,12 @@ const getAnswer = async (entry, question, round) => {
 		const response = collected.first().content
         entry.answer = response
         await entry.save()
-        return member.send(`Thanks!`)
+        return member.send({ content: `Thanks!`})
 	}).catch(async err => {
 		console.log(err)
         entry.answer = 'no answer'
         await entry.save()
-        return member.send(`Time's up!`)
+        return member.send({ content: `Time's up!`})
 	})
 }
 
@@ -169,7 +169,7 @@ const askQuestion = async (info, questionsArr) => {
 	let fuzzyAnswers = FuzzySet([], false)
     answers.forEach((a) =>  fuzzyAnswers.add(a))
 
-    channel.send(`${megaphone}  ------  Question #${info.round}  ------  ${dummy}\n${question}\n\n`)
+    channel.send({ content: `${megaphone}  ------  Question #${info.round}  ------  ${dummy}\n${question}\n\n`})
     
     const entries = await Trivia.findAll({ include: Player })
     entries.forEach((entry) => {
@@ -195,12 +195,12 @@ const askQuestion = async (info, questionsArr) => {
                 const name = entry.player.name
                 const timedOut = entry.answer === 'no answer' ? true : false
                 const answer = entry.answer
-                channel.send(`${name}${timedOut ? ` did not answer in time. That's a shame. ${orange}` : ` said: ${answer}. ${score ? `Correct! ${cultured}` : `That ain't it! ${amongmfao}`}`}`)
+                channel.send({ content: `${name}${timedOut ? ` did not answer in time. That's a shame. ${orange}` : ` said: ${answer}. ${score ? `Correct! ${cultured}` : `That ain't it! ${amongmfao}`}`}`})
             }, i * 2000)
         }
         
         if (!atLeastOneCorrect) {
-            setTimeout(() => channel.send(`The correct answer is: **${answers[0]}**`), updatedEntries.length * 2000)
+            setTimeout(() => channel.send({ content: `The correct answer is: **${answers[0]}**`}), updatedEntries.length * 2000)
         }
 
         return setTimeout(() => postTriviaStandings(info, updatedEntries, questionsArr), updatedEntries.length * 2000 + 3000)
@@ -236,7 +236,7 @@ const postTriviaStandings = async (info, entries, questions) => {
         const unit = score === 1 ? 'pt' : 'pts'
        return `${index + 1}. <@${entry.playerId}> - ${score}${unit} ${enthusiasm}`
     })
-    channel.send(`${title}\n${standings.join("\n")}`)
+    channel.send({ content: `${title}\n${standings.join("\n")}`})
 
     info.round++
     await info.save()
@@ -265,13 +265,13 @@ const endTrivia = async (info, entries) => {
             const reward = score - 2
             wallet.starchips += reward
             await wallet.save()
-            setTimeout(() => channel.send(`<@${wallet.playerId}> was awarded ${reward}${starchips} for an impressive display of knowledge. Congratulations!`), i * 1000 + 1000)
+            setTimeout(() => channel.send({ content: `<@${wallet.playerId}> was awarded ${reward}${starchips} for an impressive display of knowledge. Congratulations!`}), i * 1000 + 1000)
         } else if (score < 3 && score > 0) {
             const wallet = await Wallet.findOne({ where: { playerId: entry.playerId }, include: Player })
             const reward = (score * 5)
             wallet.stardust += reward
             await wallet.save()
-            setTimeout(() => channel.send(`<@${wallet.playerId}> was awarded ${reward}${stardust} for their effort. Thanks for playing!`), i * 1000 + 1000)
+            setTimeout(() => channel.send({ content: `<@${wallet.playerId}> was awarded ${reward}${stardust} for their effort. Thanks for playing!`}), i * 1000 + 1000)
         } 
 
         const correct_answers = await Knowledge.count({ where: { playerId: entry.playerId }})

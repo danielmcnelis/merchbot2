@@ -21,7 +21,7 @@ const manageBidding = async (message, player, fuzzyPrints) => {
     }
 
     const prompt = `Your bids are as follows:\n${bidSummary.join("\n")}\n\nWhat would you like to do?\n${bidSummary.length >= 3 ? '(1) cancel a bid\n(2) nothing' : '(1) place a bid\n(2) cancel a bid\n(3) nothing'}`
-    const msg = await message.author.send(prompt)
+    const msg = await message.author.send({ content: prompt })
     const collected = await msg.channel.awaitMessages(filter, {
         max: 1,
         time: 20000
@@ -32,17 +32,17 @@ const manageBidding = async (message, player, fuzzyPrints) => {
         } else if(response.includes('can') || (bidSummary.length >= 3 && response.includes('1')) ||  (bidSummary.length < 3 && response.includes('2'))) {
             return askForBidCancellation(message, player)
         } else {
-            return message.author.send(`Not a problem. Have a nice day.`)
+            return message.author.send({ content: `Not a problem. Have a nice day.` })
         }
     }).catch(err => {
         console.log(err)
-        return message.author.send(`Sorry, time's up.`)
+        return message.author.send({ content: `Sorry, time's up.` })
     })
 }
 
 const askForBidPlacement = async (message, player, fuzzyPrints) => {
     const filter = m => m.author.id === message.author.id
-    const msg = await message.author.send(`Which card would you like to bid on?`)
+    const msg = await message.author.send({ content: `Which card would you like to bid on?`})
     const collected = await msg.channel.awaitMessages(filter, {
         max: 1,
         time: 45000
@@ -52,11 +52,11 @@ const askForBidPlacement = async (message, player, fuzzyPrints) => {
         const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
         const card_name = await findCard(query, fuzzyPrints)
         const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, player.id, card_name, private = true, inInv = false, inAuc = true) : null
-        if (!print) return message.author.send(`Sorry, I do not recognize the card: "${query}".`)
+        if (!print) return message.author.send({ content: `Sorry, I do not recognize the card: "${query}".`})
         const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
         
         const auction = await Auction.findOne({ where: { printId: print.id } })
-        if (!auction) return message.author.send(`Sorry, ${card} is not part of the auction tonight.`)
+        if (!auction) return message.author.send({ content: `Sorry, ${card} is not part of the auction tonight.`})
 
 
         const inv = await Inventory.findOne({ 
@@ -66,12 +66,12 @@ const askForBidPlacement = async (message, player, fuzzyPrints) => {
             }
         })
 
-        if (inv && inv.quantity >= 3) return message.author.send(`Sorry, you already have ${inv.quantity} copies of ${card}.`)
+        if (inv && inv.quantity >= 3) return message.author.send({ content: `Sorry, you already have ${inv.quantity} copies of ${card}.`})
 
         if (player.bids.length) {
             for (let i = 0; i < player.bids.length; i++) {
                 const bid = player.bids[i]
-                if (print.card_code === bid.card_code) return message.author.send(`Sorry, you already placed a bid on ${card}.`)
+                if (print.card_code === bid.card_code) return message.author.send({ content: `Sorry, you already placed a bid on ${card}.`})
             }
         }
 
@@ -85,40 +85,40 @@ const askForBidPlacement = async (message, player, fuzzyPrints) => {
             auctionId: auction.id
         })
             
-        message.author.send(`Thanks! You placed a ${amount}${stardust} bid on ${eval(print.rarity)}${print.card_code} - ${print.card_name}.`)
+        message.author.send({ content: `Thanks! You placed a ${amount}${stardust} bid on ${eval(print.rarity)}${print.card_code} - ${print.card_name}.`})
         const updatedPlayer = await Player.findOne({ where: { id: player.id }, include: [Bid, Wallet], order: [[Bid, 'amount', 'DESC']]})
         if (!updatedPlayer || player.bids.length >= 3) return
         else return setTimeout(async () => manageBidding(message, updatedPlayer, fuzzyPrints), 2000)
     }).catch(err => {
         console.log(err)
-        return message.author.send(`Sorry, time's up.`)
+        return message.author.send({ content: `Sorry, time's up.`})
     })
 }
 
 const askForBidAmount = async (message, player, print, card) => {
     const filter = m => m.author.id === message.author.id
     const price = Math.ceil(print.market_price * 1.1)
-    const msg = await message.author.send(`The Shop sells ${card} for ${price}${stardust}. How much would you like to bid?`)
+    const msg = await message.author.send({ content: `The Shop sells ${card} for ${price}${stardust}. How much would you like to bid?`})
     const collected = await msg.channel.awaitMessages(filter, {
         max: 1,
         time: 20000
     }).then(collected => {
         const offer = parseInt(collected.first().content.toLowerCase())
         if (isNaN(offer) || offer < 1) {
-            message.author.send(`Sorry, that is not a valid amount.`)
+            message.author.send({ content: `Sorry, that is not a valid amount.`})
             return false
         } else if (offer < price) {
-            message.author.send(`Sorry, you must bid at least ${price}${stardust}.`)
+            message.author.send({ content: `Sorry, you must bid at least ${price}${stardust}.`})
             return false
         } else if (player.wallet.stardust < offer) {
-            message.author.send(`Sorry, you only have ${player.wallet.stardust}${stardust}.`)
+            message.author.send({ content: `Sorry, you only have ${player.wallet.stardust}${stardust}.`})
             return false
         } 
         
         return offer
     }).catch(err => {
         console.log(err)
-        message.author.send(`Sorry, time's up.`)
+        message.author.send({ content: `Sorry, time's up.`})
         return false
     })
 
@@ -139,19 +139,19 @@ const askForBidCancellation = async (message, player, fuzzyPrints) => {
         bidSummary.push(`(${i+1}) ${eval(auction.print.rarity)}${bid.card_code} - ${auction.print.card_name} - ${bid.amount}${stardust}`)
     }
 
-    const msg = await message.author.send(`Which bid would you like to cancel?:\n${bidSummary.join("\n")}?`)
+    const msg = await message.author.send({ content: `Which bid would you like to cancel?:\n${bidSummary.join("\n")}?`})
     const collected = await msg.channel.awaitMessages(filter, {
         max: 1,
         time: 20000
     }).then(async collected => {
         const response = parseInt(collected.first().content.toLowerCase())
         if (isNaN(response) || response < 1 || response > bidSummary.length) {
-            return message.author.send(`Sorry, that is not a valid number.`)
+            return message.author.send({ content: `Sorry, that is not a valid number.`})
         } else {
             const index = response - 1
             const bid = player.bids[index]
             await bid.destroy()
-            message.author.send(`You canceled your bid on ${bidSummary[index].slice(4)}.`)
+            message.author.send({ content: `You canceled your bid on ${bidSummary[index].slice(4)}.`})
             const updatedPlayer = await Player.findOne({ where: { id: player.id }, include: [Bid, Wallet], order: [[Bid, 'amount', 'DESC']]})
             if (!updatedPlayer) return
             if (updatedPlayer.bids.length === 0) return setTimeout(async () => askForBidPlacement(message, updatedPlayer, fuzzyPrints), 2000)
@@ -159,7 +159,7 @@ const askForBidCancellation = async (message, player, fuzzyPrints) => {
         }
     }).catch(err => {
         console.log(err)
-        return message.author.send(`Sorry, time's up.`)
+        return message.author.send({ content: `Sorry, time's up.`})
     })
 }
 

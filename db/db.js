@@ -1,11 +1,12 @@
 
 const Sequelize = require('sequelize')
 const { pgPassword } = require('../secrets.json')
+const { pgPassword } = require('../secrets.json')
 
 const db = new Sequelize(
   'merchbot',
-  null,
-  null,
+  'ubuntu',
+  pgPassword,
   { 
     host: 'localhost',
     port: 5432,
@@ -16,8 +17,8 @@ const db = new Sequelize(
 
 const db2 = new Sequelize(
   'formatlibrary',
-  null,
-  null,
+  'ubuntu',
+  pgPassword,
   { 
     host: 'localhost',
     port: 5432,

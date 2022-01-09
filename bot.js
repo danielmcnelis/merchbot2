@@ -1407,7 +1407,8 @@ if(calccom.includes(cmd)) {
 	if(!set) return message.channel.send(`I do not recognize the set code: "${set_code}"`)	
 
 	if (set.type === 'core' || set.type === 'mini' || set.type === 'tour') {
-		const commons = await Print.findAll({ where: { set_code: set_code, rarity: "com" } }).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
+		const commons = await Print.findAll({ where: { set_code: set_code, rarity: "com" } })
+			.map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
 		const rares = await Print.findAll({ where: { set_code: set_code, rarity: "rar" } }).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
 		const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup" } }).filter((p) => !p.card_code.includes('-SE')).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
 		const ultras = await Print.findAll({ where: { set_code: set_code, rarity: "ult" } }).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))

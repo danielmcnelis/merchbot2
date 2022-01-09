@@ -1407,12 +1407,11 @@ if(calccom.includes(cmd)) {
 	if(!set) return message.channel.send(`I do not recognize the set code: "${set_code}"`)	
 
 	if (set.type === 'core' || set.type === 'mini' || set.type === 'tour') {
-		const commons = await Print.findAll({ where: { set_code: set_code, rarity: "com" } })
-			.map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
-		const rares = await Print.findAll({ where: { set_code: set_code, rarity: "rar" } }).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
-		const supers = await Print.findAll({ where: { set_code: set_code, rarity: "sup" } }).filter((p) => !p.card_code.includes('-SE')).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
-		const ultras = await Print.findAll({ where: { set_code: set_code, rarity: "ult" } }).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
-		const secrets = await Print.findAll({ where: { set_code: set_code, rarity: "scr" } }).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
+		const commons = [...await Print.findAll({ where: { set_code: set_code, rarity: "com" } })].map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
+		const rares = [...await Print.findAll({ where: { set_code: set_code, rarity: "rar" } })].map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
+		const supers = [...await Print.findAll({ where: { set_code: set_code, rarity: "sup" } })].filter((p) => !p.card_code.includes('-SE')).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
+		const ultras = [...await Print.findAll({ where: { set_code: set_code, rarity: "ult" } })].map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
+		const secrets = [...await Print.findAll({ where: { set_code: set_code, rarity: "scr" } })].map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
 		const avgComPrice = commons.length ? commons.reduce((a, b) => a + b) / commons.length : 0
 		const avgRarPrice = rares.length ? rares.reduce((a, b) => a + b) / rares.length : 0
 		const avgSupPrice = supers.length ? supers.reduce((a, b) => a + b) / supers.length : 0
@@ -1457,7 +1456,7 @@ if(calccom.includes(cmd)) {
 
 		return message.channel.send(`The trade-in value of ${decks[deck1].name} ${eval(set.emoji)} is ${Math.round(deck1Price * 100) / 100}${stardust} and ${decks[deck2].name} ${eval(set.alt_emoji)} is ${Math.round(deck2Price * 100) / 100}${stardust}.`)		
 	} else if (set.type === 'promo') {
-		const prints = await Print.findAll({ where: { set_code: set_code }}).map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
+		const prints = [...await Print.findAll({ where: { set_code: set_code }})].map((p) => Math.ceil(0.7 * parseInt(p.market_price)))
 		const avgPrice = prints.length ? prints.reduce((a, b) => a + b) / prints.length : 0
 		return message.channel.send(`The average trade-in value of ${isVowel(set.name.charAt(0)) ? 'an' : 'a'} ${set.name} ${eval(set.emoji)} Promo is ${avgPrice.toFixed(2)}${stardust}.`)
 	}
@@ -4634,45 +4633,45 @@ if(dailycom.includes(cmd)) {
 	const set = sets[0]
 	if (!set) return message.channel.send(`No core set found.`)
 
-	const commons = await Print.findAll({ 
+	const commons = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "com"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
-	const rares = await Print.findAll({ 
+	const rares = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "rar"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
-	const supers = await Print.findAll({ 
+	const supers = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "sup"
 		},
 		order: [['card_slot', 'ASC']]
-	}).filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
+	})].filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
 
-	const ultras = await Print.findAll({ 
+	const ultras = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "ult"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
-	const secrets = await Print.findAll({ 
+	const secrets = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "scr"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 	
 	const odds = []
 	for (let i = 0; i < set.commons_per_box; i++) odds.push("commons")
@@ -5671,45 +5670,45 @@ if(packcom.includes(cmd)) {
 	if (!set) return message.channel.send(`Could not find set code: ${code}.`)
 	if (!set.for_sale) return message.channel.send(`Sorry, ${code} ${eval(set.emoji)} Packs are not available.`)
 
-	const commons = await Print.findAll({ 
+	const commons = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "com"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
-	const rares = await Print.findAll({ 
+	const rares = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "rar"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
-	const supers = await Print.findAll({ 
+	const supers = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "sup"
 		},
 		order: [['card_slot', 'ASC']]
-	}).filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
+	})].filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
 
-	const ultras = await Print.findAll({ 
+	const ultras = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "ult"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
-	const secrets = await Print.findAll({ 
+	const secrets = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "scr"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
 	const player = await Player.findOne( { where: { id: maid }, include: [Daily, Diary, Wallet] })
 	const wallet = player.wallet
@@ -5839,49 +5838,49 @@ if(specialcom.includes(cmd)) {
 	if (!set) return message.channel.send(`Could not find set code: ${code}.`)
 	if (!set.specs_for_sale) return message.channel.send(`Sorry, ${code} ${eval(set.emoji)} Special Editions are not available.`)
 
-	const commons = await Print.findAll({ 
+	const commons = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "com"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
-	const rares = await Print.findAll({ 
+	const rares = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "rar"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
-	const supers = await Print.findAll({ 
+	const supers = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "sup"
 		},
 		order: [['card_slot', 'ASC']]
-	}).filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
+	})].filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
 
 	console.log('supers', supers)
 
-	const ultras = await Print.findAll({ 
+	const ultras = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "ult"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
-	const secrets = await Print.findAll({ 
+	const secrets = await [...Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "scr"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
-	const specials = await Print.findAll({ 
+	const specials = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "sup",
@@ -5890,7 +5889,7 @@ if(specialcom.includes(cmd)) {
 			}
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
 	const wallet = await Wallet.findOne( { where: { playerId: maid }, include: Player })
 	if (!wallet) return message.channel.send(`You are not in the database. Type **!start** to begin the game.`)
@@ -6095,45 +6094,45 @@ if(boxcom.includes(cmd)) {
 	const minsLeftInHour = date.getMinutes() === 0 ? 0 : 60 - date.getMinutes()
 	if (player.daily.last_box && isSameDay(player.daily.last_box, date)) return message.channel.send(`You already purchased a Box today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`)
 
-	const commons = await Print.findAll({ 
+	const commons = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "com"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
-	const rares = await Print.findAll({ 
+	const rares = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "rar"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
-	const supers = await Print.findAll({ 
+	const supers = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "sup"
 		},
 		order: [['card_slot', 'ASC']]
-	}).filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
+	})].filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
 
-	const ultras = await Print.findAll({ 
+	const ultras = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "ult"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
-	const secrets = await Print.findAll({ 
+	const secrets = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "scr"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send(`${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.box_price * discount)}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`)

@@ -157,29 +157,29 @@ const createPacks = async (fuzzyPrints) => {
         await pool.destroy()
     }
 
-	const commons = await Print.findAll({ 
+	const commons = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "com"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
-	const rares = await Print.findAll({ 
+	const rares = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "rar"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
-	const supers = await Print.findAll({ 
+	const supers = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "sup"
 		},
 		order: [['card_slot', 'ASC']]
-	}).map((p) => p.card_code)
+	})].map((p) => p.card_code)
 
 
     for (let j = 0; j < 4; j++) {
@@ -452,13 +452,13 @@ const sendUniversalStaples = async (entries) => {
         const member = guild.members.cache.get(playerId)
         if (!member || playerId !== member.user.id) continue
         
-        const draft_inv = await Inventory.findAll({ 
+        const draft_inv = [...await Inventory.findAll({ 
             where: {
                 draft: true,
                 playerId: playerId
             },
             include: Print
-        }).map((i) => `${eval(i.print.rarity)}${i.card_code} - ${i.print.card_name} - ${i.quantity}`)
+        })].map((i) => `${eval(i.print.rarity)}${i.card_code} - ${i.print.card_name} - ${i.quantity}`)
 
         member.send(`Your Draft Inventory begins with the 6 universal staples:\n` + draft_inv.join('\n') + `\n\nThere will be 4 rounds of opening and passing around Galaxy Packs ${galaxy}, in which each player selects 16 cards. At the end, you will have 64 drafted cards + 6 universal staples to construct a 40 card deck and side deck. Best of luck!`)
     }

@@ -398,7 +398,7 @@ const calcBoxPrice = async () => {
             const rares = [...await Print.findAll({ where: { set_code: set_code, rarity: "rar" } })].map((p) => Math.round(p.market_price) || 1)
             const supers = [...await Print.findAll({ where: { set_code: set_code, rarity: "sup" } })].filter((p) => !p.card_code.includes('-SE')).map((p) => Math.round(p.market_price) || 1)
             const ultras = [...await Print.findAll({ where: { set_code: set_code, rarity: "ult" } })].map((p) => Math.round(p.market_price) || 1)
-            const secrets = await Print.findAll({ where: { set_code: set_code, rarity: "scr" } }).map((p) => Math.round(p.market_price) || 1)
+            const secrets = [...await Print.findAll({ where: { set_code: set_code, rarity: "scr" } })].map((p) => Math.round(p.market_price) || 1)
             
             const avgComPrice = commons.length ? commons.reduce((a, b) => a + b) / commons.length : 0
             const avgRarPrice = rares.length ? rares.reduce((a, b) => a + b) / rares.length : 0

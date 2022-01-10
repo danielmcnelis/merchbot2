@@ -916,7 +916,7 @@ if(startcom.includes(cmd)) {
 		const filter = m => m.author.id === maid
 		await message.channel.send({ content: `Greetings, champ! Which deck would you like to start?\n- (1) Reptile\'s Charm ${reptile}\n- (2) Warrior\'s Legend ${warrior}`})
 		
-		message.channel.createMessageCollector(filter, {
+		message.channel.createMessageCollector({ filter,
 			max: 1,
 			time: 30000
 		}).then(async collected => {
@@ -1347,7 +1347,7 @@ if(deckcom.includes(cmd)) {
 
 		const filter = m => m.author.id === message.author.id
 		const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.unit_price * discount}${eval(set.currency)} on a copy of ${decks[deck].name} ${eval(deck)}?`})
-		const collected = await msg.channel.createMessageCollector(filter, {
+		const collected = await msg.channel.createMessageCollector({ filter,
 			max: 1,
 			time: 15000
 		}).then(async collected => {
@@ -1601,7 +1601,7 @@ if(referralcom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to give a referral to ${referringPlayer.name}?`})
-	const collected = await msg.channel.createMessageCollector(filter, {
+	const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
 	}).then(async collected => {
@@ -4589,7 +4589,7 @@ if(cmd === `!grind`) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to grind ${x}${starchips} into ${x * 10}${stardust}?`})
-	const collected = await msg.channel.createMessageCollector(filter, {
+	const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
 	}).then(async collected => {
@@ -4787,7 +4787,7 @@ if(cmd === `!wager`) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to wager ${x}${stardust} on a random ${set.code} ${eval(set.emoji)} card?`})
-	const collected = await msg.channel.createMessageCollector(filter, {
+	const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
 	}).then(async collected => {
@@ -4935,7 +4935,7 @@ if(alchemycom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to transmute ${card} into ${value}${starchips}?`})
-	const collected = await msg.channel.createMessageCollector(filter, {
+	const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
 	}).then(async collected => {
@@ -5014,7 +5014,7 @@ if(reducecom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to reduce ${card} into ${value}${forgestone}?`})
-	const collected = await msg.channel.createMessageCollector(filter, {
+	const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
 	}).then(async collected => {
@@ -5130,7 +5130,7 @@ if(cmd === `!award`) {
 		if (!set) return message.channel.send({ content: `Could not find set: "${set_code}".`})
 		const filter = m => m.author.id === message.author.id
 		const msg = await message.channel.send({ content: `Are you sure you want to award ${quantity} ${set_code} ${eval(set.emoji)} ${quantity > 1 ? 'Packs' : 'Pack'} to ${player.name}?`})
-		const collected = await msg.channel.createMessageCollector(filter, {
+		const collected = await msg.channel.createMessageCollector({ filter,
 			max: 1,
 			time: 15000
 		}).then(async collected => {
@@ -5174,7 +5174,7 @@ if(cmd === `!award`) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to award ${quantity}${award} to ${player.name}?`})
-	const collected = await msg.channel.createMessageCollector(filter, {
+	const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
 	}).then(async collected => {
@@ -5267,7 +5267,7 @@ if(cmd === `!steal`) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to steal ${quantity}${loot} from ${player.name}?`})
-	const collected = await msg.channel.createMessageCollector(filter, {
+	const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
 	}).then(async collected => {
@@ -5723,7 +5723,7 @@ if(packcom.includes(cmd)) {
 	
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.unit_price * discount) * num}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`})
-	const collected = await msg.channel.createMessageCollector(filter, {
+	const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
 	}).then(async collected => {
@@ -5897,7 +5897,7 @@ if(specialcom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `${wallet.player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.spec_price}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Special Edition?`})
-	const collected = await msg.channel.createMessageCollector(filter, {
+	const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
 	}).then(async collected => {
@@ -6135,7 +6135,7 @@ if(boxcom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.box_price * discount)}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`})
-	const collected = await msg.channel.createMessageCollector(filter, {
+	const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
 	}).then(async collected => {

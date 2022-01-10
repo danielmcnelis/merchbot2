@@ -8,7 +8,7 @@ const { Auction, Info, Inventory, Print, Set } = require('../db/index.js')
 const askForSetToPrint = async (message) => {
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `What set would you like to work on printing?`})
-    const collected = await msg.channel.createMessageCollector(filter, {
+    const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
         time: 15000
     }).then(async collected => {
@@ -43,7 +43,7 @@ const askForSetToPrint = async (message) => {
 const askForCardSlot = async (message, card_name, card_id, set_code, set_id) => {
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `What number card is this in the set?`})
-    const collected = await msg.channel.createMessageCollector(filter, {
+    const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
         time: 15000
     }).then(async collected => {
@@ -71,7 +71,7 @@ const askForRarity = async (message, set, currentPrints) => {
 
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `What rarity is this print?`})
-    const collected = await msg.channel.createMessageCollector(filter, {
+    const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
         time: 15000
     }).then(async collected => {
@@ -94,7 +94,7 @@ const askForRarity = async (message, set, currentPrints) => {
 const collectNicknames = async (message, card_name) => {
     const filter = m => m.author.id === message.author.id
     const msg = await message.channel.send({ content: `Type new nicknames for ${card_name} into the chat one at a time.\n\nThis collection will last 15s.`})
-    const collected = await msg.channel.createMessageCollector(filter, {
+    const collected = await msg.channel.createMessageCollector({ filter,
         time: 15000
     }).then(collected => {
         return collected
@@ -133,7 +133,7 @@ const selectPrint = async (message, playerId, card_name, private = false, inInv 
 
     const filter = m => m.author.id === playerId
     const msg = await channel.send({ content: `Please select a print:\n${options.join('\n')}`})
-    const collected = await msg.channel.createMessageCollector(filter, {
+    const collected = await msg.channel.createMessageCollector({ filter,
         max: 1,
         time: 15000
     }).then(collected => {
@@ -155,7 +155,7 @@ const selectPrint = async (message, playerId, card_name, private = false, inInv 
 const askForAdjustConfirmation = async (message, card, market_price) => {
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `${card} is valued at ${market_price}${stardust}, do you wish to change it?`})
-    const collected = await msg.channel.createMessageCollector(filter, {
+    const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
         time: 15000
     }).then(async collected => {
@@ -173,7 +173,7 @@ const askForAdjustConfirmation = async (message, card, market_price) => {
 const getNewMarketPrice = async (message) => {
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `What should the new market price be in ${stardust}?`})
-    const collected = await msg.channel.createMessageCollector(filter, {
+    const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
         time: 15000
     }).then(async collected => {

@@ -15,7 +15,7 @@ const getNewStatus = async (message, card, old_status) => {
 
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `${card.name} is currently ${old_status}. Please select a new status:\n${filteredOptions.join("\n")}`})
-	const collected = await msg.channel.createMessageCollector(filter, {
+	const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 30000
 	}).then(collected => {

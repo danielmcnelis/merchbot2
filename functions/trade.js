@@ -16,7 +16,7 @@ const merchbotId = '584215266586525696'
 const getInitiatorConfirmation = async (message, cards, player) => {
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: cards.length > 1 ? `Are you sure you want to trade the following to ${player.name}?\n${cards.join("\n")}` : `Are you sure you want to trade ${cards[0]} to ${player.name}?`})
-	const collected = await msg.channel.createMessageCollector(filter, {
+	const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
 	}).then(async collected => {
@@ -36,7 +36,7 @@ const getInitiatorConfirmation = async (message, cards, player) => {
 const getReceiverSide = async (message, cards, player) => {
     const filter = m => m.author.id === player.id
 	const msg = await message.channel.send({ content: `${player.name}, you are you being offered:\n${cards.join("\n")}\n\nWhat do you wish to trade in return?`})
-	const collected = await msg.channel.createMessageCollector(filter, {
+	const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 60000
 	}).then(collected => {
@@ -60,7 +60,7 @@ const getReceiverSide = async (message, cards, player) => {
 const getReceiverConfirmation = async (message, cards, player) => {
     const filter = m => m.author.id === player.id
 	const msg = await message.channel.send({ content: cards.length > 1 ? `Are you sure you want to trade the following to ${message.author.username}?\n${cards.join("\n")}` : `Are you sure you want to trade ${cards[0]} to ${message.author.username}?`})
-	const collected = await msg.channel.createMessageCollector(filter, {
+	const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
 	}).then(async collected => {
@@ -83,7 +83,7 @@ const getReceiverConfirmation = async (message, cards, player) => {
 const getFinalConfirmation = async (message, cards, player) => {
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `${player.name}, you will receive:\n${cards.join("\n")}\n\nDo you accept this trade?`})
-	const collected = await msg.channel.createMessageCollector(filter, {
+	const collected = await msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
 	}).then(async collected => {

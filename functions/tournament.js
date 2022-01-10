@@ -192,7 +192,7 @@ const selectTournament = async (message, tournaments, playerId) => {
 
     const num = parseInt(collector.first().content.match(/\d+/))
     if (!num || !tournaments[num - 1]) {
-        message.channel.send({ content: `Sorry, ${collected.first().content} is not a valid option.`})
+        message.channel.send({ content: `Sorry, ${collector.first().content} is not a valid option.`})
         return null
     } else {
         return tournaments[num - 1]

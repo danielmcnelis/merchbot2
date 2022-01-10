@@ -799,7 +799,7 @@ const getExclusions = async (message, rarity, set) => {
         message.channel.send({ content: `Please do not respond with bot commands. Simply type what you would like to exclude.`})
         return false
     } else {
-        return collected.first().content.split(';')
+        return collector.first().content.split(';')
     }
 }
 

@@ -1800,7 +1800,7 @@ if (cmd === `!shop`) {
 			}
 		}
 
-		return message.channel.send({ content: results.join('\n').join('\n').toString()})
+		return message.channel.send({ content: results.join('\n').toString()})
 	}
 }
 

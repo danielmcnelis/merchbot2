@@ -30,7 +30,7 @@ const getShopDeck = async (message, deck = '') => {
     
     collector.on('collect', collected => {
         let deck
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
         if(response.includes('rep') || response.includes('1')) deck = 'reptile' 
         else if(response.includes('war') || response.includes('2')) deck = 'warrior'
         if(response.includes('drag') || response.includes('3')) deck = 'dragon' 
@@ -237,10 +237,10 @@ const checkDeckList = async (client, message, member, formatName, formatEmoji, f
     })
 
     collector.on('collect', async (collected) => {
-        if (collected.first().content.startsWith("https://www.duelingbook.com/deck") || collected.first().content.startsWith("www.duelingbook.com/deck") || collected.first().content.startsWith("duelingbook.com/deck")) {		
+        if (collected.content.startsWith("https://www.duelingbook.com/deck") || collected.content.startsWith("www.duelingbook.com/deck") || collected.content.startsWith("duelingbook.com/deck")) {		
             message.author.send({ content: 'Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.'})
 
-            const url = collected.first().content
+            const url = collected.content
             const issues = await saveYDK(message.author, url, formatDate, formatList)
             
             if (issues['illegalCards'].length || issues['forbiddenCards'].length || issues['limitedCards'].length || issues['semiLimitedCards'].length) {

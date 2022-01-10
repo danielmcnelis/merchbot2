@@ -28,7 +28,7 @@ const manageBidding = async (message, player, fuzzyPrints) => {
     })
 
     collector.on('collect', async (collected) => {
-        const response = collected.first().content.toLowerCase()
+        const response = collected.content.toLowerCase()
         if(response.includes('bid') || response.includes('place') || (bidSummary.length < 3 && response.includes('1'))) {
             return askForBidPlacement(message, player, fuzzyPrints)
         } else if(response.includes('can') || (bidSummary.length >= 3 && response.includes('1')) ||  (bidSummary.length < 3 && response.includes('2'))) {
@@ -52,7 +52,7 @@ const askForBidPlacement = async (message, player, fuzzyPrints) => {
     })
 
     collector.on('collect', async (collected) => {
-        const query = collected.first().content
+        const query = collected.content
         const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
         const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
         const card_name = await findCard(query, fuzzyPrints)
@@ -111,7 +111,7 @@ const askForBidAmount = async (message, player, print, card) => {
     })
     
     collector.on('collect', collected => {
-        const offer = parseInt(collected.first().content.toLowerCase())
+        const offer = parseInt(collected.content.toLowerCase())
         if (isNaN(offer) || offer < 1) {
             message.author.send({ content: `Sorry, that is not a valid amount.`})
             return false
@@ -155,7 +155,7 @@ const askForBidCancellation = async (message, player, fuzzyPrints) => {
     })
 
     collector.on('collect', async (collected) => {
-        const response = parseInt(collected.first().content.toLowerCase())
+        const response = parseInt(collected.content.toLowerCase())
         if (isNaN(response) || response < 1 || response > bidSummary.length) {
             return message.author.send({ content: `Sorry, that is not a valid number.`})
         } else {

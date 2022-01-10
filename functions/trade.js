@@ -22,7 +22,7 @@ const getInitiatorConfirmation = async (message, cards, player) => {
 	})
 
 	collector.on('collect', async (collected) => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return false		
+		if (!yescom.includes(collected.content.toLowerCase())) return false		
 		else return true
 	})
     
@@ -45,7 +45,7 @@ const getReceiverSide = async (message, cards, player) => {
 	})
 	
 	collector.on('collect', collected => {
-		if (collected.first().content.startsWith('!')) {
+		if (collected.content.startsWith('!')) {
 			message.channel.send({ content: `Please do not respond with bot commands. Simply type what you would like to trade.`})
 			return false
 		} else {
@@ -72,7 +72,7 @@ const getReceiverConfirmation = async (message, cards, player) => {
 	})
 
 	collector.on('collect', async (collected) => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) {
+		if (!yescom.includes(collected.content.toLowerCase())) {
 			message.channel.send({ content: `No problem. Have a nice day.`})
 			return false
 		} else {
@@ -98,7 +98,7 @@ const getFinalConfirmation = async (message, cards, player) => {
 	})
 
 	collector.on('collect', async (collected) => {
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
 		if (!yescom.includes(response)) {
 			message.channel.send({ content: `No problem. Have a nice day.`})
 			return false

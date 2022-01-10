@@ -34,7 +34,7 @@ const getArenaSample = async (message, query) => {
     
     collector.on('collect', (collected) => {
         let tribe = false
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
         if(response.includes('thun') || response.includes('10')) tribe = 'thunder'
         else if(response.includes('war') || response.includes('11')) tribe = 'warrior'
         else if(response.includes('zom') || response.includes('12')) tribe = 'zombie'
@@ -160,7 +160,7 @@ const getConfirmation = async (arena_entry, contestant) => {
 
     collector.on('collect', async (collected) => {
         let tribe
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
         if(response.includes('thun') || response.includes('10')) tribe = 'thunder'
         else if(response.includes('war') || response.includes('11')) tribe = 'warrior'
         else if(response.includes('zom') || response.includes('12')) tribe = 'zombie'

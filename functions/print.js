@@ -14,7 +14,7 @@ const askForSetToPrint = async (message) => {
     })
 
     collector.on('collect', async (collected) => {
-        const set_code = collected.first().content.toUpperCase()
+        const set_code = collected.content.toUpperCase()
         const set = await Set.findOne({ where: { code: set_code }}) 
         if (!set) {
             message.channel.send({ content: `That set outline is not in the system.`})
@@ -52,7 +52,7 @@ const askForCardSlot = async (message, card_name, card_id, set_code, set_id) => 
     })
 
     collector.on('collect', async (collected) => {
-        const card_slot = collected.first().content
+        const card_slot = collected.content
         if (isNaN(card_slot)) return message.channel.send({ content: `Please provide a number.`})
         const zeros = card_slot < 10 ? '00' : card_slot < 100 ? '0' : ''
         const card_code = `${set_code}-${zeros}${card_slot}`
@@ -83,7 +83,7 @@ const askForRarity = async (message, set, currentPrints) => {
     })
 
     collector.on('collect', async (collected) => {
-        const rarity = collected.first().content.toLowerCase()
+        const rarity = collected.content.toLowerCase()
         if (rarity !== 'com' && rarity !== 'rar' && rarity !== 'sup' && rarity !== 'ult' && rarity !== 'scr') {
             message.channel.send({ content: `Please specify a rarity.`})
             return false
@@ -151,9 +151,9 @@ const selectPrint = async (message, playerId, card_name, private = false, inInv 
     })
     
     collector.on('collect', collected => {
-        const num = parseInt(collected.first().content.match(/\d+/))
+        const num = parseInt(collected.content.match(/\d+/))
         if (!num || !prints[num - 1]) {
-            message.channel.send({ content: `Sorry, ${collected.first().content} is not a valid option.`})
+            message.channel.send({ content: `Sorry, ${collected.content} is not a valid option.`})
             return null
         }
         else return prints[num - 1]
@@ -176,7 +176,7 @@ const askForAdjustConfirmation = async (message, card, market_price) => {
     })
 
     collector.on('collect', async (collected) => {
-        if (yescom.includes(collected.first().content.toLowerCase())) return true
+        if (yescom.includes(collected.content.toLowerCase())) return true
         else return false
     })
     
@@ -197,7 +197,7 @@ const getNewMarketPrice = async (message) => {
     })
 
     collector.on('collect', async (collected) => {
-        const num = Math.round(parseInt(collected.first().content) * 100) / 100
+        const num = Math.round(parseInt(collected.content) * 100) / 100
         if (isFinite(num) && num > 0) return num
         else return false
     })

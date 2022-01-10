@@ -25,7 +25,7 @@ const askForGrindAllConfirmation = async (message, index = 0) => {
 	})
 
     collector.on('collect', async (collected) => {
-        const response = collected.first().content.toLowerCase()
+        const response = collected.content.toLowerCase()
 		if (yescom.includes(response)) return true
         else {
             message.channel.send({ content: `Not a problem. Have a nice day.`})

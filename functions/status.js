@@ -21,7 +21,7 @@ const getNewStatus = async (message, card, old_status) => {
 	})
     
     collector.on('collect', collected => {
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
         let index
         if(response.includes('1')) {
             index = 0

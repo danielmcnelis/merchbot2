@@ -24,7 +24,7 @@ const askForDBName = async (member, player, override = false, error = false, att
     })
     
     collector.on('collect', async (collected) => {
-        const dbName = collected.first().content
+        const dbName = collected.content
         if (dbName.includes("duelingbook.com/deck") || dbName.includes("imgur.com")) {
             if (attempt >= 3) {
                 member.user.send({ content: `Sorry, time's up. Go back to the server and try again.`})
@@ -60,7 +60,7 @@ const getDeckList = async (member, player, tournamentName, override = false) => 
     })
     
     collector.on('collect', async (collected) => {
-        const url = collected.first().content
+        const url = collected.content
         if (url.includes("www.duelingbook.com/deck")) {		
             member.send({ content: 'Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.'})
             const issues = await saveYDK(player, url, tournamentName)
@@ -113,7 +113,7 @@ const directSignUp = async (message, player, resubmission = false) => {
     })
 
     collector.on('collect', async (collected) => {
-        const url = collected.first().content
+        const url = collected.content
         if (url.includes("duelingbook.com/deck")) {		
             message.author.send({ content: `Thanks, ${message.author.username}, I now have the link to ${player.name}'s tournament deck. ${soldier}`})
             return url
@@ -142,7 +142,7 @@ const getDeckName = async (member, player, override = false) => {
     })
 
     collector.on('collect', async (collected) => {
-        const response = collected.first().content.toLowerCase()
+        const response = collected.content.toLowerCase()
         return response
     })
     
@@ -209,9 +209,9 @@ const selectTournament = async (message, tournaments, playerId) => {
     })
     
     collector.on('collect', collected => {
-        const num = parseInt(collected.first().content.match(/\d+/))
+        const num = parseInt(collected.content.match(/\d+/))
         if (!num || !tournaments[num - 1]) {
-            message.channel.send({ content: `Sorry, ${collected.first().content} is not a valid option.`})
+            message.channel.send({ content: `Sorry, ${collected.content} is not a valid option.`})
             return null
         }
         else return tournaments[num - 1]
@@ -437,7 +437,7 @@ const getTournamentType = async (message) => {
 	})
     
     collector.on('collect', collected => {
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
         if (response.includes(1) || response.startsWith('single')) tournamentType = 'single elimination'
         else if (response.includes(2) || response.startsWith('double')) tournamentType = 'double elimination'
         else if (response.includes(3) || response.startsWith('swiss')) tournamentType = 'swiss'

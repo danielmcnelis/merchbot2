@@ -16,7 +16,7 @@ const askToChangeProfile = async (message, field) => {
 	})
 
 	collector.on('collect', async (collected) => {
-		if (yescom.includes(collected.first().content.toLowerCase())) answer = true
+		if (yescom.includes(collected.content.toLowerCase())) answer = true
 	})
 
     return answer
@@ -32,7 +32,7 @@ const getFavoriteColor = async (message) => {
 	})
 	
 	collector.on('collect', collected => {
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
         if(response.includes('red') || response.includes('1') && !response.includes('0')) favorite_color = '#f53636' 
         else if(response.includes('orange') || response.includes('2')) favorite_color = '#fc842d'
         else if(response.includes('yellow') || response.includes('3')) favorite_color = '#fceb77'
@@ -62,7 +62,7 @@ const getFavoriteQuote = async (message) => {
 	})
 	
 	collector.on('collect', collected => {
-		const favorite_quote = collected.first().content
+		const favorite_quote = collected.content
 		if (favorite_quote.length > 200) {
 			message.channel.send({ content: `Sorry, that quote is too long. It should be no more than 200 characters.`})
 			return false
@@ -88,7 +88,7 @@ const getFavoriteAuthor = async (message) => {
 	})
 	
 	collector.on('collect', collected => {
-		const favorite_author = collected.first().content
+		const favorite_author = collected.content
 		if (favorite_author.length > 50) {
 			message.channel.send({ content: `Sorry, that author is too long. It should be no more than 50 characters.`})
 			return false
@@ -113,7 +113,7 @@ const getFavoriteCard = async (message, fuzzyPrints) => {
 	})
 
 	collector.on('collect', async (collected) => {
-		const response = collected.first().content
+		const response = collected.content
 		if (response === 'none') return 'none'
         const favorite_card = await findCard(response, fuzzyPrints) || false
 		const print = await Print.findOne({ where: { card_name: favorite_card }})
@@ -144,7 +144,7 @@ const getResetConfirmation = async (message, attempt = 1) => {
 	})
 
 	collector.on('collect', async (collected) => {
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
 		if (!yescom.includes(response)) {
 			message.channel.send({ content: `No problem. Have a nice day.`})
 			return false

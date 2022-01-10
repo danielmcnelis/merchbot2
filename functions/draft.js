@@ -112,7 +112,7 @@ const getConfirmation = async (entry, contestant) => {
 	})
 
     collector.on('collect', async (collected) => {
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
 
         const count = await Info.count({ where: {
             element: 'draft',
@@ -520,7 +520,7 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
 	})
 
     collector.on('collect', async (collected) => {
-		const response = collected.first().content
+		const response = collected.content
         const card_name = await findCard(response, fuzzyPrints)
         
         let pool_selection

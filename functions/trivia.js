@@ -108,7 +108,7 @@ const getTriviaConfirmation = async (trivia_entry) => {
 	})
 
     collector.on('collect', async (collected) => {
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
 
         const count = await Info.count({ where: {
             element: 'trivia',
@@ -147,7 +147,7 @@ const getAnswer = async (entry, question, round) => {
 	})
 
     collector.on('collect', async (collected) => {
-		const response = collected.first().content
+		const response = collected.content
         entry.answer = response
         await entry.save()
         return member.send({ content: `Thanks!`})

@@ -693,7 +693,7 @@ const askForDumpConfirmation = async (message, set, cards, compensation, count) 
     })
 
     collector.on('collect', async (collected) => {
-        if (yescom.includes(collected.first().content.toLowerCase())) {
+        if (yescom.includes(collected.content.toLowerCase())) {
             return true
         } else {
             message.channel.send({ content: `No problem. Have a nice day.`})
@@ -720,7 +720,7 @@ const getDumpRarity = async (message) => {
     })
 
     collector.on('collect', async (collected) => {
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
         if(response.includes('all') || response.includes('any') || response.includes('1')) rarity = 'all'
         else if(response.includes('com') || response.includes('2')) rarity = 'com' 
         else if(response.includes('rar') || response.includes('3')) rarity = 'rar'
@@ -747,7 +747,7 @@ const getDumpQuantity = async (message, rarity) => {
     })
 
     collector.on('collect', async (collected) => {
-		const response = Math.round(parseInt(collected.first().content.toLowerCase()))
+		const response = Math.round(parseInt(collected.content.toLowerCase()))
         if (!Number.isInteger(response) || response < 0) {
             return false
         } else {
@@ -776,7 +776,7 @@ const askForExclusions = async (message) => {
     })
 
     collector.on('collect', async (collected) => {
-        const response = collected.first().content.toLowerCase()
+        const response = collected.content.toLowerCase()
         if (yescom.includes(response)) {
             return true
         } else if (nocom.includes(response)) {
@@ -809,7 +809,7 @@ const getExclusions = async (message, rarity, set) => {
     })
 
     collector.on('collect', async (collected) => {
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
         if (response.startsWith('!')) {
             message.channel.send({ content: `Please do not respond with bot commands. Simply type what you would like to exclude.`})
             return false
@@ -873,7 +873,7 @@ const getBarterDirection = async (message) => {
     })
 
     collector.on('collect', async (collected) => {
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
         let direction
         if(response.includes('1') || response.includes('card')) {
             direction = 'get_card'
@@ -921,7 +921,7 @@ const getVoucher = async (message) => {
     })
 
     collector.on('collect', async (collected) => {
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
         let voucher
         if(response.includes('10') || response.includes('gem')) {
             voucher = 'gem'
@@ -991,7 +991,7 @@ const getTribe = async (message, player) => {
     })
 
     collector.on('collect', async (collected) => {
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
         let voucher
         if(response.includes('10') || response.includes('zom')) {
             voucher = 'skull'
@@ -1127,7 +1127,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
     })
 
     collector.on('collect', async (collected) => {
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
         let index
         if(response.includes('1') || response.includes('APC')) {
             index = 0
@@ -1165,7 +1165,7 @@ const getBarterQuery = async (message) => {
     })
 
     collector.on('collect', async (collected) => {
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
         return response
     })
     
@@ -1205,7 +1205,7 @@ const getTradeInCard = async (message, medium_complete) => {
     })
 
     collector.on('collect', async (collected) => {
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
         let index
         if(response.includes('10') || response.includes('APC-010') || response.includes('gozu')) {
             index = 9
@@ -1262,7 +1262,7 @@ const askForBarterConfirmation = async (message, voucher, card, price, direction
     })
 
     collector.on('collect', async (collected) => {
-        if (yescom.includes(collected.first().content.toLowerCase())) {
+        if (yescom.includes(collected.content.toLowerCase())) {
             return true
         } else {
             message.channel.send({ content: `No problem. Have a nice day.`})

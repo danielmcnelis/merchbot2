@@ -36,7 +36,7 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlay
 
     collector.on('collect', async (collected) => {
         console.log('collected', collected)
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
         console.log('response', response)
 		if (yescom.includes(response)) {
 			return true
@@ -68,7 +68,7 @@ const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlaye
 	})
 
     collector.on('collect', async (collected) => {
-		const response = collected.first().content.toLowerCase()
+		const response = collected.content.toLowerCase()
 		if (yescom.includes(response)) {
 			return true
 		} else {

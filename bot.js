@@ -922,7 +922,7 @@ if(startcom.includes(cmd)) {
 		})
 
 		collector.on('collect', async (collected) => {
-			const response = collected.first().content.toLowerCase()
+			const response = collected.content.toLowerCase()
 			let starter
 	
 			if(response.includes('rep') || response.includes(reptile) || response.includes("(1)") || response === "1") {
@@ -1357,7 +1357,7 @@ if(deckcom.includes(cmd)) {
 		})
 
 		collector.on('collect', async (collected) => {
-			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
+			if (!yescom.includes(collected.content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 			const code = deck === 'reptile' || deck === 'warrior' ? 'SS4' :
 				deck === 'dragon' || deck === 'spellcaster' ? 'SS3' :
 				deck === 'plant' || deck === 'dinosaur' ? 'SS2' :
@@ -1614,7 +1614,7 @@ if(referralcom.includes(cmd)) {
 	})
 
 	collector.on('collect', async (collected) => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
+		if (!yescom.includes(collected.content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 
 		referringPlayer.wallet.starchips += 15
 		await referringPlayer.wallet.save()
@@ -4605,7 +4605,7 @@ if(cmd === `!grind`) {
 	})
 
 	collector.on('collect', async (collected) => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
+		if (!yescom.includes(collected.content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 
 		wallet.starchips -= x
 		wallet.stardust += x * 10
@@ -4806,7 +4806,7 @@ if(cmd === `!wager`) {
 	})
 
 	collector.on('collect', async (collected) => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
+		if (!yescom.includes(collected.content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 
 		player.wallet.stardust -= x
 		await player.wallet.save()
@@ -4957,7 +4957,7 @@ if(alchemycom.includes(cmd)) {
 	})
 	
 	collector.on('collect', async (collected) => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
+		if (!yescom.includes(collected.content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		inv.quantity--
 		await inv.save()
@@ -5039,7 +5039,7 @@ if(reducecom.includes(cmd)) {
 	})
 	
 	collector.on('collect', async (collected) => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
+		if (!yescom.includes(collected.content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		inv.quantity--
 		await inv.save()
@@ -5158,7 +5158,7 @@ if(cmd === `!award`) {
 		})
 
 	collector.on('collect', async (collected) => {
-			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
+			if (!yescom.includes(collected.content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 			message.channel.send({ content: `Please wait while I open your ${quantity > 1 ? 'packs' : 'pack'}... ${blue}`})			
 			return awardPack(message.channel, recipient, set, quantity)
 		})
@@ -5205,7 +5205,7 @@ if(cmd === `!award`) {
 	})
 	
 	collector.on('collect', async (collected) => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
+		if (!yescom.includes(collected.content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		if (walletField) {
 			player.wallet[walletField] += quantity
@@ -5301,7 +5301,7 @@ if(cmd === `!steal`) {
 	})
 	
 	collector.on('collect', async (collected) => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
+		if (!yescom.includes(collected.content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		if (walletField) {
 			player.wallet[walletField] -= quantity
@@ -5760,7 +5760,7 @@ if(packcom.includes(cmd)) {
 	})
 
 	collector.on('collect', async (collected) => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
+		if (!yescom.includes(collected.content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		message.channel.send({ content: `Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}.`})
 		
@@ -5937,7 +5937,7 @@ if(specialcom.includes(cmd)) {
 	})
 
 	collector.on('collect', async (collected) => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
+		if (!yescom.includes(collected.content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		message.channel.send({ content: `Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Special Edition.`})
 		let gotSecret = false
@@ -6178,7 +6178,7 @@ if(boxcom.includes(cmd)) {
 	})
 
 	collector.on('collect', async (collected) => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
+		if (!yescom.includes(collected.content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		message.channel.send({ content: `Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Box.`})
 		const num = set.packs_per_box

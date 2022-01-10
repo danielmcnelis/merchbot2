@@ -33,7 +33,7 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlay
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
-		const response = collected.content.toLowerCase()
+		const response = collected.first().content.toLowerCase()
 		if (yescom.includes(response)) {
 			return true
 		} else {

@@ -5728,7 +5728,7 @@ if(packcom.includes(cmd)) {
 	await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
-	}).catch(async (collected) => {
+	}).then(async (collected) => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		message.channel.send({ content: `Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}.`})

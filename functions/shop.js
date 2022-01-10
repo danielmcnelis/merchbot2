@@ -1106,7 +1106,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
         return false
 	})
 
-    const response = collector.content
+    const response = collector.first().content
     const index = response.includes('1') || response.includes('APC') ? 0 :
         response.includes('2') ? 1 :
         response.includes('3') ? 2 :

@@ -743,6 +743,7 @@ const getDumpQuantity = async (message, rarity) => {
         if (!Number.isInteger(response) || response < 0) {
             return false
         } else {
+            console.log('response', response)
             return response
         }
     }).catch((err) => {

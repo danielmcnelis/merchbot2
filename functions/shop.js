@@ -687,7 +687,7 @@ const askForDumpConfirmation = async (message, set, cards, compensation, count) 
     }
     const filter = m => m.author.id === message.author.id
     const msg = await message.channel.send({ content: `To The Shop for ${compensation}${stardust}?`})
-    const collector = msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.awaitMessages({ filter,
         max: 1,
         time: 60000
     })
@@ -714,7 +714,7 @@ const getDumpRarity = async (message) => {
     let rarity
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `What rarity would you like to bulk sell?\n(1) all\n(2) common\n(3) rare\n(4) super\n(5) ultra\n(6) secret`})
-    const collector = msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
     })
@@ -741,7 +741,7 @@ const getDumpRarity = async (message) => {
 const getDumpQuantity = async (message, rarity) => {
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `How many of each ${rarity === 'all' ? 'card' : eval(rarity)} do you want to keep?`})
-    const collector = msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
     })
@@ -770,7 +770,7 @@ const getDumpQuantity = async (message, rarity) => {
 const askForExclusions = async (message) => {
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `Do you want to exclude any cards?`})
-    const collector = msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
     })
@@ -803,7 +803,7 @@ const getExclusions = async (message, rarity, set) => {
         ''
 
 	const msg = await message.channel.send({ content: `Please provide a list of ${rarity === 'all' ? '' : eval(rarity)}${prompt} cards you do not want to bulk sell.`})
-    const collector = msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 60000
     })
@@ -867,7 +867,7 @@ const getBarterDirection = async (message) => {
 
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `What would you like to **receive** in this exchange?\n${options.join("\n")}`})
-    const collector = msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
     })
@@ -915,7 +915,7 @@ const getVoucher = async (message) => {
 
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `Which Voucher would you like to exchange?\n${options.join("\n")}`})
-    const collector = msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
     })
@@ -985,7 +985,7 @@ const getTribe = async (message, player) => {
 
     const filter = m => m.author.id === player.id
 	const msg = await message.channel.send({ content: `${player.name}, which Tribe did you battle alongside?\n${options.join("\n")}`})
-    const collector = msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 30000
     })
@@ -1121,7 +1121,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
     
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `Which card would you like to barter for?\n${cards.join("\n")}`})
-    const collector = msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
     })
@@ -1159,7 +1159,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
 const getBarterQuery = async (message) => {
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `Which card would you like to exchange ${forgestone} for?`})
-    const collector = msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
     })
@@ -1199,7 +1199,7 @@ const getTradeInCard = async (message, medium_complete) => {
 
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `Which card would you like to trade-in?\n${cards.join("\n")}`})
-    const collector = msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
     })
@@ -1256,7 +1256,7 @@ const askForBarterConfirmation = async (message, voucher, card, price, direction
         
     const filter = m => m.author.id === message.author.id
     const msg = await message.channel.send({ content: prompt })
-    const collector = msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.awaitMessages({ filter,
         max: 1,
         time: 15000
     })

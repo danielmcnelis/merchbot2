@@ -10,7 +10,7 @@ const askToChangeProfile = async (message, field) => {
     const prompt = field === 'color' ? 'your profile color' : field === 'quote' ? 'your favorite quote' : 'your favorite card'
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Would you like to change ${prompt}?`})
-	const collector = msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	})
@@ -26,7 +26,7 @@ const getFavoriteColor = async (message) => {
     let favorite_color = ''
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Please select a color:\n(1) Red\n(2) Orange\n(3) Yellow\n(4) Green\n(5) Blue\n(6) Indigo\n(7) Magenta\n(8) Pink\n(9) Gold\n(10) Silver`})
-	const collector = msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 30000
 	})
@@ -56,7 +56,7 @@ const getFavoriteColor = async (message) => {
 const getFavoriteQuote = async (message) => {
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Please respond with a new quote.`})
-	const collector = msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 30000
 	})
@@ -82,7 +82,7 @@ const getFavoriteQuote = async (message) => {
 const getFavoriteAuthor = async (message) => {
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `To whom is this quote attributed?`})
-	const collector = msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 30000
 	})
@@ -107,7 +107,7 @@ const getFavoriteAuthor = async (message) => {
 const getFavoriteCard = async (message, fuzzyPrints) => {
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Please name a card in Forged in Chaos.`})
-	const collector = msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 30000
 	})
@@ -138,7 +138,7 @@ const getResetConfirmation = async (message, attempt = 1) => {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: prompt})
-	const collector = msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	})

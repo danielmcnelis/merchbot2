@@ -916,7 +916,7 @@ if(startcom.includes(cmd)) {
 		const filter = m => m.author.id === maid
 		await message.channel.send({ content: `Greetings, champ! Which deck would you like to start?\n- (1) Reptile\'s Charm ${reptile}\n- (2) Warrior\'s Legend ${warrior}`})
 		
-		const collector = message.channel.createMessageCollector({ filter,
+		const collector = message.channel.awaitMessages({ filter,
 			max: 1,
 			time: 30000
 		})
@@ -1351,7 +1351,7 @@ if(deckcom.includes(cmd)) {
 		const filter = m => m.author.id === message.author.id
 		const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.unit_price * discount}${eval(set.currency)} on a copy of ${decks[deck].name} ${eval(deck)}?`})
 		
-		const collector = msg.channel.createMessageCollector({ filter,
+		const collector = msg.channel.awaitMessages({ filter,
 			max: 1,
 			time: 15000
 		})
@@ -1608,7 +1608,7 @@ if(referralcom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to give a referral to ${referringPlayer.name}?`})
-	const collector = msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	})
@@ -4599,7 +4599,7 @@ if(cmd === `!grind`) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to grind ${x}${starchips} into ${x * 10}${stardust}?`})
-	const collector = msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	})
@@ -4800,7 +4800,7 @@ if(cmd === `!wager`) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to wager ${x}${stardust} on a random ${set.code} ${eval(set.emoji)} card?`})
-	const collector = msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	})
@@ -4951,7 +4951,7 @@ if(alchemycom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to transmute ${card} into ${value}${starchips}?`})
-	const collector = msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	})
@@ -5033,7 +5033,7 @@ if(reducecom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to reduce ${card} into ${value}${forgestone}?`})
-	const collector = msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	})
@@ -5152,7 +5152,7 @@ if(cmd === `!award`) {
 		if (!set) return message.channel.send({ content: `Could not find set: "${set_code}".`})
 		const filter = m => m.author.id === message.author.id
 		const msg = await message.channel.send({ content: `Are you sure you want to award ${quantity} ${set_code} ${eval(set.emoji)} ${quantity > 1 ? 'Packs' : 'Pack'} to ${player.name}?`})
-		const collector = msg.channel.createMessageCollector({ filter,
+		const collector = msg.channel.awaitMessages({ filter,
 			max: 1,
 			time: 15000
 		})
@@ -5199,7 +5199,7 @@ if(cmd === `!award`) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to award ${quantity}${award} to ${player.name}?`})
-	const collector = msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	})
@@ -5295,7 +5295,7 @@ if(cmd === `!steal`) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to steal ${quantity}${loot} from ${player.name}?`})
-	const collector = msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	})
@@ -5754,7 +5754,7 @@ if(packcom.includes(cmd)) {
 	
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.unit_price * discount) * num}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`})
-	const collector = msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	})
@@ -5931,7 +5931,7 @@ if(specialcom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `${wallet.player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.spec_price}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Special Edition?`})
-	const collector = msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	})
@@ -6172,7 +6172,7 @@ if(boxcom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.box_price * discount)}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`})
-	const collector = msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	})

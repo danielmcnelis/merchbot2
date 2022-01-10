@@ -22,7 +22,7 @@ const manageBidding = async (message, player, fuzzyPrints) => {
 
     const prompt = `Your bids are as follows:\n${bidSummary.join("\n")}\n\nWhat would you like to do?\n${bidSummary.length >= 3 ? '(1) cancel a bid\n(2) nothing' : '(1) place a bid\n(2) cancel a bid\n(3) nothing'}`
     const msg = await message.author.send({ content: prompt })
-    const collector = msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.awaitMessages({ filter,
         max: 1,
         time: 20000
     })
@@ -46,7 +46,7 @@ const manageBidding = async (message, player, fuzzyPrints) => {
 const askForBidPlacement = async (message, player, fuzzyPrints) => {
     const filter = m => m.author.id === message.author.id
     const msg = await message.author.send({ content: `Which card would you like to bid on?`})
-    const collector = msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.awaitMessages({ filter,
         max: 1,
         time: 45000
     })
@@ -105,7 +105,7 @@ const askForBidAmount = async (message, player, print, card) => {
     const filter = m => m.author.id === message.author.id
     const price = Math.ceil(print.market_price * 1.1)
     const msg = await message.author.send({ content: `The Shop sells ${card} for ${price}${stardust}. How much would you like to bid?`})
-    const collector = msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.awaitMessages({ filter,
         max: 1,
         time: 20000
     })
@@ -149,7 +149,7 @@ const askForBidCancellation = async (message, player, fuzzyPrints) => {
     }
 
     const msg = await message.author.send({ content: `Which bid would you like to cancel?:\n${bidSummary.join("\n")}?`})
-    const collector = msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.awaitMessages({ filter,
         max: 1,
         time: 20000
     })

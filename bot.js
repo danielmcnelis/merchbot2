@@ -916,10 +916,12 @@ if(startcom.includes(cmd)) {
 		const filter = m => m.author.id === maid
 		await message.channel.send({ content: `Greetings, champ! Which deck would you like to start?\n- (1) Reptile\'s Charm ${reptile}\n- (2) Warrior\'s Legend ${warrior}`})
 		
-		message.channel.createMessageCollector({ filter,
+		const collector = message.channel.createMessageCollector({ filter,
 			max: 1,
 			time: 30000
-		}).then(async collected => {
+		})
+
+		collector.on('collect', async (collected) => {
 			const response = collected.first().content.toLowerCase()
 			let starter
 	
@@ -948,11 +950,12 @@ if(startcom.includes(cmd)) {
 			await completeTask(message.channel, maid, 'e1')
 			await completeTask(message.channel, maid, 'm4', 4000)
 			return message.channel.send({ content: `I wish you luck on your journey, new duelist! ${master}`})
-		}).catch(err => {
-			console.log(err)
-			return message.channel.send({ content: `Sorry, time's up.`})
 		})
-	}
+    
+		collector.on('end', () => {
+				return message.channel.send({ content: `Sorry, time's up.`})
+			})
+		}
 }
 
 //MUTE 
@@ -1347,10 +1350,13 @@ if(deckcom.includes(cmd)) {
 
 		const filter = m => m.author.id === message.author.id
 		const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.unit_price * discount}${eval(set.currency)} on a copy of ${decks[deck].name} ${eval(deck)}?`})
-		const collected = await msg.channel.createMessageCollector({ filter,
+		
+		const collector = msg.channel.createMessageCollector({ filter,
 			max: 1,
 			time: 15000
-		}).then(async collected => {
+		})
+
+		collector.on('collect', async (collected) => {
 			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 			const code = deck === 'reptile' || deck === 'warrior' ? 'SS4' :
 				deck === 'dragon' || deck === 'spellcaster' ? 'SS3' :
@@ -1363,11 +1369,12 @@ if(deckcom.includes(cmd)) {
 			await set.save()
 			await awardStarterDeck(maid, deck)
 			return message.channel.send({ content: `Thank you for your purchase! I updated your Inventory with a copy of ${decks[deck].name} ${eval(deck)}.`})
-		}).catch(err => {
-			console.log(err)
-			return message.channel.send({ content: `Sorry, time's up.`})
 		})
-	}
+    
+		collector.on('end', () => {
+				return message.channel.send({ content: `Sorry, time's up.`})
+			})
+		}
 }
 
 //EDIT
@@ -1601,10 +1608,12 @@ if(referralcom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to give a referral to ${referringPlayer.name}?`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
-	}).then(async collected => {
+	})
+
+	collector.on('collect', async (collected) => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 
 		referringPlayer.wallet.starchips += 15
@@ -1614,8 +1623,9 @@ if(referralcom.includes(cmd)) {
 		await profile.save()
 
 		return message.channel.send({ content: `Okay! <@${referringPlayer.id}> was awarded 15${starchips} for a referral.`})
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
 		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }
@@ -4589,10 +4599,12 @@ if(cmd === `!grind`) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to grind ${x}${starchips} into ${x * 10}${stardust}?`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
-	}).then(async collected => {
+	})
+
+	collector.on('collect', async (collected) => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 
 		wallet.starchips -= x
@@ -4601,8 +4613,9 @@ if(cmd === `!grind`) {
 
 		completeTask(message.channel, maid, 'e9')
 		return message.channel.send({ content: `You ground ${x}${starchips} into ${x * 10}${stardust}.`})
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
 		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }
@@ -4787,10 +4800,12 @@ if(cmd === `!wager`) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to wager ${x}${stardust} on a random ${set.code} ${eval(set.emoji)} card?`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
-	}).then(async collected => {
+	})
+
+	collector.on('collect', async (collected) => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 
 		player.wallet.stardust -= x
@@ -4864,8 +4879,9 @@ if(cmd === `!wager`) {
 	
 		message.channel.send({ content: `1... 2...`})
 		return setTimeout(() => message.channel.send({ content: `${enthusiasm} ${player.name} won ${eval(print.rarity)}${print.card_code} - ${print.card_name} off their wager! ${emoji}`, files: [attachment] }), 2000)
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
 		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }
@@ -4935,10 +4951,12 @@ if(alchemycom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to transmute ${card} into ${value}${starchips}?`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
-	}).then(async collected => {
+	})
+	
+	collector.on('collect', async (collected) => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		inv.quantity--
@@ -4966,8 +4984,9 @@ if(alchemycom.includes(cmd)) {
 
 		completeTask(message.channel, maid, 'e5')
 		return message.channel.send({ content: `You transmuted ${card} into ${value}${starchips}!`})
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
 		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }
@@ -5014,10 +5033,12 @@ if(reducecom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to reduce ${card} into ${value}${forgestone}?`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
-	}).then(async collected => {
+	})
+	
+	collector.on('collect', async (collected) => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		inv.quantity--
@@ -5032,8 +5053,9 @@ if(reducecom.includes(cmd)) {
 		await daily.save()
 
 		return message.channel.send({ content: `You broke down ${card} into ${value}${forgestone}!`})
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
 		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }
@@ -5130,15 +5152,18 @@ if(cmd === `!award`) {
 		if (!set) return message.channel.send({ content: `Could not find set: "${set_code}".`})
 		const filter = m => m.author.id === message.author.id
 		const msg = await message.channel.send({ content: `Are you sure you want to award ${quantity} ${set_code} ${eval(set.emoji)} ${quantity > 1 ? 'Packs' : 'Pack'} to ${player.name}?`})
-		const collected = await msg.channel.createMessageCollector({ filter,
+		const collector = msg.channel.createMessageCollector({ filter,
 			max: 1,
 			time: 15000
-		}).then(async collected => {
+		})
+
+	collector.on('collect', async (collected) => {
 			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 			message.channel.send({ content: `Please wait while I open your ${quantity > 1 ? 'packs' : 'pack'}... ${blue}`})			
 			return awardPack(message.channel, recipient, set, quantity)
-		}).catch(err => {
-			console.log(err)
+		})
+    
+    collector.on('end', () => {
 			return message.channel.send({ content: `Sorry, time's up.`})
 		})
 
@@ -5174,10 +5199,12 @@ if(cmd === `!award`) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to award ${quantity}${award} to ${player.name}?`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
-	}).then(async collected => {
+	})
+	
+	collector.on('collect', async (collected) => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		if (walletField) {
@@ -5212,8 +5239,9 @@ if(cmd === `!award`) {
 		}
 	
 		return message.channel.send({ content: `${player.name} was awarded ${quantity}${award}. Congratulations!`})
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
 		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }
@@ -5267,10 +5295,12 @@ if(cmd === `!steal`) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to steal ${quantity}${loot} from ${player.name}?`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
-	}).then(async collected => {
+	})
+	
+	collector.on('collect', async (collected) => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		if (walletField) {
@@ -5309,8 +5339,9 @@ if(cmd === `!steal`) {
 		}
 	
 		return message.channel.send({ content: `Yikes! You stole ${quantity}${loot} from ${player.name}.`})
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
 		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }
@@ -5723,10 +5754,12 @@ if(packcom.includes(cmd)) {
 	
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.unit_price * discount) * num}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
-	}).then(async collected => {
+	})
+
+	collector.on('collect', async (collected) => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		message.channel.send({ content: `Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}.`})
@@ -5823,8 +5856,9 @@ if(packcom.includes(cmd)) {
 		if (set.type === 'core' && await checkCoreSetComplete(maid, 1)) completeTask(message.channel, 'h4', 5000)
 		if (set.type === 'core' && await checkCoreSetComplete(maid, 3)) completeTask(message.channel, 'l3', 6000)
 		return
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
 		return message.channel.send({ content: `Sorry, time's up.` })
 	})
 }
@@ -5897,10 +5931,12 @@ if(specialcom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `${wallet.player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.spec_price}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Special Edition?`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
-	}).then(async collected => {
+	})
+
+	collector.on('collect', async (collected) => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		message.channel.send({ content: `Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Special Edition.`})
@@ -6061,8 +6097,9 @@ if(specialcom.includes(cmd)) {
 		if (await checkCoreSetComplete(maid, 1)) completeTask(message.channel, 'h4', 5000)
 		if (await checkCoreSetComplete(maid, 3)) completeTask(message.channel, 'l3', 6000)
 		return
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
 		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }
@@ -6135,10 +6172,12 @@ if(boxcom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.box_price * discount)}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
-	}).then(async collected => {
+	})
+
+	collector.on('collect', async (collected) => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		message.channel.send({ content: `Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Box.`})
@@ -6272,8 +6311,9 @@ if(boxcom.includes(cmd)) {
 		if (await checkCoreSetComplete(maid, 1)) completeTask(message.channel, 'h4', 5000)
 		if (await checkCoreSetComplete(maid, 3)) completeTask(message.channel, 'l3', 6000)
 		return
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
 		return message.channel.send({ content: `Sorry, time's up.`})
 	})
 }

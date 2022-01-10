@@ -27,10 +27,12 @@ const getArenaSample = async (message, query) => {
     if (query && query.includes('zom')) return 'zombie'
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Please select a tribe:\n(1) Beast\n(2) Dinosaur\n(3) Dragon\n(4) Fiend\n(5) Fish\n(6) Plant\n(7) Reptile\n(8) Rock\n(9) Spellcaster\n(10) Thunder\n(11) Warrior\n(12) Zombie`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 10000
-	}).then(collected => {
+	})
+    
+    collector.on('collect', (collected) => {
         let tribe = false
 		const response = collected.first().content.toLowerCase()
         if(response.includes('thun') || response.includes('10')) tribe = 'thunder'
@@ -47,8 +49,9 @@ const getArenaSample = async (message, query) => {
         else if(response.includes('spell') || response.includes('cast') || response.includes('9')) tribe = 'spellcaster'
         else message.channel.send({ content: `Please specify a valid tribe.`})
         return tribe
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -150,10 +153,12 @@ const getConfirmation = async (arena_entry, contestant) => {
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
 	const msg = await member.send({ content: `Please confirm your participation in the Arena by selecting a tribe:\n(1) Beast\n(2) Dinosaur\n(3) Dragon\n(4) Fiend\n(5) Fish\n(6) Plant\n(7) Reptile\n(8) Rock\n(9) Spellcaster\n(10) Thunder\n(11) Warrior\n(12) Zombie`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 60000
-	}).then(async collected => {
+	})
+
+    collector.on('collect', async (collected) => {
         let tribe
 		const response = collected.first().content.toLowerCase()
         if(response.includes('thun') || response.includes('10')) tribe = 'thunder'
@@ -187,8 +192,9 @@ const getConfirmation = async (arena_entry, contestant) => {
         } else {
             return getConfirmation(arena_entry)
         }
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
         return member.send({ content: `Sorry, time's up.`})
 	})
 }

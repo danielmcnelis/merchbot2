@@ -23,10 +23,12 @@ const getShopDeck = async (message, deck = '') => {
     if(deck.includes('rep')) return 'reptile'
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Please select a deck:\n(1) Reptile's Charm\n(2) Warrior's Legend\n(3) Dragon's Inferno\n(4) Spellcaster's Art\n(5) Dinosaur's Power\n(6) Plant's Harmony\n(7) Fish's Ire\n(8) Rock's Foundation`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
-	}).then(collected => {
+	})
+    
+    collector.on('collect', collected => {
         let deck
 		const response = collected.first().content.toLowerCase()
         if(response.includes('rep') || response.includes('1')) deck = 'reptile' 
@@ -39,7 +41,9 @@ const getShopDeck = async (message, deck = '') => {
         else if(response.includes('rock') || response.includes('8')) deck = 'rock'
         else message.channel.send({ content: `Please specify a valid deck.`})
         return deck
-	}).catch(err => {
+	})
+    
+    collector.on('end', () => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
@@ -227,10 +231,12 @@ const saveAllYDK = async () => {
 const checkDeckList = async (client, message, member, formatName, formatEmoji, formatDate, formatList) => {  
     const filter = m => m.author.id === member.user.id
     const msg = await member.user.send({ content: `Please provide a duelingbook.com/deck link for the ${formatName} Format ${formatEmoji} deck you would like to check for legality.`})
-    const collected = await msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.createMessageCollector({ filter,
         max: 1,
         time: 180000
-    }).then(async collected => {
+    })
+
+    collector.on('collect', async (collected) => {
         if (collected.first().content.startsWith("https://www.duelingbook.com/deck") || collected.first().content.startsWith("www.duelingbook.com/deck") || collected.first().content.startsWith("duelingbook.com/deck")) {		
             message.author.send({ content: 'Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.'})
 
@@ -251,8 +257,9 @@ const checkDeckList = async (client, message, member, formatName, formatEmoji, f
         } else {
             return message.author.send({ content: "Sorry, I only accept duelingbook.com/deck links." })      
         }
-    }).catch(err => {
-        console.log(err)
+    })
+    
+    collector.on('end', () => {
         return message.author.send({ content: `Sorry, time's up. If you wish to try again, go back to the Discord server and use the **!check** command.` })
     })
 }

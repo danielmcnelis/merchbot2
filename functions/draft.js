@@ -106,10 +106,12 @@ const getConfirmation = async (entry, contestant) => {
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
 	const msg = await member.send({ content: `Do you still wish to participate in the Draft?`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 60000
-	}).then(async collected => {
+	})
+
+    collector.on('collect', async (collected) => {
 		const response = collected.first().content.toLowerCase()
 
         const count = await Info.count({ where: {
@@ -129,8 +131,9 @@ const getConfirmation = async (entry, contestant) => {
             member.send({ content: `Okay, sorry to see you go!`})
             return channel.send({ content: `Yikes. ${member.user.username} dodged the Draft!`})
         }
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
         return member.send({ content: `Sorry, time's up.`})
 	})
 }
@@ -511,10 +514,12 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
 
     const filter = m => m.author.id === playerId
 	const msg = await member.send({ content: `Please select a card (${24 - count} seconds):\n${galaxy} - Galaxy Pack ${letter} - ${galaxy}\n${cards.join('\n')}`, files: [attachment] })
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: (24 - count) * 1000
-	}).then(async collected => {
+	})
+
+    collector.on('collect', async (collected) => {
 		const response = collected.first().content
         const card_name = await findCard(response, fuzzyPrints)
         
@@ -570,8 +575,9 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
         await pool_selection.destroy()
         const prompt = auto_draft ? `Sorry, "${response}" is not a valid response. You auto-drafted` : 'Thanks! You selected'
         return member.send({ content: `${prompt}: ${card}.` })
-	}).catch(async err => {
-		console.log(err)
+	})
+    
+    collector.on('end', async () => {
         const pool_selection = await autoDraft(pack)
         const card = `${eval(pool_selection.print.rarity)}${pool_selection.card_code} - ${pool_selection.card_name}`
         const inv = await Inventory.findOne({ where: {

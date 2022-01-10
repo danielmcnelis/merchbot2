@@ -22,10 +22,12 @@ const manageBidding = async (message, player, fuzzyPrints) => {
 
     const prompt = `Your bids are as follows:\n${bidSummary.join("\n")}\n\nWhat would you like to do?\n${bidSummary.length >= 3 ? '(1) cancel a bid\n(2) nothing' : '(1) place a bid\n(2) cancel a bid\n(3) nothing'}`
     const msg = await message.author.send({ content: prompt })
-    const collected = await msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.createMessageCollector({ filter,
         max: 1,
         time: 20000
-    }).then(async collected => {
+    })
+
+    collector.on('collect', async (collected) => {
         const response = collected.first().content.toLowerCase()
         if(response.includes('bid') || response.includes('place') || (bidSummary.length < 3 && response.includes('1'))) {
             return askForBidPlacement(message, player, fuzzyPrints)
@@ -34,8 +36,9 @@ const manageBidding = async (message, player, fuzzyPrints) => {
         } else {
             return message.author.send({ content: `Not a problem. Have a nice day.` })
         }
-    }).catch(err => {
-        console.log(err)
+    })
+    
+    collector.on('end', () => {
         return message.author.send({ content: `Sorry, time's up.` })
     })
 }
@@ -43,10 +46,12 @@ const manageBidding = async (message, player, fuzzyPrints) => {
 const askForBidPlacement = async (message, player, fuzzyPrints) => {
     const filter = m => m.author.id === message.author.id
     const msg = await message.author.send({ content: `Which card would you like to bid on?`})
-    const collected = await msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.createMessageCollector({ filter,
         max: 1,
         time: 45000
-    }).then(async collected => {
+    })
+
+    collector.on('collect', async (collected) => {
         const query = collected.first().content
         const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
         const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
@@ -89,8 +94,9 @@ const askForBidPlacement = async (message, player, fuzzyPrints) => {
         const updatedPlayer = await Player.findOne({ where: { id: player.id }, include: [Bid, Wallet], order: [[Bid, 'amount', 'DESC']]})
         if (!updatedPlayer || player.bids.length >= 3) return
         else return setTimeout(async () => manageBidding(message, updatedPlayer, fuzzyPrints), 2000)
-    }).catch(err => {
-        console.log(err)
+    })
+    
+    collector.on('end', () => {
         return message.author.send({ content: `Sorry, time's up.`})
     })
 }
@@ -99,10 +105,12 @@ const askForBidAmount = async (message, player, print, card) => {
     const filter = m => m.author.id === message.author.id
     const price = Math.ceil(print.market_price * 1.1)
     const msg = await message.author.send({ content: `The Shop sells ${card} for ${price}${stardust}. How much would you like to bid?`})
-    const collected = await msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.createMessageCollector({ filter,
         max: 1,
         time: 20000
-    }).then(collected => {
+    })
+    
+    collector.on('collect', collected => {
         const offer = parseInt(collected.first().content.toLowerCase())
         if (isNaN(offer) || offer < 1) {
             message.author.send({ content: `Sorry, that is not a valid amount.`})
@@ -116,8 +124,9 @@ const askForBidAmount = async (message, player, print, card) => {
         } 
         
         return offer
-    }).catch(err => {
-        console.log(err)
+    })
+    
+    collector.on('end', () => {
         message.author.send({ content: `Sorry, time's up.`})
         return false
     })
@@ -140,10 +149,12 @@ const askForBidCancellation = async (message, player, fuzzyPrints) => {
     }
 
     const msg = await message.author.send({ content: `Which bid would you like to cancel?:\n${bidSummary.join("\n")}?`})
-    const collected = await msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.createMessageCollector({ filter,
         max: 1,
         time: 20000
-    }).then(async collected => {
+    })
+
+    collector.on('collect', async (collected) => {
         const response = parseInt(collected.first().content.toLowerCase())
         if (isNaN(response) || response < 1 || response > bidSummary.length) {
             return message.author.send({ content: `Sorry, that is not a valid number.`})
@@ -157,8 +168,9 @@ const askForBidCancellation = async (message, player, fuzzyPrints) => {
             if (updatedPlayer.bids.length === 0) return setTimeout(async () => askForBidPlacement(message, updatedPlayer, fuzzyPrints), 2000)
             else return setTimeout(async () => manageBidding(message, updatedPlayer, fuzzyPrints), 2000)
         }
-    }).catch(err => {
-        console.log(err)
+    })
+    
+    collector.on('end', () => {
         return message.author.send({ content: `Sorry, time's up.`})
     })
 }

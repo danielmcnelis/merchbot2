@@ -29,10 +29,12 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlay
         `for ${invoice.total_price}${stardust}?`
     })
 
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
-	}).then(async collected => {
+	})
+
+    collector.on('collect', async (collected) => {
         console.log('collected', collected)
 		const response = collected.first().content.toLowerCase()
         console.log('response', response)
@@ -42,8 +44,9 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlay
 			message.channel.send({ content: `No problem. Have a nice day.`})
 			return false
 		}
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
 		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -58,10 +61,13 @@ const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlaye
 
 	const filter = m => m.author.id === buyerId
 	const msg = await message.channel.send({ content: `${mention ? `<@${buyerId}>, Do you agree` : 'Are you sure you want'} to buy${cards.length > 1 ? `:\n${cards.join('\n')}\nF` : ` ${cards[0]} f`}rom ${sellingPlayer.id === merchbotId ? 'The Shop' : sellingPlayer.name} for ${invoice.total_price}${stardust}?`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	
+    const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
-	}).then(async collected => {
+	})
+
+    collector.on('collect', async (collected) => {
 		const response = collected.first().content.toLowerCase()
 		if (yescom.includes(response)) {
 			return true
@@ -69,8 +75,9 @@ const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlaye
 			message.channel.send({ content: `No problem. Have a nice day.`})
 			return false
 		}
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
 		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})

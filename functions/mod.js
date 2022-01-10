@@ -19,18 +19,21 @@ const askForGrindAllConfirmation = async (message, index = 0) => {
     ]
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `${prompts[index]}`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
-	}).then(async collected => {
+	})
+
+    collector.on('collect', async (collected) => {
         const response = collected.first().content.toLowerCase()
 		if (yescom.includes(response)) return true
         else {
             message.channel.send({ content: `Not a problem. Have a nice day.`})
             return false
         }
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
 		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})

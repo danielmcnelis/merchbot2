@@ -687,19 +687,21 @@ const askForDumpConfirmation = async (message, set, cards, compensation, count) 
     }
     const filter = m => m.author.id === message.author.id
     const msg = await message.channel.send({ content: `To The Shop for ${compensation}${stardust}?`})
-    const collected = await msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.createMessageCollector({ filter,
         max: 1,
         time: 60000
-    }).then(async collected => {
-        console.log('collected.first().content.toLowerCase()', collected.first().content.toLowerCase())
+    })
+
+    collector.on('collect', async (collected) => {
         if (yescom.includes(collected.first().content.toLowerCase())) {
             return true
         } else {
             message.channel.send({ content: `No problem. Have a nice day.`})
             return false
         }  
-    }).catch(err => {
-        console.log('err', err)
+    })
+    
+    collector.on('end', () => {
         message.channel.send({ content: `Sorry, time's up.`})
         return false
     })
@@ -712,10 +714,12 @@ const getDumpRarity = async (message) => {
     let rarity
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `What rarity would you like to bulk sell?\n(1) all\n(2) common\n(3) rare\n(4) super\n(5) ultra\n(6) secret`})
-    const collected = await msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
         time: 15000
-    }).then(async collected => {
+    })
+
+    collector.on('collect', async (collected) => {
 		const response = collected.first().content.toLowerCase()
         if(response.includes('all') || response.includes('any') || response.includes('1')) rarity = 'all'
         else if(response.includes('com') || response.includes('2')) rarity = 'com' 
@@ -724,8 +728,9 @@ const getDumpRarity = async (message) => {
         else if(response.includes('ult') || response.includes('5')) rarity = 'ult'
         else if(response.includes('sec') || response.includes('scr') || response.includes('6')) rarity = 'scr'
         else rarity = 'unrecognized'
-    }).catch(err => {
-		console.log(err)
+    })
+    
+    collector.on('end', () => {
         return message.channel.send({ content: `Sorry, time's up.`})
 	})
 
@@ -736,10 +741,12 @@ const getDumpRarity = async (message) => {
 const getDumpQuantity = async (message, rarity) => {
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `How many of each ${rarity === 'all' ? 'card' : eval(rarity)} do you want to keep?`})
-    const collected = await msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
         time: 15000
-    }).then(async collected => {
+    })
+
+    collector.on('collect', async (collected) => {
 		const response = Math.round(parseInt(collected.first().content.toLowerCase()))
         if (!Number.isInteger(response) || response < 0) {
             return false
@@ -747,8 +754,9 @@ const getDumpQuantity = async (message, rarity) => {
             return response
         }
 
-    }).catch(err => {
-		console.log(err)
+    })
+    
+    collector.on('end', () => {
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -762,10 +770,12 @@ const getDumpQuantity = async (message, rarity) => {
 const askForExclusions = async (message) => {
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `Do you want to exclude any cards?`})
-    const collected = await msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
         time: 15000
-    }).then(async collected => {
+    })
+
+    collector.on('collect', async (collected) => {
         const response = collected.first().content.toLowerCase()
         if (yescom.includes(response)) {
             return true
@@ -775,8 +785,9 @@ const askForExclusions = async (message) => {
             message.channel.send({ content: `I'll take that as a yes.`})
             return true
         }
-    }).catch(err => {
-		console.log(err)
+    })
+    
+    collector.on('end', () => {
         return false
 	})
 
@@ -792,10 +803,12 @@ const getExclusions = async (message, rarity, set) => {
         ''
 
 	const msg = await message.channel.send({ content: `Please provide a list of ${rarity === 'all' ? '' : eval(rarity)}${prompt} cards you do not want to bulk sell.`})
-    const collected = await msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
         time: 60000
-    }).then(async collected => {
+    })
+
+    collector.on('collect', async (collected) => {
 		const response = collected.first().content.toLowerCase()
         if (response.startsWith('!')) {
             message.channel.send({ content: `Please do not respond with bot commands. Simply type what you would like to exclude.`})
@@ -803,8 +816,9 @@ const getExclusions = async (message, rarity, set) => {
         } else {
             return collected.first().content.split(';')
         }
-    }).catch(err => {
-		console.log(err)
+    })
+    
+    collector.on('end', () => {
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -853,10 +867,12 @@ const getBarterDirection = async (message) => {
 
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `What would you like to **receive** in this exchange?\n${options.join("\n")}`})
-    const collected = await msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
         time: 15000
-    }).then(async collected => {
+    })
+
+    collector.on('collect', async (collected) => {
 		const response = collected.first().content.toLowerCase()
         let direction
         if(response.includes('1') || response.includes('card')) {
@@ -869,8 +885,9 @@ const getBarterDirection = async (message) => {
         }
 
         return direction
-    }).catch(err => {
-		console.log(err)
+    })
+    
+    collector.on('end', () => {
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -898,10 +915,12 @@ const getVoucher = async (message) => {
 
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `Which Voucher would you like to exchange?\n${options.join("\n")}`})
-    const collected = await msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
         time: 15000
-    }).then(async collected => {
+    })
+
+    collector.on('collect', async (collected) => {
 		const response = collected.first().content.toLowerCase()
         let voucher
         if(response.includes('10') || response.includes('gem')) {
@@ -936,8 +955,9 @@ const getVoucher = async (message) => {
         }
 
         return voucher
-    }).catch(err => {
-		console.log(err)
+    })
+    
+    collector.on('end', () => {
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -965,10 +985,12 @@ const getTribe = async (message, player) => {
 
     const filter = m => m.author.id === player.id
 	const msg = await message.channel.send({ content: `${player.name}, which Tribe did you battle alongside?\n${options.join("\n")}`})
-    const collected = await msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
         time: 30000
-    }).then(async collected => {
+    })
+
+    collector.on('collect', async (collected) => {
 		const response = collected.first().content.toLowerCase()
         let voucher
         if(response.includes('10') || response.includes('zom')) {
@@ -1001,8 +1023,9 @@ const getTribe = async (message, player) => {
         }
 
         return voucher
-    }).catch(err => {
-		console.log(err)
+    })
+    
+    collector.on('end', () => {
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -1098,10 +1121,12 @@ const getBarterCard = async (message, voucher, medium_complete) => {
     
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `Which card would you like to barter for?\n${cards.join("\n")}`})
-    const collected = await msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
         time: 15000
-    }).then(async collected => {
+    })
+
+    collector.on('collect', async (collected) => {
 		const response = collected.first().content.toLowerCase()
         let index
         if(response.includes('1') || response.includes('APC')) {
@@ -1118,8 +1143,9 @@ const getBarterCard = async (message, voucher, medium_complete) => {
 
         const selected_option = options[index]
         return selected_option
-    }).catch(err => {
-		console.log(err)
+    })
+    
+    collector.on('end', () => {
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -1133,14 +1159,17 @@ const getBarterCard = async (message, voucher, medium_complete) => {
 const getBarterQuery = async (message) => {
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `Which card would you like to exchange ${forgestone} for?`})
-    const collected = await msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
         time: 15000
-    }).then(async collected => {
+    })
+
+    collector.on('collect', async (collected) => {
 		const response = collected.first().content.toLowerCase()
         return response
-    }).catch(err => {
-		console.log(err)
+    })
+    
+    collector.on('end', () => {
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -1170,10 +1199,12 @@ const getTradeInCard = async (message, medium_complete) => {
 
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `Which card would you like to trade-in?\n${cards.join("\n")}`})
-    const collected = await msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
         time: 15000
-    }).then(async collected => {
+    })
+
+    collector.on('collect', async (collected) => {
 		const response = collected.first().content.toLowerCase()
         let index
         if(response.includes('10') || response.includes('APC-010') || response.includes('gozu')) {
@@ -1207,8 +1238,9 @@ const getTradeInCard = async (message, medium_complete) => {
 
         const selected_option = options[index]
         return selected_option
-    }).catch(err => {
-		console.log(err)
+    })
+    
+    collector.on('end', () => {
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -1224,18 +1256,21 @@ const askForBarterConfirmation = async (message, voucher, card, price, direction
         
     const filter = m => m.author.id === message.author.id
     const msg = await message.channel.send({ content: prompt })
-    const collected = await msg.channel.createMessageCollector({ filter,
+    const collector = msg.channel.createMessageCollector({ filter,
         max: 1,
         time: 15000
-    }).then(async collected => {
+    })
+
+    collector.on('collect', async (collected) => {
         if (yescom.includes(collected.first().content.toLowerCase())) {
             return true
         } else {
             message.channel.send({ content: `No problem. Have a nice day.`})
             return false
         }  
-    }).catch(err => {
-        console.log(err)
+    })
+    
+    collector.on('end', () => {
         message.channel.send({ content: `Sorry, time's up.`})
         return false
     })

@@ -16,14 +16,17 @@ const merchbotId = '584215266586525696'
 const getInitiatorConfirmation = async (message, cards, player) => {
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: cards.length > 1 ? `Are you sure you want to trade the following to ${player.name}?\n${cards.join("\n")}` : `Are you sure you want to trade ${cards[0]} to ${player.name}?`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
-	}).then(async collected => {
+	})
+
+	collector.on('collect', async (collected) => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return false		
 		else return true
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
 		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -36,18 +39,21 @@ const getInitiatorConfirmation = async (message, cards, player) => {
 const getReceiverSide = async (message, cards, player) => {
     const filter = m => m.author.id === player.id
 	const msg = await message.channel.send({ content: `${player.name}, you are you being offered:\n${cards.join("\n")}\n\nWhat do you wish to trade in return?`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 60000
-	}).then(collected => {
+	})
+	
+	collector.on('collect', collected => {
 		if (collected.first().content.startsWith('!')) {
 			message.channel.send({ content: `Please do not respond with bot commands. Simply type what you would like to trade.`})
 			return false
 		} else {
 			return collected.first().content.split(';')
 		}
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
 		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -60,18 +66,21 @@ const getReceiverSide = async (message, cards, player) => {
 const getReceiverConfirmation = async (message, cards, player) => {
     const filter = m => m.author.id === player.id
 	const msg = await message.channel.send({ content: cards.length > 1 ? `Are you sure you want to trade the following to ${message.author.username}?\n${cards.join("\n")}` : `Are you sure you want to trade ${cards[0]} to ${message.author.username}?`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
-	}).then(async collected => {
+	})
+
+	collector.on('collect', async (collected) => {
 		if (!yescom.includes(collected.first().content.toLowerCase())) {
 			message.channel.send({ content: `No problem. Have a nice day.`})
 			return false
 		} else {
 			return true
 		}
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
 		message.channel.send({ content: `Time's up.`})
         return false
 	})
@@ -83,10 +92,12 @@ const getReceiverConfirmation = async (message, cards, player) => {
 const getFinalConfirmation = async (message, cards, player) => {
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `${player.name}, you will receive:\n${cards.join("\n")}\n\nDo you accept this trade?`})
-	const collected = await msg.channel.createMessageCollector({ filter,
+	const collector = msg.channel.createMessageCollector({ filter,
 		max: 1,
 		time: 15000
-	}).then(async collected => {
+	})
+
+	collector.on('collect', async (collected) => {
 		const response = collected.first().content.toLowerCase()
 		if (!yescom.includes(response)) {
 			message.channel.send({ content: `No problem. Have a nice day.`})
@@ -94,8 +105,9 @@ const getFinalConfirmation = async (message, cards, player) => {
 		} else {
 			return true
 		}
-	}).catch(err => {
-		console.log(err)
+	})
+    
+    collector.on('end', () => {
 		message.channel.send({ content: `Time's up.`})
         return false
 	})

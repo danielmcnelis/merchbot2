@@ -22,28 +22,28 @@ const manageBidding = async (message, player, fuzzyPrints) => {
 
     const prompt = `Your bids are as follows:\n${bidSummary.join("\n")}\n\nWhat would you like to do?\n${bidSummary.length >= 3 ? '(1) cancel a bid\n(2) nothing' : '(1) place a bid\n(2) cancel a bid\n(3) nothing'}`
     const msg = await message.author.send({ content: prompt })
-    const collector = msg.channel.awaitMessages({ filter,
+    const collector = await msg.channel.awaitMessages({ filter,
         max: 1,
         time: 20000
-    }).then(async (collected) => {
-        const response = collected.first().content.toLowerCase()
-        if(response.includes('bid') || response.includes('place') || (bidSummary.length < 3 && response.includes('1'))) {
-            return askForBidPlacement(message, player, fuzzyPrints)
-        } else if(response.includes('can') || (bidSummary.length >= 3 && response.includes('1')) ||  (bidSummary.length < 3 && response.includes('2'))) {
-            return askForBidCancellation(message, player)
-        } else {
-            return message.author.send({ content: `Not a problem. Have a nice day.` })
-        }
     }).catch((err) => {
 		console.log(err)
         return message.author.send({ content: `Sorry, time's up.` })
     })
+
+    const response = collector.first().content.toLowerCase()
+    if(response.includes('bid') || response.includes('place') || (bidSummary.length < 3 && response.includes('1'))) {
+        return askForBidPlacement(message, player, fuzzyPrints)
+    } else if(response.includes('can') || (bidSummary.length >= 3 && response.includes('1')) ||  (bidSummary.length < 3 && response.includes('2'))) {
+        return askForBidCancellation(message, player)
+    } else {
+        return message.author.send({ content: `Not a problem. Have a nice day.` })
+    }
 }
 
 const askForBidPlacement = async (message, player, fuzzyPrints) => {
     const filter = m => m.author.id === message.author.id
     const msg = await message.author.send({ content: `Which card would you like to bid on?`})
-    const collector = msg.channel.awaitMessages({ filter,
+    await msg.channel.awaitMessages({ filter,
         max: 1,
         time: 45000
     }).then(async (collected) => {
@@ -57,7 +57,6 @@ const askForBidPlacement = async (message, player, fuzzyPrints) => {
         
         const auction = await Auction.findOne({ where: { printId: print.id } })
         if (!auction) return message.author.send({ content: `Sorry, ${card} is not part of the auction tonight.`})
-
 
         const inv = await Inventory.findOne({ 
             where: { 
@@ -108,7 +107,7 @@ const askForBidAmount = async (message, player, print, card) => {
         return false
     })
     
-    const offer = parseInt(collector.content.toLowerCase())
+    const offer = parseInt(collector.first().content.toLowerCase())
     if (isNaN(offer) || offer < 1) {
         message.author.send({ content: `Sorry, that is not a valid amount.`})
         return false
@@ -138,7 +137,7 @@ const askForBidCancellation = async (message, player, fuzzyPrints) => {
     }
 
     const msg = await message.author.send({ content: `Which bid would you like to cancel?:\n${bidSummary.join("\n")}?`})
-    const collector = msg.channel.awaitMessages({ filter,
+    await msg.channel.awaitMessages({ filter,
         max: 1,
         time: 20000
     }).then(async (collected) => {

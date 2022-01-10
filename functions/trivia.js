@@ -102,7 +102,7 @@ const getTriviaConfirmation = async (trivia_entry) => {
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
 	const msg = await member.send({ content: `Do you still wish to play Trivia?`})
-	const collector = msg.channel.awaitMessages({ filter,
+	await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 60000
 	}).then(async (collected) => {
@@ -138,7 +138,7 @@ const getAnswer = async (entry, question, round) => {
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
 	const msg = await member.send({ content: `${megaphone}  ------  Question #${round}  ------  ${dummy}\n${question}`})
-	const collector = msg.channel.awaitMessages({ filter,
+	await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 20000
 	}).then(async (collected) => {

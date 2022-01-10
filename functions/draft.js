@@ -106,7 +106,7 @@ const getConfirmation = async (entry, contestant) => {
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
 	const msg = await member.send({ content: `Do you still wish to participate in the Draft?`})
-	const collector = msg.channel.awaitMessages({ filter,
+	const collector = await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 60000
 	}).catch((err) => {
@@ -114,7 +114,7 @@ const getConfirmation = async (entry, contestant) => {
         return member.send({ content: `Sorry, time's up.`})
 	})
 
-    const response = collector.content.toLowerCase()
+    const response = collector.first().content.toLowerCase()
     const count = await Info.count({ where: {
         element: 'draft',
         status: 'confirming'
@@ -510,7 +510,7 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
 
     const filter = m => m.author.id === playerId
 	const msg = await member.send({ content: `Please select a card (${24 - count} seconds):\n${galaxy} - Galaxy Pack ${letter} - ${galaxy}\n${cards.join('\n')}`, files: [attachment] })
-	const collector = msg.channel.awaitMessages({ filter,
+	const collector = await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: (24 - count) * 1000
 	}).then(async (collected) => {

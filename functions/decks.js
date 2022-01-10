@@ -23,29 +23,27 @@ const getShopDeck = async (message, deck = '') => {
     if(deck.includes('rep')) return 'reptile'
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Please select a deck:\n(1) Reptile's Charm\n(2) Warrior's Legend\n(3) Dragon's Inferno\n(4) Spellcaster's Art\n(5) Dinosaur's Power\n(6) Plant's Harmony\n(7) Fish's Ire\n(8) Rock's Foundation`})
-	const collector = msg.channel.awaitMessages({ filter,
+	const collector = await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
-	}).then(collected => {
-        let deck
-		const response = collected.first().content.toLowerCase()
-        if(response.includes('rep') || response.includes('1')) deck = 'reptile' 
-        else if(response.includes('war') || response.includes('2')) deck = 'warrior'
-        if(response.includes('drag') || response.includes('3')) deck = 'dragon' 
-        else if(response.includes('spell') || response.includes('cast') || response.includes('4')) deck = 'spellcaster'
-        else if(response.includes('dino') || response.includes('5')) deck = 'dinosaur' 
-        else if(response.includes('plant') || response.includes('6')) deck = 'plant'
-        else if(response.includes('fish') || response.includes('7')) deck = 'fish'
-        else if(response.includes('rock') || response.includes('8')) deck = 'rock'
-        else message.channel.send({ content: `Please specify a valid deck.`})
-        return deck
 	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
-    return collector
+    let deck
+    const response = collector.first().content.toLowerCase()
+    if(response.includes('rep') || response.includes('1')) deck = 'reptile' 
+    else if(response.includes('war') || response.includes('2')) deck = 'warrior'
+    if(response.includes('drag') || response.includes('3')) deck = 'dragon' 
+    else if(response.includes('spell') || response.includes('cast') || response.includes('4')) deck = 'spellcaster'
+    else if(response.includes('dino') || response.includes('5')) deck = 'dinosaur' 
+    else if(response.includes('plant') || response.includes('6')) deck = 'plant'
+    else if(response.includes('fish') || response.includes('7')) deck = 'fish'
+    else if(response.includes('rock') || response.includes('8')) deck = 'rock'
+    else message.channel.send({ content: `Please specify a valid deck.`})
+    return deck
 }
 
 
@@ -227,7 +225,7 @@ const saveAllYDK = async () => {
 const checkDeckList = async (client, message, member, formatName, formatEmoji, formatDate, formatList) => {  
     const filter = m => m.author.id === member.user.id
     const msg = await member.user.send({ content: `Please provide a duelingbook.com/deck link for the ${formatName} Format ${formatEmoji} deck you would like to check for legality.`})
-    const collector = msg.channel.awaitMessages({ filter,
+    await msg.channel.awaitMessages({ filter,
         max: 1,
         time: 180000
     }).then(async (collected) => {

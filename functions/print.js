@@ -8,42 +8,40 @@ const { Auction, Info, Inventory, Print, Set } = require('../db/index.js')
 const askForSetToPrint = async (message) => {
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `What set would you like to work on printing?`})
-    const collector = msg.channel.awaitMessages({ filter,
+    const collector = await msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    }).then(async (collected) => {
-        const set_code = collected.first().content.toUpperCase()
-        const set = await Set.findOne({ where: { code: set_code }}) 
-        if (!set) {
-            message.channel.send({ content: `That set outline is not in the system.`})
-            return false
-        } else {
-            const info = await Info.findOne({ where: { element: 'set_to_print'}})
-            if (info) {
-                info.status = set_code
-                await info.save()
-            } else {
-                await Info.create({
-                    element: 'set_to_print',
-                    status: set_code
-                })
-            }
-
-            return set
-        }
     }).catch((err) => {
 		console.log(err)
         member.user.send({ content: `Sorry, time's up.`})
         return false
     })
 
-    return collector
+    const set_code = collector.first().content.toUpperCase()
+    const set = await Set.findOne({ where: { code: set_code }}) 
+    if (!set) {
+        message.channel.send({ content: `That set outline is not in the system.`})
+        return false
+    } else {
+        const info = await Info.findOne({ where: { element: 'set_to_print'}})
+        if (info) {
+            info.status = set_code
+            await info.save()
+        } else {
+            await Info.create({
+                element: 'set_to_print',
+                status: set_code
+            })
+        }
+
+        return set
+    }
 }
 
 const askForCardSlot = async (message, card_name, card_id, set_code, set_id) => {
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `What number card is this in the set?`})
-    const collector = msg.channel.awaitMessages({ filter,
+    await msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
     }).then(async (collected) => {
@@ -80,7 +78,7 @@ const askForRarity = async (message, set, currentPrints) => {
         return false
     })
 
-    const rarity = collector.content.toLowerCase()
+    const rarity = collector.first().content.toLowerCase()
     if (rarity !== 'com' && rarity !== 'rar' && rarity !== 'sup' && rarity !== 'ult' && rarity !== 'scr') {
         message.channel.send({ content: `Please specify a rarity.`})
         return false
@@ -92,7 +90,7 @@ const askForRarity = async (message, set, currentPrints) => {
 const collectNicknames = async (message, card_name) => {
     const filter = m => m.author.id === message.author.id
     const msg = await message.channel.send({ content: `Type new nicknames for ${card_name} into the chat one at a time.\n\nThis collection will last 15s.`})
-    const collector = msg.channel.awaitMessages({ filter,
+    const collector = await msg.channel.awaitMessages({ filter,
         time: 15000
     }).catch((err) => {
         console.log(err)
@@ -128,29 +126,28 @@ const selectPrint = async (message, playerId, card_name, private = false, inInv 
 
     const filter = m => m.author.id === playerId
     const msg = await channel.send({ content: `Please select a print:\n${options.join('\n')}`})
-    const collector = msg.channel.awaitMessages({ filter,
+    const collector = await msg.channel.awaitMessages({ filter,
         max: 1,
         time: 15000
-    }).then(collected => {
-        const num = parseInt(collected.first().content.match(/\d+/))
-        if (!num || !prints[num - 1]) {
-            message.channel.send({ content: `Sorry, ${collected.first().content} is not a valid option.`})
-            return null
-        }
-        else return prints[num - 1]
     }).catch((err) => {
 		console.log(err)
         return null
     })
 
-    return collector
+    const num = parseInt(collector.first().content.match(/\d+/))
+    if (!num || !prints[num - 1]) {
+        message.channel.send({ content: `Sorry, ${collected.first().content} is not a valid option.`})
+        return null
+    } else {
+        return prints[num - 1]
+    }
 }
 
 
 const askForAdjustConfirmation = async (message, card, market_price) => {
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `${card} is valued at ${market_price}${stardust}, do you wish to change it?`})
-    const collector = msg.channel.awaitMessages({ filter,
+    const collector = await msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
     }).catch((err) => {
@@ -159,7 +156,7 @@ const askForAdjustConfirmation = async (message, card, market_price) => {
         return false
     })
     
-    if (yescom.includes(collector.content.toLowerCase())) {
+    if (yescom.includes(collector.first().content.toLowerCase())) {
         return true
     } else { 
         return false
@@ -172,17 +169,18 @@ const getNewMarketPrice = async (message) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    }).then(async (collected) => {
-        const num = Math.round(parseInt(collected.first().content) * 100) / 100
-        if (isFinite(num) && num > 0) return num
-        else return false
     }).catch((err) => {
 		console.log(err)
         member.user.send({ content: `Sorry, time's up.`})
         return false
     })
 
-    return collector
+    const num = Math.round(parseInt(collector.first().content) * 100) / 100
+    if (isFinite(num) && num > 0) {
+        return num
+    } else {
+        return false
+    }
 }
 
 module.exports = {

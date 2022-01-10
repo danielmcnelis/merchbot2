@@ -29,52 +29,46 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlay
         `for ${invoice.total_price}${stardust}?`
     })
 
-	const collector = msg.channel.awaitMessages({ filter,
+	const collector = await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
-	}).then(async (collected) => {
-		const response = collected.first().content.toLowerCase()
-		if (yescom.includes(response)) {
-			return true
-		} else {
-			message.channel.send({ content: `No problem. Have a nice day.`})
-			return false
-		}
 	}).catch((err) => {
         console.log(err)
 		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
-    return collector
+    const response = collector.first().content.toLowerCase()
+    if (yescom.includes(response)) {
+        return true
+    } else {
+        message.channel.send({ content: `No problem. Have a nice day.`})
+        return false
+    }
 }
 
 //GET BUYER CONFIRMATION
 const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = false) => {
     const cards = shopSale ? invoice.cards : [invoice.card]
     const buyerId = buyingPlayer.id
-
 	const filter = m => m.author.id === buyerId
 	const msg = await message.channel.send({ content: `${mention ? `<@${buyerId}>, Do you agree` : 'Are you sure you want'} to buy${cards.length > 1 ? `:\n${cards.join('\n')}\nF` : ` ${cards[0]} f`}rom ${sellingPlayer.id === merchbotId ? 'The Shop' : sellingPlayer.name} for ${invoice.total_price}${stardust}?`})
-	
-    const collector = msg.channel.awaitMessages({ filter,
+    const collector = await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
-	}).then(async (collected) => {
-		const response = collected.first().content.toLowerCase()
-		if (yescom.includes(response)) {
-			return true
-		} else {
-			message.channel.send({ content: `No problem. Have a nice day.`})
-			return false
-		}
 	}).catch((err) => {
 		console.log(err)
 		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
-	return collector
+    const response = collector.first().content.toLowerCase()
+    if (yescom.includes(response)) {
+        return true
+    } else {
+        message.channel.send({ content: `No problem. Have a nice day.`})
+        return false
+    }
 }
 
 // GET INVOICE MERCHBOT SALE

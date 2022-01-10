@@ -105,10 +105,8 @@ const getTriviaConfirmation = async (trivia_entry) => {
 	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 60000
-	})
-
-    collector.on('collect', async (collected) => {
-		const response = collected.content.toLowerCase()
+	}).then(async (collected) => {
+		const response = collected.first().content.toLowerCase()
 
         const count = await Info.count({ where: {
             element: 'trivia',
@@ -126,9 +124,8 @@ const getTriviaConfirmation = async (trivia_entry) => {
             member.send({ content: `Okay, sorry to see you go!`})
             return channel.send({ content: `Oof. ${member.user.username} ducked out of Trivia!`})
         }
-	})
-    
-    collector.on('end', () => {
+	}).catch((err) => {
+		console.log(err)
         return member.send({ content: `Sorry, time's up.`})
 	})
 }
@@ -144,16 +141,13 @@ const getAnswer = async (entry, question, round) => {
 	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 20000
-	})
-
-    collector.on('collect', async (collected) => {
-		const response = collected.content
+	}).then(async (collected) => {
+		const response = collected.first().content
         entry.answer = response
         await entry.save()
         return member.send({ content: `Thanks!`})
-	})
-    
-    collector.on('end', async () => {
+	}).catch(async (err) => {
+		console.log(err)
         entry.answer = 'no answer'
         await entry.save()
         return member.send({ content: `Time's up!`})

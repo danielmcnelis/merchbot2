@@ -26,11 +26,9 @@ const getShopDeck = async (message, deck = '') => {
 	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
-	})
-    
-    collector.on('collect', collected => {
+	}).then(collected => {
         let deck
-		const response = collected.content.toLowerCase()
+		const response = collected.first().content.toLowerCase()
         if(response.includes('rep') || response.includes('1')) deck = 'reptile' 
         else if(response.includes('war') || response.includes('2')) deck = 'warrior'
         if(response.includes('drag') || response.includes('3')) deck = 'dragon' 
@@ -41,9 +39,7 @@ const getShopDeck = async (message, deck = '') => {
         else if(response.includes('rock') || response.includes('8')) deck = 'rock'
         else message.channel.send({ content: `Please specify a valid deck.`})
         return deck
-	})
-    
-    collector.on('end', () => {
+	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
@@ -234,13 +230,11 @@ const checkDeckList = async (client, message, member, formatName, formatEmoji, f
     const collector = msg.channel.awaitMessages({ filter,
         max: 1,
         time: 180000
-    })
-
-    collector.on('collect', async (collected) => {
-        if (collected.content.startsWith("https://www.duelingbook.com/deck") || collected.content.startsWith("www.duelingbook.com/deck") || collected.content.startsWith("duelingbook.com/deck")) {		
+    }).then(async (collected) => {
+        if (collected.first().content.startsWith("https://www.duelingbook.com/deck") || collected.first().content.startsWith("www.duelingbook.com/deck") || collected.first().content.startsWith("duelingbook.com/deck")) {		
             message.author.send({ content: 'Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.'})
 
-            const url = collected.content
+            const url = collected.first().content
             const issues = await saveYDK(message.author, url, formatDate, formatList)
             
             if (issues['illegalCards'].length || issues['forbiddenCards'].length || issues['limitedCards'].length || issues['semiLimitedCards'].length) {
@@ -257,9 +251,8 @@ const checkDeckList = async (client, message, member, formatName, formatEmoji, f
         } else {
             return message.author.send({ content: "Sorry, I only accept duelingbook.com/deck links." })      
         }
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         return message.author.send({ content: `Sorry, time's up. If you wish to try again, go back to the Discord server and use the **!check** command.` })
     })
 }

@@ -18,10 +18,8 @@ const getNewStatus = async (message, card, old_status) => {
 	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 30000
-	})
-    
-    collector.on('collect', collected => {
-		const response = collected.content.toLowerCase()
+	}).then(collected => {
+		const response = collected.first().content.toLowerCase()
         let index
         if(response.includes('1')) {
             index = 0
@@ -38,9 +36,8 @@ const getNewStatus = async (message, card, old_status) => {
 
         const selected_option = filteredOptions[index]
         return selected_option.slice(4)
-	})
-    
-    collector.on('end', () => {
+	}).catch((err) => {
+		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})

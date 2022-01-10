@@ -109,10 +109,8 @@ const getConfirmation = async (entry, contestant) => {
 	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 60000
-	})
-
-    collector.on('collect', async (collected) => {
-		const response = collected.content.toLowerCase()
+	}).then(async (collected) => {
+		const response = collected.first().content.toLowerCase()
 
         const count = await Info.count({ where: {
             element: 'draft',
@@ -131,11 +129,12 @@ const getConfirmation = async (entry, contestant) => {
             member.send({ content: `Okay, sorry to see you go!`})
             return channel.send({ content: `Yikes. ${member.user.username} dodged the Draft!`})
         }
-	})
-    
-    collector.on('end', () => {
+	}).catch((err) => {
+		console.log(err)
         return member.send({ content: `Sorry, time's up.`})
 	})
+
+    return collector
 }
 
 //ASSIGN DRAFT ROLES
@@ -517,10 +516,8 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
 	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: (24 - count) * 1000
-	})
-
-    collector.on('collect', async (collected) => {
-		const response = collected.content
+	}).then(async (collected) => {
+		const response = collected.first().content
         const card_name = await findCard(response, fuzzyPrints)
         
         let pool_selection
@@ -575,9 +572,8 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
         await pool_selection.destroy()
         const prompt = auto_draft ? `Sorry, "${response}" is not a valid response. You auto-drafted` : 'Thanks! You selected'
         return member.send({ content: `${prompt}: ${card}.` })
-	})
-    
-    collector.on('end', async () => {
+	}).catch(async (err) => {
+        console.log(err)
         const pool_selection = await autoDraft(pack)
         const card = `${eval(pool_selection.print.rarity)}${pool_selection.card_code} - ${pool_selection.card_name}`
         const inv = await Inventory.findOne({ where: {
@@ -603,6 +599,8 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
         await pool_selection.destroy()
         return member.send({ content: `Time's up! You auto-drafted: ${card}.`})
 	})
+
+    return collector
 }
 
 //AUTO DRAFT

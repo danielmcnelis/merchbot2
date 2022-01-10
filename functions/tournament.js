@@ -21,10 +21,8 @@ const askForDBName = async (member, player, override = false, error = false, att
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 30000
-    })
-    
-    collector.on('collect', async (collected) => {
-        const dbName = collected.content
+    }).then(async (collected) => {
+        const dbName = collected.first().content
         if (dbName.includes("duelingbook.com/deck") || dbName.includes("imgur.com")) {
             if (attempt >= 3) {
                 member.user.send({ content: `Sorry, time's up. Go back to the server and try again.`})
@@ -39,9 +37,8 @@ const askForDBName = async (member, player, override = false, error = false, att
             member.user.send({ content: `Thanks! I saved ${pronoun} DuelingBook name as: ${dbName}. If that's wrong, go back to the server and type **!db name**.`})
             return dbName
         }
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         member.user.send({ content: `Sorry, time's up. Go back to the server and try again.`})
         return false
     })
@@ -57,10 +54,8 @@ const getDeckList = async (member, player, tournamentName, override = false) => 
     const collector = msg.channel.awaitMessages({ filter,
         max: 1,
         time: 180000
-    })
-    
-    collector.on('collect', async (collected) => {
-        const url = collected.content
+    }).then(async (collected) => {
+        const url = collected.first().content
         if (url.includes("www.duelingbook.com/deck")) {		
             member.send({ content: 'Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.'})
             const issues = await saveYDK(player, url, tournamentName)
@@ -92,9 +87,8 @@ const getDeckList = async (member, player, tournamentName, override = false) => 
             member.send({ content: "Sorry, I only accept duelingbook.com/deck links."})
             return false
         }
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         member.send({ content: `Sorry, time's up. Go back to the server and try again.`})
         return false
     })
@@ -110,10 +104,8 @@ const directSignUp = async (message, player, resubmission = false) => {
     const collector = msg.channel.awaitMessages({ filter,
         max: 1,
         time: 60000
-    })
-
-    collector.on('collect', async (collected) => {
-        const url = collected.content
+    }).then(async (collected) => {
+        const url = collected.first().content
         if (url.includes("duelingbook.com/deck")) {		
             message.author.send({ content: `Thanks, ${message.author.username}, I now have the link to ${player.name}'s tournament deck. ${soldier}`})
             return url
@@ -121,9 +113,8 @@ const directSignUp = async (message, player, resubmission = false) => {
             message.author.send({ content: "Sorry, I only accept duelingbook.com/deck links."})
             return false
         }
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         member.user.send({ content: `Sorry, time's up. To try again, go back to the Discord server type **!join**.`})
         return false
     })
@@ -139,14 +130,11 @@ const getDeckName = async (member, player, override = false) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 20000
-    })
-
-    collector.on('collect', async (collected) => {
-        const response = collected.content.toLowerCase()
+    }).then(async (collected) => {
+        const response = collected.first().content.toLowerCase()
         return response
-    })
-    
-    collector.on('end', () => {    
+    }).catch((err) => {
+		console.log(err)    
         member.send({ content: `Sorry, time's up.`})
         return false
     })
@@ -206,18 +194,15 @@ const selectTournament = async (message, tournaments, playerId) => {
     const collector = msg.channel.awaitMessages({ filter,
         max: 1,
         time: 15000
-    })
-    
-    collector.on('collect', collected => {
-        const num = parseInt(collected.content.match(/\d+/))
+    }).then(collected => {
+        const num = parseInt(collected.first().content.match(/\d+/))
         if (!num || !tournaments[num - 1]) {
-            message.channel.send({ content: `Sorry, ${collected.content} is not a valid option.`})
+            message.channel.send({ content: `Sorry, ${collected.first().content} is not a valid option.`})
             return null
         }
         else return tournaments[num - 1]
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         return null
     })
 
@@ -434,18 +419,15 @@ const getTournamentType = async (message) => {
 	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 30000
-	})
-    
-    collector.on('collect', collected => {
-		const response = collected.content.toLowerCase()
+	}).then(collected => {
+		const response = collected.first().content.toLowerCase()
         if (response.includes(1) || response.startsWith('single')) tournamentType = 'single elimination'
         else if (response.includes(2) || response.startsWith('double')) tournamentType = 'double elimination'
         else if (response.includes(3) || response.startsWith('swiss')) tournamentType = 'swiss'
         else if (response.includes(4) || response.startsWith('round')) tournamentType = 'round robin'
         else return 
-	})
-    
-    collector.on('end', () => {
+	}).catch((err) => {
+		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
 	})
 

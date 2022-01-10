@@ -30,11 +30,9 @@ const getArenaSample = async (message, query) => {
 	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 10000
-	})
-    
-    collector.on('collect', (collected) => {
+	}).then('collect', (collected) => {
         let tribe = false
-		const response = collected.content.toLowerCase()
+		const response = collected.first().content.toLowerCase()
         if(response.includes('thun') || response.includes('10')) tribe = 'thunder'
         else if(response.includes('war') || response.includes('11')) tribe = 'warrior'
         else if(response.includes('zom') || response.includes('12')) tribe = 'zombie'
@@ -49,9 +47,8 @@ const getArenaSample = async (message, query) => {
         else if(response.includes('spell') || response.includes('cast') || response.includes('9')) tribe = 'spellcaster'
         else message.channel.send({ content: `Please specify a valid tribe.`})
         return tribe
-	})
-    
-    collector.on('end', () => {
+	}).catch((err) => {
+		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -156,11 +153,9 @@ const getConfirmation = async (arena_entry, contestant) => {
 	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 60000
-	})
-
-    collector.on('collect', async (collected) => {
+	}).then(async (collected) => {
         let tribe
-		const response = collected.content.toLowerCase()
+		const response = collected.first().content.toLowerCase()
         if(response.includes('thun') || response.includes('10')) tribe = 'thunder'
         else if(response.includes('war') || response.includes('11')) tribe = 'warrior'
         else if(response.includes('zom') || response.includes('12')) tribe = 'zombie'
@@ -192,9 +187,8 @@ const getConfirmation = async (arena_entry, contestant) => {
         } else {
             return getConfirmation(arena_entry)
         }
-	})
-    
-    collector.on('end', () => {
+	}).catch((err) => {
+		console.log(err)
         return member.send({ content: `Sorry, time's up.`})
 	})
 }

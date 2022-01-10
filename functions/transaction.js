@@ -60,19 +60,16 @@ const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlaye
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
-	})
-
-    collector.on('collect', async (collected) => {
-		const response = collected.content.toLowerCase()
+	}).then(async (collected) => {
+		const response = collected.first().content.toLowerCase()
 		if (yescom.includes(response)) {
 			return true
 		} else {
 			message.channel.send({ content: `No problem. Have a nice day.`})
 			return false
 		}
-	})
-    
-    collector.on('end', () => {
+	}).catch((err) => {
+		console.log(err)
 		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})

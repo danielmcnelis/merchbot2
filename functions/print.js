@@ -11,10 +11,8 @@ const askForSetToPrint = async (message) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    })
-
-    collector.on('collect', async (collected) => {
-        const set_code = collected.content.toUpperCase()
+    }).then(async (collected) => {
+        const set_code = collected.first().content.toUpperCase()
         const set = await Set.findOne({ where: { code: set_code }}) 
         if (!set) {
             message.channel.send({ content: `That set outline is not in the system.`})
@@ -33,9 +31,8 @@ const askForSetToPrint = async (message) => {
 
             return set
         }
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         member.user.send({ content: `Sorry, time's up.`})
         return false
     })
@@ -49,18 +46,15 @@ const askForCardSlot = async (message, card_name, card_id, set_code, set_id) => 
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    })
-
-    collector.on('collect', async (collected) => {
-        const card_slot = collected.content
+    }).then(async (collected) => {
+        const card_slot = collected.first().content
         if (isNaN(card_slot)) return message.channel.send({ content: `Please provide a number.`})
         const zeros = card_slot < 10 ? '00' : card_slot < 100 ? '0' : ''
         const card_code = `${set_code}-${zeros}${card_slot}`
 
         return askForRarity(message, card_name, card_id, set_code, set_id, card_code, card_slot)
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         return member.user.send({ content: `Sorry, time's up.`})
     })
 }
@@ -80,19 +74,16 @@ const askForRarity = async (message, set, currentPrints) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    })
-
-    collector.on('collect', async (collected) => {
-        const rarity = collected.content.toLowerCase()
+    }).then(async (collected) => {
+        const rarity = collected.first().content.toLowerCase()
         if (rarity !== 'com' && rarity !== 'rar' && rarity !== 'sup' && rarity !== 'ult' && rarity !== 'scr') {
             message.channel.send({ content: `Please specify a rarity.`})
             return false
         } else {
             return rarity
         }
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         member.user.send({ content: `Sorry, time's up.`})
         return false
     })
@@ -105,14 +96,11 @@ const collectNicknames = async (message, card_name) => {
     const msg = await message.channel.send({ content: `Type new nicknames for ${card_name} into the chat one at a time.\n\nThis collection will last 15s.`})
     const collector = msg.channel.awaitMessages({ filter,
         time: 15000
-    })
-    
-    collector.on('collect', collected => {
+    }).then(() => {
         return collector
-    })
-    
-    collector.on('end', () => {
-        return
+    }).catch((err) => {
+        console.log(err)
+        return collector
     })
 
     return collector
@@ -148,18 +136,15 @@ const selectPrint = async (message, playerId, card_name, private = false, inInv 
     const collector = msg.channel.awaitMessages({ filter,
         max: 1,
         time: 15000
-    })
-    
-    collector.on('collect', collected => {
-        const num = parseInt(collected.content.match(/\d+/))
+    }).then(collected => {
+        const num = parseInt(collected.first().content.match(/\d+/))
         if (!num || !prints[num - 1]) {
-            message.channel.send({ content: `Sorry, ${collected.content} is not a valid option.`})
+            message.channel.send({ content: `Sorry, ${collected.first().content} is not a valid option.`})
             return null
         }
         else return prints[num - 1]
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         return null
     })
 
@@ -173,14 +158,11 @@ const askForAdjustConfirmation = async (message, card, market_price) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    })
-
-    collector.on('collect', async (collected) => {
-        if (yescom.includes(collected.content.toLowerCase())) return true
+    }).then(async (collected) => {
+        if (yescom.includes(collected.first().content.toLowerCase())) return true
         else return false
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         member.user.send({ content: `Sorry, time's up.`})
         return false
     })
@@ -194,15 +176,12 @@ const getNewMarketPrice = async (message) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    })
-
-    collector.on('collect', async (collected) => {
-        const num = Math.round(parseInt(collected.content) * 100) / 100
+    }).then(async (collected) => {
+        const num = Math.round(parseInt(collected.first().content) * 100) / 100
         if (isFinite(num) && num > 0) return num
         else return false
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         member.user.send({ content: `Sorry, time's up.`})
         return false
     })

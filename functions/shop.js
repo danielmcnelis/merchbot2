@@ -690,18 +690,15 @@ const askForDumpConfirmation = async (message, set, cards, compensation, count) 
     const collector = msg.channel.awaitMessages({ filter,
         max: 1,
         time: 60000
-    })
-
-    collector.on('collect', async (collected) => {
-        if (yescom.includes(collected.content.toLowerCase())) {
+    }).then(async (collected) => {
+        if (yescom.includes(collected.first().content.toLowerCase())) {
             return true
         } else {
             message.channel.send({ content: `No problem. Have a nice day.`})
             return false
         }  
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
     })
@@ -717,10 +714,8 @@ const getDumpRarity = async (message) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    })
-
-    collector.on('collect', async (collected) => {
-		const response = collected.content.toLowerCase()
+    }).then(async (collected) => {
+		const response = collected.first().content.toLowerCase()
         if(response.includes('all') || response.includes('any') || response.includes('1')) rarity = 'all'
         else if(response.includes('com') || response.includes('2')) rarity = 'com' 
         else if(response.includes('rar') || response.includes('3')) rarity = 'rar'
@@ -728,9 +723,8 @@ const getDumpRarity = async (message) => {
         else if(response.includes('ult') || response.includes('5')) rarity = 'ult'
         else if(response.includes('sec') || response.includes('scr') || response.includes('6')) rarity = 'scr'
         else rarity = 'unrecognized'
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         return message.channel.send({ content: `Sorry, time's up.`})
 	})
 
@@ -744,19 +738,15 @@ const getDumpQuantity = async (message, rarity) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    })
-
-    collector.on('collect', async (collected) => {
-		const response = Math.round(parseInt(collected.content.toLowerCase()))
+    }).then(async (collected) => {
+		const response = Math.round(parseInt(collected.first().content.toLowerCase()))
         if (!Number.isInteger(response) || response < 0) {
             return false
         } else {
             return response
         }
-
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -773,10 +763,8 @@ const askForExclusions = async (message) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    })
-
-    collector.on('collect', async (collected) => {
-        const response = collected.content.toLowerCase()
+    }).then(async (collected) => {
+        const response = collected.first().content.toLowerCase()
         if (yescom.includes(response)) {
             return true
         } else if (nocom.includes(response)) {
@@ -785,9 +773,8 @@ const askForExclusions = async (message) => {
             message.channel.send({ content: `I'll take that as a yes.`})
             return true
         }
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         return false
 	})
 
@@ -806,19 +793,16 @@ const getExclusions = async (message, rarity, set) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 60000
-    })
-
-    collector.on('collect', async (collected) => {
-		const response = collected.content.toLowerCase()
+    }).then(async (collected) => {
+		const response = collected.first().content.toLowerCase()
         if (response.startsWith('!')) {
             message.channel.send({ content: `Please do not respond with bot commands. Simply type what you would like to exclude.`})
             return false
         } else {
             return collector.first().content.split(';')
         }
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -870,10 +854,8 @@ const getBarterDirection = async (message) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    })
-
-    collector.on('collect', async (collected) => {
-		const response = collected.content.toLowerCase()
+    }).then(async (collected) => {
+		const response = collected.first().content.toLowerCase()
         let direction
         if(response.includes('1') || response.includes('card')) {
             direction = 'get_card'
@@ -885,9 +867,8 @@ const getBarterDirection = async (message) => {
         }
 
         return direction
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -918,10 +899,8 @@ const getVoucher = async (message) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    })
-
-    collector.on('collect', async (collected) => {
-		const response = collected.content.toLowerCase()
+    }).then(async (collected) => {
+		const response = collected.first().content.toLowerCase()
         let voucher
         if(response.includes('10') || response.includes('gem')) {
             voucher = 'gem'
@@ -955,9 +934,8 @@ const getVoucher = async (message) => {
         }
 
         return voucher
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -988,10 +966,8 @@ const getTribe = async (message, player) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 30000
-    })
-
-    collector.on('collect', async (collected) => {
-		const response = collected.content.toLowerCase()
+    }).then(async (collected) => {
+		const response = collected.first().content.toLowerCase()
         let voucher
         if(response.includes('10') || response.includes('zom')) {
             voucher = 'skull'
@@ -1023,9 +999,8 @@ const getTribe = async (message, player) => {
         }
 
         return voucher
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -1124,10 +1099,8 @@ const getBarterCard = async (message, voucher, medium_complete) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    })
-
-    collector.on('collect', async (collected) => {
-		const response = collected.content.toLowerCase()
+    }).then('collect', async (collected) => {
+		const response = collected.first().content.toLowerCase()
         let index
         if(response.includes('1') || response.includes('APC')) {
             index = 0
@@ -1143,9 +1116,8 @@ const getBarterCard = async (message, voucher, medium_complete) => {
 
         const selected_option = options[index]
         return selected_option
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -1162,14 +1134,11 @@ const getBarterQuery = async (message) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    })
-
-    collector.on('collect', async (collected) => {
-		const response = collected.content.toLowerCase()
+    }).then(async (collected) => {
+		const response = collected.first().content.toLowerCase()
         return response
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -1202,10 +1171,8 @@ const getTradeInCard = async (message, medium_complete) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    })
-
-    collector.on('collect', async (collected) => {
-		const response = collected.content.toLowerCase()
+    }).then(async (collected) => {
+		const response = collected.first().content.toLowerCase()
         let index
         if(response.includes('10') || response.includes('APC-010') || response.includes('gozu')) {
             index = 9
@@ -1238,9 +1205,8 @@ const getTradeInCard = async (message, medium_complete) => {
 
         const selected_option = options[index]
         return selected_option
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
@@ -1259,18 +1225,15 @@ const askForBarterConfirmation = async (message, voucher, card, price, direction
     const collector = msg.channel.awaitMessages({ filter,
         max: 1,
         time: 15000
-    })
-
-    collector.on('collect', async (collected) => {
-        if (yescom.includes(collected.content.toLowerCase())) {
+    }).then(async (collected) => {
+        if (yescom.includes(collected.first().content.toLowerCase())) {
             return true
         } else {
             message.channel.send({ content: `No problem. Have a nice day.`})
             return false
         }  
-    })
-    
-    collector.on('end', () => {
+    }).catch((err) => {
+		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
     })

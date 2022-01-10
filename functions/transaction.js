@@ -35,9 +35,7 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlay
 	})
 
     collector.on('collect', async (collected) => {
-        console.log('collected', collected)
 		const response = collected.content.toLowerCase()
-        console.log('response', response)
 		if (yescom.includes(response)) {
 			return true
 		} else {
@@ -50,8 +48,6 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlay
 		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
-
-	return collector
 }
 
 //GET BUYER CONFIRMATION

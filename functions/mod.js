@@ -19,7 +19,7 @@ const askForGrindAllConfirmation = async (message, index = 0) => {
     ]
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `${prompts[index]}`})
-	const collected = await msg.channel.awaitMessages(filter, {
+	const collected = await msg.channel.createMessageCollector(filter, {
 		max: 1,
 		time: 15000
 	}).then(async collected => {

@@ -40,7 +40,8 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlay
 			message.channel.send({ content: `No problem. Have a nice day.`})
 			return false
 		}
-	}).catch(() => {
+	}).catch((err) => {
+        console.log(err)
 		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})

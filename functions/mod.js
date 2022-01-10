@@ -22,20 +22,19 @@ const askForGrindAllConfirmation = async (message, index = 0) => {
 	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
-	}).then(async (collected) => {
-        const response = collected.first().content.toLowerCase()
-		if (yescom.includes(response)) return true
-        else {
-            message.channel.send({ content: `Not a problem. Have a nice day.`})
-            return false
-        }
 	}).catch((err) => {
 		console.log(err)
 		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
-    return collector
+    const response = collector.content.toLowerCase()
+    if (yescom.includes(response)) {
+        return true
+    } else {
+        message.channel.send({ content: `Not a problem. Have a nice day.`})
+        return false
+    }
 }
 
 module.exports = {

@@ -54,21 +54,19 @@ const getFavoriteQuote = async (message) => {
 	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 30000
-	}).then(collected => {
-		const favorite_quote = collected.first().content
-		if (favorite_quote.length > 200) {
-			message.channel.send({ content: `Sorry, that quote is too long. It should be no more than 200 characters.`})
-			return false
-		} else {
-			return favorite_quote
-		}
 	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
 		return false
 	})
 
-    return collector
+	const favorite_quote = collector.content
+	if (favorite_quote.length > 200) {
+		message.channel.send({ content: `Sorry, that quote is too long. It should be no more than 200 characters.`})
+		return false
+	} else {
+		return favorite_quote
+	}
 }
 
 const getFavoriteAuthor = async (message) => {

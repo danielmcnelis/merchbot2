@@ -25,35 +25,34 @@ const getArenaSample = async (message, query) => {
     if (query && query.includes('thun')) return 'thunder'
     if (query && query.includes('war')) return 'warrior'
     if (query && query.includes('zom')) return 'zombie'
+
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Please select a tribe:\n(1) Beast\n(2) Dinosaur\n(3) Dragon\n(4) Fiend\n(5) Fish\n(6) Plant\n(7) Reptile\n(8) Rock\n(9) Spellcaster\n(10) Thunder\n(11) Warrior\n(12) Zombie`})
-	const collector = msg.channel.awaitMessages({ filter,
+	await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 10000
-	}).then('collect', (collected) => {
-        let tribe = false
-		const response = collected.first().content.toLowerCase()
-        if(response.includes('thun') || response.includes('10')) tribe = 'thunder'
-        else if(response.includes('war') || response.includes('11')) tribe = 'warrior'
-        else if(response.includes('zom') || response.includes('12')) tribe = 'zombie'
-        else if(response.includes('bea') || response.includes('1')) tribe = 'beast' 
-        else if(response.includes('dino') || response.includes('2')) tribe = 'dinosaur'
-        else if(response.includes('drag') || response.includes('3')) tribe = 'dragon'
-        else if(response.includes('fish') || response.includes('4')) tribe = 'fiend'
-        else if(response.includes('fiend') || response.includes('5')) tribe = 'fish'
-        else if(response.includes('plant') || response.includes('6')) tribe = 'plant'
-        else if(response.includes('rep') || response.includes('7')) tribe = 'reptile'
-        else if(response.includes('rock') || response.includes('8')) tribe = 'rock'
-        else if(response.includes('spell') || response.includes('cast') || response.includes('9')) tribe = 'spellcaster'
-        else message.channel.send({ content: `Please specify a valid tribe.`})
-        return tribe
 	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
-    return collector
+    let tribe = false
+    const response = collected.first().content.toLowerCase()
+    if(response.includes('thun') || response.includes('10')) tribe = 'thunder'
+    else if(response.includes('war') || response.includes('11')) tribe = 'warrior'
+    else if(response.includes('zom') || response.includes('12')) tribe = 'zombie'
+    else if(response.includes('bea') || response.includes('1')) tribe = 'beast' 
+    else if(response.includes('dino') || response.includes('2')) tribe = 'dinosaur'
+    else if(response.includes('drag') || response.includes('3')) tribe = 'dragon'
+    else if(response.includes('fish') || response.includes('4')) tribe = 'fiend'
+    else if(response.includes('fiend') || response.includes('5')) tribe = 'fish'
+    else if(response.includes('plant') || response.includes('6')) tribe = 'plant'
+    else if(response.includes('rep') || response.includes('7')) tribe = 'reptile'
+    else if(response.includes('rock') || response.includes('8')) tribe = 'rock'
+    else if(response.includes('spell') || response.includes('cast') || response.includes('9')) tribe = 'spellcaster'
+    else message.channel.send({ content: `Please specify a valid tribe.`})
+    return tribe
 }
 
 //START ARENA

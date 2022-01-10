@@ -1100,30 +1100,21 @@ const getBarterCard = async (message, voucher, medium_complete) => {
     const collector = await msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    }).then('collect', async (collected) => {
-		const response = collected.first().content.toLowerCase()
-        let index
-        if(response.includes('1') || response.includes('APC')) {
-            index = 0
-        } else if(response.includes('2')) {
-            index = 1
-        } else if(response.includes('3')) {
-            index = 2
-        } else if(response.includes('4')) {
-            index = 3
-        } else {
-            return false
-        }
-
-        const selected_option = options[index]
-        return selected_option
     }).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
-    return collector.content
+    const response = collector.content
+    const index = response.includes('1') || response.includes('APC') ? 0 :
+        response.includes('2') ? 1 :
+        response.includes('3') ? 2 :
+        response.includes('4') ? 3 :
+        null
+
+    const selected_option = options[index]
+    return selected_option
 }
 
 
@@ -1135,16 +1126,13 @@ const getBarterQuery = async (message) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    }).then(async (collected) => {
-		const response = collected.first().content.toLowerCase()
-        return response
     }).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
 
-    return collector
+    return collector.content
 }
 
 

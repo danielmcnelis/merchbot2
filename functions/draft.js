@@ -109,32 +109,29 @@ const getConfirmation = async (entry, contestant) => {
 	const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 60000
-	}).then(async (collected) => {
-		const response = collected.first().content.toLowerCase()
-
-        const count = await Info.count({ where: {
-            element: 'draft',
-            status: 'confirming'
-        } })
-
-        if (!count) return member.send({ content: `Sorry, time expired.`})
-
-        if(yescom.includes(response)) {
-            entry.active = true
-            entry.contestant = contestant
-            await entry.save()
-            member.send({ content: `Thanks! The Draft will be starting soon. Look out for more DMs.`})
-            return channel.send({ content: `${member.user.username} confirmed their participation in the Draft!`})
-        } else {
-            member.send({ content: `Okay, sorry to see you go!`})
-            return channel.send({ content: `Yikes. ${member.user.username} dodged the Draft!`})
-        }
 	}).catch((err) => {
 		console.log(err)
         return member.send({ content: `Sorry, time's up.`})
 	})
 
-    return collector
+    const response = collector.content.toLowerCase()
+    const count = await Info.count({ where: {
+        element: 'draft',
+        status: 'confirming'
+    } })
+
+    if (!count) return member.send({ content: `Sorry, time expired.`})
+
+    if(yescom.includes(response)) {
+        entry.active = true
+        entry.contestant = contestant
+        await entry.save()
+        member.send({ content: `Thanks! The Draft will be starting soon. Look out for more DMs.`})
+        return channel.send({ content: `${member.user.username} confirmed their participation in the Draft!`})
+    } else {
+        member.send({ content: `Okay, sorry to see you go!`})
+        return channel.send({ content: `Yikes. ${member.user.username} dodged the Draft!`})
+    }
 }
 
 //ASSIGN DRAFT ROLES

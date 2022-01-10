@@ -99,30 +99,28 @@ const askForBidAmount = async (message, player, print, card) => {
     const filter = m => m.author.id === message.author.id
     const price = Math.ceil(print.market_price * 1.1)
     const msg = await message.author.send({ content: `The Shop sells ${card} for ${price}${stardust}. How much would you like to bid?`})
-    const collector = msg.channel.awaitMessages({ filter,
+    const collector = await msg.channel.awaitMessages({ filter,
         max: 1,
         time: 20000
-    }).then(collected => {
-        const offer = parseInt(collected.first().content.toLowerCase())
-        if (isNaN(offer) || offer < 1) {
-            message.author.send({ content: `Sorry, that is not a valid amount.`})
-            return false
-        } else if (offer < price) {
-            message.author.send({ content: `Sorry, you must bid at least ${price}${stardust}.`})
-            return false
-        } else if (player.wallet.stardust < offer) {
-            message.author.send({ content: `Sorry, you only have ${player.wallet.stardust}${stardust}.`})
-            return false
-        } 
-        
-        return offer
     }).catch((err) => {
 		console.log(err)
         message.author.send({ content: `Sorry, time's up.`})
         return false
     })
-
-    return collector
+    
+    const offer = parseInt(collector.content.toLowerCase())
+    if (isNaN(offer) || offer < 1) {
+        message.author.send({ content: `Sorry, that is not a valid amount.`})
+        return false
+    } else if (offer < price) {
+        message.author.send({ content: `Sorry, you must bid at least ${price}${stardust}.`})
+        return false
+    } else if (player.wallet.stardust < offer) {
+        message.author.send({ content: `Sorry, you only have ${player.wallet.stardust}${stardust}.`})
+        return false
+    }
+    
+    return offer
 }
 
 const askForBidCancellation = async (message, player, fuzzyPrints) => {

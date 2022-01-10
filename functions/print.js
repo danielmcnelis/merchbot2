@@ -74,21 +74,19 @@ const askForRarity = async (message, set, currentPrints) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    }).then(async (collected) => {
-        const rarity = collected.first().content.toLowerCase()
-        if (rarity !== 'com' && rarity !== 'rar' && rarity !== 'sup' && rarity !== 'ult' && rarity !== 'scr') {
-            message.channel.send({ content: `Please specify a rarity.`})
-            return false
-        } else {
-            return rarity
-        }
     }).catch((err) => {
 		console.log(err)
         member.user.send({ content: `Sorry, time's up.`})
         return false
     })
 
-    return collector
+    const rarity = collector.content.toLowerCase()
+    if (rarity !== 'com' && rarity !== 'rar' && rarity !== 'sup' && rarity !== 'ult' && rarity !== 'scr') {
+        message.channel.send({ content: `Please specify a rarity.`})
+        return false
+    } else {
+        return rarity
+    }
 }
 
 const collectNicknames = async (message, card_name) => {
@@ -96,11 +94,8 @@ const collectNicknames = async (message, card_name) => {
     const msg = await message.channel.send({ content: `Type new nicknames for ${card_name} into the chat one at a time.\n\nThis collection will last 15s.`})
     const collector = msg.channel.awaitMessages({ filter,
         time: 15000
-    }).then(() => {
-        return collector
     }).catch((err) => {
         console.log(err)
-        return collector
     })
 
     return collector
@@ -158,16 +153,17 @@ const askForAdjustConfirmation = async (message, card, market_price) => {
     const collector = msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    }).then(async (collected) => {
-        if (yescom.includes(collected.first().content.toLowerCase())) return true
-        else return false
     }).catch((err) => {
 		console.log(err)
         member.user.send({ content: `Sorry, time's up.`})
         return false
     })
-
-    return collector
+    
+    if (yescom.includes(collector.content.toLowerCase())) {
+        return true
+    } else { 
+        return false
+    }
 }
 
 const getNewMarketPrice = async (message) => {

@@ -1097,7 +1097,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
     
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `Which card would you like to barter for?\n${cards.join("\n")}`})
-    const collector = msg.channel.awaitMessages({ filter,
+    await msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
     }).then('collect', async (collected) => {
@@ -1122,8 +1122,6 @@ const getBarterCard = async (message, voucher, medium_complete) => {
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
-
-    return collector
 }
 
 

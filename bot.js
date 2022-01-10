@@ -6561,7 +6561,7 @@ if(cmd === `!barter`) {
 		if (!selected_option) return message.channel.send({ content: `You did not select a valid option.`})
 		if (!voucher) voucher = selected_option[3]
 
-		console.log('selected_option', selected_option)
+		console.log('selected_option[1]', selected_option[1])
 	
 		price = selected_option[0]
 		print = await Print.findOne({ where: { card_code: selected_option[1] } })

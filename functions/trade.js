@@ -59,21 +59,21 @@ const getReceiverSide = async (message, cards, player) => {
 const getReceiverConfirmation = async (message, cards, player) => {
     const filter = m => m.author.id === player.id
 	const msg = await message.channel.send({ content: cards.length > 1 ? `Are you sure you want to trade the following to ${message.author.username}?\n${cards.join("\n")}` : `Are you sure you want to trade ${cards[0]} to ${message.author.username}?`})
-	const collector = await msg.channel.awaitMessages({ filter,
+	await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
+	}).then((collected) => {
+		if (!yescom.includes(collected.first().content.toLowerCase())) {
+			message.channel.send({ content: `No problem. Have a nice day.`})
+			return false
+		} else {
+			return true
+		}
 	}).catch((err) => {
 		console.log(err)
 		message.channel.send({ content: `Time's up.`})
         return false
 	})
-
-	if (!yescom.includes(collector.first().content.toLowerCase())) {
-		message.channel.send({ content: `No problem. Have a nice day.`})
-		return false
-	} else {
-		return true
-	}
 }
 
 //GET FINAL CONFIRMATION

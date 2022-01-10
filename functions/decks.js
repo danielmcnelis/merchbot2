@@ -12,15 +12,15 @@ const { Auction, Bid, Card, Print, Set, Inventory,  Tournament, Status } = requi
 const decks = require('../static/decks.json')
 
 //GET SHOP DECK
-const getShopDeck = async (message, deck = '') => {
-    if(deck.includes('dino')) return 'dinosaur' 
-    if(deck.includes('plant')) return 'plant'
-    if(deck.includes('fish')) return 'fish'
-    if(deck.includes('rock')) return 'rock'
-    if(deck.includes('drag')) return 'dragon'
-    if(deck.includes('spell') || deck.includes('cast')) return 'spellcaster'
-    if(deck.includes('war')) return 'warrior'
-    if(deck.includes('rep')) return 'reptile'
+const getShopDeck = async (message, tribe = '') => {
+    if(tribe.includes('dino')) return 'dinosaur' 
+    if(tribe.includes('plant')) return 'plant'
+    if(tribe.includes('fish')) return 'fish'
+    if(tribe.includes('rock')) return 'rock'
+    if(tribe.includes('drag')) return 'dragon'
+    if(tribe.includes('spell') || tribe.includes('cast')) return 'spellcaster'
+    if(tribe.includes('war')) return 'warrior'
+    if(tribe.includes('rep')) return 'reptile'
     const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Please select a deck:\n(1) Reptile's Charm\n(2) Warrior's Legend\n(3) Dragon's Inferno\n(4) Spellcaster's Art\n(5) Dinosaur's Power\n(6) Plant's Harmony\n(7) Fish's Ire\n(8) Rock's Foundation`})
 	const collector = await msg.channel.awaitMessages({ filter,

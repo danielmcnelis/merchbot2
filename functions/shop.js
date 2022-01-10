@@ -711,7 +711,7 @@ const getDumpRarity = async (message) => {
     let rarity
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `What rarity would you like to bulk sell?\n(1) all\n(2) common\n(3) rare\n(4) super\n(5) ultra\n(6) secret`})
-    const collector = msg.channel.awaitMessages({ filter,
+    await msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
     }).then(async (collected) => {

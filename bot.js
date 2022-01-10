@@ -6560,13 +6560,18 @@ if(cmd === `!barter`) {
 		const selected_option = direction === 'get_card' ? await getBarterCard(message, voucher, medium_complete) : await getTradeInCard(message, medium_complete)
 		if (!selected_option) return message.channel.send({ content: `You did not select a valid option.`})
 		if (!voucher) voucher = selected_option[3]
+
+		console.log('selected_option', selected_option)
 	
 		price = selected_option[0]
 		print = await Print.findOne({ where: { card_code: selected_option[1] } })
 		if (!print) return message.channel.send({ content: `Could not find card: "${selected_option[1]}".`})
+		console.log('print.id', print.id)
+		console.log('print.card_code', print.card_code)
 	}
 
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+	console.log('card', card)
 
 	if (direction === 'get_card' && wallet[voucher] < price) return message.channel.send({ content: `Sorry, you only have ${wallet[voucher]} ${eval(voucher)} and ${card} costs ${price} ${eval(voucher)}.`})
 

@@ -49,7 +49,7 @@ const getShopDeck = async (message, deck = '') => {
         return false
 	})
 
-    return collected
+    return collector
 }
 
 

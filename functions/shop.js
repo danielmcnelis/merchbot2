@@ -706,7 +706,7 @@ const askForDumpConfirmation = async (message, set, cards, compensation, count) 
         return false
     })
 
-    return collected
+    return collector
 }
 
 // GET DUMP RARITY
@@ -761,7 +761,7 @@ const getDumpQuantity = async (message, rarity) => {
         return false
 	})
 
-    return collected
+    return collector
 }
 
 
@@ -791,7 +791,7 @@ const askForExclusions = async (message) => {
         return false
 	})
 
-    return collected
+    return collector
 }
 
 
@@ -814,7 +814,7 @@ const getExclusions = async (message, rarity, set) => {
             message.channel.send({ content: `Please do not respond with bot commands. Simply type what you would like to exclude.`})
             return false
         } else {
-            return collected.first().content.split(';')
+            return collector.first().content.split(';')
         }
     })
     
@@ -823,7 +823,7 @@ const getExclusions = async (message, rarity, set) => {
         return false
 	})
 
-    return collected
+    return collector
 }
 
 // GET EXCLUDED PRINTS
@@ -892,7 +892,7 @@ const getBarterDirection = async (message) => {
         return false
 	})
 
-    return collected
+    return collector
 }
 
 // GET VOUCHER
@@ -962,7 +962,7 @@ const getVoucher = async (message) => {
         return false
 	})
 
-    return collected
+    return collector
 }
 
 
@@ -1030,7 +1030,7 @@ const getTribe = async (message, player) => {
         return false
 	})
 
-    return collected
+    return collector
 }
 
 
@@ -1150,7 +1150,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
         return false
 	})
 
-    return collected
+    return collector
 }
 
 
@@ -1174,7 +1174,7 @@ const getBarterQuery = async (message) => {
         return false
 	})
 
-    return collected
+    return collector
 }
 
 
@@ -1245,7 +1245,7 @@ const getTradeInCard = async (message, medium_complete) => {
         return false
 	})
 
-    return collected
+    return collector
 }
 
 
@@ -1275,7 +1275,7 @@ const askForBarterConfirmation = async (message, voucher, card, price, direction
         return false
     })
 
-    return collected
+    return collector
 }
 
 

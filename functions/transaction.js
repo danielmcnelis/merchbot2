@@ -51,7 +51,7 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlay
         return false
 	})
 
-	return collected
+	return collector
 }
 
 //GET BUYER CONFIRMATION
@@ -82,7 +82,7 @@ const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlaye
         return false
 	})
 
-	return collected
+	return collector
 }
 
 // GET INVOICE MERCHBOT SALE

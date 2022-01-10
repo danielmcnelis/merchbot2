@@ -76,7 +76,7 @@ const getFavoriteQuote = async (message) => {
 		return false
 	})
 
-    return collected
+    return collector
 }
 
 const getFavoriteAuthor = async (message) => {
@@ -101,7 +101,7 @@ const getFavoriteAuthor = async (message) => {
         message.channel.send({ content: `Sorry, time's up.`})
 	})
 
-    return collected
+    return collector
 }
 
 const getFavoriteCard = async (message, fuzzyPrints) => {
@@ -127,7 +127,7 @@ const getFavoriteCard = async (message, fuzzyPrints) => {
 		return false
 	})
 
-    return collected
+    return collector
 }
 
 // GET RESET CONFIRMATION
@@ -158,7 +158,7 @@ const getResetConfirmation = async (message, attempt = 1) => {
 		return false
 	})
 
-	return collected
+	return collector
 }
 
 

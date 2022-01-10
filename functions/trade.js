@@ -31,7 +31,7 @@ const getInitiatorConfirmation = async (message, cards, player) => {
         return false
 	})
 
-    return collected
+    return collector
 }
 
 
@@ -49,7 +49,7 @@ const getReceiverSide = async (message, cards, player) => {
 			message.channel.send({ content: `Please do not respond with bot commands. Simply type what you would like to trade.`})
 			return false
 		} else {
-			return collected.first().content.split(';')
+			return collector.first().content.split(';')
 		}
 	})
     
@@ -58,7 +58,7 @@ const getReceiverSide = async (message, cards, player) => {
         return false
 	})
 
-    return collected
+    return collector
 }
 
 
@@ -85,7 +85,7 @@ const getReceiverConfirmation = async (message, cards, player) => {
         return false
 	})
 
-    return collected
+    return collector
 }
 
 //GET FINAL CONFIRMATION
@@ -112,7 +112,7 @@ const getFinalConfirmation = async (message, cards, player) => {
         return false
 	})
 
-    return collected
+    return collector
 }
 
 //GET TRADE SUMMARY

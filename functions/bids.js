@@ -131,7 +131,7 @@ const askForBidAmount = async (message, player, print, card) => {
         return false
     })
 
-    return collected
+    return collector
 }
 
 const askForBidCancellation = async (message, player, fuzzyPrints) => {

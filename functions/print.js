@@ -40,7 +40,7 @@ const askForSetToPrint = async (message) => {
         return false
     })
 
-    return collected
+    return collector
 }
 
 const askForCardSlot = async (message, card_name, card_id, set_code, set_id) => {
@@ -97,7 +97,7 @@ const askForRarity = async (message, set, currentPrints) => {
         return false
     })
 
-    return collected
+    return collector
 }
 
 const collectNicknames = async (message, card_name) => {
@@ -108,14 +108,14 @@ const collectNicknames = async (message, card_name) => {
     })
     
     collector.on('collect', collected => {
-        return collected
+        return collector
     })
     
     collector.on('end', () => {
         return
     })
 
-    return collected
+    return collector
 }
 
 //SELECT PRINT
@@ -163,7 +163,7 @@ const selectPrint = async (message, playerId, card_name, private = false, inInv 
         return null
     })
 
-    return collected
+    return collector
 }
 
 
@@ -185,7 +185,7 @@ const askForAdjustConfirmation = async (message, card, market_price) => {
         return false
     })
 
-    return collected
+    return collector
 }
 
 const getNewMarketPrice = async (message) => {
@@ -207,7 +207,7 @@ const getNewMarketPrice = async (message) => {
         return false
     })
 
-    return collected
+    return collector
 }
 
 module.exports = {

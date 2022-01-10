@@ -45,7 +45,7 @@ const getNewStatus = async (message, card, old_status) => {
         return false
 	})
 
-    return collected
+    return collector
 } 
 
 module.exports = {

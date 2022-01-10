@@ -38,7 +38,7 @@ const askForGrindAllConfirmation = async (message, index = 0) => {
         return false
 	})
 
-    return collected
+    return collector
 }
 
 module.exports = {

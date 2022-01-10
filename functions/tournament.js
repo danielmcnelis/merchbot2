@@ -46,7 +46,7 @@ const askForDBName = async (member, player, override = false, error = false, att
         return false
     })
 
-    return collected
+    return collector
 }
 
 //GET DECK LIST TOURNAMENT
@@ -99,7 +99,7 @@ const getDeckList = async (member, player, tournamentName, override = false) => 
         return false
     })
 
-    return collected
+    return collector
 }
 
 
@@ -128,7 +128,7 @@ const directSignUp = async (message, player, resubmission = false) => {
         return false
     })
 
-    return collected
+    return collector
 }
 
 //GET DECK NAME
@@ -151,7 +151,7 @@ const getDeckName = async (member, player, override = false) => {
         return false
     })
 
-    return collected
+    return collector
 }
 
 
@@ -221,7 +221,7 @@ const selectTournament = async (message, tournaments, playerId) => {
         return null
     })
 
-    return collected
+    return collector
 }
 
 

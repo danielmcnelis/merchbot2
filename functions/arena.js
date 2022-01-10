@@ -56,7 +56,7 @@ const getArenaSample = async (message, query) => {
         return false
 	})
 
-    return collected
+    return collector
 }
 
 //START ARENA

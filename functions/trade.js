@@ -40,18 +40,18 @@ const getReceiverSide = async (message, cards, player) => {
 	const collector = await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 60000
+	}).then((collected) => {
+		if (collected.first().content.startsWith('!')) {
+			message.channel.send({ content: `Please do not respond with bot commands. Simply type what you would like to trade.`})
+			return false
+		} else {
+			return collected.first().content.split(';')
+		}
 	}).catch((err) => {
 		console.log(err)
 		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
-
-	if (collector.first().content.startsWith('!')) {
-		message.channel.send({ content: `Please do not respond with bot commands. Simply type what you would like to trade.`})
-		return false
-	} else {
-		return collector.first().content.split(';')
-	}
 }
 
 

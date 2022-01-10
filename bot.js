@@ -2138,8 +2138,13 @@ if (historycom.includes(cmd)) {
 		results.push(`**Trade ${i+1}** - ${days ? days : 'Earlier Today'} ${days === 0 ? '' : days === 1 ? 'Day Ago' : 'Days Ago'}\n${summary.p1_name} received:\n${summary.p1_receives.join("\n")}\n${summary.p2_name} received:\n${summary.p2_receives.join("\n")}`)
 	}
 
+	console.log('results', results)
+
 	message.channel.send({ content: `I messaged you the trade history for ${card}.`})
-	for (let i = 0 ; i < results.length; i++) message.author.send({ content: results[i].join('\n').toString()})
+	for (let i = 0 ; i < results.length; i++) {
+		message.author.send({ content: results[i].toString()})
+	}
+
 	return
 }
 

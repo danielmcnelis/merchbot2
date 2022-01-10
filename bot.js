@@ -1348,7 +1348,7 @@ if(deckcom.includes(cmd)) {
 		const filter = m => m.author.id === message.author.id
 		const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.unit_price * discount}${eval(set.currency)} on a copy of ${decks[deck].name} ${eval(deck)}?`})
 		
-		msg.channel.awaitMessages({ filter,
+		await msg.channel.awaitMessages({ filter,
 			max: 1,
 			time: 15000
 		}).then(async (collected) => {
@@ -1602,7 +1602,7 @@ if(referralcom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to give a referral to ${referringPlayer.name}?`})
-	msg.channel.awaitMessages({ filter,
+	await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -2137,8 +2137,6 @@ if (historycom.includes(cmd)) {
 		const days = summary.days
 		results.push(`**Trade ${i+1}** - ${days ? days : 'Earlier Today'} ${days === 0 ? '' : days === 1 ? 'Day Ago' : 'Days Ago'}\n${summary.p1_name} received:\n${summary.p1_receives.join("\n")}\n${summary.p2_name} received:\n${summary.p2_receives.join("\n")}`)
 	}
-
-	console.log('results', results)
 
 	message.channel.send({ content: `I messaged you the trade history for ${card}.`})
 	for (let i = 0 ; i < results.length; i++) {
@@ -4595,7 +4593,7 @@ if(cmd === `!grind`) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to grind ${x}${starchips} into ${x * 10}${stardust}?`})
-	msg.channel.awaitMessages({ filter,
+	await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -4793,7 +4791,7 @@ if(cmd === `!wager`) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to wager ${x}${stardust} on a random ${set.code} ${eval(set.emoji)} card?`})
-	msg.channel.awaitMessages({ filter,
+	await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -4941,7 +4939,7 @@ if(alchemycom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to transmute ${card} into ${value}${starchips}?`})
-	msg.channel.awaitMessages({ filter,
+	await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -5020,7 +5018,7 @@ if(reducecom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to reduce ${card} into ${value}${forgestone}?`})
-	msg.channel.awaitMessages({ filter,
+	await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -5136,7 +5134,7 @@ if(cmd === `!award`) {
 		if (!set) return message.channel.send({ content: `Could not find set: "${set_code}".`})
 		const filter = m => m.author.id === message.author.id
 		const msg = await message.channel.send({ content: `Are you sure you want to award ${quantity} ${set_code} ${eval(set.emoji)} ${quantity > 1 ? 'Packs' : 'Pack'} to ${player.name}?`})
-		msg.channel.awaitMessages({ filter,
+		await msg.channel.awaitMessages({ filter,
 			max: 1,
 			time: 15000
 		}).then(async (collected) => {
@@ -5178,7 +5176,7 @@ if(cmd === `!award`) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to award ${quantity}${award} to ${player.name}?`})
-	msg.channel.awaitMessages({ filter,
+	await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -5271,7 +5269,7 @@ if(cmd === `!steal`) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `Are you sure you want to steal ${quantity}${loot} from ${player.name}?`})
-	msg.channel.awaitMessages({ filter,
+	await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -5727,7 +5725,7 @@ if(packcom.includes(cmd)) {
 	
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.unit_price * discount) * num}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`})
-	msg.channel.awaitMessages({ filter,
+	await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).catch(async (collected) => {
@@ -5901,7 +5899,7 @@ if(specialcom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `${wallet.player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.spec_price}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Special Edition?`})
-	msg.channel.awaitMessages({ filter,
+	await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -6139,7 +6137,7 @@ if(boxcom.includes(cmd)) {
 
 	const filter = m => m.author.id === message.author.id
 	const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.box_price * discount)}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`})
-	msg.channel.awaitMessages({ filter,
+	await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {

@@ -44,7 +44,7 @@ const getReceiverSide = async (message, cards, player) => {
 			message.channel.send({ content: `Please do not respond with bot commands. Simply type what you would like to trade.`})
 			return false
 		} else {
-			return collector.first().content.split(';')
+			return collected.first().content.split(';')
 		}
 	}).catch((err) => {
 		console.log(err)

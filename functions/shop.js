@@ -1123,8 +1123,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
         return false
 	})
 
-    console.log('collector', collector)
-    return collector
+    return collector.content
 }
 
 

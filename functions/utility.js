@@ -341,10 +341,9 @@ const capitalize = (str) => {
 
 //GET RANDOM ELEMENT
 const getRandomElement = (arr = []) => {
+    console.log('getRandomElement arr', arr)
     const index = Math.floor((arr.length) * Math.random())
-    const result = arr[index] || []
-    console.log('result', result)
-    return result
+    return arr[index]
 }
 
 //GET RANDOM SUBSET

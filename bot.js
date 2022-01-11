@@ -5763,7 +5763,7 @@ if(packcom.includes(cmd)) {
 			const yourFoil = getRandomElement(eval(luck))
 			console.log('yourFoil', yourFoil)
 
-			const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil]
+			const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil].filter((e) => !!e)
 			console.log('yourPack', yourPack)
 
 			for (let i = 0; i < yourPack.length; i++) {

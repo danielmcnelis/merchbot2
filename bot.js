@@ -162,7 +162,11 @@ if (!message.content.startsWith("!") && message.content.includes(`{`) && message
 	const query = message.content.slice(message.content.indexOf('{') + 1, message.content.indexOf('}'))
 	const { cardEmbed, attachment } = await search(query, fuzzyCards)
 	if (!cardEmbed) return message.channel.send({ content: `Could not find card: "${query}".`})
-	else return message.channel.send({ embeds: [cardEmbed], files: [attachment] })
+	if (attachment) {
+		return message.channel.send({ embeds: [cardEmbed], files: [attachment] })
+	} else {
+		return message.channel.send({ embeds: [cardEmbed] })
+	}
 }
 
 //PING 

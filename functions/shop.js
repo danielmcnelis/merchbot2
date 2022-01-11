@@ -1077,6 +1077,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
         }
     }
 
+    if (!wares[voucher]) return false
     const options = medium_complete ? [...wares[voucher].original, ...wares[voucher].unlocked] : [...wares[voucher].original]
     if (options.length === 1) return options[0]
     const cards = options.map((o) => o[2])

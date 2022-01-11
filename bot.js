@@ -160,9 +160,9 @@ client.on('messageCreate', async (message) => {
 if (!message.content.startsWith("!") && message.content.includes(`{`) && message.content.includes(`}`)) { 
 	if (message.member.roles.cache.some(role => role.id === triviaRole)) return message.channel.send({ content: `You cannot search for cards while playing Trivia.`})
 	const query = message.content.slice(message.content.indexOf('{') + 1, message.content.indexOf('}'))
-	const cardEmbed = await search(query, fuzzyCards)
+	const { cardEmbed, attachment } = await search(query, fuzzyCards)
 	if (!cardEmbed) return message.channel.send({ content: `Could not find card: "${query}".`})
-	else return message.channel.send({ embeds: [cardEmbed] })
+	else return message.channel.send({ embeds: [cardEmbed], files: [attachment] })
 }
 
 //PING 

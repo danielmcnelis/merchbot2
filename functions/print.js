@@ -69,7 +69,7 @@ const askForRarity = async (message, set, currentPrints) => {
 
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `What rarity is this print?`})
-    const collector = msg.channel.awaitMessages({ filter,
+    const collector = await msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
     }).catch((err) => {

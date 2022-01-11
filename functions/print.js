@@ -134,12 +134,16 @@ const selectPrint = async (message, playerId, card_name, private = false, inInv 
         return null
     })
 
-    const num = parseInt(collector.first().content.match(/\d+/))
-    if (!num || !prints[num - 1]) {
-        message.channel.send({ content: `Sorry, ${collector.first().content} is not a valid option.`})
-        return null
+    if (collector.first()) {
+        const num = parseInt(collector.first().content.match(/\d+/))
+        if (!num || !prints[num - 1]) {
+            message.channel.send({ content: `Sorry, ${collector.first().content} is not a valid option.`})
+            return null
+        } else {
+            return prints[num - 1]
+        }
     } else {
-        return prints[num - 1]
+        return false
     }
 }
 

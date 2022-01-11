@@ -5759,9 +5759,12 @@ if(packcom.includes(cmd)) {
 			if (!yourSecrets.length) for (let i = 0; i < set.secrets_per_box; i++) odds.push("secrets")
 
 			const luck = j < packs_from_boxes ? odds[j % set.packs_per_box] : getRandomElement(odds)
+			console.log('luck', luck)
 			const yourFoil = getRandomElement(eval(luck))
+			console.log('yourFoil', yourFoil)
 
 			const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil]
+			console.log('yourPack', yourPack)
 
 			for (let i = 0; i < yourPack.length; i++) {
 				const print = await Print.findOne({ where: {

@@ -340,7 +340,7 @@ const capitalize = (str) => {
 }
 
 //GET RANDOM ELEMENT
-const getRandomElement = (arr) => {
+const getRandomElement = (arr = []) => {
     const index = Math.floor((arr.length) * Math.random())
     return arr[index] || []
 }

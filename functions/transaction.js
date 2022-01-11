@@ -29,13 +29,13 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlay
         `for ${invoice.total_price}${stardust}?`
     })
 
-	const collector = await msg.channel.awaitMessages({ filter,
+	const collector = await msg.channel.awaitMessages({ 
+        filter,
 		max: 1,
 		time: 15000
 	}).catch((err) => {
         console.log(err)
 		message.channel.send({ content: `Sorry, time's up.`})
-        return false
 	})
 
     if (collector.first()) {

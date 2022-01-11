@@ -170,7 +170,7 @@ const askForAdjustConfirmation = async (message, card, market_price) => {
 const getNewMarketPrice = async (message) => {
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `What should the new market price be in ${stardust}?`})
-    const collector = msg.channel.awaitMessages({ filter,
+    const collector = await msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
     }).catch((err) => {

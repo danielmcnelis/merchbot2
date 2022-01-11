@@ -38,11 +38,15 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlay
         return false
 	})
 
-    const response = collector.first().content.toLowerCase()
-    if (yescom.includes(response)) {
-        return true
+    if (collector.first()) {
+        const response = collector.first().content.toLowerCase()
+        if (yescom.includes(response)) {
+            return true
+        } else {
+            message.channel.send({ content: `No problem. Have a nice day.`})
+            return false
+        }
     } else {
-        message.channel.send({ content: `No problem. Have a nice day.`})
         return false
     }
 }

@@ -1109,16 +1109,20 @@ const getBarterCard = async (message, voucher, medium_complete) => {
 const getBarterQuery = async (message) => {
     const filter = m => m.author.id === message.member.user.id
 	const msg = await message.channel.send({ content: `Which card would you like to exchange ${forgestone} for?`})
-    await msg.channel.awaitMessages({ filter,
+    const collector = await msg.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    }).then((collected) => {
-        return collected.first().content
-	}).catch((err) => {
+    }).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
+
+    if (collector.first()) {
+        return collector.first().content
+    } else {
+        return false
+    }
 }
 
 

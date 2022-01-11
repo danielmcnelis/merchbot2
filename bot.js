@@ -44,7 +44,7 @@ const { client } = require('./static/clients.js')
 const { alchemycom, aliuscom, bindercom, botcom, boxcom, bracketcom, calccom, checklistcom, dailycom, dbcom, deckcom, dicecom, dropcom, flipcom, h2hcom, historycom, infocom, invcom, joincom, listcom, losscom, manualcom, nicknamecom, noshowcom, packcom, pfpcom, populationcom, profcom, queuecom, rankcom, reducecom, referralcom, rolecom, specialcom, startcom, statscom, undocom, walletcom, wishlistcom, yescom } = require('./static/commands.json')
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
-const { abuser, aight, galaxy, orange, robbed, king, beast, blue, bonk, bronze, cactus, cavebob, checkmark, com, skull, familiar, battery, credits, cultured, diamond, dinosaur, DOC, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, greenmark, hook, hmmm, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, shrine, spellcaster, DRT, fiend, thunder, zombie, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, downward, upward, sup, tix, tres, ult, vince, wokeaf, yellow, green, waah, wut, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare, draft } = require('./static/emojis.json')
+const { abuser, aight, galaxy, orange, robbed, king, beast, blue, bonk, bronze, cactus, cavebob, checkmark, com, skull, familiar, battery, credits, cultured, diamond, dinosaur, DOC, LPK, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, greenmark, hook, hmmm, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, shrine, spellcaster, DRT, fiend, thunder, zombie, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, downward, upward, sup, tix, tres, ult, vince, wokeaf, yellow, green, waah, wut, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare, draft } = require('./static/emojis.json')
 const { adminRole, arenaRole, botRole, draftRole, expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')
@@ -346,7 +346,7 @@ if (cmd === `!import_print_images`) {
 		console.log(`found card ${card.name}, ${card.image_file}`)
 		const url = `https://ygoprodeck.com/pics/${card.image_file}`
 		const writer = fs.createWriteStream(`./public/card_images/${card.image_file}`)
-
+		
 		const response = await axios({
 			url,
 			method: 'GET',
@@ -523,30 +523,31 @@ if (cmd === `!new_set`) {
 	if (!isJazz(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
 	
 	const set = {
-		code: "DRT",
-		name: "Dark Titans",
-		type: "core",
-		emoji: "DRT",
-		alt_emoji: "DRT",
-		size: 150,
-		commons: 72,
-		rares: 30,
-		supers: 27,
-		ultras: 15,
-		secrets: 6,
+		code: "LP1",
+		name: "Luxury Pack 1",
+		type: "mini",
+		emoji: "LPK",
+		alt_emoji: "LPK",
+		size: 20,
+		commons: 0,
+		rares: 0,
+		supers: 10,
+		ultras: 5,
+		secrets: 5,
 		specials: 0,
 		for_sale: false,
 		spec_for_sale: false,
-		unit_price: 15,
+		unit_price: 60,
 		unit_sales: 0,
-		cards_per_pack: 9,
-		packs_per_box: 24,
-		commons_per_pack: 7,
-		rares_per_pack: 1,
-		commons_per_box: 168,
-		rares_per_box: 24,
-		supers_per_box: 18,
-		ultras_per_box: 5,
+		cards_per_pack: 5,
+		packs_per_box: 1,
+		supers_per_pack: 3,
+		ultras_per_pack: 1,
+		secrets_per_pack: 1,
+		commons_per_box: 0,
+		rares_per_box: 0,
+		supers_per_box: 3,
+		ultras_per_box: 1,
 		secrets_per_box: 1
 	}
 
@@ -671,7 +672,7 @@ if (cmd === `!init`) {
 	await Set.create(DOC)
 	await Set.create(APC)
 
-	message.channel.send({ content: `I created 3 sets (SS1, DOC, APC). Please reset the bot for these changes to take full effect.`})
+	message.channel.send({ content: `I created 3 sets (SS1, DOC, LPK, APC). Please reset the bot for these changes to take full effect.`})
 
 	if (!(await isNewUser(merchbotId))) return message.channel.send({ content: `The Shop has already been initiated.`})
 	await createPlayer(merchbotId, 'MerchBot', 'MerchBot#1002')

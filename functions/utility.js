@@ -1,12 +1,37 @@
 
 //UTILITY FUNCTIONS
 
-const { adminRole, ambassadorRole, arenaRole, draftRole, modRole, tourRole } = require('../static/roles.json')
-const { mad, sad, rocks, bronze, silver, gold, platinum, diamond, master, legend, god } = require('../static/emojis.json')
+// DATABASE IMPORTS
+const { Auction, Binder, Daily, Diary, Inventory, Knowledge, Match, Player, Profile, Reset, Wallet, Wishlist } = require('../db/index.js')
 const { Op } = require('sequelize')
-const { Arena, Auction, Binder, Card, Daily, Diary, Draft, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Reset, Set, Tournament, Trade, Trivia, Wallet, Wishlist  } = require('../db/index.js')
+
+// STATIC IMPORTS
+const { mad, sad, rocks, bronze, silver, gold, platinum, diamond, master, legend, god } = require('../static/emojis.json')
+const { adminRole, ambassadorRole, arenaRole, draftRole, modRole, tourRole } = require('../static/roles.json')
 const merchbotId = '584215266586525696'
 const quotes = require('../static/quotes.json')
+
+//GET CONFIRMATION
+const getConfirmation = async (channel, pleasantry = true) => {
+    return await channel.awaitMessages({ filter,
+        max: 1,
+        time: 15000
+    }).then((collected) => {
+        const response = collected.first().content.toLowerCase()
+        if (yescom.includes(response)) {
+            return true
+        } else if (pleasantry) {
+            channel.send({ content: `Not a problem. Have a nice day.`})
+            return false
+        } else {
+            return false
+        }
+    }).catch((err) => {
+        console.log(err)
+        channel.send({ content: `Sorry, time's up.`})
+        return false
+    })
+}
 
 //CREATE PLAYER
 const createPlayer = async (id, username = null, tag = null, muted = false) => {
@@ -81,7 +106,6 @@ const resetPlayer = async (message, player) => {
         await inv.destroy()
     }
 
-    console.log('RESETING ALL PLAYER STATS NOW!')
     player.stats = 500
     player.backup = 0
     player.wins = 0
@@ -112,7 +136,6 @@ const resetPlayer = async (message, player) => {
     player.pauper_backup = 0
     await player.save()
 
-    console.log('DELETING ALL PLAYER PROFILE FIELDS NOW!')
     const binder = await Binder.findOne({ where: { playerId: player.id }})
     if (binder) await binder.destroy()
 
@@ -138,7 +161,6 @@ const resetPlayer = async (message, player) => {
     const wishlist = await Wishlist.findOne({ where: { playerId: player.id }})
     if (wishlist) await wishlist.destroy()
 
-    console.log('SAVING RESET DATE!')
     const date = new Date()
     await Reset.create({ 
         date: date,
@@ -402,6 +424,7 @@ module.exports = {
     createPlayer,
     createProfile,
     getArenaVictories,
+    getConfirmation,
     getDeckCategory,
     getMedal,
     getRandomElement,

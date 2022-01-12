@@ -1,22 +1,21 @@
 
 
 //TRADE FUNCTIONS
-const { Inventory, Player, Set, Trade, Print, Wallet } = require('../db')
+const { Inventory, Set, Trade, Print } = require('../db')
 const { Op } = require('sequelize')
-const { yescom, nocom } = require('../static/commands.json')
-const { starchips, stardust, com, rar, sup, ult, scr, skull, familiar, battery, egg, cactus, hook, moai, mushroom, rose, orb, gem, swords } = require('../static/emojis.json')
+const { yescom } = require('../static/commands.json')
+const { stardust, com, rar, sup, ult, scr, skull, familiar, battery, egg, cactus, hook, moai, mushroom, rose, orb, gem, swords } = require('../static/emojis.json')
 const { findCard } = require('./search.js')
 const { updateBinder } = require('./binder.js')
 const { selectPrint } = require('./print.js')
 const { capitalize } = require('./utility.js')
 const { completeTask } = require('./diary')
-const merchbotId = '584215266586525696'
 
 //GET INITIATOR CONFIRMATION
 const getInitiatorConfirmation = async (message, cards, player) => {
     const filter = m => m.author.id === message.author.id
 	message.channel.send({ content: cards.length > 1 ? `Are you sure you want to trade the following to ${player.name}?\n${cards.join("\n")}` : `Are you sure you want to trade ${cards[0]} to ${player.name}?`})
-	return await msg.channel.awaitMessages({ filter,
+	return await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then((collected) => {

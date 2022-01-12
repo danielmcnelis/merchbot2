@@ -687,7 +687,7 @@ const askForDumpConfirmation = async (message, set, cards, compensation, count) 
     }
     const filter = m => m.author.id === message.author.id
     message.channel.send({ content: `To The Shop for ${compensation}${stardust}?`})
-    return await msg.channel.awaitMessages({ filter,
+    return await message.channel.awaitMessages({ filter,
         max: 1,
         time: 60000
     }).then((collected) => {
@@ -712,9 +712,10 @@ const getDumpRarity = async (message) => {
     }).then(async (collected) => {
         const response = collected.first().content.toLowerCase()
         const rarity = response.includes('all') || response.includes('any') || response.includes('1') ? 'all' :
-        response.includes('rar') || response.includes('2') ? 'rar' :
-        response.includes('sup') || response.includes('3') ? 'sup' :
-        response.includes('ult') || response.includes('4') ? 'ult' :
+        response.includes('com') || response.includes('2') ? 'com' :
+        response.includes('rar') || response.includes('3') ? 'rar' :
+        response.includes('sup') || response.includes('4') ? 'sup' :
+        response.includes('ult') || response.includes('5') ? 'ult' :
         response.includes('sec') || response.includes('scr') || response.includes('6') ? 'scr' :
         'unrecognized'
 

@@ -88,8 +88,8 @@ const askForRarity = async (message, set, currentPrints) => {
 
 const collectNicknames = async (message, card_name) => {
     const filter = m => m.author.id === message.author.id
-    const msg = await message.channel.send({ content: `Type new nicknames for ${card_name} into the chat one at a time.\n\nThis collection will last 15s.`})
-    const collector = await msg.channel.awaitMessages({ filter,
+    message.channel.send({ content: `Type new nicknames for ${card_name} into the chat one at a time.\n\nThis collection will last 15s.`})
+    const collector = await message.channel.awaitMessages({ filter,
         time: 15000
     }).catch((err) => {
         console.log(err)
@@ -146,8 +146,8 @@ const selectPrint = async (message, playerId, card_name, private = false, inInv 
 
 const askForAdjustConfirmation = async (message, card, market_price) => {
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send({ content: `${card} is valued at ${market_price}${stardust}, do you wish to change it?`})
-    return await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `${card} is valued at ${market_price}${stardust}, do you wish to change it?`})
+    return await message.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
     }).then((collected) => {

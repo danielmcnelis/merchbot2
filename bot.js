@@ -909,33 +909,26 @@ if(startcom.includes(cmd)) {
 	} else {
 		if(await isNewUser(maid)) await createPlayer(maid, message.author.username, message.author.tag)
 		if(await hasProfile(maid)) return message.channel.send({ content: "You already received your first Starter Deck."})
-	
 		const set1 = await Set.findOne({ where: { code: 'DOC' }})
 		const set2 = await Set.findOne({ where: { code: 'ORF' }})
 		const set3 = await Set.findOne({ where: { code: 'TEB' }})
 		const set4 = await Set.findOne({ where: { code: 'FON' }})
 		const set5 = await Set.findOne({ where: { code: 'DRT' }})
-
-		if (!set1 || !set2 || !set3 || !set4 || !set5) return message.channel.send({ content: `Could not find sets: "DOC", "ORF", "TEB", "FON", or "DRT".`})
+		const set5 = await Set.findOne({ where: { code: 'LP1' }})
+		if (!set1 || !set2 || !set3 || !set4 || !set5 || !set6) return message.channel.send({ content: `Could not find sets: "DOC", "ORF", "TEB", "FON", "DRT", or "LP1".`})
 	
 		const filter = m => m.author.id === maid
-		await message.channel.send({ content: `Greetings, champ! Which deck would you like to start?\n- (1) Reptile\'s Charm ${reptile}\n- (2) Warrior\'s Legend ${warrior}`})
-
-		message.channel.awaitMessages({ filter,
+		message.channel.send({ content: `Greetings, champ! Which deck would you like to start?\n- (1) Reptile\'s Charm ${reptile}\n- (2) Warrior\'s Legend ${warrior}`})
+		await message.channel.awaitMessages({ filter,
 			max: 1,
 			time: 30000
 		}).then(async (collected) => {
 			const response = collected.first().content.toLowerCase()
-			let starter
-	
-			if(response.includes('rep') || response.includes(reptile) || response.includes("(1)") || response === "1") {
-				starter = 'reptile'
-			} else if(response.includes('war') || response.includes(warrior) || response.includes === "(2)" || response === "2") {
-				starter = 'warrior'
-			}
+			const starter = response.includes('rep') || response.includes(reptile) || response.includes("(1)") || response === "1" ? 'reptile' :
+				response.includes('war') || response.includes(warrior) || response.includes === "(2)" || response === "2" ? 'warrior' :
+				null
 	
 			if (!starter) return message.channel.send({ content: 'You did not select a valid Starter Deck. Please type **!start** to try again.'})
-	
 			await awardStarterDeck(maid, starter)
 			await createProfile(maid, starter)
 			message.member.roles.add(fpRole)
@@ -950,6 +943,7 @@ if(startcom.includes(cmd)) {
 			await awardPack(message.channel, maid, set3, 24)
 			await awardPack(message.channel, maid, set4, 24)
 			await awardPack(message.channel, maid, set5, 24)
+			await awardPack(message.channel, maid, set6, 5)
 			await completeTask(message.channel, maid, 'e1')
 			await completeTask(message.channel, maid, 'm4', 4000)
 			return message.channel.send({ content: `I wish you luck on your journey, new duelist! ${master}`})
@@ -1321,6 +1315,7 @@ if(infocom.includes(cmd)) {
 if(deckcom.includes(cmd)) {
 	if (mcid === arenaChannelId) {
 		const deck = await getArenaSample(message, args[0])
+		console.log('deck', deck)
 		if (!deck) return
 		if (!arenas.decks[deck]) return message.channel.send({ content: `I do not recognize that tribe.`})
 
@@ -1351,9 +1346,8 @@ if(deckcom.includes(cmd)) {
 		if (money < set.unit_price * discount) return message.channel.send({ content: `Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${decks[deck].name} ${eval(deck)} costs ${set.unit_price * discount}${eval(set.currency)}.`})
 
 		const filter = m => m.author.id === message.author.id
-		const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.unit_price * discount}${eval(set.currency)} on a copy of ${decks[deck].name} ${eval(deck)}?`})
-		
-		await msg.channel.awaitMessages({ filter,
+		message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.unit_price * discount}${eval(set.currency)} on a copy of ${decks[deck].name} ${eval(deck)}?`})
+		await message.channel.awaitMessages({ filter,
 			max: 1,
 			time: 15000
 		}).then(async (collected) => {
@@ -1606,8 +1600,8 @@ if(referralcom.includes(cmd)) {
 	if (!referringPlayer) return message.channel.send({ content: `That person is not in the database.`})
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `Are you sure you want to give a referral to ${referringPlayer.name}?`})
-	await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `Are you sure you want to give a referral to ${referringPlayer.name}?`})
+	await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -4597,8 +4591,8 @@ if(cmd === `!grind`) {
 	if (x > wallet.starchips) return message.channel.send({ content: `You only have ${wallet.starchips}${starchips}.`})
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `Are you sure you want to grind ${x}${starchips} into ${x * 10}${stardust}?`})
-	await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `Are you sure you want to grind ${x}${starchips} into ${x * 10}${stardust}?`})
+	await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -4795,8 +4789,8 @@ if(cmd === `!wager`) {
 	if (!set) return message.channel.send({ content: `No core set found.`})
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `Are you sure you want to wager ${x}${stardust} on a random ${set.code} ${eval(set.emoji)} card?`})
-	await msg.channel.awaitMessages({ filter,
+	await message.channel.send({ content: `Are you sure you want to wager ${x}${stardust} on a random ${set.code} ${eval(set.emoji)} card?`})
+	await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -4943,8 +4937,8 @@ if(alchemycom.includes(cmd)) {
 	if (!inv) return message.channel.send({ content: `You do not have any copies of ${card}.`})
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `Are you sure you want to transmute ${card} into ${value}${starchips}?`})
-	await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `Are you sure you want to transmute ${card} into ${value}${starchips}?`})
+	await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -5022,8 +5016,8 @@ if(reducecom.includes(cmd)) {
 	if (!inv) return message.channel.send({ content: `You do not have any copies of ${card}.`})
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `Are you sure you want to reduce ${card} into ${value}${forgestone}?`})
-	await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `Are you sure you want to reduce ${card} into ${value}${forgestone}?`})
+	await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -5138,8 +5132,8 @@ if(cmd === `!award`) {
 		const set = await Set.findOne({ where: { code: set_code } })
 		if (!set) return message.channel.send({ content: `Could not find set: "${set_code}".`})
 		const filter = m => m.author.id === message.author.id
-		const msg = await message.channel.send({ content: `Are you sure you want to award ${quantity} ${set_code} ${eval(set.emoji)} ${quantity > 1 ? 'Packs' : 'Pack'} to ${player.name}?`})
-		await msg.channel.awaitMessages({ filter,
+		message.channel.send({ content: `Are you sure you want to award ${quantity} ${set_code} ${eval(set.emoji)} ${quantity > 1 ? 'Packs' : 'Pack'} to ${player.name}?`})
+		await message.channel.awaitMessages({ filter,
 			max: 1,
 			time: 15000
 		}).then(async (collected) => {
@@ -5180,8 +5174,8 @@ if(cmd === `!award`) {
 	const award = walletField ? `${eval(walletField)}` : ` ${eval(print.rarity)}${print.card_code} - ${print.card_name}` 
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `Are you sure you want to award ${quantity}${award} to ${player.name}?`})
-	await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `Are you sure you want to award ${quantity}${award} to ${player.name}?`})
+	await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -5273,8 +5267,8 @@ if(cmd === `!steal`) {
 	const loot = walletField ? `${eval(walletField)}` : ` ${eval(print.rarity)}${print.card_code} - ${print.card_name}` 
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `Are you sure you want to steal ${quantity}${loot} from ${player.name}?`})
-	await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `Are you sure you want to steal ${quantity}${loot} from ${player.name}?`})
+	await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -5729,8 +5723,8 @@ if(packcom.includes(cmd)) {
 	if (money < (Math.round(set.unit_price * discount) * num)) return message.channel.send({ content: `Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${num > 1 ? `${num} ` : ''}${set.name} ${eval(set.emoji)} Packs cost ${Math.round(set.unit_price * discount) * num}${eval(set.currency)}.`})
 	
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.unit_price * discount) * num}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`})
-	await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.unit_price * discount) * num}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`})
+	await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -5906,8 +5900,8 @@ if(specialcom.includes(cmd)) {
 	if (money < (set.spec_price)) return message.channel.send({ content: `Sorry, ${wallet.player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Special Editions cost ${set.spec_price}${eval(set.currency)}.`})
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `${wallet.player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.spec_price}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Special Edition?`})
-	await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `${wallet.player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${set.spec_price}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Special Edition?`})
+	await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -6144,8 +6138,8 @@ if(boxcom.includes(cmd)) {
 	})].map((p) => p.card_code)
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.box_price * discount)}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`})
-	await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.box_price * discount)}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`})
+	await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then(async (collected) => {
@@ -6568,8 +6562,6 @@ if(cmd === `!barter`) {
 		const selected_option = direction === 'get_card' ? await getBarterCard(message, voucher, medium_complete) : await getTradeInCard(message, medium_complete)
 		if (!selected_option) return message.channel.send({ content: `You did not select a valid option.`})
 		if (!voucher) voucher = selected_option[3]
-
-		console.log('selected_option[1]', selected_option[1])
 	
 		price = selected_option[0]
 		print = await Print.findOne({ where: { card_code: selected_option[1] } })

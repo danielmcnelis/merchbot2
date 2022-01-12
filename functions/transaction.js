@@ -22,33 +22,24 @@ const getSellerConfirmation = async (message, invoice, buyingPlayer, sellingPlay
     const sellerId = sellingPlayer.id
 
 	const filter = m => m.author.id === sellerId
-	const msg = await message.channel.send({ content: 
+	message.channel.send({ content: 
         `${mention ? `<@${sellerId}>, Do you agree` : 'Are you sure you want'} ` +
         `to sell${cards.length > 1 ? `:\n${cards.join('\n')}\nT` : ` ${cards[0]} t`}o ` +
         `${shopSale ? 'The Shop' : buyingPlayer.name} ` + 
         `for ${invoice.total_price}${stardust}?`
     })
 
-	const collector = await msg.channel.awaitMessages({ 
+	return await message.channel.awaitMessages({ 
         filter,
 		max: 1,
 		time: 15000
+	}).then((collected) => {
+        const response = collected.first().content.toLowerCase()
+        return yescom.includes(response)
 	}).catch((err) => {
         console.log(err)
 		message.channel.send({ content: `Sorry, time's up.`})
 	})
-
-    if (collector.first()) {
-        const response = collector.first().content.toLowerCase()
-        if (yescom.includes(response)) {
-            return true
-        } else {
-            message.channel.send({ content: `No problem. Have a nice day.`})
-            return false
-        }
-    } else {
-        return false
-    }
 }
 
 //GET BUYER CONFIRMATION
@@ -56,27 +47,18 @@ const getBuyerConfirmation = async (message, invoice, buyingPlayer, sellingPlaye
     const cards = shopSale ? invoice.cards : [invoice.card]
     const buyerId = buyingPlayer.id
 	const filter = m => m.author.id === buyerId
-	const msg = await message.channel.send({ content: `${mention ? `<@${buyerId}>, Do you agree` : 'Are you sure you want'} to buy${cards.length > 1 ? `:\n${cards.join('\n')}\nF` : ` ${cards[0]} f`}rom ${sellingPlayer.id === merchbotId ? 'The Shop' : sellingPlayer.name} for ${invoice.total_price}${stardust}?`})
-    const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `${mention ? `<@${buyerId}>, Do you agree` : 'Are you sure you want'} to buy${cards.length > 1 ? `:\n${cards.join('\n')}\nF` : ` ${cards[0]} f`}rom ${sellingPlayer.id === merchbotId ? 'The Shop' : sellingPlayer.name} for ${invoice.total_price}${stardust}?`})
+    return await message.channel.awaitMessages({ 
+        filter,
 		max: 1,
 		time: 15000
+	}).then((collected) => {
+        const response = collected.first().content.toLowerCase()
+        return yescom.includes(response)
 	}).catch((err) => {
-		console.log(err)
+        console.log(err)
 		message.channel.send({ content: `Sorry, time's up.`})
-        return false
 	})
-
-    if (collector.first()) {
-        const response = collector.first().content.toLowerCase()
-        if (yescom.includes(response)) {
-            return true
-        } else {
-            message.channel.send({ content: `No problem. Have a nice day.`})
-            return false
-        }
-    } else {
-        return false
-    }
 }
 
 // GET INVOICE MERCHBOT SALE

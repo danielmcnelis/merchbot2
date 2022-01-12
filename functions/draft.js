@@ -105,33 +105,35 @@ const getConfirmation = async (entry, contestant) => {
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
-	const msg = await member.send({ content: `Do you still wish to participate in the Draft?`})
-	const collector = await msg.channel.awaitMessages({ filter,
+	const { channel } = await member.send({ content: `Do you still wish to participate in the Draft?`})
+	await channel.awaitMessages({ filter,
 		max: 1,
 		time: 60000
+	}).then(async (collected) => {
+        const count = await Info.count({ 
+            where: {
+                element: 'draft',
+                status: 'confirming'
+            }
+        })
+
+        if (!count) return member.send({ content: `Sorry, time expired.`})
+
+        const response = collected.first().content.toLowerCase()
+        if(yescom.includes(response)) {
+            entry.active = true
+            entry.contestant = contestant
+            await entry.save()
+            member.send({ content: `Thanks! The Draft will be starting soon. Look out for more DMs.`})
+            return channel.send({ content: `${member.user.username} confirmed their participation in the Draft!`})
+        } else {
+            member.send({ content: `Okay, sorry to see you go!`})
+            return channel.send({ content: `Yikes. ${member.user.username} dodged the Draft!`})
+        }
 	}).catch((err) => {
 		console.log(err)
         return member.send({ content: `Sorry, time's up.`})
 	})
-
-    const response = collector.first().content.toLowerCase()
-    const count = await Info.count({ where: {
-        element: 'draft',
-        status: 'confirming'
-    } })
-
-    if (!count) return member.send({ content: `Sorry, time expired.`})
-
-    if(yescom.includes(response)) {
-        entry.active = true
-        entry.contestant = contestant
-        await entry.save()
-        member.send({ content: `Thanks! The Draft will be starting soon. Look out for more DMs.`})
-        return channel.send({ content: `${member.user.username} confirmed their participation in the Draft!`})
-    } else {
-        member.send({ content: `Okay, sorry to see you go!`})
-        return channel.send({ content: `Yikes. ${member.user.username} dodged the Draft!`})
-    }
 }
 
 //ASSIGN DRAFT ROLES
@@ -509,14 +511,14 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
         false
 
     const filter = m => m.author.id === playerId
-	const msg = await member.send({ content: `Please select a card (${24 - count} seconds):\n${galaxy} - Galaxy Pack ${letter} - ${galaxy}\n${cards.join('\n')}`, files: [attachment] })
-	const collector = await msg.channel.awaitMessages({ filter,
+	const { channel } = await member.send({ content: `Please select a card (${24 - count} seconds):\n${galaxy} - Galaxy Pack ${letter} - ${galaxy}\n${cards.join('\n')}`, files: [attachment] })
+	await channel.awaitMessages({ 
+        filter,
 		max: 1,
 		time: (24 - count) * 1000
 	}).then(async (collected) => {
 		const response = collected.first().content
         const card_name = await findCard(response, fuzzyPrints)
-        
         let pool_selection
         let auto_draft = false
         if (pack.length > 0 && (response.replace(/[^0-9]/g, '') === '1' || card_name === pack[0].card_name)) pool_selection = pack[0]

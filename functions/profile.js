@@ -6,107 +6,111 @@ const { com, rar, sup, ult, scr, blue, champion, FiC, leatherbound, legend, mega
 const { findCard } = require('./search.js')
 
 const askToChangeProfile = async (message, field) => {
-    let answer = false
     const prompt = field === 'color' ? 'your profile color' : field === 'quote' ? 'your favorite quote' : 'your favorite card'
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `Would you like to change ${prompt}?`})
-	await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `Would you like to change ${prompt}?`})
+	return await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
-	}).then(async (collected) => {
-		if (yescom.includes(collected.first().content.toLowerCase())) answer = true
+	}).then((collected) => {
+		const response = collected.first().content.toLowerCase()
+		return yescom.includes(response)
+	}).catch((err) => {
+		console.log(err)
+		return false
 	})
-
-    return answer
 }
 
 const getFavoriteColor = async (message) => {
-    let favorite_color = ''
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `Please select a color:\n(1) Red\n(2) Orange\n(3) Yellow\n(4) Green\n(5) Blue\n(6) Indigo\n(7) Magenta\n(8) Pink\n(9) Gold\n(10) Silver`})
-	const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `Please select a color:\n(1) Red\n(2) Orange\n(3) Yellow\n(4) Green\n(5) Blue\n(6) Indigo\n(7) Magenta\n(8) Pink\n(9) Gold\n(10) Silver`})
+	return await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 30000
+	}).then((collected) => {
+		const response = collected.first().content.toLowerCase()
+		const favorite_color = response.includes('silver') || response.includes('10') ? '#bccbd6' :
+			response.includes('red') || response.includes('1') ? '#f53636' :
+			response.includes('orange') || response.includes('2') ? '#fc842d' :
+			response.includes('green') || response.includes('4') ? '#63d46d' :
+			response.includes('yellow') || response.includes('3') ? '#fceb77' :
+			response.includes('blue') || response.includes('5') ? '#3c91e6' :
+			response.includes('indigo') || response.includes('6') ? '#5c5fab' :
+			response.includes('magenta') || response.includes('7') ? '#ed1a79' :
+			response.includes('pink') || response.includes('8') ? '#eb7cad' :
+			response.includes('gold') || response.includes('9') ? '#f0bf3a' :
+			'unrecognized'
+
+		return favorite_color
 	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
+		return false
 	})
 
-	const response = collector.first().content.toLowerCase()
-	if(response.includes('red') || response.includes('1') && !response.includes('0')) favorite_color = '#f53636' 
-	else if(response.includes('orange') || response.includes('2')) favorite_color = '#fc842d'
-	else if(response.includes('yellow') || response.includes('3')) favorite_color = '#fceb77'
-	else if(response.includes('green') || response.includes('4')) favorite_color = '#63d46d'
-	else if(response.includes('blue') || response.includes('5')) favorite_color = '#3c91e6'
-	else if(response.includes('indigo') || response.includes('6')) favorite_color = '#5c5fab'
-	else if(response.includes('magenta') || response.includes('7')) favorite_color = '#ed1a79'
-	else if(response.includes('pink') || response.includes('8')) favorite_color = '#eb7cad'
-	else if(response.includes('gold') || response.includes('9')) favorite_color = '#f0bf3a'
-	else if(response.includes('silver') || response.includes('10')) favorite_color = '#bccbd6'
-	else favorite_color = 'unrecognized'
-	return favorite_color
 }
 
 const getFavoriteQuote = async (message) => {
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `Please respond with a new quote.`})
-	const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `Please respond with a new quote.`})
+	return await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 30000
+	}).then((collected) => {
+		const favorite_quote = collected.first().content
+		if (favorite_quote.length > 200) {
+			message.channel.send({ content: `Sorry, that quote is too long. It should be no more than 200 characters.`})
+			return false
+		} else {
+			return favorite_quote
+		}
 	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
 		return false
 	})
-
-	const favorite_quote = collector.first().content
-	if (favorite_quote.length > 200) {
-		message.channel.send({ content: `Sorry, that quote is too long. It should be no more than 200 characters.`})
-		return false
-	} else {
-		return favorite_quote
-	}
 }
 
 const getFavoriteAuthor = async (message) => {
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `To whom is this quote attributed?`})
-	const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `To whom is this quote attributed?`})
+	return await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 30000
+	}).then((collected) => {
+		const favorite_author = collected.first().content
+		if (favorite_author.length > 50) {
+			message.channel.send({ content: `Sorry, that author is too long. It should be no more than 50 characters.`})
+			return false
+		} else {
+			return favorite_author
+		}
 	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
-	})
-
-	const favorite_author = collector.first().content
-	if (favorite_author.length > 50) {
-		message.channel.send({ content: `Sorry, that author is too long. It should be no more than 50 characters.`})
 		return false
-	} else {
-		return favorite_author
-	}
+	})
 }
 
 const getFavoriteCard = async (message, fuzzyPrints) => {
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `Please name a card in Forged in Chaos.`})
-	const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `Please name a card in Forged in Chaos.`})
+	return await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 30000
+	}).then(async (collected) => {
+		const response = collected.first().content
+		if (response === 'none') return 'none'
+		const favorite_card = await findCard(response, fuzzyPrints)
+		const print = await Print.findOne({ where: { card_name: favorite_card }})
+		const count = await Inventory.count({ where: { printId: print.id }})
+		if (!favorite_card || !count) message.channel.send({ content: `Could not find card: "${response}".`})
+		return favorite_card
 	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
 		return false
 	})
-
-	const response = collector.first().content
-	if (response === 'none') return 'none'
-	const favorite_card = await findCard(response, fuzzyPrints) || false
-	const print = await Print.findOne({ where: { card_name: favorite_card }})
-	const count = await Inventory.count({ where: { printId: print.id }})
-	if (!favorite_card || !count) message.channel.send({ content: `Could not find card: "${response}".`})
-	return favorite_card
 }
 
 // GET RESET CONFIRMATION
@@ -116,23 +120,18 @@ const getResetConfirmation = async (message, attempt = 1) => {
 		`${wtf} HOMIE, THIS IS YOUR ${megaphone} **FINAL CHANCE** ${megaphone} TO BACK OUT. ARE YOU **COMPLETELY** 💯 ABOUT THIS? ${blue}`
 
 	const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: prompt})
-	const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: prompt})
+	return await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
+	}).then((collected) => {
+		const response = collected.first().content.toLowerCase()
+		return yescom.includes(response)
 	}).catch((err) => {
 		console.log(err)
 		message.channel.send({ content: `Sorry, time's up.`})
 		return false
 	})
-	
-	const response = collector.first().content.toLowerCase()
-	if (!yescom.includes(response)) {
-		message.channel.send({ content: `No problem. Have a nice day.`})
-		return false
-	} else {
-		return true
-	}
 }
 
 

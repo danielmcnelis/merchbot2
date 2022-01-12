@@ -1329,7 +1329,7 @@ if(deckcom.includes(cmd)) {
 
 		const deck = await getShopDeck(message, args[0])
 		const valid_decks = ["reptile", "warrior", "dragon", "spellcaster", "dinosaur", "plant", "fish", "rock"]
-		if (!deck) return
+		if (!deck) return message.channel.send({ content: `Please specify a valid deck.`})
 		if (!valid_decks.includes(deck)) return message.channel.send({ content: `Sorry, I do not have that deck for sale.`})
 
 		const set = await Set.findOne({ where: { 
@@ -5135,7 +5135,7 @@ if(cmd === `!award`) {
 		await message.channel.awaitMessages({ filter,
 			max: 1,
 			time: 15000
-		}).then(async (collected) => {
+		}).then((collected) => {
 			if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 			message.channel.send({ content: `Please wait while I open your ${quantity > 1 ? 'packs' : 'pack'}... ${blue}`})			
 			return awardPack(message.channel, recipient, set, quantity)
@@ -5184,8 +5184,6 @@ if(cmd === `!award`) {
 			player.wallet[walletField] += quantity
 			await player.wallet.save()
 		} else {
-			const set = await Set.findOne({ where: { code: print.set_code } })
-
 			const inv = await Inventory.findOne({ where: { 
 				card_code: print.card_code,
 				printId: print.id,
@@ -5730,7 +5728,6 @@ if(packcom.includes(cmd)) {
 		if (!yescom.includes(collected.first().content.toLowerCase())) return message.channel.send({ content: `No problem. Have a nice day.`})
 		
 		message.channel.send({ content: `Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}.`})
-		
 		let gotSecret = false
 		const boxes = Math.floor(num / set.packs_per_box)
 		const packs_from_boxes = boxes * set.packs_per_box
@@ -5752,12 +5749,8 @@ if(packcom.includes(cmd)) {
 			if (!yourSecrets.length) for (let i = 0; i < set.secrets_per_box; i++) odds.push("secrets")
 
 			const luck = j < packs_from_boxes ? odds[j % set.packs_per_box] : getRandomElement(odds)
-			console.log('luck', luck)
 			const yourFoil = getRandomElement(eval(luck))
-			console.log('yourFoil', yourFoil)
-
 			const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil].filter((e) => !!e)
-			console.log('yourPack', yourPack)
 
 			for (let i = 0; i < yourPack.length; i++) {
 				const print = await Print.findOne({ where: {
@@ -6450,10 +6443,10 @@ if(cmd === `!sell`) {
 	if (invoice.total_price > buyingPlayer.wallet.stardust) return message.channel.send({ content: `Sorry, ${buyingPlayer.name} only has ${buyingPlayer.wallet.stardust} and ${invoice.quantities[0] > 1 ? `${invoice.quantities[0]} copies of ` : ''}${invoice.cards[0]} costs ${invoice.total_price}${stardust}.`})
 
 	const sellerConfirmation = await getSellerConfirmation(message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = false)
-	if (!sellerConfirmation) return
+	if (!sellerConfirmation) return message.channel.send(`No a problem. Have a nice day.`)
 
 	const buyerConfirmation = !shopSale ? await getBuyerConfirmation(message, invoice, buyingPlayer, sellingPlayer, shopSale, mention = true) : true
-	if (!buyerConfirmation) return
+	if (!buyerConfirmation) return message.channel.send(`No a problem. Have a nice day.`)
 
 	const processSale = shopSale ? await processMerchBotSale(message, invoice, buyingPlayer, sellingPlayer) : await processP2PSale(message, invoice, buyingPlayer, sellingPlayer) 
 	if (!processSale) return

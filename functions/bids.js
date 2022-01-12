@@ -42,8 +42,8 @@ const manageBidding = async (message, player, fuzzyPrints) => {
 
 const askForBidPlacement = async (message, player, fuzzyPrints) => {
     const filter = m => m.author.id === message.author.id
-    const msg = await message.author.send({ content: `Which card would you like to bid on?`})
-    await msg.channel.awaitMessages({ filter,
+    const { channel } = await message.author.send({ content: `Which card would you like to bid on?`})
+    await channel.awaitMessages({ filter,
         max: 1,
         time: 45000
     }).then(async (collected) => {
@@ -54,7 +54,6 @@ const askForBidPlacement = async (message, player, fuzzyPrints) => {
         const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, player.id, card_name, private = true, inInv = false, inAuc = true) : null
         if (!print) return message.author.send({ content: `Sorry, I do not recognize the card: "${query}".`})
         const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
-        
         const auction = await Auction.findOne({ where: { printId: print.id } })
         if (!auction) return message.author.send({ content: `Sorry, ${card} is not part of the auction tonight.`})
 
@@ -97,29 +96,29 @@ const askForBidPlacement = async (message, player, fuzzyPrints) => {
 const askForBidAmount = async (message, player, print, card) => {
     const filter = m => m.author.id === message.author.id
     const price = Math.ceil(print.market_price * 1.1)
-    const msg = await message.author.send({ content: `The Shop sells ${card} for ${price}${stardust}. How much would you like to bid?`})
-    const collector = await msg.channel.awaitMessages({ filter,
+    const { channel } = await message.author.send({ content: `The Shop sells ${card} for ${price}${stardust}. How much would you like to bid?`})
+    return await channel.awaitMessages({ filter,
         max: 1,
         time: 20000
+    }).then((collected) => {
+        const offer = parseInt(collected.first().content.toLowerCase())
+        if (isNaN(offer) || offer < 1) {
+            message.author.send({ content: `Sorry, that is not a valid amount.`})
+            return false
+        } else if (offer < price) {
+            message.author.send({ content: `Sorry, you must bid at least ${price}${stardust}.`})
+            return false
+        } else if (player.wallet.stardust < offer) {
+            message.author.send({ content: `Sorry, you only have ${player.wallet.stardust}${stardust}.`})
+            return false
+        } else {
+            return offer
+        }
     }).catch((err) => {
 		console.log(err)
         message.author.send({ content: `Sorry, time's up.`})
         return false
     })
-    
-    const offer = parseInt(collector.first().content.toLowerCase())
-    if (isNaN(offer) || offer < 1) {
-        message.author.send({ content: `Sorry, that is not a valid amount.`})
-        return false
-    } else if (offer < price) {
-        message.author.send({ content: `Sorry, you must bid at least ${price}${stardust}.`})
-        return false
-    } else if (player.wallet.stardust < offer) {
-        message.author.send({ content: `Sorry, you only have ${player.wallet.stardust}${stardust}.`})
-        return false
-    }
-    
-    return offer
 }
 
 const askForBidCancellation = async (message, player, fuzzyPrints) => {
@@ -136,8 +135,9 @@ const askForBidCancellation = async (message, player, fuzzyPrints) => {
         bidSummary.push(`(${i+1}) ${eval(auction.print.rarity)}${bid.card_code} - ${auction.print.card_name} - ${bid.amount}${stardust}`)
     }
 
-    const msg = await message.author.send({ content: `Which bid would you like to cancel?:\n${bidSummary.join("\n")}?`})
-    await msg.channel.awaitMessages({ filter,
+    const { channel } = await message.author.send({ content: `Which bid would you like to cancel?:\n${bidSummary.join("\n")}?`})
+    await channel.awaitMessages({ 
+        filter,
         max: 1,
         time: 20000
     }).then(async (collected) => {

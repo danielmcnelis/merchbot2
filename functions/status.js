@@ -14,33 +14,33 @@ const getNewStatus = async (message, card, old_status) => {
     }
 
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `${card.name} is currently ${old_status}. Please select a new status:\n${filteredOptions.join("\n")}`})
-	const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `${card.name} is currently ${old_status}. Please select a new status:\n${filteredOptions.join("\n")}`})
+	return await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 30000
+	}).then((collected) => {
+        const response = collected.first().content.toLowerCase()
+        let index
+        if(response.includes('1')) {
+            index = 0
+        } else if(response.includes('2')) {
+            index = 1
+        } else if(response.includes('3')) {
+            index = 2
+        } else if(response.includes('4')) {
+            index = 3
+        } else {
+            message.channel.send({ content: `You did not select a valid option.`})
+            return false
+        }
+    
+        const selected_option = filteredOptions[index]
+        return selected_option.slice(4)
 	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
-
-    const response = collector.first().content.toLowerCase()
-    let index
-    if(response.includes('1')) {
-        index = 0
-    } else if(response.includes('2')) {
-        index = 1
-    } else if(response.includes('3')) {
-        index = 2
-    } else if(response.includes('4')) {
-        index = 3
-    } else {
-        message.channel.send({ content: `You did not select a valid option.`})
-        return false
-    }
-
-    const selected_option = filteredOptions[index]
-    return selected_option.slice(4)
 } 
 
 module.exports = {

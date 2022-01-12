@@ -15,29 +15,26 @@ const merchbotId = '584215266586525696'
 //GET INITIATOR CONFIRMATION
 const getInitiatorConfirmation = async (message, cards, player) => {
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: cards.length > 1 ? `Are you sure you want to trade the following to ${player.name}?\n${cards.join("\n")}` : `Are you sure you want to trade ${cards[0]} to ${player.name}?`})
-	const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: cards.length > 1 ? `Are you sure you want to trade the following to ${player.name}?\n${cards.join("\n")}` : `Are you sure you want to trade ${cards[0]} to ${player.name}?`})
+	return await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
+	}).then((collected) => {
+		const response = collected.first().content.toLowerCase()
+		return yescom.includes(response)
 	}).catch((err) => {
 		console.log(err)
 		message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
-
-	if (!yescom.includes(collector.first().content.toLowerCase())) {
-		return false	
-	} else {
-		return true
-	}
 }
 
 
 //GET RECEIVER SIDE
 const getReceiverSide = async (message, cards, player) => {
     const filter = m => m.author.id === player.id
-	const msg = await message.channel.send({ content: `${player.name}, you are you being offered:\n${cards.join("\n")}\n\nWhat do you wish to trade in return?`})
-	const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `${player.name}, you are you being offered:\n${cards.join("\n")}\n\nWhat do you wish to trade in return?`})
+	return await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 60000
 	}).then((collected) => {
@@ -58,17 +55,13 @@ const getReceiverSide = async (message, cards, player) => {
 //GET RECEIVER CONFIRMATION
 const getReceiverConfirmation = async (message, cards, player) => {
     const filter = m => m.author.id === player.id
-	const msg = await message.channel.send({ content: cards.length > 1 ? `Are you sure you want to trade the following to ${message.author.username}?\n${cards.join("\n")}` : `Are you sure you want to trade ${cards[0]} to ${message.author.username}?`})
-	await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: cards.length > 1 ? `Are you sure you want to trade the following to ${message.author.username}?\n${cards.join("\n")}` : `Are you sure you want to trade ${cards[0]} to ${message.author.username}?`})
+	return message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then((collected) => {
-		if (!yescom.includes(collected.first().content.toLowerCase())) {
-			message.channel.send({ content: `No problem. Have a nice day.`})
-			return false
-		} else {
-			return true
-		}
+		const response = collected.first().content.toLowerCase()
+		return yescom.includes(response)
 	}).catch((err) => {
 		console.log(err)
 		message.channel.send({ content: `Time's up.`})
@@ -79,23 +72,18 @@ const getReceiverConfirmation = async (message, cards, player) => {
 //GET FINAL CONFIRMATION
 const getFinalConfirmation = async (message, cards, player) => {
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `${player.name}, you will receive:\n${cards.join("\n")}\n\nDo you accept this trade?`})
-	const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `${player.name}, you will receive:\n${cards.join("\n")}\n\nDo you accept this trade?`})
+	return message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
+	}).then((collected) => {
+		const response = collected.first().content.toLowerCase()
+		return yescom.includes(response)
 	}).catch((err) => {
 		console.log(err)
 		message.channel.send({ content: `Time's up.`})
         return false
 	})
-
-	const response = collector.first().content.toLowerCase()
-	if (!yescom.includes(response)) {
-		message.channel.send({ content: `No problem. Have a nice day.`})
-		return false
-	} else {
-		return true
-	}
 }
 
 //GET TRADE SUMMARY

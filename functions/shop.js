@@ -680,75 +680,72 @@ const askForDumpConfirmation = async (message, set, cards, compensation, count) 
     const prompt = set && set.emoji === set.alt_emoji ? `${set.code} ${eval(set.emoji)}` :
     set && set.emoji !== set.alt_emoji ? `${set.code} ${eval(set.emoji)}${eval(set.alt_emoji)}` :
     ''
-    
+
     cards.unshift(`Are you sure you want to sell the following ${count} ${prompt} cards:`)
     for (let i = 0; i < cards.length; i+=30) {
         message.channel.send({ content: cards.slice(i, i+30).join("\n")})
     }
     const filter = m => m.author.id === message.author.id
-    const msg = await message.channel.send({ content: `To The Shop for ${compensation}${stardust}?`})
-    const collector = await msg.channel.awaitMessages({ filter,
+    message.channel.send({ content: `To The Shop for ${compensation}${stardust}?`})
+    return await msg.channel.awaitMessages({ filter,
         max: 1,
         time: 60000
+    }).then((collected) => {
+        const response = collected.first().content.toLowerCase()
+        const confirmed = yescom.includes(response)
+        if (!confirmed) message.channel.send(`Not a problem. Have a nice day.`)
+        return confirmed
     }).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
     })
-
-    if (yescom.includes(collector.first().content.toLowerCase())) {
-        return true
-    } else {
-        message.channel.send({ content: `No problem. Have a nice day.`})
-        return false
-    }  
 }
 
 // GET DUMP RARITY
 const getDumpRarity = async (message) => {
-    let rarity
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send({ content: `What rarity would you like to bulk sell?\n(1) all\n(2) common\n(3) rare\n(4) super\n(5) ultra\n(6) secret`})
-    await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `What rarity would you like to bulk sell?\n(1) all\n(2) common\n(3) rare\n(4) super\n(5) ultra\n(6) secret`})
+    return await message.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
     }).then(async (collected) => {
-		const response = collected.first().content.toLowerCase()
-        if(response.includes('all') || response.includes('any') || response.includes('1')) rarity = 'all'
-        else if(response.includes('com') || response.includes('2')) rarity = 'com' 
-        else if(response.includes('rar') || response.includes('3')) rarity = 'rar'
-        else if(response.includes('sur') || response.includes('4')) rarity = 'sup'
-        else if(response.includes('ult') || response.includes('5')) rarity = 'ult'
-        else if(response.includes('sec') || response.includes('scr') || response.includes('6')) rarity = 'scr'
-        else rarity = 'unrecognized'
-    }).catch((err) => {
-		console.log(err)
-        return message.channel.send({ content: `Sorry, time's up.`})
-	})
+        const response = collected.first().content.toLowerCase()
+        const rarity = response.includes('all') || response.includes('any') || response.includes('1') ? 'all' :
+        response.includes('rar') || response.includes('2') ? 'rar' :
+        response.includes('sup') || response.includes('3') ? 'sup' :
+        response.includes('ult') || response.includes('4') ? 'ult' :
+        response.includes('sec') || response.includes('scr') || response.includes('6') ? 'scr' :
+        'unrecognized'
 
-    return rarity
-}
-
-// GET DUMP QUANTITY
-const getDumpQuantity = async (message, rarity) => {
-    const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send({ content: `How many of each ${rarity === 'all' ? 'card' : eval(rarity)} do you want to keep?`})
-    const collector = await msg.channel.awaitMessages({ filter,
-		max: 1,
-        time: 15000
+        return rarity
     }).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
+}
 
-    const response = Math.round(parseInt(collector.first().content.toLowerCase()))
-    if (!Number.isInteger(response) || response < 0) {
+// GET DUMP QUANTITY
+const getDumpQuantity = async (message, rarity) => {
+    const filter = m => m.author.id === message.member.user.id
+	message.channel.send({ content: `How many of each ${rarity === 'all' ? 'card' : eval(rarity)} do you want to keep?`})
+    return await message.channel.awaitMessages({ filter,
+		max: 1,
+        time: 15000
+    }).then((collected) => {
+        const response = collected.first().content.toLowerCase()
+        const num = Math.round(parseInt(response))
+        if (!Number.isInteger(num) || num < 0) {
+            return false
+        } else {
+            return num
+        }
+	}).catch((err) => {
+		console.log(err)
+        message.channel.send({ content: `Sorry, time's up.`})
         return false
-    } else {
-        console.log('response', response)
-        return response
-    }
+	})
 }
 
 
@@ -756,24 +753,25 @@ const getDumpQuantity = async (message, rarity) => {
 // ASK FOR EXCLUSIONS
 const askForExclusions = async (message) => {
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send({ content: `Do you want to exclude any cards?`})
-    const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `Do you want to exclude any cards?`})
+    return await message.channel.awaitMessages({ 
+        filter,
 		max: 1,
         time: 15000
-    }).catch((err) => {
+    }).then((collected) => {
+		const response = collected.first().content.toLowerCase()
+        if (yescom.includes(response)) {
+            return true
+        } else if (nocom.includes(response)) {
+            return false
+        } else {
+            message.channel.send({ content: `I'll take that as a yes.`})
+            return true
+        }
+	}).catch((err) => {
 		console.log(err)
         return false
 	})
-
-    const response = collector.first().content.toLowerCase()
-    if (yescom.includes(response)) {
-        return true
-    } else if (nocom.includes(response)) {
-        return false
-    } else {
-        message.channel.send({ content: `I'll take that as a yes.`})
-        return true
-    }
 }
 
 
@@ -784,24 +782,26 @@ const getExclusions = async (message, rarity, set) => {
         set && set.emoji !== set.alt_emoji ? `${set.code} ${eval(set.emoji)}${eval(set.alt_emoji)}` :
         ''
 
-	const msg = await message.channel.send({ content: `Please provide a list of ${rarity === 'all' ? '' : eval(rarity)}${prompt} cards you do not want to bulk sell.`})
-    const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `Please provide a list of ${rarity === 'all' ? '' : eval(rarity)}${prompt} cards you do not want to bulk sell.`})
+    return await message.channel.awaitMessages({ filter,
 		max: 1,
         time: 60000
-    }).catch((err) => {
+    }).then((collected) => {
+		const response = collected.first().content.toLowerCase()
+        if (response.startsWith('!')) {
+            message.channel.send({ content: `Please do not respond with bot commands. Simply type what you would like to exclude.`})
+            return false
+        } else {
+            return collected.first().content.split(';')
+        }
+	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
-
-    const response = collector.first().content.toLowerCase()
-    if (response.startsWith('!')) {
-        message.channel.send({ content: `Please do not respond with bot commands. Simply type what you would like to exclude.`})
-        return false
-    } else {
-        return collector.first().content.split(';')
-    }
 }
+
+    
 
 // GET EXCLUDED PRINTS
 const getExcludedPrintIds = async (message, rarity, set, exclusions, fuzzyPrints) => {
@@ -843,28 +843,25 @@ const getBarterDirection = async (message) => {
     ]
 
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send({ content: `What would you like to **receive** in this exchange?\n${options.join("\n")}`})
-    const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `What would you like to **receive** in this exchange?\n${options.join("\n")}`})
+    return await message.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    }).catch((err) => {
+    }).then((collected) => {
+        const response = collected.first().content.toLowerCase()
+        if(response.includes('1') || response.includes('card')) {
+            return 'get_card'
+        } else if(response.includes('2') || response.includes('vouch')) {
+            return 'get_vouchers'
+        } else {
+            message.channel.send({ content: `You did not select a valid option.`})
+            return false
+        }
+	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
-
-    const response = collector.first().content.toLowerCase()
-    let direction
-    if(response.includes('1') || response.includes('card')) {
-        direction = 'get_card'
-    } else if(response.includes('2') || response.includes('vouch')) {
-        direction = 'get_vouchers'
-    } else {
-        message.channel.send({ content: `You did not select a valid option.`})
-        return false
-    }
-
-    return direction
 }
 
 // GET VOUCHER
@@ -886,50 +883,50 @@ const getVoucher = async (message) => {
     ]
 
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send({ content: `Which Voucher would you like to exchange?\n${options.join("\n")}`})
-    const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `Which Voucher would you like to exchange?\n${options.join("\n")}`})
+    return await message.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    }).catch((err) => {
+    }).then((collected) => {
+        const response = collected.first().content.toLowerCase()
+        let voucher
+        if(response.includes('10') || response.includes('gem')) {
+            voucher = 'gem'
+        } else if(response.includes('11') || response.includes('skull')) {
+            voucher = 'skull'
+        } else if(response.includes('12') || response.includes('familiar')) {
+            voucher = 'familiar'
+        } else if(response.includes('13') || response.includes('batter')) {
+            voucher = 'battery'
+        } else if(response.includes('1') || response.includes('forge') || response.includes('stone')) {
+            voucher = 'forgestone'
+        } else if(response.includes('2') || response.includes('mush') || response.includes('shroom')) {
+            voucher = 'mushroom'
+        }else if(response.includes('3') || response.includes('moai')) {
+            voucher = 'moai'
+        } else if(response.includes('4') || response.includes('rose')) {
+            voucher = 'rose'
+        } else if(response.includes('5') || response.includes('hook')) {
+            voucher = 'hook'
+        } else if(response.includes('6') || response.includes('egg')) {
+            voucher = 'egg'
+        } else if(response.includes('7') || response.includes('cact')) {
+            voucher = 'cactus'
+        } else if(response.includes('8') || response.includes('sword')) {
+            voucher = 'swords'
+        } else if(response.includes('9') || response.includes('orb')) {
+            voucher = 'orb'
+        } else {
+            message.channel.send({ content: `You did not select a valid option.`})
+            return false
+        }
+    
+        return voucher
+	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
-
-    const response = collector.first().content.toLowerCase()
-    let voucher
-    if(response.includes('10') || response.includes('gem')) {
-        voucher = 'gem'
-    } else if(response.includes('11') || response.includes('skull')) {
-        voucher = 'skull'
-    } else if(response.includes('12') || response.includes('familiar')) {
-        voucher = 'familiar'
-    } else if(response.includes('13') || response.includes('batter')) {
-        voucher = 'battery'
-    } else if(response.includes('1') || response.includes('forge') || response.includes('stone')) {
-        voucher = 'forgestone'
-    } else if(response.includes('2') || response.includes('mush') || response.includes('shroom')) {
-        voucher = 'mushroom'
-    }else if(response.includes('3') || response.includes('moai')) {
-        voucher = 'moai'
-    } else if(response.includes('4') || response.includes('rose')) {
-        voucher = 'rose'
-    } else if(response.includes('5') || response.includes('hook')) {
-        voucher = 'hook'
-    } else if(response.includes('6') || response.includes('egg')) {
-        voucher = 'egg'
-    } else if(response.includes('7') || response.includes('cact')) {
-        voucher = 'cactus'
-    } else if(response.includes('8') || response.includes('sword')) {
-        voucher = 'swords'
-    } else if(response.includes('9') || response.includes('orb')) {
-        voucher = 'orb'
-    } else {
-        message.channel.send({ content: `You did not select a valid option.`})
-        return false
-    }
-
-    return voucher
 }
 
 
@@ -951,48 +948,48 @@ const getTribe = async (message, player) => {
     ]
 
     const filter = m => m.author.id === player.id
-	const msg = await message.channel.send({ content: `${player.name}, which Tribe did you battle alongside?\n${options.join("\n")}`})
-    const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `${player.name}, which Tribe did you battle alongside?\n${options.join("\n")}`})
+    return await message.channel.awaitMessages({ filter,
 		max: 1,
         time: 30000
-    }).catch((err) => {
+    }).then((collected) => {
+        const response = collected.first().content.toLowerCase()
+        let voucher
+        if(response.includes('10') || response.includes('zom')) {
+            voucher = 'skull'
+        } else if(response.includes('11') || response.includes('fiend')) {
+            voucher = 'familiar'
+        } else if(response.includes('12') || response.includes('thunder')) {
+            voucher = 'battery'
+        } else if(response.includes('1') || response.includes('beast')) {
+            voucher = 'mushroom'
+        } else if(response.includes('2') || response.includes('rock')) {
+            voucher = 'moai'
+        }else if(response.includes('3') || response.includes('plan')) {
+            voucher = 'rose'
+        } else if(response.includes('4') || response.includes('fish')) {
+            voucher = 'hook'
+        } else if(response.includes('5') || response.includes('dino')) {
+            voucher = 'egg'
+        } else if(response.includes('6') || response.includes('rep')) {
+            voucher = 'cactus'
+        } else if(response.includes('7') || response.includes('war')) {
+            voucher = 'swords'
+        } else if(response.includes('8') || response.includes('cast')) {
+            voucher = 'orb'
+        } else if(response.includes('9') || response.includes('drag')) {
+            voucher = 'gem'
+        } else {
+            message.channel.send({ content: `You did not select a valid option.`})
+            return false
+        }
+
+        return voucher
+	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
-
-    const response = collector.first().content.toLowerCase()
-    let voucher
-    if(response.includes('10') || response.includes('zom')) {
-        voucher = 'skull'
-    } else if(response.includes('11') || response.includes('fiend')) {
-        voucher = 'familiar'
-    } else if(response.includes('12') || response.includes('thunder')) {
-        voucher = 'battery'
-    } else if(response.includes('1') || response.includes('beast')) {
-        voucher = 'mushroom'
-    } else if(response.includes('2') || response.includes('rock')) {
-        voucher = 'moai'
-    }else if(response.includes('3') || response.includes('plan')) {
-        voucher = 'rose'
-    } else if(response.includes('4') || response.includes('fish')) {
-        voucher = 'hook'
-    } else if(response.includes('5') || response.includes('dino')) {
-        voucher = 'egg'
-    } else if(response.includes('6') || response.includes('rep')) {
-        voucher = 'cactus'
-    } else if(response.includes('7') || response.includes('war')) {
-        voucher = 'swords'
-    } else if(response.includes('8') || response.includes('cast')) {
-        voucher = 'orb'
-    } else if(response.includes('9') || response.includes('drag')) {
-        voucher = 'gem'
-    } else {
-        message.channel.send({ content: `You did not select a valid option.`})
-        return false
-    }
-
-    return voucher
 }
 
 
@@ -1083,25 +1080,25 @@ const getBarterCard = async (message, voucher, medium_complete) => {
     const cards = options.map((o) => o[2])
     
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send({ content: `Which card would you like to barter for?\n${cards.join("\n")}`})
-    const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `Which card would you like to barter for?\n${cards.join("\n")}`})
+    return await message.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    }).catch((err) => {
+    }).then((collected) => {
+		const response = collected.first().content
+        const index = response.includes('1') || response.includes('APC') ? 0 :
+            response.includes('2') ? 1 :
+            response.includes('3') ? 2 :
+            response.includes('4') ? 3 :
+            null
+
+        const selected_option = options[index]
+        return selected_option
+	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
-
-    const response = collector.first().content
-    const index = response.includes('1') || response.includes('APC') ? 0 :
-        response.includes('2') ? 1 :
-        response.includes('3') ? 2 :
-        response.includes('4') ? 3 :
-        null
-
-    const selected_option = options[index]
-    return selected_option
 }
 
 
@@ -1109,21 +1106,17 @@ const getBarterCard = async (message, voucher, medium_complete) => {
 // GET BARTER QUERY
 const getBarterQuery = async (message) => {
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send({ content: `Which card would you like to exchange ${forgestone} for?`})
-    const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `Which card would you like to exchange ${forgestone} for?`})
+    return await message.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    }).catch((err) => {
+    }).then((collected) => {
+		return collected.first().content
+	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
-
-    if (collector.first()) {
-        return collector.first().content
-    } else {
-        return false
-    }
 }
 
 
@@ -1147,49 +1140,49 @@ const getTradeInCard = async (message, medium_complete) => {
     const cards = options.map((o) => o[2])
 
     const filter = m => m.author.id === message.member.user.id
-	const msg = await message.channel.send({ content: `Which card would you like to trade-in?\n${cards.join("\n")}`})
-    const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `Which card would you like to trade-in?\n${cards.join("\n")}`})
+    return await message.channel.awaitMessages({ filter,
 		max: 1,
         time: 15000
-    }).catch((err) => {
+    }).then((collected) => {
+        const response = collected.first().content.toLowerCase()
+        let index
+        if(response.includes('10') || response.includes('APC-010') || response.includes('gozu')) {
+            index = 9
+        } else if(response.includes('11') || response.includes('APC-011') || response.includes('graff') || response.includes('burning')) {
+            index = 10
+        } else if(response.includes('12') || response.includes('APC-012') || response.includes('thunder') || response.includes('tdrag')) {
+            index = 11
+        } else if(response.includes('1') || response.includes('APC-001') || response.includes('devil') || response.includes('desm')) {
+            index = 0
+        } else if(response.includes('2') || response.includes('APC-002') || response.includes('koa') || response.includes('guardian')) {
+            index = 1
+        } else if(response.includes('3') || response.includes('APC-003') || response.includes('rose') || response.includes('lover')) {
+            index = 2
+        } else if(response.includes('4') || response.includes('APC-004') || response.includes('moray') || response.includes('greed')) {
+            index = 3
+        } else if(response.includes('5') || response.includes('APC-005') || response.includes('space') || response.includes('trans')) {
+            index = 4
+        } else if(response.includes('6') || response.includes('APC-006') || response.includes('viper') || response.includes('rebirth')) {
+            index = 5
+        } else if(response.includes('7') || response.includes('APC-007') || response.includes('sublim') || response.includes('knight')) {
+            index = 6
+        } else if(response.includes('8') || response.includes('APC-008') || response.includes('book') || response.includes('know')) {
+            index = 7
+        } else if(response.includes('9') || response.includes('APC-009') || response.includes('drag') || response.includes('cata')) {
+            index = 8
+        } else {
+            message.channel.send({ content: `You did not select a valid option.`})
+            return false
+        }
+    
+        const selected_option = options[index]
+        return selected_option	
+	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
 	})
-
-    const response = collector.first().content.toLowerCase()
-    let index
-    if(response.includes('10') || response.includes('APC-010') || response.includes('gozu')) {
-        index = 9
-    } else if(response.includes('11') || response.includes('APC-011') || response.includes('graff') || response.includes('burning')) {
-        index = 10
-    } else if(response.includes('12') || response.includes('APC-012') || response.includes('thunder') || response.includes('tdrag')) {
-        index = 11
-    } else if(response.includes('1') || response.includes('APC-001') || response.includes('devil') || response.includes('desm')) {
-        index = 0
-    } else if(response.includes('2') || response.includes('APC-002') || response.includes('koa') || response.includes('guardian')) {
-        index = 1
-    } else if(response.includes('3') || response.includes('APC-003') || response.includes('rose') || response.includes('lover')) {
-        index = 2
-    } else if(response.includes('4') || response.includes('APC-004') || response.includes('moray') || response.includes('greed')) {
-        index = 3
-    } else if(response.includes('5') || response.includes('APC-005') || response.includes('space') || response.includes('trans')) {
-        index = 4
-    } else if(response.includes('6') || response.includes('APC-006') || response.includes('viper') || response.includes('rebirth')) {
-        index = 5
-    } else if(response.includes('7') || response.includes('APC-007') || response.includes('sublim') || response.includes('knight')) {
-        index = 6
-    } else if(response.includes('8') || response.includes('APC-008') || response.includes('book') || response.includes('know')) {
-        index = 7
-    } else if(response.includes('9') || response.includes('APC-009') || response.includes('drag') || response.includes('cata')) {
-        index = 8
-    } else {
-        message.channel.send({ content: `You did not select a valid option.`})
-        return false
-    }
-
-    const selected_option = options[index]
-    return selected_option
 }
 
 
@@ -1199,22 +1192,18 @@ const askForBarterConfirmation = async (message, voucher, card, price, direction
         `Are you sure you want to exchange a copy of ${card} for ${price} ${eval(voucher)}?`
         
     const filter = m => m.author.id === message.author.id
-    const msg = await message.channel.send({ content: prompt })
-    const collector = await msg.channel.awaitMessages({ filter,
+    message.channel.send({ content: prompt })
+    return await message.channel.awaitMessages({ filter,
         max: 1,
         time: 15000
+    }).then((collected) => {
+        const response = collected.first().content.toLowerCase()
+        return yescom.includes(response)
     }).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
         return false
     })
-
-    if (yescom.includes(collector.first().content.toLowerCase())) {
-        return true
-    } else {
-        message.channel.send({ content: `No problem. Have a nice day.`})
-        return false
-    } 
 }
 
 

@@ -149,48 +149,48 @@ const getConfirmation = async (arena_entry, contestant) => {
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
-	const msg = await member.send({ content: `Please confirm your participation in the Arena by selecting a tribe:\n(1) Beast\n(2) Dinosaur\n(3) Dragon\n(4) Fiend\n(5) Fish\n(6) Plant\n(7) Reptile\n(8) Rock\n(9) Spellcaster\n(10) Thunder\n(11) Warrior\n(12) Zombie`})
-	return await msg.channel.awaitMessages({ filter,
-		max: 1,
+	const { channel } = await member.send({ content: `Please confirm your participation in the Arena by selecting a tribe:\n(1) Beast\n(2) Dinosaur\n(3) Dragon\n(4) Fiend\n(5) Fish\n(6) Plant\n(7) Reptile\n(8) Rock\n(9) Spellcaster\n(10) Thunder\n(11) Warrior\n(12) Zombie`})
+	await channel.awaitMessages({ 
+        filter,
 		time: 60000
+	}).then(async (collected) => {
+        const response = collected.first().content.toLowerCase()
+        const tribe = response.includes('thun') || response.includes('10') ? 'thunder' :
+            response.includes('war') || response.includes('11') ? 'warrior' :
+            response.includes('zom') || response.includes('12') ? 'zombie' :
+            response.includes('bea') || response.includes('1') ? 'beast' :
+            response.includes('dino') || response.includes('2') ? 'dinosaur' :
+            response.includes('drag') || response.includes('3') ? 'dragon' :
+            response.includes('fish') || response.includes('4') ? 'fish' :
+            response.includes('fiend') || response.includes('5') ? 'fiend' :
+            response.includes('plant') || response.includes('6') ? 'plant' :
+            response.includes('rep') || response.includes('7') ? 'reptile' :
+            response.includes('rock') || response.includes('8') ? 'warrior' :
+            response.includes('spell') || response.includes('cast') || response.includes('9') ? 'spellcaster' :
+            false
+        
+        const count = await Info.count({ where: {
+            element: 'arena',
+            status: 'confirming'
+        } })
+
+        if (!count) return member.send({ content: `Sorry, time expired.`})
+
+        if (tribe) {
+            arena_entry.active = true
+            arena_entry.tribe = tribe
+            arena_entry.contestant = contestant
+            await arena_entry.save()
+            member.send({ content: `Thanks! This is your Arena deck (staples in the side). You may cut it down to 40 cards:\n${decks[tribe].url}\n${decks[tribe].screenshot}`})
+            return channel.send({ content: `${member.user.username} confirmed their participation in the Arena!`})
+        } else {
+            message.channel.send({ content: `Please specify a valid tribe.`})
+            return getConfirmation(arena_entry, contestant)
+        }
 	}).catch((err) => {
 		console.log(err)
         return member.send({ content: `Sorry, time's up.`})
 	})
-
-    let tribe
-    const response = collector.first().content.toLowerCase()
-    if(response.includes('thun') || response.includes('10')) tribe = 'thunder'
-    else if(response.includes('war') || response.includes('11')) tribe = 'warrior'
-    else if(response.includes('zom') || response.includes('12')) tribe = 'zombie'
-    else if(response.includes('bea') || response.includes('1')) tribe = 'beast' 
-    else if(response.includes('dino') || response.includes('2')) tribe = 'dinosaur'
-    else if(response.includes('drag') || response.includes('3')) tribe = 'dragon'
-    else if(response.includes('fish') || response.includes('4')) tribe = 'fiend'
-    else if(response.includes('fiend') || response.includes('5')) tribe = 'fish'
-    else if(response.includes('plant') || response.includes('6')) tribe = 'plant'
-    else if(response.includes('rep') || response.includes('7')) tribe = 'reptile'
-    else if(response.includes('rock') || response.includes('8')) tribe = 'rock'
-    else if(response.includes('spell') || response.includes('cast') || response.includes('9')) tribe = 'spellcaster'
-    else message.channel.send({ content: `Please specify a valid tribe.`})
-
-    const count = await Info.count({ where: {
-        element: 'arena',
-        status: 'confirming'
-    } })
-
-    if (!count) return member.send({ content: `Sorry, time expired.`})
-
-    if (tribe) {
-        arena_entry.active = true
-        arena_entry.tribe = tribe
-        arena_entry.contestant = contestant
-        await arena_entry.save()
-        member.send({ content: `Thanks! This is your Arena deck (staples in the side). You may cut it down to 40 cards:\n${decks[tribe].url}\n${decks[tribe].screenshot}`})
-        return channel.send({ content: `${member.user.username} confirmed their participation in the Arena!`})
-    } else {
-        return getConfirmation(arena_entry)
-    }
 }
 
 //ASSIGN ARENA ROLES

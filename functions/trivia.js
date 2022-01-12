@@ -96,18 +96,17 @@ const startTrivia = async () => {
 
 const getTriviaConfirmation = async (trivia_entry) => {
     const guild = client.guilds.cache.get("842476300022054913")
-    const channel = client.channels.cache.get(triviaChannelId)
+    const triviaChannel = client.channels.cache.get(triviaChannelId)
     const playerId = trivia_entry.playerId
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
-	const msg = await member.send({ content: `Do you still wish to play Trivia?`})
-	await msg.channel.awaitMessages({ filter,
+	const { channel } = await member.send({ content: `Do you still wish to play Trivia?`})
+	await channel.awaitMessages({ filter,
 		max: 1,
 		time: 60000
 	}).then(async (collected) => {
 		const response = collected.first().content.toLowerCase()
-
         const count = await Info.count({ where: {
             element: 'trivia',
             status: 'confirming'
@@ -119,10 +118,10 @@ const getTriviaConfirmation = async (trivia_entry) => {
             trivia_entry.active = true
             await trivia_entry.save()
             member.send({ content: `Thanks! Trivia will be starting very soon.`})
-            return channel.send({ content: `${member.user.username} confirmed their participation in Trivia!`})
+            return triviaChannel.send({ content: `${member.user.username} confirmed their participation in Trivia!`})
         } else {
             member.send({ content: `Okay, sorry to see you go!`})
-            return channel.send({ content: `Oof. ${member.user.username} ducked out of Trivia!`})
+            return triviaChannel.send({ content: `Oof. ${member.user.username} ducked out of Trivia!`})
         }
 	}).catch((err) => {
 		console.log(err)
@@ -137,8 +136,8 @@ const getAnswer = async (entry, question, round) => {
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
-	const msg = await member.send({ content: `${megaphone}  ------  Question #${round}  ------  ${dummy}\n${question}`})
-	await msg.channel.awaitMessages({ filter,
+	const { channel } = await member.send({ content: `${megaphone}  ------  Question #${round}  ------  ${dummy}\n${question}`})
+	await channel.awaitMessages({ filter,
 		max: 1,
 		time: 20000
 	}).then(async (collected) => {

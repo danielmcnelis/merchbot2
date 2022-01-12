@@ -7,7 +7,7 @@ const { orange, soldier, FiC } = require('../static/emojis.json')
 const { Arena, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist } = require('../db')
 const { client } = require('../static/clients.js')
 const { saveYDK, saveAllYDK } = require('./decks.js')
-const { capitalize, shuffleArray } = require('./utility.js')
+const { capitalize, shuffleArray, resetPlayer } = require('./utility.js')
 
 //ASK FOR DB NAME
 const askForDBName = async (member, player, override = false, error = false, attempt = 1) => {
@@ -16,121 +16,123 @@ const askForDBName = async (member, player, override = false, error = false, att
     const greeting = override ? '' : 'Hi! '
     const prompt = error ? `I think you're getting ahead of yourself. First, I need ${pronoun} DuelingBook name.`
     : `${greeting}This appears to be ${player.name}'s first tournament in our system. Can you please provide ${pronoun} DuelingBook name?`
-	const msg = await member.user.send({ content: prompt})
-
-    const collector = await msg.channel.awaitMessages({ filter,
+	const { channel } = await member.user.send({ content: prompt})
+    return await channel.awaitMessages({ filter,
 		max: 1,
         time: 30000
+    }).then((collected) => {
+		const dbName = collected.first().content
+        if (dbName.includes("duelingbook.com/deck") || dbName.includes("imgur.com")) {
+            if (attempt >= 3) {
+                member.user.send({ content: `Sorry, time's up. Go back to the server and try again.`})
+                return false
+            } else {
+                return askForDBName(member, player, override, true, attempt++)
+            }
+        } else {
+            await player.update({
+                duelingBook: dbName
+            })
+            member.user.send({ content: `Thanks! I saved ${pronoun} DuelingBook name as: ${dbName}. If that's wrong, go back to the server and type **!db name**.`})
+            return dbName
+        }
     }).catch((err) => {
 		console.log(err)
         member.user.send({ content: `Sorry, time's up. Go back to the server and try again.`})
         return false
     })
-
-    const dbName = collector.first().content
-    if (dbName.includes("duelingbook.com/deck") || dbName.includes("imgur.com")) {
-        if (attempt >= 3) {
-            member.user.send({ content: `Sorry, time's up. Go back to the server and try again.`})
-            return false
-        } else {
-            return askForDBName(member, player, override, true, attempt++)
-        }
-    } else {
-        await player.update({
-            duelingBook: dbName
-        })
-        member.user.send({ content: `Thanks! I saved ${pronoun} DuelingBook name as: ${dbName}. If that's wrong, go back to the server and type **!db name**.`})
-        return dbName
-    }
 }
 
 //GET DECK LIST TOURNAMENT
 const getDeckList = async (member, player, tournamentName, override = false) => {            
     const filter = m => m.author.id === member.user.id
     const pronoun = override ? `${player.name}'s` : 'your'
-    const msg = await member.user.send({ content: `Please provide a duelingbook.com/deck link for ${pronoun} tournament deck.`});
-    const collector = await msg.channel.awaitMessages({ filter,
+    const { channel } = await member.user.send({ content: `Please provide a duelingbook.com/deck link for ${pronoun} tournament deck.`});
+    return await channel.awaitMessages({ filter,
         max: 1,
         time: 180000
+    }).then((collected) => {
+		const url = collected.first().content
+        if (url.includes("www.duelingbook.com/deck")) {		
+            member.send({ content: 'Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.'})
+            const issues = await saveYDK(player, url, tournamentName)
+
+            if (override) {
+                member.send({ content: `Thanks, ${member.user.username}, I saved a copy of ${pronoun} deck. ${soldier}`})
+                return url
+            } else if (issues['illegalCards'].length || issues['forbiddenCards'].length || issues['limitedCards'].length || issues['semiLimitedCards'].length) {
+                let response = `I'm sorry, ${member.user.username}, ${pronoun} deck is not legal. ${orange}`
+                if (issues['illegalCards'].length) response += `\n\nThe following cards are not in this game:\n${issues['illegalCards'].join('\n')}`
+                if (issues['forbiddenCards'].length) response += `\n\nThe following cards are forbidden:\n${issues['forbiddenCards'].join('\n')}`
+                if (issues['limitedCards'].length) response += `\n\nThe following cards are limited:\n${issues['limitedCards'].join('\n')}`
+                if (issues['semiLimitedCards'].length) response += `\n\nThe following cards are semi-limited:\n${issues['semiLimitedCards'].join('\n')}`
+                response += `\n\nPlease edit ${pronoun} deck and try again once it's legal. If you believe this message is in error, contact the Tournament Organizer.`
+            
+                member.send({ content: response})
+                return false
+            } else if (issues['unrecognizedCards'].length) {
+                let response = `I'm sorry, ${member.user.username}, the following card IDs were not found in our database:\n${issues['unrecognizedCards'].join('\n')}`
+                response += `\n\nThese cards are either alternate artwork, new to the TCG, OCG only, or incorrect in our database. Please contact the Tournament Organizer or the Admin if you can't resolve this.`
+                
+                member.send({ content: response})
+                return false
+                } else {
+                member.send({ content: `Thanks, ${member.user.username}, ${pronoun} deck is perfectly legal. ${soldier}`})
+                return url
+            }
+        } else {
+            member.send({ content: "Sorry, I only accept duelingbook.com/deck links."})
+            return false
+        }
     }).catch((err) => {
 		console.log(err)
         member.send({ content: `Sorry, time's up. Go back to the server and try again.`})
         return false
     })
-
-    const url = collector.first().content
-    if (url.includes("www.duelingbook.com/deck")) {		
-        member.send({ content: 'Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.'})
-        const issues = await saveYDK(player, url, tournamentName)
-
-        if (override) {
-            member.send({ content: `Thanks, ${member.user.username}, I saved a copy of ${pronoun} deck. ${soldier}`})
-            return url
-        } else if (issues['illegalCards'].length || issues['forbiddenCards'].length || issues['limitedCards'].length || issues['semiLimitedCards'].length) {
-            let response = `I'm sorry, ${member.user.username}, ${pronoun} deck is not legal. ${orange}`
-            if (issues['illegalCards'].length) response += `\n\nThe following cards are not in this game:\n${issues['illegalCards'].join('\n')}`
-            if (issues['forbiddenCards'].length) response += `\n\nThe following cards are forbidden:\n${issues['forbiddenCards'].join('\n')}`
-            if (issues['limitedCards'].length) response += `\n\nThe following cards are limited:\n${issues['limitedCards'].join('\n')}`
-            if (issues['semiLimitedCards'].length) response += `\n\nThe following cards are semi-limited:\n${issues['semiLimitedCards'].join('\n')}`
-            response += `\n\nPlease edit ${pronoun} deck and try again once it's legal. If you believe this message is in error, contact the Tournament Organizer.`
-        
-            member.send({ content: response})
-            return false
-        } else if (issues['unrecognizedCards'].length) {
-            let response = `I'm sorry, ${member.user.username}, the following card IDs were not found in our database:\n${issues['unrecognizedCards'].join('\n')}`
-            response += `\n\nThese cards are either alternate artwork, new to the TCG, OCG only, or incorrect in our database. Please contact the Tournament Organizer or the Admin if you can't resolve this.`
-            
-            member.send({ content: response})
-            return false
-            } else {
-            member.send({ content: `Thanks, ${member.user.username}, ${pronoun} deck is perfectly legal. ${soldier}`})
-            return url
-        }
-    } else {
-        member.send({ content: "Sorry, I only accept duelingbook.com/deck links."})
-        return false
-    }
 }
 
 
 //DIRECT SIGN UP
 const directSignUp = async (message, player, resubmission = false) => {            
     const filter = m => m.author.id === member.user.id
-    const msg = await message.author.send({ content: `Please provide a duelingbook.com/deck link for ${player.name}'s tournament deck.`});
-    const collector = await msg.channel.awaitMessages({ filter,
+    const { channel } = await message.author.send({ content: `Please provide a duelingbook.com/deck link for ${player.name}'s tournament deck.`});
+    return await channel.awaitMessages({ filter,
         max: 1,
         time: 60000
+    }).then((collected) => {
+		const url = collected.first().content
+        if (url.includes("duelingbook.com/deck")) {		
+            message.author.send({ content: `Thanks, ${message.author.username}, I now have the link to ${player.name}'s tournament deck. ${soldier}`})
+            return url
+        } else {
+            message.author.send({ content: "Sorry, I only accept duelingbook.com/deck links."})
+            return false
+        }
     }).catch((err) => {
 		console.log(err)
         member.user.send({ content: `Sorry, time's up. To try again, go back to the Discord server type **!join**.`})
         return false
     })
 
-    const url = collector.first().content
-    if (url.includes("duelingbook.com/deck")) {		
-        message.author.send({ content: `Thanks, ${message.author.username}, I now have the link to ${player.name}'s tournament deck. ${soldier}`})
-        return url
-    } else {
-        message.author.send({ content: "Sorry, I only accept duelingbook.com/deck links."})
-        return false
-    }
+    
 }
 
 //GET DECK NAME
 const getDeckName = async (member, player, override = false) => {
     const pronoun = override ? `${player.name}'s` : 'your'
-	const msg = await member.send({ content: `Please provide the common name for ${pronoun} deck (i.e. Chaos Control, Chaos Turbo, Warrior, etc.).`})
     const filter = m => m.author.id === member.user.id
-    const collector = await msg.channel.awaitMessages({ filter,
+	const { channel } = await member.send({ content: `Please provide the common name for ${pronoun} deck (i.e. Chaos Control, Chaos Turbo, Warrior, etc.).`})
+    return await channel.awaitMessages({ filter,
 		max: 1,
         time: 20000
+    }).then((collected) => {
+        const response = collected.first().content.toLowerCase()
+		return response
     }).catch((err) => {
 		console.log(err)    
         member.send({ content: `Sorry, time's up.`})
         return false
     })
-
-    return collector.first().content.toLowerCase()
 }
 
 
@@ -181,22 +183,23 @@ const selectTournament = async (message, tournaments, playerId) => {
     if (tournaments.length === 1) return tournaments[0]
     const options = tournaments.map((tournament, index) => `(${index + 1}) ${tournament.name}`)
     const filter = m => m.author.id === playerId
-    const msg = await message.channel.send({ content: `Please select a tournament:\n${options.join('\n')}`})
-    const collector = await msg.channel.awaitMessages({ filter,
+    message.channel.send({ content: `Please select a tournament:\n${options.join('\n')}`})
+    return await message.channel.awaitMessages({ filter,
         max: 1,
         time: 15000
+    }).then((collected) => {
+        const response = collected.first().content
+		const num = parseInt(response.match(/\d+/))
+        if (!num || !tournaments[num - 1]) {
+            message.channel.send({ content: `Sorry, ${collected.first().content} is not a valid option.`})
+            return null
+        } else {
+            return tournaments[num - 1]
+        }
     }).catch((err) => {
 		console.log(err)
         return null
-    })
-
-    const num = parseInt(collector.first().content.match(/\d+/))
-    if (!num || !tournaments[num - 1]) {
-        message.channel.send({ content: `Sorry, ${collector.first().content} is not a valid option.`})
-        return null
-    } else {
-        return tournaments[num - 1]
-    }
+    })    
 }
 
 
@@ -404,22 +407,23 @@ const findNoShowOpponent = (match, noShowParticipantId) => {
 // GET TOURNAMENT TYPE
 const getTournamentType = async (message) => {
     const filter = m => m.author.id === message.author.id
-	const msg = await message.channel.send({ content: `What type of tournament is this?\n(1) Single Elimination\n(2) Double Elimination\n(3) Swiss\n(4) Round Robin`})
-	const collector = await msg.channel.awaitMessages({ filter,
+	message.channel.send({ content: `What type of tournament is this?\n(1) Single Elimination\n(2) Double Elimination\n(3) Swiss\n(4) Round Robin`})
+	return await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 30000
+	}).then((collected) => {
+        const response = collected.first().content.toLowerCase()
+		const tournamentType = response.includes(1) || response.startsWith('single') ? 'single elimination' : 
+            response.includes(2) || response.startsWith('double') ? 'double elimination' :
+            response.includes(3) || response.startsWith('swiss') ? 'swiss' :
+            response.includes(4) || response.startsWith('round') ? 'round robin' :
+            null
+
+        return tournamentType
 	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
-	})
-
-    let tournamentType
-    const response = collector.first().content.toLowerCase()
-    if (response.includes(1) || response.startsWith('single')) tournamentType = 'single elimination'
-    else if (response.includes(2) || response.startsWith('double')) tournamentType = 'double elimination'
-    else if (response.includes(3) || response.startsWith('swiss')) tournamentType = 'swiss'
-    else if (response.includes(4) || response.startsWith('round')) tournamentType = 'round robin'
-    else return 
+	})    
 }
 
 // GENERATE SHEET DATA

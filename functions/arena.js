@@ -11,44 +11,35 @@ const { shuffleArray, getRandomElement, capitalize } = require('./utility.js')
 const { awardCard } = require('./award.js')
 const { decks, vouchers, prizes, victories, apcs, verbs, encouragements } = require('../static/arenas.json')
 
+const tribes = [
+    '(1) Beast', 
+    '(2) Dinosaur', 
+    '(3) Dragon', 
+    '(4) Fiend', 
+    '(5) Fish', 
+    '(6) Plant', 
+    '(7) Reptile', 
+    '(8) Rock', 
+    '(9) Spellcaster', 
+    '(10) Thunder', 
+    '(11) Warrior', 
+    '(12) Zombie'
+]
+
 //GET ARENA SAMPLE DECK
 const getArenaSample = async (message, query) => {
-    if (query && query.includes('bea')) return 'beast'
-    if (query && query.includes('dino')) return 'dinosaur'
-    if (query && query.includes('drag')) return 'dragon'
-    if (query && query.includes('fiend')) return 'fiend'
-    if (query && query.includes('fish')) return 'fish'
-    if (query && query.includes('plant')) return 'plant'
-    if (query && query.includes('rep')) return 'reptile'
-    if (query && query.includes('rock')) return 'rock'
-    if (query && (query.includes('spell') || query.includes('cast'))) return 'spellcaster'
-    if (query && query.includes('thun')) return 'thunder'
-    if (query && query.includes('war')) return 'warrior'
-    if (query && query.includes('zom')) return 'zombie'
+    const directTribe = getTribe(query)
+    if (directTribe) return directTribe
 
     const filter = m => m.author.id === message.author.id
-	message.channel.send({ content: `Please select a tribe:\n(1) Beast\n(2) Dinosaur\n(3) Dragon\n(4) Fiend\n(5) Fish\n(6) Plant\n(7) Reptile\n(8) Rock\n(9) Spellcaster\n(10) Thunder\n(11) Warrior\n(12) Zombie`})
+	message.channel.send({ content: `Please select a tribe:${tribes.join('\n')}`})
 	return await message.channel.awaitMessages({ 
         filter,
 		max: 1,
 		time: 10000
 	}).then((collected) => {
         const response = collected.first().content.toLowerCase()
-        const tribe = response.includes('thun') || response.includes('10') ? 'thunder' :
-            response.includes('war') || response.includes('11') ? 'warrior' :
-            response.includes('zom') || response.includes('12') ? 'zombie' :
-            response.includes('bea') || response.includes('1') ? 'beast' :
-            response.includes('dino') || response.includes('2') ? 'dinosaur' :
-            response.includes('drag') || response.includes('3') ? 'dragon' :
-            response.includes('fish') || response.includes('4') ? 'fish' :
-            response.includes('fiend') || response.includes('5') ? 'fiend' :
-            response.includes('plant') || response.includes('6') ? 'plant' :
-            response.includes('rep') || response.includes('7') ? 'reptile' :
-            response.includes('rock') || response.includes('8') ? 'warrior' :
-            response.includes('spell') || response.includes('cast') || response.includes('9') ? 'spellcaster' :
-            false
-
-        return tribe
+        return getTribe(response)
 	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
@@ -56,17 +47,36 @@ const getArenaSample = async (message, query) => {
 	})
 }
 
+// GET TRIBE
+const getTribe = (query = '') => {
+    const tribe = query.includes('thun') || query.includes('10') ? 'thunder' :
+        query.includes('war') || query.includes('11') ? 'warrior' :
+        query.includes('zom') || query.includes('12') ? 'zombie' :
+        query.includes('bea') || query.includes('1') ? 'beast' :
+        query.includes('dino') || query.includes('2') ? 'dinosaur' :
+        query.includes('drag') || query.includes('3') ? 'dragon' :
+        query.includes('fish') || query.includes('4') ? 'fish' :
+        query.includes('fiend') || query.includes('5') ? 'fiend' :
+        query.includes('plant') || query.includes('6') ? 'plant' :
+        query.includes('rep') || query.includes('7') ? 'reptile' :
+        query.includes('rock') || query.includes('8') ? 'warrior' :
+        query.includes('spell') || query.includes('cast') || query.includes('9') ? 'spellcaster' :
+        false
+
+    return tribe
+}
+
 //START ARENA
 const startArena = async() => {
     const channel = client.channels.cache.get(arenaChannelId)
     channel.send({ content: `Arena players, please check your DMs!`})
-    const allArenaEntries = await Arena.findAll({ include: Player })
+    const entries = await Arena.findAll({ include: Player })
     const contestants = shuffleArray(["P1", "P2", "P3", "P4"])
-
-    getConfirmation(allArenaEntries[0], contestants[0])
-    getConfirmation(allArenaEntries[1], contestants[1])
-    getConfirmation(allArenaEntries[2], contestants[2])
-    getConfirmation(allArenaEntries[3], contestants[3])
+    
+    getArenaConfirmation(entries[0], contestants[0])
+    getArenaConfirmation(entries[1], contestants[1])
+    getArenaConfirmation(entries[2], contestants[2])
+    getArenaConfirmation(entries[3], contestants[3])
 
     const info = await Info.findOne({ where: {
         element: 'arena'
@@ -87,7 +97,7 @@ const startArena = async() => {
                 info.round = 1
                 info.status = 'active'
                 await info.save()
-                assignArenaRoles(allArenaEntries)
+                assignArenaRoles(entries)
                 setTimeout(() => {
                     channel.send({ content: `<@&${arenaRole}>, square-up gamers! The Arena starts in 10 seconds. ${cavebob}\n\nP.S. If you aren't playing within 5 minutes of this message, **it's a game loss**!`})
                 }, 1000)
@@ -118,7 +128,7 @@ const startArena = async() => {
 
             const names = missingArenaEntries.map((entry) => entry.player.name)
 
-            await resetArena(info, allArenaEntries)
+            await resetArena(info, entries)
 
             for (let i = 0; i < missingArenaEntries.length; i++) {
                 const entry = missingArenaEntries[i]
@@ -130,7 +140,7 @@ const startArena = async() => {
             info.round = 1
             info.status = 'active'
             await info.save()
-            assignArenaRoles(allArenaEntries)
+            assignArenaRoles(entries)
             setTimeout(() => {
                 channel.send({ content: `<@&${arenaRole}>, square-up gamers! The Arena starts in 10 seconds. ${cavebob}\n\nP.S. If you aren't playing within 5 minutes of this message, **it's a game loss**!`})
             }, 1000)
@@ -141,33 +151,21 @@ const startArena = async() => {
     }, 61000)
 }
 
-//GET CONFIRMATION
-const getConfirmation = async (arena_entry, contestant) => {
+//GET ARENA CONFIRMATION
+const getArenaConfirmation = async (arena_entry, contestant) => {
     const arenaChannel = client.channels.cache.get(arenaChannelId)
     const guild = client.guilds.cache.get("842476300022054913")
     const playerId = arena_entry.playerId
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
-	const { channel } = await member.send({ content: `Please confirm your participation in the Arena by selecting a tribe:\n(1) Beast\n(2) Dinosaur\n(3) Dragon\n(4) Fiend\n(5) Fish\n(6) Plant\n(7) Reptile\n(8) Rock\n(9) Spellcaster\n(10) Thunder\n(11) Warrior\n(12) Zombie`})
+	const { channel } = await member.send({ content: `Please confirm your participation in the Arena by selecting a tribe:${tribes.join('\n')}`})
 	await channel.awaitMessages({ 
         filter,
 		time: 60000
 	}).then(async (collected) => {
         const response = collected.first().content.toLowerCase()
-        const tribe = response.includes('thun') || response.includes('10') ? 'thunder' :
-            response.includes('war') || response.includes('11') ? 'warrior' :
-            response.includes('zom') || response.includes('12') ? 'zombie' :
-            response.includes('bea') || response.includes('1') ? 'beast' :
-            response.includes('dino') || response.includes('2') ? 'dinosaur' :
-            response.includes('drag') || response.includes('3') ? 'dragon' :
-            response.includes('fish') || response.includes('4') ? 'fish' :
-            response.includes('fiend') || response.includes('5') ? 'fiend' :
-            response.includes('plant') || response.includes('6') ? 'plant' :
-            response.includes('rep') || response.includes('7') ? 'reptile' :
-            response.includes('rock') || response.includes('8') ? 'warrior' :
-            response.includes('spell') || response.includes('cast') || response.includes('9') ? 'spellcaster' :
-            false
+        const tribe = getTribe(response)
         
         const count = await Info.count({ where: {
             element: 'arena',
@@ -185,7 +183,7 @@ const getConfirmation = async (arena_entry, contestant) => {
             return arenaChannel.send({ content: `${member.user.username} confirmed their participation in the Arena!`})
         } else {
             message.channel.send({ content: `Please specify a valid tribe.`})
-            return getConfirmation(arena_entry, contestant)
+            return getArenaConfirmation(arena_entry, contestant)
         }
 	}).catch((err) => {
 		console.log(err)

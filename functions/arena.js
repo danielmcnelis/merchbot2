@@ -143,7 +143,7 @@ const startArena = async() => {
 
 //GET CONFIRMATION
 const getConfirmation = async (arena_entry, contestant) => {
-    const channel = client.channels.cache.get(arenaChannelId)
+    const arenaChannel = client.channels.cache.get(arenaChannelId)
     const guild = client.guilds.cache.get("842476300022054913")
     const playerId = arena_entry.playerId
     const member = guild.members.cache.get(playerId)
@@ -182,7 +182,7 @@ const getConfirmation = async (arena_entry, contestant) => {
             arena_entry.contestant = contestant
             await arena_entry.save()
             member.send({ content: `Thanks! This is your Arena deck (staples in the side). You may cut it down to 40 cards:\n${decks[tribe].url}\n${decks[tribe].screenshot}`})
-            return channel.send({ content: `${member.user.username} confirmed their participation in the Arena!`})
+            return arenaChannel.send({ content: `${member.user.username} confirmed their participation in the Arena!`})
         } else {
             message.channel.send({ content: `Please specify a valid tribe.`})
             return getConfirmation(arena_entry, contestant)

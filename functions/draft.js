@@ -99,7 +99,7 @@ const startDraft = async(fuzzyPrints) => {
 
 //GET CONFIRMATION
 const getConfirmation = async (entry, contestant) => {
-    const channel = client.channels.cache.get(draftChannelId)
+    const draftChannel = client.channels.cache.get(draftChannelId)
     const playerId = entry.playerId
     const guild = client.guilds.cache.get("842476300022054913")
     const member = guild.members.cache.get(playerId)
@@ -125,10 +125,10 @@ const getConfirmation = async (entry, contestant) => {
             entry.contestant = contestant
             await entry.save()
             member.send({ content: `Thanks! The Draft will be starting soon. Look out for more DMs.`})
-            return channel.send({ content: `${member.user.username} confirmed their participation in the Draft!`})
+            return draftChannel.send({ content: `${member.user.username} confirmed their participation in the Draft!`})
         } else {
             member.send({ content: `Okay, sorry to see you go!`})
-            return channel.send({ content: `Yikes. ${member.user.username} dodged the Draft!`})
+            return draftChannel.send({ content: `Yikes. ${member.user.username} dodged the Draft!`})
         }
 	}).catch((err) => {
 		console.log(err)
@@ -630,7 +630,6 @@ const autoDraft = async (pack) => {
 //START DRAFT ROUND
 const startDraftRound = async (info, entries) => {
     const channel = client.channels.cache.get(draftChannelId)
-    const guild = client.guilds.cache.get("842476300022054913")
 
     if (info.round === 4) {
         if (entries[0].score > entries[1].score) {

@@ -20,7 +20,7 @@ const askForDBName = async (member, player, override = false, error = false, att
     return await channel.awaitMessages({ filter,
 		max: 1,
         time: 30000
-    }).then((collected) => {
+    }).then(async (collected) => {
 		const dbName = collected.first().content
         if (dbName.includes("duelingbook.com/deck") || dbName.includes("imgur.com")) {
             if (attempt >= 3) {
@@ -51,7 +51,7 @@ const getDeckList = async (member, player, tournamentName, override = false) => 
     return await channel.awaitMessages({ filter,
         max: 1,
         time: 180000
-    }).then((collected) => {
+    }).then(async (collected) => {
 		const url = collected.first().content
         if (url.includes("www.duelingbook.com/deck")) {		
             member.send({ content: 'Thanks. Please wait while I download the .YDK file. This can take up to 30 seconds.'})

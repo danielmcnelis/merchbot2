@@ -567,7 +567,6 @@ if (cmd === `!konami`) {
 
 	for (let i = 0; i < prints.length; i++) {
 		const print = prints[i]
-		const card_id = print.card_id
 		const card = await Card.findOne({
 			where: {
 				name: print.card_name

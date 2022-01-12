@@ -37,11 +37,12 @@ const getReceiverSide = async (message, cards, player) => {
 		max: 1,
 		time: 60000
 	}).then((collected) => {
-		if (collected.first().content.startsWith('!')) {
+		const response = collected.first().content.toLowerCase()
+		if (response.startsWith('!')) {
 			message.channel.send({ content: `Please do not respond with bot commands. Simply type what you would like to trade.`})
 			return false
 		} else {
-			return collected.first().content.split(';')
+			return response.split(';')
 		}
 	}).catch((err) => {
 		console.log(err)

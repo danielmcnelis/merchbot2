@@ -793,7 +793,7 @@ const getExclusions = async (message, rarity, set) => {
             message.channel.send({ content: `Please do not respond with bot commands. Simply type what you would like to exclude.`})
             return false
         } else {
-            return collected.first().content.split(';')
+            return response.split(';')
         }
 	}).catch((err) => {
 		console.log(err)
@@ -1112,7 +1112,8 @@ const getBarterQuery = async (message) => {
 		max: 1,
         time: 15000
     }).then((collected) => {
-		return collected.first().content
+        const response = collected.first().content
+		return response
 	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})

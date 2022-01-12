@@ -914,7 +914,7 @@ if(startcom.includes(cmd)) {
 		const set3 = await Set.findOne({ where: { code: 'TEB' }})
 		const set4 = await Set.findOne({ where: { code: 'FON' }})
 		const set5 = await Set.findOne({ where: { code: 'DRT' }})
-		const set5 = await Set.findOne({ where: { code: 'LP1' }})
+		const set6 = await Set.findOne({ where: { code: 'LP1' }})
 		if (!set1 || !set2 || !set3 || !set4 || !set5 || !set6) return message.channel.send({ content: `Could not find sets: "DOC", "ORF", "TEB", "FON", "DRT", or "LP1".`})
 	
 		const filter = m => m.author.id === maid

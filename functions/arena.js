@@ -48,8 +48,6 @@ const getArenaSample = async (message, query) => {
             response.includes('spell') || response.includes('cast') || response.includes('9') ? 'spellcaster' :
             false
 
-        if (!tribe) message.channel.send({ content: `Please specify a valid tribe.`})
-        console.log('tribe', tribe)
         return tribe
 	}).catch((err) => {
 		console.log(err)
@@ -152,7 +150,7 @@ const getConfirmation = async (arena_entry, contestant) => {
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
 	const msg = await member.send({ content: `Please confirm your participation in the Arena by selecting a tribe:\n(1) Beast\n(2) Dinosaur\n(3) Dragon\n(4) Fiend\n(5) Fish\n(6) Plant\n(7) Reptile\n(8) Rock\n(9) Spellcaster\n(10) Thunder\n(11) Warrior\n(12) Zombie`})
-	const collector = await msg.channel.awaitMessages({ filter,
+	return await msg.channel.awaitMessages({ filter,
 		max: 1,
 		time: 60000
 	}).catch((err) => {

@@ -218,6 +218,15 @@ if(cmd === `!test`) {
 	}
 }
 
+//DECAY
+if(cmd === `!decay`) {
+	if (isJazz(message.member)) {
+		return applyPriceDecay()
+	} else {
+		return message.channel.send({ content: 'You do not have permission to do that.'})
+	}
+}
+
 //FIX
 if(cmd === `!fix`) {
 	if (isJazz(message.member)) {
@@ -226,6 +235,7 @@ if(cmd === `!fix`) {
 		return message.channel.send({ content: '🛠️'})
 	}
 }
+
 
 //DING
 if(cmd === `!ding`) return message.channel.send({ content: '🚪'})

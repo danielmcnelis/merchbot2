@@ -5008,7 +5008,7 @@ if(reducecom.includes(cmd)) {
 	const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
 
 	const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) : card_name ? await selectPrint(message, maid, card_name, private = false, inInv = true) : null
-	if (!print && !card_name) return message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
+	if (!print) return message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
 	if (print.set_code === 'FPC') return message.channel.send({ content: `You cannot use reduce on FPCs.`})
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
 	const value = print.rarity === 'com' ? 1 : print.rarity === 'rar' ? 2 : print.rarity === 'sup' ? 4 : print.rarity === 'ult' ? 8 : 16 

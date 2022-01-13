@@ -55,8 +55,8 @@ const getTribe = (query = '') => {
         query.includes('bea') || query.includes('1') ? 'beast' :
         query.includes('dino') || query.includes('2') ? 'dinosaur' :
         query.includes('drag') || query.includes('3') ? 'dragon' :
-        query.includes('fish') || query.includes('4') ? 'fish' :
-        query.includes('fiend') || query.includes('5') ? 'fiend' :
+        query.includes('fiend') || query.includes('4') ? 'fiend' :
+        query.includes('fish') || query.includes('5') ? 'fish' :
         query.includes('plant') || query.includes('6') ? 'plant' :
         query.includes('rep') || query.includes('7') ? 'reptile' :
         query.includes('rock') || query.includes('8') ? 'warrior' :

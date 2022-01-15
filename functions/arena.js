@@ -59,7 +59,7 @@ const getTribe = (query = '') => {
         query.includes('fish') || query.includes('5') ? 'fish' :
         query.includes('plant') || query.includes('6') ? 'plant' :
         query.includes('rep') || query.includes('7') ? 'reptile' :
-        query.includes('rock') || query.includes('8') ? 'warrior' :
+        query.includes('rock') || query.includes('8') ? 'rock' :
         query.includes('spell') || query.includes('cast') || query.includes('9') ? 'spellcaster' :
         false
 

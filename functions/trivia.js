@@ -25,7 +25,14 @@ const startTrivia = async () => {
     const all_questions = Object.entries(trivia)
     console.log('all_questions', all_questions)
     const questions = getRandomSubset(all_questions, 10)
-    console.log('questions', questions)
+    console.log('questions.slice(0, 100)', questions.slice(0, 100))
+    console.log('questions.slice(0, 100)', questions.slice(1000, 1100))
+    console.log('questions.slice', questions.slice(2000, 2100))
+    console.log('questions.slice', questions.slice(2100))
+    console.log('questions.length', questions.length)
+    console.log('questions.map((q) => q[0]).slice(0, 1000)', questions.map((q) => q[0]).slice(0, 1000))
+    console.log('questions.map((q) => q[0]).slice(1000, 2000)', questions.map((q) => q[0]).slice(1000, 2000))
+    console.log('questions.map((q) => q[0]).slice(2000)', questions.map((q) => q[0]).slice(2000))
     const info = await Info.findOne({ where: { element: 'trivia' }})
 
     for (let i = 1; i <= 12; i ++) {

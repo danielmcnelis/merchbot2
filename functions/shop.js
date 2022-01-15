@@ -472,8 +472,6 @@ const updateShop = async () => {
             `Good day, The Shop ${merchant} is open. ${open}`,
             `\n${master} --- Core Products --- ${master}`
         ]
-
-        console.log('results', results)
     
         const setsForSale = await Set.findAll({ 
             where: { 
@@ -542,7 +540,7 @@ const updateShop = async () => {
            try {
                shopChannel.send({ content: results.slice(i, i+10).join('\n').toString() })
            } catch (err) {
-               console.log('err...', err)
+               console.log(err)
            }
         }
     }, 9000)

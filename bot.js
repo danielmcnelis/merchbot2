@@ -6537,8 +6537,6 @@ if(cmd === `!barter`) {
 	}
 
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`
-	console.log('card', card)
-
 	if (direction === 'get_card' && wallet[voucher] < price) return message.channel.send({ content: `Sorry, you only have ${wallet[voucher]} ${eval(voucher)} and ${card} costs ${price} ${eval(voucher)}.`})
 
 	const inv = await Inventory.findOne({ where: {

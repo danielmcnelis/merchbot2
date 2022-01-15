@@ -12,6 +12,7 @@ const { shuffleArray, getRandomElement, getRandomSubset, capitalize } = require(
 const trivia = require('../trivia.json')
 const { Message } = require('discord.js')
 
+//START TRIVIA
 const startTrivia = async () => {
     const channel = client.channels.cache.get(triviaChannelId)
     channel.send({ content: `Trivia players, please check your DMs!`})
@@ -22,10 +23,12 @@ const startTrivia = async () => {
     }
 
     const all_questions = Object.entries(trivia)
+    console.log('all_questions', all_questions)
     const questions = getRandomSubset(all_questions, 10)
+    console.log('questions', questions)
     const info = await Info.findOne({ where: { element: 'trivia' }})
 
-    for (let i = 1; i < 12; i ++) {
+    for (let i = 1; i <= 12; i ++) {
         setTimeout(async () => {
             const count = await Trivia.count({ where: { active: true }})
             const active = await Info.count({ where: { element: 'trivia', status: 'active' }})
@@ -74,7 +77,7 @@ const startTrivia = async () => {
             
             return channel.send({ content: `Unfortunately, Trivia cannot begin without 4 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`})
         } else if (count >= 4 && !active) {
-            const missing_entries = await Trivia.findAll({ where: { active: false }, include: Player })
+            const missing_entries = await Trivia.findAll({ where: { active: false } })
             for (let i = 0; i < missing_entries.length; i++) {
                 const entry = missing_entries[i]
                 await entry.destroy()
@@ -91,9 +94,10 @@ const startTrivia = async () => {
                 return askQuestion(info, questions)
             }, 11000)
         }
-    }, 61000)
+    }, 66000)
 }
 
+//GET TRIVIA CONFIRMATION
 const getTriviaConfirmation = async (trivia_entry) => {
     const guild = client.guilds.cache.get("842476300022054913")
     const triviaChannel = client.channels.cache.get(triviaChannelId)
@@ -129,7 +133,7 @@ const getTriviaConfirmation = async (trivia_entry) => {
 	})
 }
 
-
+//GET ANSWER
 const getAnswer = async (entry, question, round) => {
     const guild = client.guilds.cache.get("842476300022054913")
     const playerId = entry.playerId
@@ -153,6 +157,7 @@ const getAnswer = async (entry, question, round) => {
 	})
 }
 
+//ASSIGN TRIVIA ROLES
 const assignTriviaRoles = (entries) => {    
     const guild = client.guilds.cache.get("842476300022054913")
     entries.forEach((entry) => {
@@ -161,6 +166,7 @@ const assignTriviaRoles = (entries) => {
     })
 }
 
+//ASK QUESTION
 const askQuestion = async (info, questionsArr) => {
     const channel = client.channels.cache.get(triviaChannelId)
     const questionNumber = questionsArr[info.round - 1][0]
@@ -171,9 +177,7 @@ const askQuestion = async (info, questionsArr) => {
     channel.send({ content: `${megaphone}  ------  Question #${info.round}  ------  ${dummy}\n${question}\n\n`})
     
     const entries = await Trivia.findAll({ include: Player })
-    entries.forEach((entry) => {
-        getAnswer(entry, question, info.round)
-    })
+    entries.forEach((entry) => getAnswer(entry, question, info.round))
 
     setTimeout(async() => {
         const updatedEntries = await Trivia.findAll({ include: Player})
@@ -203,9 +207,10 @@ const askQuestion = async (info, questionsArr) => {
         }
 
         return setTimeout(() => postTriviaStandings(info, updatedEntries, questionsArr), updatedEntries.length * 2000 + 3000)
-    }, 22000)
+    }, 24000)
 }
 
+//CHECK ANSWER
 const checkAnswer = async (answer, fuzzyAnswers, stringency) => {
     const matching = fuzzyAnswers.get(answer, null, stringency) || []
 	matching.sort((a, b) => b[0] - a[0])
@@ -213,6 +218,7 @@ const checkAnswer = async (answer, fuzzyAnswers, stringency) => {
     else return true
 }
 
+//CHECK KNOWLEDGE
 const checkKnowledge = async (playerId, questionNumber) => {
     const question = questionNumber.slice(questionNumber.indexOf("_") + 1)
     const count = await Knowledge.count({ where: { question: question, playerId: playerId } })
@@ -224,6 +230,7 @@ const checkKnowledge = async (playerId, questionNumber) => {
     }
 }
 
+//POST TRIVIA STANDINGS
 const postTriviaStandings = async (info, entries, questions) => {
     const channel = client.channels.cache.get(triviaChannelId)
     entries.sort((a, b) => b.score - a.score)
@@ -246,6 +253,7 @@ const postTriviaStandings = async (info, entries, questions) => {
     }, 10000)
 }
 
+//END TRIVIA
 const endTrivia = async (info, entries) => {
     const guild = client.guilds.cache.get("842476300022054913")
     const channel = client.channels.cache.get(triviaChannelId)
@@ -282,6 +290,7 @@ const endTrivia = async (info, entries) => {
     }
 }
 
+//RESET TRIVIA
 const resetTrivia = async (info, entries) => {
     const guild = client.guilds.cache.get("842476300022054913")
 

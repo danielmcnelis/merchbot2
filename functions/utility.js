@@ -2,7 +2,7 @@
 //UTILITY FUNCTIONS
 
 // DATABASE IMPORTS
-const { Auction, Binder, Daily, Diary, Inventory, Knowledge, Match, Player, Profile, Reset, Wallet, Wishlist } = require('../db/index.js')
+const { Auction, Binder, Daily, Diary, Info, Inventory, Knowledge, Match, Player, Profile, Reset, Wallet, Wishlist } = require('../db/index.js')
 const { Op } = require('sequelize')
 
 // STATIC IMPORTS
@@ -10,6 +10,15 @@ const { mad, sad, rocks, bronze, silver, gold, platinum, diamond, master, legend
 const { adminRole, ambassadorRole, arenaRole, draftRole, modRole, tourRole } = require('../static/roles.json')
 const merchbotId = '584215266586525696'
 const quotes = require('../static/quotes.json')
+
+//CLEAR STATUS
+const clearStatus = async (element) => {
+    const info = await Info.findOne({ where: { element } })
+    if (!info) return
+    info.status = 'free'
+    console.log(`${element} is now free`)
+    await info.save()
+}
 
 //GET CONFIRMATION
 const getConfirmation = async (channel, pleasantry = true) => {
@@ -65,7 +74,6 @@ const resetPlayer = async (message, player) => {
 		})
 
         if (!count) {
-            console.log(`Creating ${card_code} Inventory for MerchBot.`)
             await Inventory.create({ 
                 card_code: card_code,
                 printId: printId,
@@ -92,7 +100,6 @@ const resetPlayer = async (message, player) => {
                     printId: printId
                 })
             } else {
-                console.log(`Adding ${quantity} ${card_code} to the Auction.`)
                 auction.quantity += quantity
                 await auction.save()
             }
@@ -363,7 +370,6 @@ const capitalize = (str) => {
 
 //GET RANDOM ELEMENT
 const getRandomElement = (arr = []) => {
-    console.log('getRandomElement arr', arr)
     const index = Math.floor((arr.length) * Math.random())
     return arr[index]
 }
@@ -420,6 +426,7 @@ const getDeckCategory = (deckType) => {
 
 module.exports = {
     capitalize,
+    clearStatus,
     convertArrayToObject,
     createPlayer,
     createProfile,

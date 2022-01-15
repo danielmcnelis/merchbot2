@@ -67,8 +67,6 @@ const unfreeze = async () => {
         const print = prints[i]
         const updatedAt = print.updatedAt
         if (!isWithinXHours(9, time, updatedAt)) {
-            console.log('unfreezing print:', print.id)
-            print.frozen = false
             await print.save()
 
             const invs = await Inventory.findAll({ where: {
@@ -387,7 +385,7 @@ const calcBoxPrice = async () => {
          for_sale: true
     } })
 
-	if(!sets.length) return console.log(`No sets are currently being sold for stardust.`)	
+	if(!sets.length) return	
 
     for (let i = 0; i < sets.length; i++) {
         const set = sets[i]

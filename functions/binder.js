@@ -18,7 +18,6 @@ const updateBinder = async (player) => {
         })
         
         if (!count) {
-            console.log(`PURGING`)
             binder[`slot_${i + 1}`] = null
             await binder.save()
         } 

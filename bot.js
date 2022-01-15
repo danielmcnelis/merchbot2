@@ -35,7 +35,7 @@ const { askForDBName, checkChallongePairing, findNextMatch, findNextOpponent, fi
 const { processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
 const { getBuyerConfirmation, getInvoiceMerchBotPurchase, getInvoiceMerchBotSale, getInvoiceP2PSale, getSellerConfirmation, processMerchBotSale, processP2PSale } = require('./functions/transaction.js')
 const { askQuestion, endTrivia, resetTrivia, startTrivia } = require('./functions/trivia.js')
-const { generateRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isDraftPlayer, isJazz, isMod, isTourPlayer, isVowel, isWithinXHours, getArenaVictories, getDeckCategory, getMedal, getRandomElement, getRandomSubset, getRarity, resetPlayer } = require('./functions/utility.js')
+const { clearStatus, generateRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isDraftPlayer, isJazz, isMod, isTourPlayer, isVowel, isWithinXHours, getArenaVictories, getDeckCategory, getMedal, getRandomElement, getRandomSubset, getRarity, resetPlayer } = require('./functions/utility.js')
 
 // STATIC IMPORTS
 const arenas = require('./static/arenas.json')
@@ -175,45 +175,8 @@ if (cmd === `!ping`) return message.channel.send({ content: '🏓'})
 //TEST
 if(cmd === `!test`) {
 	if (isJazz(message.member)) {
-		const x = args[0] || 1000
-		const results = []
-		const rarities = []
-		const commons = await Print.findAll({ where: { set_code: 'DRT', rarity: 'com' }})
-		const rares = await Print.findAll({ where: { set_code: 'DRT', rarity: 'rar' }})
-		const supers = [...await Print.findAll({ where: { set_code: 'DRT', rarity: 'sup' }})].filter((p) => !p.card_code.includes('-SE'))
-		const ultras = await Print.findAll({ where: { set_code: 'DRT', rarity: 'ult' }})
-		const secrets = await Print.findAll({ where: { set_code: 'DRT', rarity: 'scr' }})
-	
-		for (let i = 0; i < 10000; i++) {
-			let best = 1
-			const matrix = new Array(3600)
-			matrix.fill(1, 0, 3463)
-			matrix.fill(2, 3463, 3559)
-			matrix.fill(3, 3559, 3591)
-			matrix.fill(4, 3591, 3599)
-			matrix.fill(5, 3599, 3600)
-	
-			for (let i = 0; i < x; i++) {
-				const sample = getRandomElement(matrix)
-				if (sample > best) best = sample
-			}
-	
-			const rarity = best === 5 ? "secrets" :
-			best === 4 ? "ultras" :
-			best === 3 ? "supers" :
-			best === 2 ? "rares" :
-			"commons"
-	
-			const print = getRandomElement(eval(rarity))
-			rarities.push(rarities)
-			results.push(print.market_price)
-		}
-	
-		console.log(`Results from a trial of 10,000 wagers at ${x}sd:\n${rarities}`)
-	
-		const expected_value = Math.round(results.reduce((a, b) => a + b) / results.length)
-		return message.channel.send({ content: `In 10,000 random trials the average market value of a random DRT ${eval(DRT)} card from a ${x}${stardust} wager was ${expected_value}${stardust}.`})
-	} else {
+		
+		} else {
 		return message.channel.send({ content: '🧪'})
 	}
 }
@@ -4021,8 +3984,6 @@ if (rankcom.includes(cmd)) {
 			if (!playerIds.includes(playerId)) playerIds.push(playerId)
 		}
 
-		console.log('playerIds', playerIds)
-
 		for (let i = 0; i < playerIds.length; i++) {
 			const playerId = playerIds[i]
 			const correct_answers = await Knowledge.count({ where: { playerId: playerId }})
@@ -4032,8 +3993,6 @@ if (rankcom.includes(cmd)) {
 				transformed_knowledges.push([player.name, playerId, correct_answers])
 			} 
 		}
-
-		console.log('transformed_knowledges', transformed_knowledges)
 
 		const filtered_knowledges = transformed_knowledges.filter((p) => memberIds.includes(p[1]))
 		if (x > filtered_knowledges.length) return message.channel.send({ content: `I need a smaller number. We only have ${filtered_knowledges.length} Trivia players.`})
@@ -4130,13 +4089,21 @@ if(joincom.includes(cmd)) {
         const tournament = await selectTournament(message, tournaments, maid)
         if (!tournament && count) return message.channel.send({ content: `Sorry, the tournament already started.`})
         if (!tournament && !count) return message.channel.send({ content: `There is no active tournament.`})
-        const entry = await Entry.findOne({ where: { playerId: maid, tournamentId: tournament.id } })
-		
-        message.channel.send({ content: `Please check your DMs.`})
+         
+        const info = await Info.findOne({ where: { element: 'firefox' }})
+        if (!info || info.status !== 'free') {
+            return message.channel.send(`Another user is submitting their deck. Please wait a bit and try **!join** again.`)
+        } else {
+        info.status = 'occupied'
+            await info.save()
+            message.channel.send({ content: `Please check your DMs.` });
+        }
+        
+		const entry = await Entry.findOne({ where: { playerId: maid, tournamentId: tournament.id } })		
         const dbName = player.duelingBook ? player.duelingBook : await askForDBName(message.member, player)
-        if (!dbName) return
+        if (!dbName) return clearStatus('firefox')
         const deckListUrl = await getDeckList(message.member, player, tournament.name, resubmission = false)
-        if (!deckListUrl) return
+        if (!deckListUrl) return clearStatus('firefox')
         const deckName = await getDeckName(message.member, player)
         const deckType = await getDeckType(player, tournament.name)
         if (!deckType) return
@@ -5865,8 +5832,6 @@ if(specialcom.includes(cmd)) {
 		},
 		order: [['card_slot', 'ASC']]
 	})].filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
-
-	console.log('supers', supers)
 
 	const ultras = [...await Print.findAll({ 
 		where: {

@@ -221,20 +221,16 @@ const removeParticipant = async (message, member, entry, tournament, drop = fals
                 return message.channel.send({ content: `${member.user.username} has been removed from the tournament.`})
             }
         } else if (!success && drop) {
-            console.log(1)
             return message.channel.send({ content: `Hmm... I don't see you in the participants list.`})
         } else if (!success && !drop) {
-            console.log(1)
             return message.channel.send({ content: `I could not find ${member.user.username} in the participants list.`})
         }
 
     } catch (err) {
         console.log(err)
         if (drop) {
-            console.log(2)
             return message.channel.send({ content: `Hmm... I don't see you in the participants list.`})
         } else {
-            console.log(2)
             return message.channel.send({ content: `I could not find ${member.user.username} in the participants list.`})
         }
     }   

@@ -6,7 +6,7 @@ const fs = require('fs')
 const errors = require('../static/errors.json')
 const { soldier } = require('../static/emojis.json')
 const { Op } = require('sequelize')
-const { convertArrayToObject } = require('./utility.js')
+const { clearStatus, convertArrayToObject } = require('./utility.js')
 const { fetchAllForgedCards, getInventorySummary } = require('./search.js')
 const { Auction, Bid, Card, Print, Set, Inventory,  Tournament, Status } = require('../db')
 const decks = require('../static/decks.json')
@@ -78,123 +78,130 @@ const awardStarterDeck = async (playerId, starter) => {
 
 //SAVE YDK
 const saveYDK = async (player, url, tournamentName = 'other') => {
+    let deck_arr = []
     const options = new firefox.Options()
     options.addArguments("-headless")
     const driver = await new Builder().forBrowser('firefox').setFirefoxOptions(options).build()
 
-    try {
-        console.log(`Loading ${player.tag}'s deck at ${url}...`)
-        const get_deck = `
-            deck_arr = ["#created by ...", "#main"]
+    const get_deck = `
+        deck_arr = ["#created by ...", "#main"]
 
-            for (let i = 0; i < deck_filled_arr.length; i++) {
-                if (~~deck_filled_arr[i].data("serial_number") > 0) {
-                    deck_arr.push(deck_filled_arr[i].data("serial_number"))
-                }
+        for (let i = 0; i < deck_filled_arr.length; i++) {
+            if (~~deck_filled_arr[i].data("serial_number") > 0) {
+                deck_arr.push(deck_filled_arr[i].data("serial_number"))
             }
+        }
 
-            deck_arr.push("#extra")
-            for (i = 0; i < extra_filled_arr.length; i++) {
-                if (~~extra_filled_arr[i].data("serial_number") > 0) {
-                    deck_arr.push(extra_filled_arr[i].data("serial_number"))   
-                }
+        deck_arr.push("#extra")
+        for (i = 0; i < extra_filled_arr.length; i++) {
+            if (~~extra_filled_arr[i].data("serial_number") > 0) {
+                deck_arr.push(extra_filled_arr[i].data("serial_number"))   
             }
+        }
 
-            deck_arr.push("!side")
-            for (i = 0; i < side_filled_arr.length; i++) {
-                if (~~side_filled_arr[i].data("serial_number") > 0) {
-                    deck_arr.push(side_filled_arr[i].data("serial_number"))
-                }
+        deck_arr.push("!side")
+        for (i = 0; i < side_filled_arr.length; i++) {
+            if (~~side_filled_arr[i].data("serial_number") > 0) {
+                deck_arr.push(side_filled_arr[i].data("serial_number"))
             }
+        }
 
-            deck_arr.push("")
-            return deck_arr
-        `
+        deck_arr.push("")
+        return deck_arr
+    `
         
-		await driver.get(url)
-		await driver.wait(until.elementLocated(By.id('deck_card1')))
-		const deck_arr = await driver.executeScript(get_deck)
-        const file = deck_arr.join('\n')
-        const cards_arr = deck_arr.filter(el => el.charAt(0) !== '#' && el.charAt(0) !== '!' && el !== '').sort()
-        const cards_obj = convertArrayToObject(cards_arr)    
+    try {      
+        console.log(`Loading ${player.tag}'s deck at ${url}...`)
+        await driver.get(url)
+        console.log('driver got Url')
+        await driver.wait(until.elementLocated(By.id("deck_card1")))
+        console.log('driver found deck_card1')
+        deck_arr = await driver.executeScript(get_deck)
+        console.log('driver executed script')
+    } catch (err) {
+        console.log(err)
+    } finally {
+        await driver.quit()
+        await clearStatus('firefox')
+    }
+        
+    if (!deck_arr.length) return false
+    const file = deck_arr.join('\n')
+    const cards_arr = deck_arr.filter(el => el.charAt(0) !== '#' && el.charAt(0) !== '!' && el !== '').sort()
+    const cards_obj = convertArrayToObject(cards_arr)    
 
-        const forbiddenCardIds = [...await Status.findAll({ where: { current: 'forbidden' }})].map(s => s.konami_code)
-        const limitedCardIds = [...await Status.findAll({ where: { current: 'limited' }})].map(s => s.konami_code)
-        const semiLimitedCardIds = [...await Status.findAll({ where: { current: 'semi-limited' }})].map(s => s.konami_code)
-        const allForgedCards = await fetchAllForgedCards()
-        const cardIds = allForgedCards.map(c => c.konami_code)
-        const { singleIds, doubleIds, tripleIds } = await getInventorySummary(allForgedCards, player.id)
-       
-        const illegalCards = []
-        const phantomCards = []
-        const forbiddenCards = []
-        const limitedCards = []
-        const semiLimitedCards = []
-        const unrecognizedCards = []
+    const forbiddenCardIds = [...await Status.findAll({ where: { current: 'forbidden' }})].map(s => s.konami_code)
+    const limitedCardIds = [...await Status.findAll({ where: { current: 'limited' }})].map(s => s.konami_code)
+    const semiLimitedCardIds = [...await Status.findAll({ where: { current: 'semi-limited' }})].map(s => s.konami_code)
+    const allForgedCards = await fetchAllForgedCards()
+    const cardIds = allForgedCards.map(c => c.konami_code)
+    const { singleIds, doubleIds, tripleIds } = await getInventorySummary(allForgedCards, player.id)
+    
+    const illegalCards = []
+    const phantomCards = []
+    const forbiddenCards = []
+    const limitedCards = []
+    const semiLimitedCards = []
+    const unrecognizedCards = []
 
-        const keys = Object.keys(cards_obj)
-        for (let i = 0; i < keys.length; i++) {
-            let konami_code = keys[i]
-            while (konami_code.length < 8) konami_code = '0' + konami_code 
-            if (!cardIds.includes(konami_code)) {
-                const card = await Card.findOne({ where: { konami_code: konami_code } })
-                if (card) {
-                    illegalCards.push(card.name)
-                } else {
-                    unrecognizedCards.push(konami_code)
-                }
-            } else if (forbiddenCardIds.includes(konami_code)) {
-                const card = await Card.findOne({ where: { konami_code: konami_code } })
-                if (card) forbiddenCards.push(card.name)
-            } else if (limitedCardIds.includes(konami_code) && cards_obj[konami_code] > 1) {
-                const card = await Card.findOne({ where: { konami_code: konami_code } })
-                if (card) limitedCards.push(card.name)
-            } else if (semiLimitedCardIds.includes(konami_code) && cards_obj[konami_code] > 2) {
-                const card = await Card.findOne({ where: { konami_code: konami_code } })
-                if (card) semiLimitedCards.push(card.name)
-            } else if (!tripleIds.includes(konami_code) && cards_obj[konami_code] >= 3) {
-                const card = await Card.findOne({ where: { konami_code: konami_code } })
-                if (card) phantomCards.push(card.name)
-            } else if (!doubleIds.includes(konami_code) && cards_obj[konami_code] >= 2) {
-                const card = await Card.findOne({ where: { konami_code: konami_code } })
-                if (card) phantomCards.push(card.name)
-            } else if (!singleIds.includes(konami_code) && cards_obj[konami_code] >= 1) {
-                const card = await Card.findOne({ where: { konami_code: konami_code } })
-                if (card) phantomCards.push(card.name)
-            } 
-        }
-
-        const tag = player.tag.replace(/[^\w\s]/gi, "_").replace(/ /g,'')
-		fs.writeFile(`./decks/${tournamentName}/${tag}.ydk`, file, (err) => {
-			if(err) {
-				return console.log(err)
-			} else {
-                console.log(`${player.tag}'s deck was saved!`)
+    const keys = Object.keys(cards_obj)
+    for (let i = 0; i < keys.length; i++) {
+        let konami_code = keys[i]
+        while (konami_code.length < 8) konami_code = '0' + konami_code 
+        if (!cardIds.includes(konami_code)) {
+            const card = await Card.findOne({ where: { konami_code: konami_code } })
+            if (card) {
+                illegalCards.push(card.name)
+            } else {
+                unrecognizedCards.push(konami_code)
             }
-		})
+        } else if (forbiddenCardIds.includes(konami_code)) {
+            const card = await Card.findOne({ where: { konami_code: konami_code } })
+            if (card) forbiddenCards.push(card.name)
+        } else if (limitedCardIds.includes(konami_code) && cards_obj[konami_code] > 1) {
+            const card = await Card.findOne({ where: { konami_code: konami_code } })
+            if (card) limitedCards.push(card.name)
+        } else if (semiLimitedCardIds.includes(konami_code) && cards_obj[konami_code] > 2) {
+            const card = await Card.findOne({ where: { konami_code: konami_code } })
+            if (card) semiLimitedCards.push(card.name)
+        } else if (!tripleIds.includes(konami_code) && cards_obj[konami_code] >= 3) {
+            const card = await Card.findOne({ where: { konami_code: konami_code } })
+            if (card) phantomCards.push(card.name)
+        } else if (!doubleIds.includes(konami_code) && cards_obj[konami_code] >= 2) {
+            const card = await Card.findOne({ where: { konami_code: konami_code } })
+            if (card) phantomCards.push(card.name)
+        } else if (!singleIds.includes(konami_code) && cards_obj[konami_code] >= 1) {
+            const card = await Card.findOne({ where: { konami_code: konami_code } })
+            if (card) phantomCards.push(card.name)
+        } 
+    }
 
-        phantomCards.sort()
-        illegalCards.sort()
-        forbiddenCards.sort()
-        limitedCards.sort()
-        semiLimitedCards.sort()
-        unrecognizedCards.sort()
-
-        const issues = {
-            phantomCards,
-            illegalCards,
-            forbiddenCards,
-            limitedCards,
-            semiLimitedCards,
-            unrecognizedCards
+    const tag = player.tag.replace(/[^\w\s]/gi, "_").replace(/ /g,'')
+    fs.writeFile(`./decks/${tournamentName}/${tag}.ydk`, file, (err) => {
+        if(err) {
+            return console.log(err)
+        } else {
+            console.log(`${player.tag}'s deck was saved!`)
         }
+    })
 
-        return issues
-	} catch (err) {
-		console.log(err)
-	} finally {
-		await driver.quit()
-	}
+    phantomCards.sort()
+    illegalCards.sort()
+    forbiddenCards.sort()
+    limitedCards.sort()
+    semiLimitedCards.sort()
+    unrecognizedCards.sort()
+
+    const issues = {
+        phantomCards,
+        illegalCards,
+        forbiddenCards,
+        limitedCards,
+        semiLimitedCards,
+        unrecognizedCards
+    }
+
+    return issues
 }
 
 //SAVE ALL YDKs
@@ -264,10 +271,8 @@ const getDeckType = async (player, tournamentName = 'other') => {
     if (!main) return
     const arr = main.split('\n').filter(el => el.charAt(0) !== '#' && el.charAt(0) !== '!' && el !== '').sort()
     const ydk = convertArrayToObject(arr)
-
     const deckType =  'other'
 
-    console.log(file, ' is ', deckType)
     return deckType
 }
 

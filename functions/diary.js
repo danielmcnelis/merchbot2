@@ -73,8 +73,7 @@ const check6TribesComplete = async (playerId, goal = 1) => {
 
 
 const completeTask = async (channel, playerId, task, milliseconds = 2000) => {
-    if (playerId === merchbotId) return console.log('abort task completion for @MerchBot')
-
+    if (playerId === merchbotId) return
     const count = await Diary.count({
         where: {
             playerId: playerId,

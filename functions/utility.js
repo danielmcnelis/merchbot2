@@ -218,6 +218,17 @@ const deletePlayer = async (message, player) => {
     return message.channel.send({ content: `${name}'s account has been successfully destroyed. All their cards and progress has been wiped.`})
 }
 
+// DELETE INVENTORY
+const deleteInventory = async (message, player) => {
+    const name = player.name
+    const invs = await Inventory.findAll({ where: { playerId: player.id }, order: [["card_code", "ASC"]] })
+    for (let i = 0; i < invs.length; i++) {
+        const inv = invs[i]
+        await inv.destroy()
+    }
+    return message.channel.send({ content: `${name}'s inventory has been destroyed. All their cards have been wiped.`})
+}
+
 //GET RANDOM STRING
 const generateRandomString = (length, chars) => {
     let result = '';
@@ -468,6 +479,7 @@ module.exports = {
     convertArrayToObject,
     createPlayer,
     createProfile,
+    deleteInventory,
     deletePlayer,
     getArenaVictories,
     getConfirmation,

@@ -35,7 +35,7 @@ const { askForDBName, checkChallongePairing, findNextMatch, findNextOpponent, fi
 const { processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
 const { getBuyerConfirmation, getInvoiceMerchBotPurchase, getInvoiceMerchBotSale, getInvoiceP2PSale, getSellerConfirmation, processMerchBotSale, processP2PSale } = require('./functions/transaction.js')
 const { askQuestion, endTrivia, resetTrivia, startTrivia } = require('./functions/trivia.js')
-const { clearStatus, generateRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isDraftPlayer, isJazz, isMod, isTourPlayer, isVowel, isWithinXHours, getArenaVictories, getDeckCategory, getMedal, getRandomElement, getRandomSubset, getRarity, resetPlayer, deletePlayer } = require('./functions/utility.js')
+const { clearStatus, generateRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isDraftPlayer, isJazz, isMod, isTourPlayer, isVowel, isWithinXHours, getArenaVictories, getDeckCategory, getMedal, getRandomElement, getRandomSubset, getRarity, resetPlayer, deletePlayer, deleteInventory } = require('./functions/utility.js')
 
 // STATIC IMPORTS
 const arenas = require('./static/arenas.json')
@@ -192,8 +192,12 @@ if(cmd === `!decay`) {
 
 //FIX
 if(cmd === `!fix`) {
-	if (isJazz(message.member)) {
-		return
+	if (isJazz(message.member)) {		
+		const player = await Player.findOne({ where: { id: maid }})
+		const confirmation = await askForThanosConfirmation(message, player)
+		if (!confirmation) return
+		message.channel.send({ content: `Deleting account. Please wait...`})
+		return deleteInventory(message, player) 
 	} else {
 		return message.channel.send({ content: '🛠️'})
 	}

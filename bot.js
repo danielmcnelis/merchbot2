@@ -4231,7 +4231,7 @@ if (cmd === `!reset`) {
 if (cmd === `!thanos`) {
 	if (!isJazz(message.member)) return message.channel.send({ content: 'You do not have permission to do that.'})
 	const member = message.mentions.members.first()
-	const playerId = member && member.user ? member.user.id : null
+	const playerId = member && member.user ? member.user.id : '210250981080956929'
 	if (!playerId) return message.channel.send({ content: `No player specified.`})
 	const player = await Player.findOne({ where: { id: playerId }})
 	const confirmation = await askForThanosConfirmation(message, player)

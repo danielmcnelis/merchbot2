@@ -31,8 +31,7 @@ const startTrivia = async () => {
     console.log('all_questions.map((q) => q[0]).slice(0, 1000)', all_questions.map((q) => q[0]).slice(0, 1000))
     console.log('all_questions.map((q) => q[0]).slice(1000, 2000)', all_questions.map((q) => q[0]).slice(1000, 2000))
     console.log('all_questions.map((q) => q[0]).slice(2000)', all_questions.map((q) => q[0]).slice(2000))
-    const questions = getRandomSubset(all_questions, 9)
-    questions.unshift((all_questions[1291]))
+    const questions = getRandomSubset(all_questions, 10)
     const info = await Info.findOne({ where: { element: 'trivia' }})
 
     for (let i = 1; i <= 12; i ++) {

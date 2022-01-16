@@ -79,7 +79,7 @@ const awardPack = async (channel, playerId, set, num = 1) => {
     
         const luck = j < packs_from_boxes ? odds[j % set.packs_per_box] : getRandomElement(odds)
         const yourFoil = getRandomElement(eval(luck))
-        const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil]
+        const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil].filter((e) => !!e)
     
         for (let i = 0; i < yourPack.length; i++) {
             const print = await Print.findOne({ where: {

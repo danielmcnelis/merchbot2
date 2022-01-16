@@ -35,7 +35,7 @@ const { askForDBName, checkChallongePairing, findNextMatch, findNextOpponent, fi
 const { processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
 const { getBuyerConfirmation, getInvoiceMerchBotPurchase, getInvoiceMerchBotSale, getInvoiceP2PSale, getSellerConfirmation, processMerchBotSale, processP2PSale } = require('./functions/transaction.js')
 const { askQuestion, endTrivia, resetTrivia, startTrivia } = require('./functions/trivia.js')
-const { clearStatus, generateRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isDraftPlayer, isJazz, isMod, isTourPlayer, isVowel, isWithinXHours, getArenaVictories, getDeckCategory, getMedal, getRandomElement, getRandomSubset, getRarity, resetPlayer } = require('./functions/utility.js')
+const { clearStatus, generateRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isDraftPlayer, isJazz, isMod, isTourPlayer, isVowel, isWithinXHours, getArenaVictories, getDeckCategory, getMedal, getRandomElement, getRandomSubset, getRarity, resetPlayer, deletePlayer } = require('./functions/utility.js')
 
 // STATIC IMPORTS
 const arenas = require('./static/arenas.json')
@@ -4225,6 +4225,17 @@ if (cmd === `!reset`) {
 	
 		return message.channel.send({ content: `${game === 'Trivia' ? 'Trivia' : `The ${game}`} has been reset.`})
 	}
+}
+
+//THANOS
+if (cmd === `!thanos`) {
+	if (!isJazz(message.member)) return message.channel.send({ content: 'You do not have permission to do that.'})
+	const member = message.mentions.members.first()
+	const playerId = member && member.user ? member.user.id : null
+	if (!playerId) return message.channel.send({ content: `No player specified.`})
+	const player = await Player.findOne({ where: { id: maid }})
+	message.channel.send({ content: `Deleting account. Please wait...`})
+	return deletePlayer(message, player) 
 }
 
 //RESUME

@@ -36,7 +36,28 @@ const askForGrindAllConfirmation = async (message, index = 0) => {
         return false
 	})
 }
+askForThanosConfirmation = async (message, player) => {
+	const filter = m => m.author.id === message.author.id
+	message.channel.send({ content: `Are you sure you want to delete ${player.name}'s account?`})
+	return await message.channel.awaitMessages({ filter,
+		max: 1,
+		time: 15000
+	}).then((collected) => {
+        const response = collected.first().content.toLowerCase()
+        if (yescom.includes(response)) {
+            return true
+        } else {
+            message.channel.send({ content: `Not a problem. Have a nice day.`})
+            return false
+        }
+	}).catch((err) => {
+		console.log(err)
+		message.channel.send({ content: `Sorry, time's up.`})
+        return false
+	})
+}
 
 module.exports = {
-    askForGrindAllConfirmation
+    askForGrindAllConfirmation,
+    askForThanosConfirmation
 }

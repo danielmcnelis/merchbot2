@@ -23,7 +23,7 @@ const { awardStarterDeck, getDeckType, getShopDeck } = require('./functions/deck
 const { checkCoreSetComplete, completeTask } = require('./functions/diary.js')
 const { checkDraftProgress, endDraft, resetDraft, sendInventories, createPacks, startDraft, startDraftRound, draftCards } = require('./functions/draft.js')
 //const { uploadDeckFolder } = require('./functions/drive.js')
-const { askForGrindAllConfirmation } = require('./functions/mod.js')
+const { askForGrindAllConfirmation, askForThanosConfirmation } = require('./functions/mod.js')
 const { awardPack } = require('./functions/packs.js')
 const { askForAdjustConfirmation, collectNicknames, getNewMarketPrice, askForSetToPrint, selectPrint, askForRarity } = require('./functions/print.js')
 const { askToChangeProfile, getFavoriteColor, getFavoriteQuote, getFavoriteAuthor, getFavoriteCard, getResetConfirmation } = require('./functions/profile.js')
@@ -4233,7 +4233,9 @@ if (cmd === `!thanos`) {
 	const member = message.mentions.members.first()
 	const playerId = member && member.user ? member.user.id : null
 	if (!playerId) return message.channel.send({ content: `No player specified.`})
-	const player = await Player.findOne({ where: { id: maid }})
+	const player = await Player.findOne({ where: { id: playerId }})
+	const confirmation = await askForThanosConfirmation(message, player)
+	if (!confirmation) return
 	message.channel.send({ content: `Deleting account. Please wait...`})
 	return deletePlayer(message, player) 
 }

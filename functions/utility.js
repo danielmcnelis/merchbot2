@@ -215,7 +215,6 @@ const deletePlayer = async (message, player) => {
     if (wishlist) await wishlist.destroy()
 
     await player.destroy()
-
     return message.channel.send({ content: `${name}'s account has been successfully destroyed. All their cards and progress has been wiped.`})
 }
 

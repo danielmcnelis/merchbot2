@@ -35,7 +35,7 @@ const { askForDBName, checkChallongePairing, findNextMatch, findNextOpponent, fi
 const { processTrade, getTradeSummary, getFinalConfirmation, getInitiatorConfirmation, getReceiverSide, getReceiverConfirmation } = require('./functions/trade.js')
 const { getBuyerConfirmation, getInvoiceMerchBotPurchase, getInvoiceMerchBotSale, getInvoiceP2PSale, getSellerConfirmation, processMerchBotSale, processP2PSale } = require('./functions/transaction.js')
 const { askQuestion, endTrivia, resetTrivia, startTrivia } = require('./functions/trivia.js')
-const { clearStatus, generateRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isDraftPlayer, isJazz, isMod, isTourPlayer, isVowel, isWithinXHours, getArenaVictories, getDeckCategory, getMedal, getRandomElement, getRandomSubset, getRarity, resetPlayer, deletePlayer, deleteInventory } = require('./functions/utility.js')
+const { clearStatus, generateRandomString, isSameDay, hasProfile, capitalize, recalculate, createProfile, createPlayer, isNewUser, isAdmin, isAmbassador, isArenaPlayer, isDraftPlayer, isJazz, isMod, isTourPlayer, isVowel, isWithinXHours, getArenaVictories, getDeckCategory, getMedal, getRandomElement, getRandomSubset, getRarity, resetPlayer } = require('./functions/utility.js')
 
 // STATIC IMPORTS
 const arenas = require('./static/arenas.json')
@@ -45,6 +45,7 @@ const { alchemycom, aliuscom, bindercom, botcom, boxcom, bracketcom, calccom, ch
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
 const { abuser, aight, galaxy, orange, robbed, king, beast, blue, bonk, bronze, cactus, cavebob, checkmark, com, skull, familiar, battery, credits, cultured, diamond, dinosaur, DOC, LPK, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, greenmark, hook, hmmm, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, shrine, spellcaster, DRT, fiend, thunder, zombie, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, downward, upward, sup, tix, tres, ult, vince, wokeaf, yellow, green, waah, wut, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare, draft } = require('./static/emojis.json')
+const jazz = require('./jazz.json')
 const { adminRole, arenaRole, botRole, draftRole, expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')
@@ -193,11 +194,38 @@ if(cmd === `!decay`) {
 //FIX
 if(cmd === `!fix`) {
 	if (isJazz(message.member)) {		
-		const player = await Player.findOne({ where: { id: maid }})
-		const confirmation = await askForThanosConfirmation(message, player)
-		if (!confirmation) return
-		message.channel.send({ content: `Deleting account. Please wait...`})
-		return deleteInventory(message, player) 
+		const playerId = '194147938786738176'
+		for (let i = 0; i < jazz.length; i++) {
+			const el = jazz[i]
+			const card_code = el.slice(0, indexOf(' - '))
+			const quantity = parseInt(el.slice(-1))
+			console.log('card_code - quantity', card_code, '-', quantity)
+			// const print = await Print.findOne({
+			// 	where: {
+			// 		card_code
+			// 	}
+			// })
+
+			// if (!print) {
+			// 	console.log(`NO PRINT for ${card_code}`)
+			// 	continue
+			// } 
+
+			// const inv = await Inventory.create({
+			// 	card_code,
+			// 	quantity,
+			// 	playerId,
+			// 	printId: print.id
+			// })
+
+			// if (!inv) {
+			// 	console.log(`FAILED to CREATE inv: ${card_code} - ${quantity}`)
+			// 	continue
+			// } 
+		}
+
+		return
+		return message.channel.send({ content: `Jazz's inventory was restored.`})
 	} else {
 		return message.channel.send({ content: '🛠️'})
 	}
@@ -4229,19 +4257,6 @@ if (cmd === `!reset`) {
 	
 		return message.channel.send({ content: `${game === 'Trivia' ? 'Trivia' : `The ${game}`} has been reset.`})
 	}
-}
-
-//THANOS
-if (cmd === `!thanos`) {
-	if (!isJazz(message.member)) return message.channel.send({ content: 'You do not have permission to do that.'})
-	const member = message.mentions.members.first()
-	const playerId = member && member.user ? member.user.id : '210250981080956929'
-	if (!playerId) return message.channel.send({ content: `No player specified.`})
-	const player = await Player.findOne({ where: { id: playerId }})
-	const confirmation = await askForThanosConfirmation(message, player)
-	if (!confirmation) return
-	message.channel.send({ content: `Deleting account. Please wait...`})
-	return deletePlayer(message, player) 
 }
 
 //RESUME

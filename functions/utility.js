@@ -180,55 +180,6 @@ const resetPlayer = async (message, player) => {
     return message.channel.send({ content: `Your account has been successfully reset. All your cards and progress have been wiped.`})
 }
 
-// DELETE PLAYER
-const deletePlayer = async (message, player) => {
-    const name = player.name
-    const invs = await Inventory.findAll({ where: { playerId: player.id }, order: [["card_code", "ASC"]] })
-
-    for (let i = 0; i < invs.length; i++) {
-        const inv = invs[i]
-        await inv.destroy()
-    }
-
-    const binder = await Binder.findOne({ where: { playerId: player.id }})
-    if (binder) await binder.destroy()
-
-    const daily = await Daily.findOne({ where: { playerId: player.id }})
-    if (daily) await daily.destroy()
-
-    const diary = await Diary.findOne({ where: { playerId: player.id }})
-    if (diary) await diary.destroy()
-
-    const knowledges = await Knowledge.findAll({ where: { playerId: player.id }})
-    for (let i = 0; i < knowledges.length; i++) {
-        const knowledge = knowledges[i]
-        await knowledge.destroy()
-    }
-
-    const profile = await Profile.findOne({ where: { playerId: player.id }})
-    if (profile) await profile.destroy()
-
-    const wallet = await Wallet.findOne({ where: { playerId: player.id }})
-    if (wallet) await wallet.destroy()
-
-    const wishlist = await Wishlist.findOne({ where: { playerId: player.id }})
-    if (wishlist) await wishlist.destroy()
-
-    await player.destroy()
-    return message.channel.send({ content: `${name}'s account has been successfully destroyed. All their cards and progress has been wiped.`})
-}
-
-// DELETE INVENTORY
-const deleteInventory = async (message, player) => {
-    const name = player.name
-    const invs = await Inventory.findAll({ where: { playerId: player.id }, order: [["card_code", "ASC"]] })
-    for (let i = 0; i < invs.length; i++) {
-        const inv = invs[i]
-        await inv.destroy()
-    }
-    return message.channel.send({ content: `${name}'s inventory has been destroyed. All their cards have been wiped.`})
-}
-
 //GET RANDOM STRING
 const generateRandomString = (length, chars) => {
     let result = '';
@@ -479,8 +430,6 @@ module.exports = {
     convertArrayToObject,
     createPlayer,
     createProfile,
-    deleteInventory,
-    deletePlayer,
     getArenaVictories,
     getConfirmation,
     getDeckCategory,

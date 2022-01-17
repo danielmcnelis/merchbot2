@@ -197,7 +197,7 @@ if(cmd === `!fix`) {
 		const playerId = '194147938786738176'
 		for (let i = 0; i < jazz.length; i++) {
 			const el = jazz[i]
-			const card_code = el.slice(0, indexOf(' - '))
+			const card_code = el.slice(0, el.indexOf(' - '))
 			const quantity = parseInt(el.slice(-1))
 			console.log('card_code - quantity', card_code, '-', quantity)
 			// const print = await Print.findOne({

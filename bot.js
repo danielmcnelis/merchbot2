@@ -199,32 +199,31 @@ if(cmd === `!fix`) {
 			const el = jazz[i]
 			const card_code = el.slice(0, el.indexOf(' - '))
 			const quantity = parseInt(el.slice(-1))
-			console.log('card_code - quantity', card_code, '-', quantity)
-			// const print = await Print.findOne({
-			// 	where: {
-			// 		card_code
-			// 	}
-			// })
+			//console.log('card_code - quantity', card_code, '-', quantity)
+			const print = await Print.findOne({
+				where: {
+					card_code
+				}
+			})
 
-			// if (!print) {
-			// 	console.log(`NO PRINT for ${card_code}`)
-			// 	continue
-			// } 
+			if (!print) {
+				console.log(`NO PRINT for ${card_code}`)
+				continue
+			} 
 
-			// const inv = await Inventory.create({
-			// 	card_code,
-			// 	quantity,
-			// 	playerId,
-			// 	printId: print.id
-			// })
+			const inv = await Inventory.create({
+				card_code,
+				quantity,
+				playerId,
+				printId: print.id
+			})
 
-			// if (!inv) {
-			// 	console.log(`FAILED to CREATE inv: ${card_code} - ${quantity}`)
-			// 	continue
-			// } 
+			if (!inv) {
+				console.log(`FAILED to CREATE inv: ${card_code} - ${quantity}`)
+				continue
+			} 
 		}
 
-		return
 		return message.channel.send({ content: `Jazz's inventory was restored.`})
 	} else {
 		return message.channel.send({ content: '🛠️'})

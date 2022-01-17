@@ -45,7 +45,7 @@ const { alchemycom, aliuscom, bindercom, botcom, boxcom, bracketcom, calccom, ch
 const decks = require('./static/decks.json')
 const diaries = require('./static/diaries.json')
 const { abuser, aight, galaxy, orange, robbed, king, beast, blue, bonk, bronze, cactus, cavebob, checkmark, com, skull, familiar, battery, credits, cultured, diamond, dinosaur, DOC, LPK, egg, emptybox, evil, FiC, fire, fish, forgestone, god, gold, greenmark, hook, hmmm, koolaid, leatherbound, legend, lmfao, lmf3dao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, shrine, spellcaster, DRT, fiend, thunder, zombie, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, downward, upward, sup, tix, tres, ult, vince, wokeaf, yellow, green, waah, wut, yes, ygocard, orb, swords, gem, champion, open, closed, fishstare, draft } = require('./static/emojis.json')
-const jazz = require('./jazz.json')
+const jazz = require('./static/jazz.json')
 const { adminRole, arenaRole, botRole, draftRole, expertRole, fpRole, modRole, muteRole, noviceRole, tourRole, triviaRole } = require('./static/roles.json')
 const { challongeAPIKey } = require('./secrets.json')
 const trivia = require('./trivia.json')

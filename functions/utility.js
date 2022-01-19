@@ -213,15 +213,14 @@ const createProfile = async (playerId, starter) => {
         starter === 'fish' ? 'Rage of the Deep Sea' :
         starter === 'rock' ? 'Guardian Sphinx' :
         null
+        
     const date = new Date()
     const month = `0${date.getMonth() + 1}`
     const day = `0${date.getDate()}`
     const year = `${date.getFullYear()}`
-
     const elem = getRandomElement(quotes)
     const quote = elem.quote
     const author = elem.author
-    
     const colors = ['#f53636', '#fc842d', '#fceb77', '#63d46d', '#3c91e6', '#5c5fab', '#ed1a79', '#eb7cad', '#f0bf3a', '#bccbd6']
     const color = getRandomElement(colors)
 

@@ -4,6 +4,7 @@
 // DATABASE IMPORTS
 const { Auction, Binder, Daily, Diary, Info, Inventory, Knowledge, Match, Player, Profile, Reset, Wallet, Wishlist } = require('../db/index.js')
 const { Op } = require('sequelize')
+const { exec } = require('child_process')
 
 // STATIC IMPORTS
 const { mad, sad, rocks, bronze, silver, gold, platinum, diamond, master, legend, god } = require('../static/emojis.json')
@@ -18,6 +19,20 @@ const clearStatus = async (element) => {
     info.status = 'free'
     console.log(`${element} is now free`)
     await info.save()
+    return true
+}
+
+//KILL FIREFOX
+const killFirefox = async () => {
+    exec('killall firefox', (error, stdout, stderr) => {
+        console.log('stdout: ' + stdout)
+        console.log('stderr: ' + stderr)
+        if (error) {
+            console.log('exec error: ' + error)
+        } else {
+            console.log('killed all firefox processes')
+        }
+    })
 }
 
 //GET CONFIRMATION
@@ -449,6 +464,7 @@ module.exports = {
     isSameDay,
     isVowel,
     isWithinXHours,
+    killFirefox,
     recalculate,
     resetPlayer,
     shuffleArray

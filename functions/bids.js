@@ -21,9 +21,9 @@ const manageBidding = async (message, player, fuzzyPrints) => {
     }
 
     const prompt = `Your bids are as follows:\n${bidSummary.join("\n")}\n\nWhat would you like to do?\n${bidSummary.length >= 3 ? '(1) cancel a bid\n(2) nothing' : '(1) place a bid\n(2) cancel a bid\n(3) nothing'}`
-    const message = await message.author.send({ content: prompt.toString() }).catch((err) => console.log(err))
-    if (!message || !message.channel) return false
-    return await message.channel.awaitMessages({ filter,
+    const msg = await message.author.send({ content: prompt.toString() }).catch((err) => console.log(err))
+    if (!msg || !msg.channel) return false
+    return await msg.channel.awaitMessages({ filter,
         max: 1,
         time: 20000
     }).then((collected) => {

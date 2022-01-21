@@ -111,8 +111,9 @@ const getTriviaConfirmation = async (trivia_entry) => {
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
-	const { channel } = await member.send({ content: `Do you still wish to play Trivia?`})
-	await channel.awaitMessages({ filter,
+	const message = await member.send({ content: `Do you still wish to play Trivia?`}).catch((err) => console.log(err))
+    if (!message || !message.channel) return false
+	await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 60000
 	}).then(async (collected) => {
@@ -146,8 +147,9 @@ const getAnswer = async (entry, question, round) => {
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
-	const { channel } = await member.send({ content: `${megaphone}  ------  Question #${round}  ------  ${dummy}\n${question}`})
-	await channel.awaitMessages({ filter,
+	const message = await member.send({ content: `${megaphone}  ------  Question #${round}  ------  ${dummy}\n${question}`}).catch((err) => console.log(err))
+	if (!message || !message.channel) return false
+    await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 20000
 	}).then(async (collected) => {

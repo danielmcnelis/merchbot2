@@ -22,8 +22,8 @@ const getShopDeck = async (message, tribe = '') => {
     if(tribe.includes('war')) return 'warrior'
     if(tribe.includes('rep')) return 'reptile'
     const filter = m => m.author.id === message.author.id
-	const { channel } = await message.channel.send({ content: `Please select a deck:\n(1) Reptile's Charm\n(2) Warrior's Legend\n(3) Dragon's Inferno\n(4) Spellcaster's Art\n(5) Dinosaur's Power\n(6) Plant's Harmony\n(7) Fish's Ire\n(8) Rock's Foundation`})
-	return await channel.awaitMessages({ filter,
+	message.channel.send({ content: `Please select a deck:\n(1) Reptile's Charm\n(2) Warrior's Legend\n(3) Dragon's Inferno\n(4) Spellcaster's Art\n(5) Dinosaur's Power\n(6) Plant's Harmony\n(7) Fish's Ire\n(8) Rock's Foundation`})
+	return await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 15000
 	}).then((collected) => {
@@ -236,8 +236,9 @@ const saveAllYDK = async () => {
 //CHECK DECK LIST
 const checkDeckList = async (client, message, member, formatName, formatEmoji, formatDate, formatList) => {  
     const filter = m => m.author.id === member.user.id
-    const { channel } = await member.user.send({ content: `Please provide a duelingbook.com/deck link for the ${formatName} Format ${formatEmoji} deck you would like to check for legality.`})
-    await channel.awaitMessages({ 
+    const msg = await member.user.send({ content: `Please provide a duelingbook.com/deck link for the ${formatName} Format ${formatEmoji} deck you would like to check for legality.`}).catch((err) => console.log(err))
+    if (!msg || !msg.channel) return false
+    await msg.channel.awaitMessages({ 
         filter,
         max: 1,
         time: 180000

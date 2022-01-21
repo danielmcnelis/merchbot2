@@ -124,7 +124,7 @@ const selectPrint = async (message, playerId, card_name, private = false, inInv 
     const options = prints.map((print, index) => `(${index + 1}) ${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
 
     const filter = m => m.author.id === playerId
-    channel.send({ content: `Please select a print:\n${options.join('\n')}`})
+    channel.send({ content: `Please select a print:\n${options.join('\n').toString()}`}).catch((err) => console.log(err))
     return await channel.awaitMessages({ filter,
         max: 1,
         time: 15000

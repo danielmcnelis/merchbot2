@@ -105,8 +105,9 @@ const getConfirmation = async (entry, contestant) => {
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
-	const { channel } = await member.send({ content: `Do you still wish to participate in the Draft?`})
-	await channel.awaitMessages({ filter,
+	const message = await member.send({ content: `Do you still wish to participate in the Draft?`}).catch((err) => console.log(err))
+	if (!message || !message.channel) return false
+    await message.channel.awaitMessages({ filter,
 		max: 1,
 		time: 60000
 	}).then(async (collected) => {
@@ -511,8 +512,9 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
         false
 
     const filter = m => m.author.id === playerId
-	const { channel } = await member.send({ content: `Please select a card (${24 - count} seconds):\n${galaxy} - Galaxy Pack ${letter} - ${galaxy}\n${cards.join('\n')}`, files: [attachment] })
-	await channel.awaitMessages({ 
+	const message = await member.send({ content: `Please select a card (${24 - count} seconds):\n${galaxy} - Galaxy Pack ${letter} - ${galaxy}\n${cards.join('\n').toString()}`, files: [attachment] }).catch((err) => console.log(err))
+    if (!message || !message.channel) return false
+	await message.channel.awaitMessages({ 
         filter,
 		max: 1,
 		time: (24 - count) * 1000

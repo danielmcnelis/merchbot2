@@ -16,8 +16,9 @@ const askForDBName = async (member, player, override = false, error = false, att
     const greeting = override ? '' : 'Hi! '
     const prompt = error ? `I think you're getting ahead of yourself. First, I need ${pronoun} DuelingBook name.`
     : `${greeting}This appears to be ${player.name}'s first tournament in our system. Can you please provide ${pronoun} DuelingBook name?`
-	const { channel } = await member.user.send({ content: prompt})
-    return await channel.awaitMessages({ filter,
+	const message = await member.user.send({ content: prompt}).catch((err) => console.log(err))
+    if (!message || !message.channel) return false
+    return await message.channel.awaitMessages({ filter,
 		max: 1,
         time: 30000
     }).then(async (collected) => {
@@ -47,8 +48,9 @@ const askForDBName = async (member, player, override = false, error = false, att
 const getDeckList = async (member, player, tournamentName, override = false) => {            
     const filter = m => m.author.id === member.user.id
     const pronoun = override ? `${player.name}'s` : 'your'
-    const { channel } = await member.user.send({ content: `Please provide a duelingbook.com/deck link for ${pronoun} tournament deck.`});
-    return await channel.awaitMessages({ filter,
+    const message = await member.user.send({ content: `Please provide a duelingbook.com/deck link for ${pronoun} tournament deck.`}).catch((err) => console.log(err));
+    if (!message || !message.channel) return false
+    return await message.channel.awaitMessages({ filter,
         max: 1,
         time: 180000
     }).then(async (collected) => {
@@ -95,8 +97,9 @@ const getDeckList = async (member, player, tournamentName, override = false) => 
 //DIRECT SIGN UP
 const directSignUp = async (message, player, resubmission = false) => {            
     const filter = m => m.author.id === member.user.id
-    const { channel } = await message.author.send({ content: `Please provide a duelingbook.com/deck link for ${player.name}'s tournament deck.`});
-    return await channel.awaitMessages({ filter,
+    const msg = await message.author.send({ content: `Please provide a duelingbook.com/deck link for ${player.name}'s tournament deck.`}).catch((err) => console.log(err));
+    if (!msg || !msg.channel) return false
+    return await msg.channel.awaitMessages({ filter,
         max: 1,
         time: 60000
     }).then((collected) => {
@@ -121,8 +124,9 @@ const directSignUp = async (message, player, resubmission = false) => {
 const getDeckName = async (member, player, override = false) => {
     const pronoun = override ? `${player.name}'s` : 'your'
     const filter = m => m.author.id === member.user.id
-	const { channel } = await member.send({ content: `Please provide the common name for ${pronoun} deck (i.e. Chaos Control, Chaos Turbo, Warrior, etc.).`})
-    return await channel.awaitMessages({ filter,
+	const message = await member.send({ content: `Please provide the common name for ${pronoun} deck (i.e. Chaos Control, Chaos Turbo, Warrior, etc.).`}).catch((err) => console.log(err))
+    if (!message || !message.channel) return false
+    return await message.channel.awaitMessages({ filter,
 		max: 1,
         time: 20000
     }).then((collected) => {

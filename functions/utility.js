@@ -24,13 +24,19 @@ const clearStatus = async (element) => {
 
 //KILL FIREFOX
 const killFirefox = async () => {
-    exec('killall /usr/lib/firefox/firefox', (error, stdout, stderr) => {
-        console.log('stdout: ' + stdout)
-        console.log('stderr: ' + stderr)
-        if (error) {
-            console.log('exec error: ' + error)
+    exec('killall firefox', (err) => {
+        if (err) {
+            console.log('exec error: ' + err)
         } else {
             console.log('killed all firefox processes')
+        }
+    })
+
+    exec('killall /usr/lib/firefox/firefox', (err) => {
+        if (err) {
+            console.log('exec error: ' + err)
+        } else {
+            console.log('killed all firefox processes from /usr/lib/')
         }
     })
 }

@@ -21,8 +21,9 @@ const manageBidding = async (message, player, fuzzyPrints) => {
     }
 
     const prompt = `Your bids are as follows:\n${bidSummary.join("\n")}\n\nWhat would you like to do?\n${bidSummary.length >= 3 ? '(1) cancel a bid\n(2) nothing' : '(1) place a bid\n(2) cancel a bid\n(3) nothing'}`
-    const { channel } = await message.author.send({ content: prompt })
-    return await channel.awaitMessages({ filter,
+    const message = await message.author.send({ content: prompt.toString() }).catch((err) => console.log(err))
+    if (!message || !message.channel) return false
+    return await message.channel.awaitMessages({ filter,
         max: 1,
         time: 20000
     }).then((collected) => {
@@ -42,8 +43,9 @@ const manageBidding = async (message, player, fuzzyPrints) => {
 
 const askForBidPlacement = async (message, player, fuzzyPrints) => {
     const filter = m => m.author.id === message.author.id
-    const { channel } = await message.author.send({ content: `Which card would you like to bid on?`})
-    await channel.awaitMessages({ filter,
+    const msg = await message.author.send({ content: `Which card would you like to bid on?`}).catch((err) => console.log(err))
+    if (!msg || !message.channel) return false
+    await msg.channel.awaitMessages({ filter,
         max: 1,
         time: 45000
     }).then(async (collected) => {
@@ -96,8 +98,9 @@ const askForBidPlacement = async (message, player, fuzzyPrints) => {
 const askForBidAmount = async (message, player, print, card) => {
     const filter = m => m.author.id === message.author.id
     const price = Math.ceil(print.market_price * 1.1)
-    const { channel } = await message.author.send({ content: `The Shop sells ${card} for ${price}${stardust}. How much would you like to bid?`})
-    return await channel.awaitMessages({ filter,
+    const msg = await message.author.send({ content: `The Shop sells ${card} for ${price}${stardust}. How much would you like to bid?`}).catch((err) => console.log(err))
+    if (!msg || !msg.channel) return false
+    return await msg.channel.awaitMessages({ filter,
         max: 1,
         time: 20000
     }).then((collected) => {
@@ -135,8 +138,9 @@ const askForBidCancellation = async (message, player, fuzzyPrints) => {
         bidSummary.push(`(${i+1}) ${eval(auction.print.rarity)}${bid.card_code} - ${auction.print.card_name} - ${bid.amount}${stardust}`)
     }
 
-    const { channel } = await message.author.send({ content: `Which bid would you like to cancel?:\n${bidSummary.join("\n")}?`})
-    await channel.awaitMessages({ 
+    const msg = await message.author.send({ content: `Which bid would you like to cancel?:\n${bidSummary.join("\n").toString()}?`}).catch((err) => console.log(err))
+    if (!msg || !msg.channel) return false
+    await msg.channel.awaitMessages({ 
         filter,
         max: 1,
         time: 20000

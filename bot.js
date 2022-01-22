@@ -199,7 +199,6 @@ if(cmd === `!fix`) {
 			const el = jazz[i]
 			const card_code = el.slice(0, el.indexOf(' - '))
 			const quantity = parseInt(el.slice(-1))
-			//console.log('card_code - quantity', card_code, '-', quantity)
 			const print = await Print.findOne({
 				where: {
 					card_code
@@ -347,7 +346,7 @@ if (cmd === `!import_print_images`) {
 		}})
 
 		if (!card) {
-			console.log(`failure for ${print}`)
+			console.log(`failure for ${print.card_name}`)
 			continue
 		} 
 
@@ -705,7 +704,6 @@ if (aliuscom.includes(cmd)) {
 	for (let i = 0; i < values.length; i++) {
 		const alius = values[i].content.toLowerCase()
 		const old_nick = await Nickname.findOne({ where: { alius } })
-		if (old_nick) console.log('old_nick.card_name', old_nick.card_name)
 	
 		if (old_nick) {
 			message.channel.send({ content: `"${alius}" was previously used for ${old_nick.card_name}.`})
@@ -6193,7 +6191,7 @@ if(boxcom.includes(cmd)) {
 					card_code: yourPack[i]
 				}})
 	
-				if (!print.id) return console.log(`${card} does not exist in the Print database.`)
+				if (!print.id) return console.log(`${yourPack[i]} does not exist in the Print database.`)
 				results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
 	
 				const card = await Card.findOne({ where: {
@@ -6586,8 +6584,6 @@ if(cmd === `!barter`) {
 		price = selected_option[0]
 		print = await Print.findOne({ where: { card_code: selected_option[1] } })
 		if (!print) return message.channel.send({ content: `Could not find card: "${selected_option[1]}".`})
-		console.log('print.id', print.id)
-		console.log('print.card_code', print.card_code)
 	}
 
 	const card = `${eval(print.rarity)}${print.card_code} - ${print.card_name}`

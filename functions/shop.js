@@ -798,7 +798,6 @@ const getExclusions = async (message, rarity, set) => {
 	})
 }
 
-    
 
 // GET EXCLUDED PRINTS
 const getExcludedPrintIds = async (message, rarity, set, exclusions, fuzzyPrints) => {
@@ -821,7 +820,7 @@ const getExcludedPrintIds = async (message, rarity, set, exclusions, fuzzyPrints
             return false
         }
 
-        if (print.setId !== set.id || (rarity !== 'all' && print.rarity !== rarity)) {
+        if ((set && print.setId !== set.id) || (rarity !== 'all' && print.rarity !== rarity)) {
             message.channel.send({ content: `Sorry, "${query}" A.K.A. ${print.card_name} is not a ${rarity === 'all' ? '' : eval(rarity)}${set.code} ${set.emoji === set.alt_emoji ? eval(set.emoji) : eval(set.emoji), eval(set.alt_emoji)} card.`})
             return false
         }

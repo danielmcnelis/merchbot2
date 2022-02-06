@@ -96,27 +96,38 @@ client.on('ready', async () => {
   
 //WELCOME
 client.on('guildMemberAdd', async (member) => {
-	const userId = member.user.id
-    const channel = client.channels.cache.get(welcomeChannelId)
-	const player = await Player.findOne({ where: { id: userId }})
-    if (player && player.muted) member.roles.add(muteRole)
-
-    if (await isNewUser(userId)) {
-        createPlayer(userId, member.user.username, member.user.tag) 
-        return channel.send({ content: `${member} Welcome to the Forged in Chaos ${FiC} Discord server! Go to <#${botSpamChannelId}> and type **!start** to begin playing. ${legend}`})
-    } else {
+	try {
+		const userId = member.user.id
+		const channel = client.channels.cache.get(welcomeChannelId)
 		const player = await Player.findOne({ where: { id: userId }})
-		if (player.stats >= 530) member.roles.add(expertRole)
-		else member.roles.add(noviceRole)
-        return channel.send({ content: `${member} Welcome back to the Forged in Chaos ${FiC} Discord server! We missed you. ${soldier}`})
-    }
+		if (player && player.muted) member.roles.add(muteRole)
+	
+		if (await isNewUser(userId)) {
+			createPlayer(userId, member.user.username, member.user.tag) 
+			return channel.send({ content: `${member} Welcome to the Forged in Chaos ${FiC} Discord server! Go to <#${botSpamChannelId}> and type **!start** to begin playing. ${legend}`})
+		} else {
+			const player = await Player.findOne({ where: { id: userId }})
+			if (player.stats >= 530) member.roles.add(expertRole)
+			else member.roles.add(noviceRole)
+			return channel.send({ content: `${member} Welcome back to the Forged in Chaos ${FiC} Discord server! We missed you. ${soldier}`})
+		}
+	} catch (err) {
+		console.log(err)
+	}
 })
     
 //GOODBYE
-client.on('guildMemberRemove', member => client.channels.cache.get(welcomeChannelId).send({ content: `Oh dear. ${member.user.username} has left the server. ${sad}`}))
+client.on('guildMemberRemove', member => {
+	try {
+		client.channels.cache.get(welcomeChannelId).send({ content: `Oh dear. ${member.user.username} has left the server. ${sad}`})
+	} catch (err) {
+		console.log(err)
+	}
+})
 
 //COMMANDS
 client.on('messageCreate', async (message) => {
+try {
     const mcid = message.channel.id
     if (
 		//no commands in DMs
@@ -6936,4 +6947,6 @@ if (listcom.includes(cmd)) {
 	return message.channel.send({ content: `I messaged you the Forbidden & Limited list. ${FiC}`})
 }
 
-})
+} catch (err) {
+	console.log(err)
+}})

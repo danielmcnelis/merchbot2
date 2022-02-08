@@ -449,22 +449,22 @@ const updateShop = async () => {
     await calcBoxPrice()
     await unfreeze()
     const shopChannel = client.channels.cache.get(shopChannelId)
-    shopChannel.bulkDelete(100)
+    shopChannel.bulkDelete(100).catch((err) => console.log(err))
 
     setTimeout(() => {
-        shopChannel.bulkDelete(100)
+        shopChannel.bulkDelete(100).catch((err) => console.log(err))
     }, 2000)
     
     setTimeout(() => {
-        shopChannel.bulkDelete(100)
+        shopChannel.bulkDelete(100).catch((err) => console.log(err))
     }, 4000)
 
     setTimeout(() => {
-        shopChannel.bulkDelete(100)
+        shopChannel.bulkDelete(100).catch((err) => console.log(err))
     }, 6000)
 
     setTimeout(() => {
-        shopChannel.bulkDelete(100)
+        shopChannel.bulkDelete(100).catch((err) => console.log(err))
     }, 8000)
 
     setTimeout(async () => {
@@ -551,22 +551,22 @@ const postBids = async () => {
     await calcBoxPrice()
     await unfreeze()
     const shopChannel = client.channels.cache.get(shopChannelId)
-    shopChannel.bulkDelete(100)
+    shopChannel.bulkDelete(100).catch((err) => console.log(err))
     
     setTimeout(() => {
-        shopChannel.bulkDelete(100)
+        shopChannel.bulkDelete(100).catch((err) => console.log(err))
     }, 2000)
     
     setTimeout(() => {
-        shopChannel.bulkDelete(100)
+        shopChannel.bulkDelete(100).catch((err) => console.log(err))
     }, 4000)
 
     setTimeout(() => {
-        shopChannel.bulkDelete(100)
+        shopChannel.bulkDelete(100).catch((err) => console.log(err))
     }, 6000)
 
     setTimeout(() => {
-        shopChannel.bulkDelete(100)
+        shopChannel.bulkDelete(100).catch((err) => console.log(err))
     }, 8000)
 
     setTimeout(async () => {

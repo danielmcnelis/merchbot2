@@ -159,15 +159,19 @@ const getArenaConfirmation = async (arena_entry, contestant) => {
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
-	const message = await member.send({ content: `Please confirm your participation in the Arena by selecting a tribe:${tribes.join('\n').toString()}`}).catch((err) => console.log(err))
+	const message = await member.send({ content: `Please confirm your participation in the Arena by selecting a tribe:\n${tribes.join('\n').toString()}`}).catch((err) => console.log(err))
+    console.log('!!message', !!message)
     if (!message || !message.channel) return false
+    console.log('awaitMessages')
 	await message.channel.awaitMessages({ 
         filter,
 		time: 60000
 	}).then(async (collected) => {
         const response = collected.first().content.toLowerCase()
+        console.log('response',  response)
         const tribe = getTribe(response)
-        
+        console.log('tribe',  tribe)
+
         const count = await Info.count({ where: {
             element: 'arena',
             status: 'confirming'

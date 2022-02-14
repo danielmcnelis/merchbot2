@@ -165,12 +165,11 @@ const getArenaConfirmation = async (arena_entry, contestant) => {
     console.log('awaitMessages')
 	await message.channel.awaitMessages({ 
         filter,
+        max: 1,
 		time: 60000
 	}).then(async (collected) => {
         const response = collected.first().content.toLowerCase()
-        console.log('response',  response)
         const tribe = getTribe(response)
-        console.log('tribe',  tribe)
 
         const count = await Info.count({ where: {
             element: 'arena',

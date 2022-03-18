@@ -188,6 +188,7 @@ if (cmd === `!ping`) return message.channel.send({ content: '🏓'})
 //REBOOT
 if (cmd === `!reboot`) {
 	if (!isMod(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
+	message.channel.send({ content: `Resetting bots, please wait a few seconds.`})
 	exec('killall node\ncd ~/code\n./run_bots.sh', (err) => {
 		if (err) {
 			console.log('exec error: ' + err)

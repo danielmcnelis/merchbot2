@@ -21,7 +21,7 @@ const client = new Client({
 
 setTimeout(() => {
     client.login(discordBotToken)
-}, 24000)
+}, 12000)
 
 module.exports = {
     client

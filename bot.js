@@ -5,6 +5,7 @@ const Canvas = require('canvas')
 const Discord = require('discord.js')
 const fs = require('fs')
 const FuzzySet = require('fuzzyset')
+const { exec } = require('child_process')
 
 // USEFUL CONSTANTS
 const fuzzyCards = FuzzySet([], false)
@@ -183,6 +184,18 @@ if (!message.content.startsWith("!") && message.content.includes(`{`) && message
 
 //PING 
 if (cmd === `!ping`) return message.channel.send({ content: '🏓'})
+
+//REBOOT
+if (cmd === `!reboot`) {
+	if (!isMod(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
+	exec('killall node\ncd ~/code\n./run_bots.sh', (err) => {
+		if (err) {
+			console.log('exec error: ' + err)
+		} else {
+			console.log('rebooting bots...')
+		}
+	})
+}
 
 //TEST
 if(cmd === `!test`) {

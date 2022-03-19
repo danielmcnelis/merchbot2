@@ -189,7 +189,7 @@ if (cmd === `!ping`) return message.channel.send({ content: '🏓'})
 if (cmd === `!reboot`) {
 	if (!isAmbassador(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
 	await message.channel.send({ content: `Rebooting RetroBot, GoatBot, EdisonBot, and MerchBot. This should take about 30 seconds.`})
-	return exec('cd ~/code\n./run_bots.sh &')
+	return exec('cd ~/code\n./run_bots.sh')
 }
 
 //TEST

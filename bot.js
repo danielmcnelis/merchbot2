@@ -5,7 +5,7 @@ const Canvas = require('canvas')
 const Discord = require('discord.js')
 const fs = require('fs')
 const FuzzySet = require('fuzzyset')
-const { exec, execFile, execFileSync } = require('child_process')
+const { exec, execFile, execFileSync, spawn } = require('child_process')
 
 // USEFUL CONSTANTS
 const fuzzyCards = FuzzySet([], false)

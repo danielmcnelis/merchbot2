@@ -10,6 +10,7 @@ const { clearStatus, convertArrayToObject } = require('./utility.js')
 const { fetchAllForgedCards, getInventorySummary } = require('./search.js')
 const { Auction, Bid, Card, Print, Set, Inventory,  Tournament, Status } = require('../db')
 const decks = require('../static/decks.json')
+const { exec } = require('child_process')
 
 //GET SHOP DECK
 const getShopDeck = async (message, tribe = '') => {

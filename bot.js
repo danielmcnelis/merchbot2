@@ -193,7 +193,7 @@ if (cmd === `!reboot`) {
 		console.log('clearing firefox')
 		await clearStatus('firefox')
 		console.log('cleared')
-		execFile('~/code/run_bots.sh', (error, stdout, stderr) => {
+		await execFileSync('~/code/run_bots.sh', (error, stdout, stderr) => {
 			if (error) {
 				console.error('stderr', stderr);
 				throw error;

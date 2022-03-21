@@ -19,26 +19,6 @@ const clearStatus = async (element) => {
     info.status = 'free'
     console.log(`${element} is now free`)
     await info.save()
-    return
-}
-
-//KILL FIREFOX
-const killFirefox = async () => {
-    exec('killall firefox', (err) => {
-        if (err) {
-            console.log('exec error: ' + err)
-        } else {
-            console.log('killed all firefox processes')
-        }
-    })
-
-    exec('killall /usr/lib/firefox/firefox', (err) => {
-        if (err) {
-            console.log('exec error: ' + err)
-        } else {
-            console.log('killed all firefox processes from /usr/lib/')
-        }
-    })
 }
 
 //GET CONFIRMATION

@@ -123,7 +123,8 @@ const saveYDK = async (player, url, tournamentName = 'other') => {
         try {
             await driver.quit()
             console.log('driver quit')
-            await killFirefox()
+            exec('killall firefox')
+            exec('killall /usr/lib/firefox/firefox')
             await clearStatus('firefox')
         } catch (err) {
             console.log(err)
@@ -132,7 +133,8 @@ const saveYDK = async (player, url, tournamentName = 'other') => {
         try {
             await driver.quit()
             console.log('driver quit')
-            await killFirefox()
+            exec('killall firefox')
+            exec('killall /usr/lib/firefox/firefox')
             await clearStatus('firefox')
         } catch (err) {
             console.log(err)

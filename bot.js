@@ -5,7 +5,7 @@ const Canvas = require('canvas')
 const Discord = require('discord.js')
 const fs = require('fs')
 const FuzzySet = require('fuzzyset')
-const { exec } = require('child_process')
+const { exec, execFile } = require('child_process')
 
 // USEFUL CONSTANTS
 const fuzzyCards = FuzzySet([], false)
@@ -188,8 +188,13 @@ if (cmd === `!ping`) return message.channel.send({ content: '🏓'})
 //REBOOT
 if (cmd === `!reboot`) {
 	if (!isAmbassador(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
-	await message.channel.send({ content: `Rebooting RetroBot, GoatBot, EdisonBot, and MerchBot. This should take about 30 seconds.`})
-	return exec('cd ~/code\n./run_bots.sh')
+	try {
+		await message.channel.send({ content: `Rebooting RetroBot, GoatBot, EdisonBot, and MerchBot. This should take about 30 seconds.`})
+		await clearStatus('firefox')
+		return execFile('~/code/run_bots.sh')
+	} catch (err) {
+		console.log(err)
+	}
 }
 
 //TEST
@@ -4149,9 +4154,17 @@ if(joincom.includes(cmd)) {
         
 		const entry = await Entry.findOne({ where: { playerId: maid, tournamentId: tournament.id } })		
         const dbName = player.duelingBook ? player.duelingBook : await askForDBName(message.member, player)
-        if (!dbName) return clearStatus('firefox')
+        if (!dbName) try {
+			return clearStatus('firefox')
+		} catch (err) {
+			console.log(err)
+		}
         const deckListUrl = await getDeckList(message.member, player, tournament.name, resubmission = false)
-        if (!deckListUrl) return clearStatus('firefox')
+        if (!deckListUrl) try {
+			return clearStatus('firefox')
+		} catch (err) {
+			console.log(err)
+		}
         const deckName = await getDeckName(message.member, player)
         const deckType = await getDeckType(player, tournament.name)
         if (!deckType) return
@@ -4563,13 +4576,10 @@ if (cmd === '!quit') {
 	if (!isAmbassador(message.member)) return message.channel.send({ content: "You do not have permission to do that.", })
 	
 	try {
-		await killFirefox()
-		const cleared = await clearStatus('firefox')
-		if (cleared) {
-			return message.channel.send({content: `You force quit FireFox. 🦊`})
-		} else {
-			return message.channel.send({ content: `Failed to quit FireFox. 🦊`})
-		}
+		exec('killall firefox')
+		exec('killall /usr/lib/firefox/firefox')
+		await clearStatus('firefox')
+		return message.channel.send({ content: `You force quit FireFox. 🦊`})
 	} catch (err) {
 		console.log(err)
 		return message.channel.send({ content: `Failed to quit FireFox. 🦊`})

@@ -15,11 +15,11 @@ const quotes = require('../static/quotes.json')
 //CLEAR STATUS
 const clearStatus = async (element) => {
     const info = await Info.findOne({ where: { element } })
-    if (!info) return
+    if (!info) throw new Error(`Could not find Info where element = ${element}`)
     info.status = 'free'
     console.log(`${element} is now free`)
     await info.save()
-    return true
+    return
 }
 
 //KILL FIREFOX

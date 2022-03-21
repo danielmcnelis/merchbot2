@@ -120,15 +120,23 @@ const saveYDK = async (player, url, tournamentName = 'other') => {
         console.log('driver executed script')
     } catch (err) {
         console.log(err)
-        await driver.quit()
-        console.log('driver quit')
-        await killFirefox()
-        await clearStatus('firefox')
+        try {
+            await driver.quit()
+            console.log('driver quit')
+            await killFirefox()
+            await clearStatus('firefox')
+        } catch (err) {
+            console.log(err)
+        }
     } finally {
-        await driver.quit()
-        console.log('driver quit')
-        await killFirefox()
-        await clearStatus('firefox')
+        try {
+            await driver.quit()
+            console.log('driver quit')
+            await killFirefox()
+            await clearStatus('firefox')
+        } catch (err) {
+            console.log(err)
+        }
     }
         
     if (!deck_arr.length) return false

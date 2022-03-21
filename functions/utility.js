@@ -450,7 +450,6 @@ module.exports = {
     isSameDay,
     isVowel,
     isWithinXHours,
-    killFirefox,
     recalculate,
     resetPlayer,
     shuffleArray

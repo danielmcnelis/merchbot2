@@ -185,17 +185,17 @@ if (!message.content.startsWith("!") && message.content.includes(`{`) && message
 //PING 
 if (cmd === `!ping`) return message.channel.send({ content: '🏓'})
 
-//REBOOT
-if (cmd === `!reboot`) {
-	if (!isAmbassador(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
-	try {
-		await message.channel.send({ content: `Rebooting RetroBot, GoatBot, EdisonBot, and MerchBot. This should take about 30 seconds.`})
-		await clearStatus('firefox')
-		return spawn('~/code/run_bots.sh', [], {shell: true})
-	} catch (err) {
-		console.log(err)
-	}
-}
+// //REBOOT
+// if (cmd === `!reboot`) {
+// 	if (!isAmbassador(message.member)) return message.channel.send({ content: `You do not have permission to do that.`})
+// 	try {
+// 		await message.channel.send({ content: `Rebooting RetroBot, GoatBot, EdisonBot, and MerchBot. This should take about 30 seconds.`})
+// 		await clearStatus('firefox')
+// 		return spawn('~/code/run_bots.sh', [], {shell: true})
+// 	} catch (err) {
+// 		console.log(err)
+// 	}
+// }
 
 //TEST
 if(cmd === `!test`) {

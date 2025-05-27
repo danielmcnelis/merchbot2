@@ -1,152 +1,142 @@
 
+
+// const Canvas = require('canvas')
+import { createRequire } from "module";
+const require = createRequire(import.meta.url)
 const Canvas = require('canvas')
-const Discord = require('discord.js')
-const fs = require('fs')
-const { Op } = require('sequelize')
-const { Auction, Bid, Card, Print, Set, Inventory } = require('../db')
-const { getRandomElement, getRandomSubset } = require('./utility.js')
-const { botSpamChannelId } = require('../static/channels.json')
-const { client } = require('../static/clients.js')
+
+import {AttachmentBuilder} from 'discord.js'
+import fs from 'fs'
+import { Op } from 'sequelize'
+import { Auction, Bid, Card, ForgedPrint, ForgedSet, ForgedInventory, Player } from '../database/index.js'
+import { getRandomElement, getRandomSubset } from './utility.js'
+import channels from '../static/channels.json' with { type: 'json' }
+const { botSpamChannelId } = channels
+import { client } from '../static/clients.js'
 const merchbotId = '584215266586525696'
-const { beast, blue, bronze, cactus, cavebob, DRT, fiend, skull, familiar, battery, thunder, zombie, checkmark, com, credits, cultured, diamond, dinosaur, DOC, LPK, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
+import emojis from '../static/emojis.json' with { type: 'json' }
+const { AOD, beast, blue, bronze, cactus, cavebob, DRT, fiend, skull, familiar, battery, thunder, zombie, checkmark, com, credits, cultured, diamond, dinosaur, DOC, LPK, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, dimmadome, sup, tix, ult, wokefrog, yellow, yes, ygocard } = emojis
 
-const awardPack = async (channel, playerId, set, num = 1) => {
-	const member = channel.guild.members.cache.get(playerId)
+// AWARD PACKS
+export const awardPacks = async (interaction, member, set, num = 1) => {
+    const player = await Player.findByDiscordId(member.user.id)
+	
+    const commons = [...await ForgedPrint.findAll({ 
+        where: {
+            forgedSetId: set.id,
+            rarity: "com"
+        },
+        order: [['cardSlot', 'ASC']]
+    })].map((p) => p.cardCode)
 
-    if (!set) set = await Set.findOne({ where: { code: 'DRT' } })
-    if (!set) return channel.send({ content: `Could not find set.`})
+    const rares = [...await ForgedPrint.findAll({ 
+        where: {
+            forgedSetId: set.id,
+            rarity: "rar"
+        },
+        order: [['cardSlot', 'ASC']]
+    })].map((p) => p.cardCode)
 
-	const commons = [...await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "com"
-		},
-		order: [['card_slot', 'ASC']]
-	})].map((p) => p.card_code)
+    const supers = [...await ForgedPrint.findAll({ 
+        where: {
+            forgedSetId: set.id,
+            rarity: "sup"
+        },
+        order: [['cardSlot', 'ASC']]
+    })].filter((p) => !p.cardCode.includes('-SE')).map((p) => p.cardCode)
 
-	const rares = [...await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "rar"
-		},
-		order: [['card_slot', 'ASC']]
-	})].map((p) => p.card_code)
+    const ultras = [...await ForgedPrint.findAll({ 
+        where: {
+            forgedSetId: set.id,
+            rarity: "ult"
+        },
+        order: [['cardSlot', 'ASC']]
+    })].map((p) => p.cardCode)
 
-	const supers = [...await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "sup"
-		},
-		order: [['card_slot', 'ASC']]
-	})].filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
-
-	const ultras = [...await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "ult"
-		},
-		order: [['card_slot', 'ASC']]
-	})].map((p) => p.card_code)
-
-	const secrets = [...await Print.findAll({ 
-		where: {
-			setId: set.id,
-			rarity: "scr"
-		},
-		order: [['card_slot', 'ASC']]
-	})].map((p) => p.card_code)
-
-    let gotSecret = false
-
-    const boxes = Math.floor(num / set.packs_per_box)
-    const packs_from_boxes = boxes * set.packs_per_box
+    const secrets = [...await ForgedPrint.findAll({ 
+        where: {
+            forgedSetId: set.id,
+            rarity: "scr"
+        },
+        order: [['cardSlot', 'ASC']]
+    })].map((p) => p.cardCode)
 
     for (let j = 0; j < num; j++) {
-        const images = []
-        const results = [`${eval(set.emoji)} - ${set.name} Pack${num > 1 ? ` ${j + 1}` : ''} - ${eval(set.alt_emoji)}`]
-        const yourCommons = set.commons_per_pack > 1 ? getRandomSubset(commons, set.commons_per_pack) : set.commons_per_pack === 1 ? [getRandomElement(commons)] : []
-        const yourRares = set.rares_per_pack > 1 ? getRandomSubset(rares, set.rares_per_pack) : set.rares_per_pack === 1 ? [getRandomElement(rares)] : []
-        const yourSupers = set.supers_per_pack > 1 ? getRandomSubset(supers, set.supers_per_pack) : set.supers_per_pack === 1 ? [getRandomElement(supers)] : []
-        const yourUltras = set.ultras_per_pack > 1 ? getRandomSubset(ultras, set.ultras_per_pack) : set.ultras_per_pack === 1 ? [getRandomElement(ultras)] : []
-        const yourSecrets = set.secrets_per_pack > 1 ? getRandomSubset(secrets, set.secrets_per_pack) : set.secrets_per_pack === 1 ? [getRandomElement(secrets)] :  []
+        try {
+            const results = [`\n${eval(set.emoji)} - ${set.name} Pack${num > 1 ? ` ${j + 1}` : ''} - ${eval(set.altEmoji)}`]
+            const yourCommons = set.commonsPerPack > 1 ? getRandomSubset(commons, set.commonsPerPack) : set.commonsPerPack === 1 ? [getRandomElement(commons)] : []
+            const yourRares = set.raresPerPack > 1 ? getRandomSubset(rares, set.raresPerPack) : set.raresPerPack === 1 ? [getRandomElement(rares)] : []
+            const yourSupers = set.supersPerPack > 1 ? getRandomSubset(supers, set.supersPerPack) : set.supersPerPack === 1 ? [getRandomElement(supers)] : []
+            const yourUltras = set.ultrasPerPack > 1 ? getRandomSubset(ultras, set.ultrasPerPack) : set.ultrasPerPack === 1 ? [getRandomElement(ultras)] : []
+            const yourSecrets = set.secretsPerPack > 1 ? getRandomSubset(secrets, set.secretsPerPack) : set.secretsPerPack === 1 ? [getRandomElement(secrets)] :  []
     
-        const odds = []
-        if (!yourCommons.length) for (let i = 0; i < set.commons_per_box; i++) odds.push("commons")
-        if (!yourRares.length) for (let i = 0; i < set.rares_per_box; i++) odds.push("rares")
-        if (!yourSupers.length) for (let i = 0; i < set.supers_per_box; i++) odds.push("supers")
-        if (!yourUltras.length) for (let i = 0; i < set.ultras_per_box; i++) odds.push("ultras")
-        if (!yourSecrets.length) for (let i = 0; i < set.secrets_per_box; i++) odds.push("secrets")
+            const odds = []
+            if (!yourCommons.length) for (let i = 0; i < set.commonsPerBox; i++) odds.push("commons")
+            if (!yourRares.length) for (let i = 0; i < set.raresPerBox; i++) odds.push("rares")
+            if (!yourSupers.length) for (let i = 0; i < set.supersPerBox; i++) odds.push("supers")
+            if (!yourUltras.length) for (let i = 0; i < set.ultrasPerBox; i++) odds.push("ultras")
+            if (!yourSecrets.length) for (let i = 0; i < set.secretsPerBox; i++) odds.push("secrets")
     
-        const luck = j < packs_from_boxes ? odds[j % set.packs_per_box] : getRandomElement(odds)
-        const yourFoil = getRandomElement(eval(luck))
-        const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil].filter((e) => !!e)
-    
-        for (let i = 0; i < yourPack.length; i++) {
-            const print = await Print.findOne({ where: {
-                card_code: yourPack[i]
-            }})
-    
-            if (!print.id) return message.channel.send({ content: `${card} does not exist in the Print database.`})
-            results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
-    
-            const card = await Card.findOne({ where: {
-                name: print.card_name
-            }})
-    
-            images.push(`${card.image_file}`)
-
-            const inv = await Inventory.findOne({ where: { 
-                card_code: print.card_code,
-                printId: print.id,
-                playerId: playerId
-            }})
-    
-            if (inv) {
-                inv.quantity++
-                await inv.save()
-            } else {
-                await Inventory.create({ 
-                    card_code: print.card_code,
-                    quantity: 1,
-                    printId: print.id,
-                    playerId: playerId
-                })
-
-                if (print.rarity === 'scr') gotSecret = true
+            const luck = getRandomElement(odds)
+            const yourFoil = getRandomElement(eval(luck))
+            const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil].filter((e) => !!e)
+            
+            let yourCardArtworkIds = []
+            for (let j = 0; j < yourPack.length; j++) {
+                const cardCode = yourPack[j]
+                const print = await ForgedPrint.findOne({ where: { cardCode }})
+                const card = await Card.findOne({ where: { name: print.cardName }})
+                yourCardArtworkIds.push(card.artworkId)
             }
+    
+            for (let i = 0; i < yourPack.length; i++) {
+                const print = await ForgedPrint.findOne({ where: {
+                    cardCode: yourPack[i]
+                }})
+    
+                results.push(`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`)
+            
+                const inv = await ForgedInventory.findOne({ where: { 
+                    cardCode: print.cardCode,
+                    forgedPrintId: print.id,
+                    playerId: player.id
+                }})
+    
+                if (inv) {
+                    inv.quantity++
+                    await inv.save()
+                } else {
+                    await ForgedInventory.create({ 
+                        cardName: print.cardName,
+                        cardCode: print.cardCode,
+                        quantity: 1,
+                        forgedPrintId: print.id,
+                        playerName: player.name,
+                        playerId: player.id
+                    })
+                }
+            }
+    
+            const attachment = await drawPack(yourCardArtworkIds) || []
+            member.send({ content: `${results.join('\n').toString()}`, files: [attachment] }).catch((err) => console.log(err))
+        } catch (err) {
+            console.log(err)
         }
-
-        const card_width = 57
-        const canvas = Canvas.createCanvas(card_width * set.cards_per_pack, 80)
-        const context = canvas.getContext('2d')
-
-        for (let i = 0; i < set.cards_per_pack; i++) {
-            const card = fs.existsSync(`./public/card_images/${images[i]}`) ? 
-            await Canvas.loadImage(`./public/card_images/${images[i]}`) :
-            await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[i]}`)
-            if (canvas && context && card) context.drawImage(card, card_width * i, 0, card_width, canvas.height)
-        }
-
-        const attachment = canvas && context ?
-            new Discord.MessageAttachment(canvas.toBuffer(), `pack_${j+1}.png`) :
-            false
-
-        member.send({ content: results.join('\n').toString(), files: [attachment]})
     }
 
-    channel.send({ content: `<@${playerId}> was awarded ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'}. Congratulations!`})
-    return gotSecret
+    return interaction.channel.send({ content: `<@${member.user.id}> was awarded ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'}. Congratulations!`})
 }
 
-const awardPacksToShop = async (num, core = true) => {
+export const awardPacksToShop = async (num, core = true) => {
+    num = 48
 	const botSpamChannel = client.channels.cache.get(botSpamChannelId)
     if (!botSpamChannel) return console.log('Could not find #bot-spam channel.')
 
     const sets = core ? 
-        await Set.findAll({ where: {
+        await ForgedSet.findAll({ where: {
             type: 'core'
         }, order: [["createdAt", "DESC"]]}) :
-        await Set.findAll({ where: {
+        await ForgedSet.findAll({ where: {
             type: 'mini'
         }, order: [["createdAt", "DESC"]]})
                 
@@ -157,87 +147,85 @@ const awardPacksToShop = async (num, core = true) => {
     for (let i = 0; i < 2; i++) {
         const set = i === 0 ? set_1 : set_2
         if (!set) continue
-        const commons = [...await Print.findAll({ 
+        const commons = [...await ForgedPrint.findAll({ 
             where: {
-                setId: set.id,
+                forgedSetId: set.id,
                 rarity: "com"
             },
-            order: [['card_slot', 'ASC']]
-        })].map((p) => p.card_code)
+            order: [['cardSlot', 'ASC']]
+        })].map((p) => p.cardCode)
     
-        const rares = [...await Print.findAll({ 
+        const rares = [...await ForgedPrint.findAll({ 
             where: {
-                setId: set.id,
+                forgedSetId: set.id,
                 rarity: "rar"
             },
-            order: [['card_slot', 'ASC']]
-        })].map((p) => p.card_code)
+            order: [['cardSlot', 'ASC']]
+        })].map((p) => p.cardCode)
     
-        const supers = [...await Print.findAll({ 
+        const supers = [...await ForgedPrint.findAll({ 
             where: {
-                setId: set.id,
+                forgedSetId: set.id,
                 rarity: "sup"
             },
-            order: [['card_slot', 'ASC']]
-        })].filter((p) => !p.card_code.includes('-SE')).map((p) => p.card_code)
+            order: [['cardSlot', 'ASC']]
+        })].filter((p) => !p.cardCode.includes('-SE')).map((p) => p.cardCode)
         
-        const ultras = [...await Print.findAll({ 
+        const ultras = [...await ForgedPrint.findAll({ 
             where: {
-                setId: set.id,
+                forgedSetId: set.id,
                 rarity: "ult"
             },
-            order: [['card_slot', 'ASC']]
-        })].map((p) => p.card_code)
+            order: [['cardSlot', 'ASC']]
+        })].map((p) => p.cardCode)
     
-        const secrets = [...await Print.findAll({ 
+        const secrets = [...await ForgedPrint.findAll({ 
             where: {
-                setId: set.id,
+                forgedSetId: set.id,
                 rarity: "scr"
             },
-            order: [['card_slot', 'ASC']]
-        })].map((p) => p.card_code)
+            order: [['cardSlot', 'ASC']]
+        })].map((p) => p.cardCode)
     
         const results = []
-        const boxes = Math.floor(num / set.packs_per_box)
-        const packs_from_boxes = boxes * set.packs_per_box
+        const boxes = Math.floor(num / set.packsPerBox)
+        const packs_fromBoxes = boxes * set.packsPerBox
     
         for (let j = 0; j < num; j++) {
-            const yourCommons = set.commons_per_pack > 1 ? getRandomSubset(commons, set.commons_per_pack) : set.commons_per_pack === 1 ? [getRandomElement(commons)] : []
-            const yourRares = set.rares_per_pack > 1 ? getRandomSubset(rares, set.rares_per_pack) : set.rares_per_pack === 1 ? [getRandomElement(rares)] : []
-            const yourSupers = set.supers_per_pack > 1 ? getRandomSubset(supers, set.supers_per_pack) : set.supers_per_pack === 1 ? [getRandomElement(supers)] : []
-            const yourUltras = set.ultras_per_pack > 1 ? getRandomSubset(ultras, set.ultras_per_pack) : set.ultras_per_pack === 1 ? [getRandomElement(ultras)] : []
-            const yourSecrets = set.secrets_per_pack > 1 ? getRandomSubset(secrets, set.secrets_per_pack) : set.secrets_per_pack === 1 ? [getRandomElement(secrets)] :  []
+            const yourCommons = set.commonsPerPack > 1 ? getRandomSubset(commons, set.commonsPerPack) : set.commonsPerPack === 1 ? [getRandomElement(commons)] : []
+            const yourRares = set.raresPerPack > 1 ? getRandomSubset(rares, set.raresPerPack) : set.raresPerPack === 1 ? [getRandomElement(rares)] : []
+            const yourSupers = set.supersPerPack > 1 ? getRandomSubset(supers, set.supersPerPack) : set.supersPerPack === 1 ? [getRandomElement(supers)] : []
+            const yourUltras = set.ultrasPerPack > 1 ? getRandomSubset(ultras, set.ultrasPerPack) : set.ultrasPerPack === 1 ? [getRandomElement(ultras)] : []
+            const yourSecrets = set.secretsPerPack > 1 ? getRandomSubset(secrets, set.secretsPerPack) : set.secretsPerPack === 1 ? [getRandomElement(secrets)] :  []
         
             const odds = []
-            if (!yourCommons.length) for (let i = 0; i < set.commons_per_box; i++) odds.push("commons")
-            if (!yourRares.length) for (let i = 0; i < set.rares_per_box; i++) odds.push("rares")
-            if (!yourSupers.length) for (let i = 0; i < set.supers_per_box; i++) odds.push("supers")
-            if (!yourUltras.length) for (let i = 0; i < set.ultras_per_box; i++) odds.push("ultras")
-            if (!yourSecrets.length) for (let i = 0; i < set.secrets_per_box; i++) odds.push("secrets")
+            if (!yourCommons.length) for (let i = 0; i < set.commonsPerBox; i++) odds.push("commons")
+            if (!yourRares.length) for (let i = 0; i < set.raresPerBox; i++) odds.push("rares")
+            if (!yourSupers.length) for (let i = 0; i < set.supersPerBox; i++) odds.push("supers")
+            if (!yourUltras.length) for (let i = 0; i < set.ultrasPerBox; i++) odds.push("ultras")
+            if (!yourSecrets.length) for (let i = 0; i < set.secretsPerBox; i++) odds.push("secrets")
         
-            const luck = j < packs_from_boxes ? odds[j % set.packs_per_box] : getRandomElement(odds)
+            const luck = j < packs_fromBoxes ? odds[j % set.packsPerBox] : getRandomElement(odds)
             const yourFoil = getRandomElement(eval(luck))
         
             const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil].filter((e) => !!e)
         
-            results.push(`\n${eval(set.emoji)} - ${set.name} Pack${num > 0 ? ` ${j + 1}` : ''} - ${eval(set.alt_emoji)}`)
+            results.push(`\n${eval(set.emoji)} - ${set.name} Pack${num > 0 ? ` ${j + 1}` : ''} - ${eval(set.altEmoji)}`)
         
             for (let i = 0; i < yourPack.length; i++) {
-                const print = await Print.findOne({ where: {
-                    card_code: yourPack[i]
+                const print = await ForgedPrint.findOne({ where: {
+                    cardCode: yourPack[i]
                 }})
         
-                if (!print.id) return botSpamChannel.send({ content: `${card} does not exist in the Print database.`})
-                results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name}`)
+                results.push(`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`)
         
-                const inv = await Inventory.findOne({ where: { 
-                    card_code: print.card_code,
-                    printId: print.id,
-                    playerId: merchbotId
+                const inv = await ForgedInventory.findOne({ where: { 
+                    forgedPrintId: print.id,
+                    playerId: 'ZXyLL1wTcEZXSZYtegEuTr'
                 }})
         
                 const auction = await Auction.findOne({ where: { 
-                    card_code: print.card_code
+                    cardCode: print.cardCode
                 }})
     
                 if (auction) {
@@ -247,20 +235,24 @@ const awardPacksToShop = async (num, core = true) => {
     
                 if (!inv || inv.quantity === 0) {
                     await Auction.create({
-                        card_code: print.card_code,
-                        printId: print.id
+                        cardCode: print.cardCode,
+                        cardName: print.cardName,
+                        forgedPrintId: print.id,
+                        quantity: 1
                     })
-                } 
+                }
     
                 if (inv) {
                     inv.quantity++
                     await inv.save()
                 } else {
-                    await Inventory.create({ 
-                        card_code: print.card_code,
+                    await ForgedInventory.create({ 
+                        cardCode: print.cardCode,
+                        cardName: print.cardName,
                         quantity: 1,
-                        printId: print.id,
-                        playerId: merchbotId
+                        forgedPrintId: print.id,
+                        playerName: 'MerchBot',
+                        playerId: 'ZXyLL1wTcEZXSZYtegEuTr'
                     })
                 }
             }
@@ -282,7 +274,50 @@ const awardPacksToShop = async (num, core = true) => {
     return true
 }
 
-module.exports = {
-    awardPack,
-    awardPacksToShop
+// MAKE CANVAS ATTACHMENT
+export const makeCanvasAttachment = async (artworkIds = [], width = 57, height = 80, cardsPerRow = 10) => {
+    try {
+        const rows = Math.ceil(artworkIds.length / cardsPerRow)
+        const canvas = Canvas.createCanvas(width * cardsPerRow, height * rows)
+        const context = canvas.getContext('2d')
+
+        for (let i = 0; i < artworkIds.length; i++) {
+            try {
+                const artworkId = artworkIds[i]
+                const row = Math.floor(i / cardsPerRow)
+                const col = i % cardsPerRow
+                const image = await Canvas.loadImage(`https://cdn.formatlibrary.com/images/cards/${artworkId}.jpg`)
+                context.drawImage(image, width * col, row * height, width, height)
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: `pack.png` })
+        return attachment
+    } catch (err) {
+        console.log(err)
+        return null
+    }
+}
+
+// DRAW PACK
+export const drawPack = async (artworkIds = []) => {
+    const packAttachment = await makeCanvasAttachment(artworkIds, 57, 80, 9)
+    return packAttachment
+}
+
+// DRAW CARD IMAGE
+export const drawCardImage = async (cardId) => {
+    try {
+        const canvas = Canvas.createCanvas(105, 158)
+        const context = canvas.getContext('2d')
+        const card = await Card.findOne({ where: { id: cardId }})
+        const image = await Canvas.loadImage(`https://cdn.formatlibrary.com/images/cards/${card.artworkId}.jpg`)
+        context.drawImage(image, 0, 0, 105, 158)
+        const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: `${card.name}` })
+        return attachment
+    } catch (err) {
+        console.log(err)
+    }
 }

@@ -1,8 +1,8 @@
 
-const { Arena, Diary, Info, Player, Profile, Wallet, Match } = require('../db')
-const { Op } = require('sequelize')
+const { Arena, Diary, Info, Player, Profile, Wallet, Match } = require('../database/index.js')
+import { Op } from 'sequelize'
 const { yescom, nocom } = require('../static/commands.json')
-const { DRT, fiend, thunder, zombie, king, shrine, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, skull, familiar, battery, com, credits, cultured, diamond, dinosaur, DOC, LPK, dragon, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, spellcaster, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
+const { DRT, fiend, thunder, zombie, king, shrine, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, skull, familiar, battery, com, credits, cultured, diamond, dinosaur, DOC, LPK, dragon, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, spellcaster, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, dimmadome, sup, tix, ult, wokefrog, yellow, yes, ygocard } = require('../static/emojis.json')
 const { arenaRole } = require('../static/roles.json')
 const { arenaChannelId } = require('../static/channels.json')
 const { client } = require('../static/clients.js')
@@ -27,7 +27,7 @@ const tribes = [
 ]
 
 //GET ARENA SAMPLE DECK
-const getArenaSample = async (message, query) => {
+export const getArenaSample = async (message, query) => {
     const directTribe = getTribe(query)
     if (directTribe) return directTribe
 
@@ -48,7 +48,7 @@ const getArenaSample = async (message, query) => {
 }
 
 // GET TRIBE
-const getTribe = (query = '') => {
+export const getTribe = (query = '') => {
     const tribe = query.includes('thun') || query.includes('10') ? 'thunder' :
         query.includes('war') || query.includes('11') ? 'warrior' :
         query.includes('zom') || query.includes('12') ? 'zombie' :
@@ -67,7 +67,7 @@ const getTribe = (query = '') => {
 }
 
 //START ARENA
-const startArena = async() => {
+export const startArena = async() => {
     const channel = client.channels.cache.get(arenaChannelId)
     channel.send({ content: `Arena players, please check your DMs!`})
     const entries = await Arena.findAll({ include: Player })
@@ -152,7 +152,7 @@ const startArena = async() => {
 }
 
 //GET ARENA CONFIRMATION
-const getArenaConfirmation = async (arena_entry, contestant) => {
+export const getArenaConfirmation = async (arena_entry, contestant) => {
     const arenaChannel = client.channels.cache.get(arenaChannelId)
     const guild = client.guilds.cache.get("842476300022054913")
     const playerId = arena_entry.playerId
@@ -196,7 +196,7 @@ const getArenaConfirmation = async (arena_entry, contestant) => {
 }
 
 //ASSIGN ARENA ROLES
-const assignArenaRoles = (entries) => {
+export const assignArenaRoles = (entries) => {
     const guild = client.guilds.cache.get("842476300022054913")
     entries.forEach((entry) => {
         const member = guild.members.cache.get(entry.playerId)
@@ -205,7 +205,7 @@ const assignArenaRoles = (entries) => {
 }
 
 //START ROUND
-const startRound = async (info, entries) => {
+export const startRound = async (info, entries) => {
     const channel = client.channels.cache.get(arenaChannelId)
     const guild = client.guilds.cache.get("842476300022054913")
 
@@ -340,7 +340,7 @@ const startRound = async (info, entries) => {
 }
 
 //FORFEIT
-const forfeit = async (winnerId, loserId) => {
+export const forfeit = async (winnerId, loserId) => {
         const channel = client.channels.cache.get(arenaChannelId)
         const info = await Info.findOne({ where: { element: 'arena' } })
 		if (!info) return channel.send({ content: `Error: could not find game: "arena".`})
@@ -364,7 +364,7 @@ const forfeit = async (winnerId, loserId) => {
 }
 
 //DOUBLE FORFEIT
-const doubleForfeit = async (player1Id, player2Id) => {
+export const doubleForfeit = async (player1Id, player2Id) => {
     const channel = client.channels.cache.get(arenaChannelId)
     const info = await Info.findOne({ where: { element: 'arena' } })
     if (!info) return channel.send({ content: `Error: could not find game: "arena".`})
@@ -384,7 +384,7 @@ const doubleForfeit = async (player1Id, player2Id) => {
 }
 
 //POST STANDINGS
-const postStandings = async (info, entries) => {
+export const postStandings = async (info, entries) => {
     const channel = client.channels.cache.get(arenaChannelId)
 
     for (let i = 0; i < entries.length; i++) {
@@ -409,7 +409,7 @@ const postStandings = async (info, entries) => {
 }
 
 //END ARENA
-const endArena = async (info, entries) => {
+export const endArena = async (info, entries) => {
     info.status = 'pending'
     info.round = null
     await info.save()
@@ -424,7 +424,7 @@ const endArena = async (info, entries) => {
 }
 
 //RESET ARENA
-const resetArena = async (info, entries) => {
+export const resetArena = async (info, entries) => {
     info.status = 'pending'
     info.round = null
     await info.save()
@@ -442,7 +442,7 @@ const resetArena = async (info, entries) => {
 }
 
 //CHECK ARENA PROGRESS
-const checkArenaProgress = async (info) => {
+export const checkArenaProgress = async (info) => {
     const entries = await Arena.findAll({ include: Player, order: [["score", "DESC"]]})
     if (!entries) return channel.send({ content: `Critical error. Missing entries in the database.`}) 
 
@@ -457,13 +457,4 @@ const checkArenaProgress = async (info) => {
     const sum = scores.reduce((a, b) => a + b)
 
     if (sum % 2 === 0 && !progress_report.includes(true)) return setTimeout(() => postStandings(info, entries), 3000)
-}
-
-module.exports = {
-    checkArenaProgress,
-    endArena,
-    getArenaSample,
-    resetArena,
-    startArena,
-    startRound
 }

@@ -1,14 +1,15 @@
 
-const { discordBotToken} = require('../secrets.json')
-const { Client } = require('discord.js')
+import secrets from '../secrets.json' with { type: "json" } 
+const {discordBotToken} = secrets
+import { Client, GatewayIntentBits } from 'discord.js'
+
 const client = new Client({ 
     intents: [ 
-        'GUILDS', 
-        'GUILD_MEMBERS', 
-        'GUILD_PRESENCES',
-        'GUILD_MESSAGES', 
-        'GUILD_MESSAGE_REACTIONS',
-        'DIRECT_MESSAGES'
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMessageReactions, 
+        GatewayIntentBits.DirectMessages
     ],
     partials: [
         'MESSAGE',
@@ -19,10 +20,6 @@ const client = new Client({
     ]
 })
 
-setTimeout(() => {
-    client.login(discordBotToken)
-}, 24000)
+client.login(discordBotToken)
 
-module.exports = {
-    client
-}
+export { client }

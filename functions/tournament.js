@@ -1,13 +1,13 @@
 
-const axios = require('axios')
-const { challongeAPIKey } = require('../secrets.json')
-const { registrationChannelId } = require('../static/channels.json')
-const { tourRole } = require('../static/roles.json')
-const { orange, soldier, FiC } = require('../static/emojis.json')
-const { Arena, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist } = require('../db')
-const { client } = require('../static/clients.js')
-const { saveYDK, saveAllYDK } = require('./decks.js')
-const { capitalize, shuffleArray, resetPlayer } = require('./utility.js')
+import axios from 'axios'
+import { challongeAPIKey } from '../secrets.json' with { type: "json" }
+import { registrationChannelId } from '../static/channels.json' with { type: "json" }
+import { tourRole } from '../static/roles.json' with { type: "json" }
+import { orange, soldier, FiC } from '../static/emojis.json' with { type: "json" }
+import { Arena, Binder, Card, Daily, Diary, Draft, Entry, Gauntlet, Info, Inventory, Knowledge, Match, Player, Print, Profile, Set, Tournament, Trade, Trivia, Wallet, Wishlist } from '../database/index.js'
+import { client } from '../static/clients.js'
+import { saveYDK, saveAllYDK } from './decks.js'
+import { capitalize, shuffleArray, resetPlayer } from './utility.js'
 
 //ASK FOR DB NAME
 const askForDBName = async (member, player, override = false, error = false, attempt = 1) => {
@@ -244,7 +244,7 @@ const removeParticipant = async (message, member, entry, tournament, drop = fals
 //GET TOURNAMENT
 const getTournament = async (tournament) => {
     try {
-        const { data } = await axios.get(
+        import { data } = await axios.get(
             `https://formatlibrary:${challongeAPIKey}@api.challonge.com/v1/tournaments/${tournament.id}.json`
         )
         return data
@@ -256,7 +256,7 @@ const getTournament = async (tournament) => {
 //GET MATCHES
 const getMatches = async (tournamentId) => {
     try {
-        const { data } = await axios.get(
+        import { data } = await axios.get(
             `https://formatlibrary:${challongeAPIKey}@api.challonge.com/v1/tournaments/${tournamentId}/matches.json`
         )
         return data
@@ -273,7 +273,7 @@ const putMatchResult = async (tournamentId, matchId, winnerId, scores) => {
             url: `https://formatlibrary:${challongeAPIKey}@api.challonge.com/v1/tournaments/${tournamentId}/matches/${matchId}.json`,
             data: {
                 match: {
-                    winner_id: winnerId,
+                    winnerId: winnerId,
                     scores_csv: scores
                 }
             }
@@ -288,7 +288,7 @@ const putMatchResult = async (tournamentId, matchId, winnerId, scores) => {
 //POST PARTICIPANT
 const postParticipant = async (tournament, player) => {
     try {
-        const { data } = await axios({
+        import { data } = await axios({
             method: 'post',
             url: `https://formatlibrary:${challongeAPIKey}@api.challonge.com/v1/tournaments/${tournament.id}/participants.json`,
             data: {
@@ -308,7 +308,7 @@ const findNextMatch = (matchesArr, matchId, participantId) => {
     for (let i = 0; i < matchesArr.length; i++) {
         const match = matchesArr[i].match
         if (match.state === 'complete') continue
-        if (match.prerequisite_match_ids_csv.includes(matchId) && (match.player1_id === participantId || match.player2_id === participantId)) {
+        if (match.prerequisite_matchIds_csv.includes(matchId) && (match.player1Id === participantId || match.player2Id === participantId)) {
             return match.id
         }
     }
@@ -321,7 +321,7 @@ const findOtherPreReqMatch = (matchesArr, nextMatchId, completedMatchId) => {
     for (let i = 0; i < matchesArr.length; i++) {
         const match = matchesArr[i].match
         if (match.id === nextMatchId) {
-            const pre_reqs = match.prerequisite_match_ids_csv.split(",")
+            const pre_reqs = match.prerequisite_matchIds_csv.split(",")
             if (pre_reqs[0] === completedMatchId) {
                 const pairing = getPairing(matchesArr, pre_reqs[1])
                 return pairing
@@ -344,8 +344,8 @@ const getPairing = (matchesArr, matchId) => {
     for (let i = 0; i < matchesArr.length; i++) {
         const match = matchesArr[i].match
         if (match.id === matchId) {
-            p1 = match.player1_id
-            p2 = match.player2_id
+            p1 = match.player1Id
+            p2 = match.player2Id
             break
         }
     }
@@ -363,25 +363,25 @@ const findNextOpponent = async (tournamentId, matchesArr, matchId, participantId
     for (let i = 0; i < matchesArr.length; i++) {
         const match = matchesArr[i].match
         if (match.id === matchId) {
-            const player1_id = match.player1_id
-            const player2_id = match.player2_id
-            if (player1_id === participantId) {
-                if (!player2_id) return false
+            const player1Id = match.player1Id
+            const player2Id = match.player2Id
+            if (player1Id === participantId) {
+                if (!player2Id) return false
                 const opponentEntry = await Entry.findOne({
                     where: {
                         tournamentId: tournamentId,
-                        participantId: player2_id
+                        participantId: player2Id
                     },
                     include: Player
                 })
 
                 return opponentEntry
-            } else if (player2_id === participantId) {
-                if (!player1_id) return false
+            } else if (player2Id === participantId) {
+                if (!player1Id) return false
                 const opponentEntry = await Entry.findOne({
                     where: {
                         tournamentId: tournamentId,
-                        participantId: player1_id
+                        participantId: player1Id
                     },
                     include: Player
                 }) 
@@ -395,12 +395,12 @@ const findNextOpponent = async (tournamentId, matchesArr, matchId, participantId
 }
 
 //CHECK CHALLONGE PAIRING
-const checkChallongePairing = (match, p1, p2) => (match.player1_id === p1 && match.player2_id === p2) || (match.player1_id === p2 && match.player2_id === p1)
+const checkChallongePairing = (match, p1, p2) => (match.player1Id === p1 && match.player2Id === p2) || (match.player1Id === p2 && match.player2Id === p1)
 
 //FIND NO SHOW OPPONENT
 const findNoShowOpponent = (match, noShowParticipantId) => {
-    if (match.player1_id === noShowParticipantId) return match.player2_id
-    if (match.player2_id === noShowParticipantId) return match.player1_id
+    if (match.player1Id === noShowParticipantId) return match.player2Id
+    if (match.player2Id === noShowParticipantId) return match.player1Id
     else return false
 }
 

@@ -8,7 +8,7 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 // // The file token.json stores the user's access and refresh tokens, and is
 // // created automatically when the authorization flow completes for the first
 // // time.
-const TOKEN_PATH = '../secrets.json';
+const TOKEN_PATH = '../secrets.json' with { type: "json" }
 
 // Load client secrets from a local file.
 fs.readFile('../credentials.json', (err, content) => {
@@ -24,9 +24,9 @@ fs.readFile('../credentials.json', (err, content) => {
  * @param {function} callback The callback to call with the authorized client.
  */
 function authorize(credentials, callback) {
-  const {client_secret, client_id, redirect_uris} = credentials.installed;
+  const {client_secret, clientId, redirect_uris} = credentials.installed;
   const oAuth2Client = new google.auth.OAuth2(
-      client_id, client_secret, redirect_uris[0]);
+      clientId, client_secret, redirect_uris[0]);
 
   // Check if we have previously stored a token.
   fs.readFile(TOKEN_PATH, (err, token) => {

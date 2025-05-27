@@ -1,19 +1,19 @@
 
 //SEARCH FUNCTIONS
-const Discord = require('discord.js')
-const fs = require('fs')
-const { Op } = require('sequelize')
-const { Card, Nickname, Inventory, Print } = require('../db/index.js')
+// const Discord = require('discord.js')
+import fs from 'fs'
+import { Op } from 'sequelize'
+import { Card, ForgedInventory, ForgedPrint } from '../database/index.js'
 
 //CARD SEARCH
-const search = async (query, fuzzyCards) => {
-	const card_name = await findCard(query, fuzzyCards)
-	if (!card_name) return false
+export const search = async (query, fuzzyCards) => {
+	const cardName = await findCard(query, fuzzyCards)
+	if (!cardName) return false
 
 	const card = await Card.findOne({ 
 		where: { 
 			name: {
-				[Op.iLike]: card_name
+				[Op.iLike]: cardName
 			}
 		}
 	})
@@ -61,33 +61,33 @@ const search = async (query, fuzzyCards) => {
 			` ${!card.link ? `**DEF:** ${card.def === null ? '?' : card.def}` : ''}` :
 			''
 	
-	const attachment = fs.existsSync(`./public/card_images/${card.image_file}`) ?
-		new Discord.MessageAttachment(`./public/card_images/${card.image_file}`, card.image_file) :
-		false
+	// const attachment = fs.existsSync(`./public/card_images/${card.image_file}`) ?
+	// 	new Discord.MessageAttachment(`./public/card_images/${card.image_file}`, card.image_file) :
+	// 	false
 
-	const thumbnail = attachment ? `attachment://${card.image_file}` : `https://ygoprodeck.com/pics/${card.image_file}`
-	const cardEmbed = new Discord.MessageEmbed()
-	cardEmbed.setColor(color)
-	cardEmbed.setTitle(card.name)
-	cardEmbed.setThumbnail(thumbnail)
-	cardEmbed.setDescription(`${labels}\n\n${card.description}\n\n${stats}`)
-	return { cardEmbed, attachment }
+	// const thumbnail = attachment ? `attachment://${card.image_file}` : `https://ygoprodeck.com/pics/${card.image_file}`
+	// const cardEmbed = new Discord.MessageEmbed()
+	// cardEmbed.setColor(color)
+	// cardEmbed.setTitle(card.name)
+	// cardEmbed.setThumbnail(thumbnail)
+	// cardEmbed.setDescription(`${labels}\n\n${card.description}\n\n${stats}`)
+	// return { cardEmbed, attachment }
 }
 
 //FETCH ALL CARDS
-const fetchAllCardNames = async () => {
+export const fetchAllCardNames = async () => {
     const allCardNames = await Card.findAll()
     return allCardNames.map((card) => { return card.name })
 }
 
 //FETCH ALL CARDS
-const fetchAllCards = async () => {
+export const fetchAllCards = async () => {
     const allCards = await Card.findAll()
     return allCards
 }
 
 //FETCH ALL FORGED CARDS
-const fetchAllForgedCards = async () => {
+export const fetchAllForgedCards = async () => {
     const allCards = await fetchAllCards()
 	const allUniquePrintNames = await fetchAllUniquePrintNames()
 	const allForgedCards = allCards.filter(card => allUniquePrintNames.includes(card.name))
@@ -95,15 +95,15 @@ const fetchAllForgedCards = async () => {
 }
 
 //FETCH ALL YOUR SINGLES
-const getInventorySummary = async (allForgedCards, playerId) => {
-	const invs = await Inventory.findAll({ 
+export const getInventorySummary = async (allForgedCards, playerId) => {
+	const invs = await ForgedInventory.findAll({ 
 		where: {
 			playerId: playerId,
 			quantity: {
 				[Op.gte]: 1
 			}
 		},
-		include: Print
+		include: ForgedPrint
 	})
 
 	const inv_map = {}
@@ -111,25 +111,25 @@ const getInventorySummary = async (allForgedCards, playerId) => {
 	for (let i = 0; i < invs.length; i++) {
 		const inv = invs[i]
 		const quantity = inv.quantity
-		const name = inv.print.card_name
+		const name = inv.print.cardName
 		if (inv_map[name]) inv_map[name] += quantity
 		else inv_map[name] = quantity
 	}
 
 	const names = Object.keys(inv_map)
-	const one_of_names = []
-	const two_of_names = []
-	const three_of_names = []
+	const one_ofNames = []
+	const two_ofNames = []
+	const three_ofNames = []
 
 	names.forEach((name) => {
-		if (inv_map[name] >= 1) one_of_names.push(name)
-		if (inv_map[name] >= 2) two_of_names.push(name)
-		if (inv_map[name] >= 3) three_of_names.push(name)
+		if (inv_map[name] >= 1) one_ofNames.push(name)
+		if (inv_map[name] >= 2) two_ofNames.push(name)
+		if (inv_map[name] >= 3) three_ofNames.push(name)
 	})
 
-	const singleIds = allForgedCards.filter(card => one_of_names.includes(card.name)).map(c => c.konami_code)
-	const doubleIds = allForgedCards.filter(card => two_of_names.includes(card.name)).map(c => c.konami_code)
-	const tripleIds = allForgedCards.filter(card => three_of_names.includes(card.name)).map(c => c.konami_code)
+	const singleIds = allForgedCards.filter(card => one_ofNames.includes(card.name)).map(c => c.konamiCode)
+	const doubleIds = allForgedCards.filter(card => two_ofNames.includes(card.name)).map(c => c.konamiCode)
+	const tripleIds = allForgedCards.filter(card => three_ofNames.includes(card.name)).map(c => c.konamiCode)
 
 	const summary = {
 		singleIds,
@@ -143,14 +143,14 @@ const getInventorySummary = async (allForgedCards, playerId) => {
 
 
 //FETCH UNIQUE PRINTS
-const fetchAllUniquePrintNames = async () => {
+export const fetchAllUniquePrintNames = async () => {
     const prints = []
     const allUniquePrintNames = []
-    const allPrints = await Print.findAll()
+    const allPrints = await ForgedPrint.findAll()
     allPrints.forEach((print) => { 
-        if (!prints.includes(print.card_name)) {
-            prints.push(print.card_name)
-            allUniquePrintNames.push(print.card_name)
+        if (!prints.includes(print.cardName)) {
+            prints.push(print.cardName)
+            allUniquePrintNames.push(print.cardName)
         }
     })
     allUniquePrintNames.sort()
@@ -158,9 +158,9 @@ const fetchAllUniquePrintNames = async () => {
 }
 
 //FIND CARD
-const findCard = async (query, fuzzyCards) => {
-	const nickname = await Nickname.findOne({ where: { alius: query.toLowerCase() } })
-	if (nickname && nickname.card_name) return nickname.card_name 
+export const findCard = async (query, fuzzyCards) => {
+	// const nickname = await Nickname.findOne({ where: { alius: query.toLowerCase() } })
+	// if (nickname && nickname.cardName) return nickname.cardName 
 
     const fuzzy_search = fuzzyCards.get(query, null, 0.36) || []
 	fuzzy_search.sort((a, b) => b[0] - a[0])
@@ -177,19 +177,9 @@ const findCard = async (query, fuzzyCards) => {
 		}
 	}
 
-	const card_name = partial_match ? partial_match :
+	const cardName = partial_match ? partial_match :
 		fuzzy_search[0][0] > 0.5 ? fuzzy_search[0][1] :
 		null
 		
-    return card_name
-}
-
-module.exports = {
-	fetchAllCardNames,
-	fetchAllCards,
-	fetchAllForgedCards,
-	fetchAllUniquePrintNames,
-	getInventorySummary,
-    findCard,
-	search
+    return cardName
 }

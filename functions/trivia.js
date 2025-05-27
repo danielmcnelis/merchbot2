@@ -1,6 +1,6 @@
 
-const { Diary, Info, Knowledge, Player, Profile, Trivia, Wallet } = require('../db')
-const { Op } = require('sequelize')
+const { Diary, Info, Knowledge, Player, Profile, Trivia, Wallet } = require('../database/index.js')
+import { Op } from 'sequelize'
 const FuzzySet = require('fuzzyset')
 const { yescom, nocom } = require('../static/commands.json')
 const { gradcap, yes, no, orange, cultured, megaphone, amongmfao, dummy, wut, starchips, stardust } = require('../static/emojis.json')

@@ -1,44 +1,50 @@
 
-const { Auction, Bid, Card, Match, Player, Tournament, Print, Set, Status, Wallet, Diary, Inventory, Arena, Trivia, Keeper, Gauntlet, Draft, Daily, Binder, Wishlist, Profile, Info } = require('../db')
-const merchbotId = '584215266586525696'
-const { Op } = require('sequelize')
-const { nocom, yescom } = require('../static/commands.json')
-const { downward, upward, forgestone, gem, orb, swords, beast, blue, bronze, DRT, fiend, thunder, zombie, skull, familiar, battery, cactus, cavebob, checkmark, closed, com, credits, cultured, diamond, dinosaur, DOC, LPK, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, open, ORF, TEB, FON, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, stonks, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
-const { awardPacksToShop } = require('./packs')
-const adminId = '194147938786738176'
-const { client } = require('../static/clients.js')
-const { fpRole } = require('../static/roles.json')
-const { announcementsChannelId, botSpamChannelId, shopChannelId, staffChannelId } = require('../static/channels.json')
-const { completeTask } = require('./diary.js')
-const { selectPrint } = require('./print.js')
-const { findCard } = require('./search.js')
-const { isWithinXHours } = require('./utility.js')
-const decks = require('../static/decks.json')
+import { Auction, Bid, Card, Player, Tournament, ForgedPrint, ForgedSet, Wallet, ForgedInventory, Daily, Binder, Wishlist, Info } from '../database/index.js'
+const merchbotDiscordId = '584215266586525696'
+const merchbot = await Player.findByDiscordId(merchbotDiscordId)
+const merchbotId = merchbot.id
+import { Op } from 'sequelize'
+import commands from '../static/commands.json' with { type: 'json' }
+const { nocom, yescom } = commands
+import emojis from '../static/emojis.json' with { type: "json" } 
+const { AOD, downward, upward, forgestone, gem, orb, swords, beast, blue, bronze, DRT, fiend, thunder, zombie, skull, familiar, battery, cactus, cavebob, checkmark, closed, com, credits, cultured, diamond, dinosaur, DOC, LPK, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, open, ORF, TEB, FON, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, dimmadome, stonks, sup, tix, ult, wokefrog, yellow, yes, ygocard } = emojis
+import { awardPacksToShop } from './packs.js'
+// const adminId = '194147938786738176'
+import { client } from '../static/clients.js'
+import roles from '../static/roles.json' with { type: "json" }
+const { fpRole } = roles
+import channels from '../static/channels.json' with { type: 'json' }
+const { announcementsChannelId, botSpamChannelId, shopChannelId, staffChannelId } = channels
+// import { completeTask } from './diary.js'
+import { selectPrint } from './print.js'
+import { findCard } from './search.js'
+import { isWithinXHours } from './utility.js'
+// const decks = require('../static/decks.json')
 
 // OPEN SHOP
-const openShop = async () => {
+export const openShop = async (interaction) => {
 	const shop = await Info.findOne({ where: { element: 'shop' }})
-	if (!shop) return client.channels.cache.get(botSpamChannelId).send({ content: `Could not find game element: "shop".`})
+	if (!shop) return interaction.reply({ content: `Could not find game element: "shop".`})
 
 	if (shop.status === 'open') {
-		return client.channels.cache.get(botSpamChannelId).send({ content: `The Shop ${merchant} was already open. ${open}`})
+		return interaction.reply({ content: `The Shop ${merchant} was already open. ${open}`})
 	} else {
 		shop.status = 'open'
 		await shop.save()
         await processBids()
         updateShop()
-        client.channels.cache.get(announcementsChannelId).send({ content: `Good morning, <@&${fpRole}>, The Shop ${merchant} is now open! ${open}`})
+        client.channels.cache.get(announcementsChannelId).send({ content: `Good morning, The Shop ${merchant} is now open! ${open}`})
         const shopCountdown = getShopCountdown()
 		return setTimeout(() => closeShop(), shopCountdown)
 	} 
 }
 
 // CLOSE SHOP
-const closeShop = async () => {
+export const closeShop = async (interaction) => {
     const shop = await Info.findOne({ where: { element: 'shop' }})
-	if (!shop) return client.channels.cache.get(botSpamChannelId).send({ content: `Could not find game element: "shop".`})
+	if (!shop) return interaction.reply({ content: `Could not find game element: "shop".`})
 	if (shop.status === 'closed') {
-		return client.channels.cache.get(botSpamChannelId).send({ content: `The Shop ${merchant} was already closed. ${closed}`})
+		return interaction.reply({ content: `The Shop ${merchant} was already closed. ${closed}`})
 	} else {
 		shop.status = 'closed'
 		await shop.save()
@@ -50,68 +56,14 @@ const closeShop = async () => {
         }
 
         await restock()
-		client.channels.cache.get(announcementsChannelId).send({ content: `Good evening, <@&${fpRole}>, The Shop ${merchant} is now closed! ${closed}`})
+		client.channels.cache.get(announcementsChannelId).send({ content: `Good evening, The Shop ${merchant} is now closed! ${closed}`})
         const shopCountdown = getShopCountdown()
         return setTimeout(() => openShop(), shopCountdown)
 	} 
 }
 
-
-// UNFREEZE
-const unfreeze = async () => {
-    const date = new Date()
-	const time = date.getTime()
-	const prints = await Print.findAll({ where: { frozen: true } })
-
-    for (let i = 0; i < prints.length; i++) {
-        const print = prints[i]
-        const updatedAt = print.updatedAt
-        if (!isWithinXHours(9, time, updatedAt)) {
-            await print.save()
-
-            const invs = await Inventory.findAll({ where: {
-                printId: print.id,
-                quantity: { [Op.gt]: 0 }
-            }})
-        
-            const quants = invs.map((i) => i.quantity)
-            const total = quants.length ? quants.reduce((a, b) => a + b) : 0
-        
-            const merchbot_inv = await Inventory.findOne({ where: {
-                printId: print.id,
-                quantity: { [Op.gt]: 0 },
-                playerId: merchbotId
-            }})
-        
-            const shop_pop = merchbot_inv ? merchbot_inv.quantity : 0
-            const shop_percent = total ? shop_pop / total : 0
-        
-            const current_price = print.market_price
-        
-            if (shop_percent < 0.15) {
-                const z_diff = ( 0.15 - shop_percent ) / 0.15
-                console.log(`${print.card_code} - ${print.card_name} decayed UP (z_diff = ${z_diff}) from ${print.market_price} to ${print.market_price + (0.02 * current_price * z_diff)}`)
-                print.market_price += 0.02 * current_price * z_diff
-                if (z_diff > 0.3) {
-                    print.trending_up = true
-                } else {
-                    print.trending_up = false
-                }
-                await print.save()
-            } else if (shop_percent >= 0.15) {
-                const z_diff = ( shop_percent - 0.15 ) / 0.85
-                console.log(`${print.card_code} - ${print.card_name} decayed DOWN (z_diff = ${z_diff}) from ${print.market_price} to ${print.market_price - (0.06 * current_price * z_diff)}`)
-                print.market_price -= 0.06 * current_price * z_diff 
-                print.trending_up = false
-                await print.save()
-            }
-        }
-    }
-}
-
-
 // CLEAR DAILIES
-const clearDailies = async () => {
+export const clearDailies = async () => {
     const dailies = await Daily.findAll()
     for (let i = 0; i < dailies.length; i++) {
         const daily = dailies[i]
@@ -124,61 +76,71 @@ const clearDailies = async () => {
 
 
 // APPLY PRICE DECAY
-const applyPriceDecay = async () => {
-	const prints = await Print.findAll({ where: { frozen: false } })
-    
+export const applyPriceDecay = async () => {
+    const shop = await Info.findOne({ where: { element: 'shop' }})
+    if (shop.status === 'closed') {
+        return setTimeout(async () => applyPriceDecay(), 24 * 60 * 60 * 1000)
+    }
+
+	const prints = await ForgedPrint.findAll()
+    let a = 0
+    let b = 0
+
     for (let i = 0; i < prints.length; i++) {
         const print = prints[i]
 
-        const invs = await Inventory.findAll({ where: {
-            printId: print.id,
+        const invs = await ForgedInventory.findAll({ where: {
+            forgedPrintId: print.id,
             quantity: { [Op.gt]: 0 }
         }})
     
         const quants = invs.map((i) => i.quantity)
         const total = quants.length ? quants.reduce((a, b) => a + b) : 0
     
-        const merchbotinv = await Inventory.findOne({ where: {
-            printId: print.id,
+        const merchbotinv = await ForgedInventory.findOne({ where: {
+            forgedPrintId: print.id,
             quantity: { [Op.gt]: 0 },
-            playerId: merchbotId
+            playerId: 'ZXyLL1wTcEZXSZYtegEuTr'
         }})
     
         const shop_pop = merchbotinv ? merchbotinv.quantity : 0
         const shop_percent = total ? shop_pop / total : 0
     
-        const current_price = print.market_price
+        const currentPrice = print.marketPrice
     
         if (shop_percent < 0.15) {
             const z_diff = ( 0.15 - shop_percent ) / 0.15
-            console.log(`${print.card_code} - ${print.card_name} decayed UP (z_diff = ${z_diff}) from ${print.market_price} to ${print.market_price + (0.02 * current_price * z_diff)}`)
-            print.market_price += 0.02 * current_price * z_diff
-            if (print.market_price >= 40 && z_diff > 0.3) {
-                print.trending_up = true
+            console.log(`${print.cardCode} - ${print.cardName} decayed UP (z_diff = ${z_diff}) from ${print.marketPrice} to ${print.marketPrice + (0.02 * currentPrice * z_diff)}`)
+            print.marketPrice += 0.02 * currentPrice * z_diff
+            a++
+            if (print.marketPrice >= 40 && z_diff > 0.3) {
+                print.trendingUp = true
             } else {
-                print.trending_up = false
+                print.trendingUp = false
             }
-            print.trending_down = false
+            print.trendingDown = false
             await print.save()
         } else if (shop_percent >= 0.15) {
             const z_diff = ( shop_percent - 0.15 ) / 0.85
-            console.log(`${print.card_code} - ${print.card_name} decayed DOWN (z_diff = ${z_diff}) from ${print.market_price} to ${print.market_price - (0.06 * current_price * z_diff)}`)
-            print.market_price -= 0.06 * current_price * z_diff 
-            if (print.market_price >= 40 && z_diff > 0.3) {
-                print.trending_down = true
+            console.log(`${print.cardCode} - ${print.cardName} decayed DOWN (z_diff = ${z_diff}) from ${print.marketPrice} to ${print.marketPrice - (0.06 * currentPrice * z_diff)}`)
+            print.marketPrice -= 0.06 * currentPrice * z_diff
+            b++ 
+            if (print.marketPrice >= 40 && z_diff > 0.3) {
+                print.trendingDown = true
             } else {
-                print.trending_down = false
+                print.trendingDown = false
             }
-            print.trending_up = false
+            print.trendingUp = false
             await print.save()
         }
     }
 
+    console.log(`success on price decay: ${a} prints decayed up, ${b} prints decayed down`)
     return setTimeout(async () => applyPriceDecay(), 24 * 60 * 60 * 1000)
 }
 
 // CHECK SHOP OPEN
-const checkShopOpen = async () => {
+export const checkShopOpen = async () => {
     const shopIsOpen = await Info.count({ where: {
         element: 'shop',
         status: 'open'
@@ -188,7 +150,7 @@ const checkShopOpen = async () => {
 }
 
 // GET SHOP COUNTDOWN
-const getShopCountdown = () => {
+export const getShopCountdown = () => {
 	const date = new Date()
 	const day = date.getDay()
 	const hours = date.getHours()
@@ -224,7 +186,7 @@ const getShopCountdown = () => {
 
 
 // GET MIDNIGHT COUNTDOWN
-const getMidnightCountdown = () => {
+export const getMidnightCountdown = () => {
 	const date = new Date()
 	const hours = date.getHours()
 	const mins = date.getMinutes()
@@ -236,7 +198,7 @@ const getMidnightCountdown = () => {
 }
 
 //CHECK SHOP SHOULD BE
-const checkShopShouldBe = () => {
+export const checkShopShouldBe = () => {
 	const date = new Date()
 	const day = date.getDay()
 	const hours = date.getHours()
@@ -258,67 +220,67 @@ const checkShopShouldBe = () => {
 }
 
 // PROCESS BIDS
-const processBids = async () => {
+export const processBids = async () => {
     const announcementsChannel = client.channels.cache.get(announcementsChannelId)
     const botSpamChannel = client.channels.cache.get(botSpamChannelId)
-    const allBids = await Bid.findAll({ include: Auction , order: [["amount", "DESC"]] })
+    const allBids = await Bid.findAll({ include: [Auction, ForgedPrint] , order: [["amount", "DESC"]] })
 
     for (let i = 0; i < allBids.length; i++) {
         const bid = allBids[i]
         const wallet = await Wallet.findOne({ where: { playerId: bid.playerId }, include: Player })
         if (!wallet) continue
 
-        const print = await Print.findOne({ where: { card_code: bid.card_code } })
-        if (!print) continue
+        const print = bid.forgedPrint
 
-        const inv = await Inventory.findOne({ where: { 
-            playerId: merchbotId,
-            card_code: bid.card_code,
+        const merchbotInv = await ForgedInventory.findOne({ where: { 
+            playerId: 'ZXyLL1wTcEZXSZYtegEuTr',
+            forgedPrintId: bid.forgedPrintId,
 			quantity: { [Op.gt]: 0 }
          } })
 
-        if (!inv) {
-            announcementsChannel.send({ content: `${wallet.player.name} placed a ${bid.amount}${stardust} bid on ${print.card_name} but they were outbid.`})
+        if (!merchbotInv) {
+            announcementsChannel.send({ content: `${wallet.playerName} placed a ${bid.amount}${stardust} bid on ${print.cardName}, but they were outbid.`})
             continue
         }
         if (wallet.stardust < bid.amount) {
-            announcementsChannel.send({ content: `${wallet.player.name} would have won ${print.card_name} for ${bid.amount}${stardust} but they are too poor.`}) 
+            announcementsChannel.send({ content: `${wallet.player.name} would have won ${print.cardName} for ${bid.amount}${stardust}, but they are too poor.`}) 
             continue
         }
         
-        const winnerInv = await Inventory.findOne({ where: {
+        const winnerInv = await ForgedInventory.findOne({ where: {
             playerId: bid.playerId,
-            card_code: bid.card_code
+            forgedPrintId: bid.forgedPrintId
         }})
 
         if (winnerInv) {
             winnerInv.quantity++
             await winnerInv.save()
         } else {
-            await Inventory.create({ 
-                card_code: bid.card_code,
+            await ForgedInventory.create({ 
+                cardName: bid.cardName,
+                cardCode: bid.cardCode,
                 quantity: 1,
-                printId: print.id,
-                playerId: bid.playerId
+                forgedPrintId: bid.forgedPrintId,
+                playerId: bid.playerId,
+                playerName: bid.playerName
             })
         }
 
         wallet.stardust -= bid.amount
         await wallet.save()
 
-        inv.quantity--
-        await inv.save()
+        merchbotInv.quantity--
+        await merchbotInv.save()
 
-        const newPrice = ( bid.amount + print.market_price ) / 2
-        print.market_price = newPrice
+        const newPrice = ( bid.amount + print.marketPrice ) / 2
+        print.marketPrice = newPrice
         await print.save()
-
         await bid.destroy()
 
-        if (print.rarity !== 'com' && print.rarity !== 'rar') completeTask(botSpamChannel, wallet.player.id, 'm5')
-        if (print.rarity === 'scr') completeTask(botSpamChannel, wallet.player.id, 'm4', 4000)
-        if (print.set_code === 'APC' && winnerInv && winnerInv.quantity >= 3) completeTask(botSpamChannel, wallet.player.id, 'h5', 4000)
-        announcementsChannel.send({ content: `<@${wallet.player.id}> won a copy of ${eval(print.rarity)}${print.card_code} - ${print.card_name} for ${bid.amount}${stardust}. Congratulations!`}) 
+        // if (print.rarity !== 'com' && print.rarity !== 'rar') completeTask(botSpamChannel, wallet.player.id, 'm5')
+        // if (print.rarity === 'scr') completeTask(botSpamChannel, wallet.player.id, 'm4', 4000)
+        // if (print.setCode === 'APC' && winnerInv && winnerInv.quantity >= 3) completeTask(botSpamChannel, wallet.player.id, 'h5', 4000)
+        announcementsChannel.send({ content: `<@${wallet.player.discordId}> won a copy of ${eval(print.rarity)}${print.cardCode} - ${print.cardName} for ${bid.amount}${stardust}. Congratulations!`}) 
     }
 
     const allAuctions = await Auction.findAll()
@@ -334,8 +296,8 @@ const processBids = async () => {
 }
 
 // RESTOCK
-const restock = async () => {
-	const allSetsForSale = await Set.findAll({ where: { for_sale: true }, order: [['createdAt', 'DESC']]})
+export const restock = async () => {
+	const allSetsForSale = await ForgedSet.findAll({ where: { forSale: true }, order: [['createdAt', 'DESC']]})
 
 	let weightedCount = 0
     let most_recent = false
@@ -345,109 +307,108 @@ const restock = async () => {
 		if (set.type === 'core') {
             if (!most_recent) most_recent = 'core'
 			if (set.currency === 'starchips') {
-				weightedCount += set.unit_sales
+				weightedCount += set.unitSales
 			} else {
-				weightedCount += (set.unit_sales / 2)
+				weightedCount += (set.unitSales / 2)
 			}
 		} else if (set.type === 'starter_deck') {
 			if (set.currency === 'starchips') {
-				weightedCount += (set.unit_sales * 5)
+				weightedCount += (set.unitSales * 5)
 			} else {
-				weightedCount += (set.unit_sales * 5 / 2)
+				weightedCount += (set.unitSales * 5 / 2)
 			}
 		} else if (set.type === 'mini') {
             if (!most_recent) most_recent = 'mini'
 			if (set.currency === 'starchips') {
-				weightedCount += (set.unit_sales * 2 / 3)
+				weightedCount += (set.unitSales * 2 / 3)
 			} else {
-				weightedCount += (set.unit_sales / 3)
+				weightedCount += (set.unitSales / 3)
 			}
 		}
 
-        set.unit_sales = 0
+        set.unitSales = 0
         await set.save()
 	}
 
     if (weightedCount < 1) weightedCount = 1
     const core_count = most_recent === 'core' ?  Math.ceil(weightedCount / 8) : Math.ceil(weightedCount / 16)
     const mini_count = Math.ceil(weightedCount * 3 / 32)
-    const corePacksAwarded = await awardPacksToShop(core_count, core = true)
-    const miniPacksAwarded = await awardPacksToShop(mini_count, core = false)
+    const corePacksAwarded = await awardPacksToShop(core_count, true)
+    const miniPacksAwarded = await awardPacksToShop(mini_count, false)
     if (!corePacksAwarded) client.channels.cache.get(shopChannelId).send({ content: `Error awarding ${core_count} packs to shop.`})
     if (!miniPacksAwarded) client.channels.cache.get(shopChannelId).send({ content: `Error awarding ${mini_count} packs to shop.`})
     else return postBids()
 }
 
 // CALCULATE BOX PRICE
-const calcBoxPrice = async () => {
-	const sets = await Set.findAll({ where: {
+export const calcBoxPrice = async () => {
+	const sets = await ForgedSet.findAll({ where: {
          currency: 'stardust',
-         for_sale: true
+         forSale: true
     } })
 
 	if(!sets.length) return	
 
     for (let i = 0; i < sets.length; i++) {
         const set = sets[i]
-        const set_code = set.code
+        const setCode = set.code
 
         if (set.type === 'core' || set.type === 'mini') {
-            const commons = [...await Print.findAll({ where: { set_code: set_code, rarity: "com" } })].map((p) => Math.round(p.market_price) || 1)
-            const rares = [...await Print.findAll({ where: { set_code: set_code, rarity: "rar" } })].map((p) => Math.round(p.market_price) || 1)
-            const supers = [...await Print.findAll({ where: { set_code: set_code, rarity: "sup" } })].filter((p) => !p.card_code.includes('-SE')).map((p) => Math.round(p.market_price) || 1)
-            const ultras = [...await Print.findAll({ where: { set_code: set_code, rarity: "ult" } })].map((p) => Math.round(p.market_price) || 1)
-            const secrets = [...await Print.findAll({ where: { set_code: set_code, rarity: "scr" } })].map((p) => Math.round(p.market_price) || 1)
+            const commons = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "com" } })].map((p) => Math.round(p.marketPrice) || 1)
+            const rares = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "rar" } })].map((p) => Math.round(p.marketPrice) || 1)
+            const supers = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "sup" } })].filter((p) => !p.cardCode.includes('-SE')).map((p) => Math.round(p.marketPrice) || 1)
+            const ultras = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "ult" } })].map((p) => Math.round(p.marketPrice) || 1)
+            const secrets = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "scr" } })].map((p) => Math.round(p.marketPrice) || 1)
             
             const avgComPrice = commons.length ? commons.reduce((a, b) => a + b) / commons.length : 0
             const avgRarPrice = rares.length ? rares.reduce((a, b) => a + b) / rares.length : 0
             const avgSupPrice = supers.length ? supers.reduce((a, b) => a + b) / supers.length : 0
             const avgUltPrice = ultras.length ? ultras.reduce((a, b) => a + b) / ultras.length : 0
             const avgScrPrice = secrets.length ? secrets.reduce((a, b) => a + b) / secrets.length : 0
-            const avgBoxPrice = (avgComPrice * set.commons_per_box) 
-                + (avgRarPrice * set.rares_per_box) 
-                + (avgSupPrice * set.supers_per_box) 
-                + (avgUltPrice * set.ultras_per_box) 
-                + (avgScrPrice * set.secrets_per_box) 
+            const avgBoxPrice = (avgComPrice * set.commonsPerBox) 
+                + (avgRarPrice * set.raresPerBox) 
+                + (avgSupPrice * set.supersPerBox) 
+                + (avgUltPrice * set.ultrasPerBox) 
+                + (avgScrPrice * set.secretsPerBox) 
     
-            const avgPackPrice = avgBoxPrice / set.packs_per_box
-            set.unit_price = Math.round(avgPackPrice / 10) * 10  
-            set.box_price = set.type === 'core' ? Math.round(21 * set.unit_price / 100) * 100 : null
+            const avgPackPrice = avgBoxPrice / set.packsPerBox
+            set.unitPrice = Math.round(avgPackPrice / 10) * 10  
+            set.boxPrice = set.type === 'core' ? Math.round(21 * set.unitPrice / 100) * 100 : null
             await set.save()
         } else if (set.type === 'starter_deck') {
-            const prints = await Print.findAll({ where: { set_code: set_code }})
+            const prints = await ForgedPrint.findAll({ where: { setCode: setCode }})
             let deck1Price = 0
             let deck2Price = 0
             let deck1
             let deck2
 
-            const deck_names = Object.keys(decks)
-            deck_names.forEach((d) => {
-                if(decks[d].set_code === set_code) {
-                    if (!deck1) deck1 = d
-                    else deck2 = d
-                }
-            })
+            // const deckNames = Object.keys(decks)
+            // deckNames.forEach((d) => {
+            //     if(decks[d].setCode === setCode) {
+            //         if (!deck1) deck1 = d
+            //         else deck2 = d
+            //     }
+            // })
             
-            for (let i = 0; i < prints.length; i++) {
-                const print = prints[i]
-                const market_price = Math.round(print.market_price) || 1
-                const d1quantity = decks[deck1].cards[print.card_code] || 0
-                const d2quantity = decks[deck2].cards[print.card_code] || 0
-                deck1Price += (d1quantity * market_price)
-                deck2Price += (d2quantity * market_price)
-            }
+            // for (let i = 0; i < prints.length; i++) {
+            //     const print = prints[i]
+            //     const marketPrice = Math.round(print.marketPrice) || 1
+            //     const d1quantity = decks[deck1].cards[print.cardCode] || 0
+            //     const d2quantity = decks[deck2].cards[print.cardCode] || 0
+            //     deck1Price += (d1quantity * marketPrice)
+            //     deck2Price += (d2quantity * marketPrice)
+            // }
 
             const avgDeckPrice = (deck1Price + deck2Price) / 2
-            set.unit_price = Math.round(avgDeckPrice / 10) * 10
+            set.unitPrice = Math.round(avgDeckPrice / 10) * 10
             await set.save()
         }
     }
 }
 
 // UPDATE SHOP
-const updateShop = async () => {
+export const updateShop = async () => {
     await calcBoxPrice()
-    await unfreeze()
     const shopChannel = client.channels.cache.get(shopChannelId)
     shopChannel.bulkDelete(100).catch((err) => console.log(err))
 
@@ -473,9 +434,9 @@ const updateShop = async () => {
             `\n${master} --- Core Products --- ${master}`
         ]
     
-        const setsForSale = await Set.findAll({ 
+        const setsForSale = await ForgedSet.findAll({ 
             where: { 
-                for_sale: true
+                forSale: true
              },
              order: [['createdAt', 'DESC']]
         })
@@ -483,11 +444,11 @@ const updateShop = async () => {
         for (let i = 0; i < setsForSale.length; i++) {
             const set = setsForSale[i]
             if (set.type === 'core') {
-                results.push(`${set.box_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Box`)
-                if (set.specs_for_sale) results.push(`${set.spec_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - SE`)
-                results.push(`${set.unit_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Pack`)
+                results.push(`${set.boxPrice}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Box`)
+                if (set.specs_forSale) results.push(`${set.specPrice}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - SE`)
+                results.push(`${set.unitPrice}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Pack`)
             } else if (set.type === 'mini') {
-                results.push(`${set.unit_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Pack`)
+                results.push(`${set.unitPrice}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Pack`)
             }
         }
     
@@ -495,17 +456,17 @@ const updateShop = async () => {
             const set = setsForSale[i]
             if (set.type === 'starter_deck') {
                 if (set.name === 'Starter Series 1') {
-                    results.push(`${set.unit_price}${eval(set.currency)} - Fish's Ire ${eval(set.emoji)} - Deck`)
-                    results.push(`${set.unit_price}${eval(set.currency)} - Rock's Foundation ${eval(set.alt_emoji)} - Deck`)
+                    results.push(`${set.unitPrice}${eval(set.currency)} - Fish's Ire ${eval(set.emoji)} - Deck`)
+                    results.push(`${set.unitPrice}${eval(set.currency)} - Rock's Foundation ${eval(set.altEmoji)} - Deck`)
                 } else if (set.name === 'Starter Series 2') {
-                    results.push(`${set.unit_price}${eval(set.currency)} - Dinosaur's Power ${eval(set.emoji)} - Deck`)
-                    results.push(`${set.unit_price}${eval(set.currency)} - Plant's Harmony ${eval(set.alt_emoji)} - Deck`)
+                    results.push(`${set.unitPrice}${eval(set.currency)} - Dinosaur's Power ${eval(set.emoji)} - Deck`)
+                    results.push(`${set.unitPrice}${eval(set.currency)} - Plant's Harmony ${eval(set.altEmoji)} - Deck`)
                 } else if (set.name === 'Starter Series 3') {
-                    results.push(`${set.unit_price}${eval(set.currency)} - Dragon's Inferno ${eval(set.emoji)} - Deck`)
-                    results.push(`${set.unit_price}${eval(set.currency)} - Spellcaster's Art ${eval(set.alt_emoji)} - Deck`)
+                    results.push(`${set.unitPrice}${eval(set.currency)} - Dragon's Inferno ${eval(set.emoji)} - Deck`)
+                    results.push(`${set.unitPrice}${eval(set.currency)} - Spellcaster's Art ${eval(set.altEmoji)} - Deck`)
                 } else if (set.name === 'Starter Series 4') {
-                    results.push(`${set.unit_price}${eval(set.currency)} - Reptile's Charm ${eval(set.emoji)} - Deck`)
-                    results.push(`${set.unit_price}${eval(set.currency)} - Warrior's Legend ${eval(set.alt_emoji)} - Deck`)
+                    results.push(`${set.unitPrice}${eval(set.currency)} - Reptile's Charm ${eval(set.emoji)} - Deck`)
+                    results.push(`${set.unitPrice}${eval(set.currency)} - Warrior's Legend ${eval(set.altEmoji)} - Deck`)
                 }
             }
         }
@@ -513,27 +474,28 @@ const updateShop = async () => {
         const auctions = await Auction.findAll()
         const auction_printIds = auctions.map((a) => a.printId)
 
-        const shopInv = await Inventory.findAll({ 
+        const shopInvs = await ForgedInventory.findAll({ 
             where: { 
-                playerId: merchbotId,
+                playerId: 'ZXyLL1wTcEZXSZYtegEuTr',
                 quantity: {
                     [Op.gte]: 1
                 }
              },
-            include: Print,
-            order: [[Print, 'market_price', 'DESC']]
+            include: ForgedPrint,
+            order: [[ForgedPrint, 'marketPrice', 'DESC']]
         })
 
         results.push(`\n${ygocard} --- Single Cards --- ${ygocard}`)
     
-        for (let i = 0; i < shopInv.length; i++) {
-            const inv = shopInv[i]
-            const print = inv.print
+        for (let i = 0; i < shopInvs.length; i++) {
+            const inv = shopInvs[i]
+            const print = inv.forgedPrint
+            if (!print) continue
             const excluded = !!auction_printIds.includes(print.id)
-            const market_price = print.market_price
-            const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
-            const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(print.rarity)}${inv.card_code} - ${print.card_name} - ${inv.quantity}${print.frozen ? " - ❄️" : print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}${excluded ? ` - ${no}` : ''}`) 
+            const marketPrice = print.marketPrice
+            const buyingPrice = Math.floor(marketPrice * 0.7) > 0 ? Math.floor(marketPrice * 0.7) : 1
+            const sellingPrice = Math.floor(marketPrice * 1.1) > buyingPrice ? Math.floor(marketPrice * 1.1) : buyingPrice + 1
+            results.push(`${sellingPrice}${stardust}| ${buyingPrice}${stardust}-${eval(print.rarity)}${inv.cardCode} - ${print.cardName} - ${inv.quantity}${print.trendingUp ? ` - ${upward}` : ''}${print.trendingDown ? ` - ${downward}` : ''}${excluded ? ` - ${no}` : ''}`) 
         }
     
         for (let i = 0; i < results.length; i += 10) {
@@ -547,9 +509,8 @@ const updateShop = async () => {
 }
 
 // POST BIDS
-const postBids = async () => {
+export const postBids = async () => {
     await calcBoxPrice()
-    await unfreeze()
     const shopChannel = client.channels.cache.get(shopChannelId)
     shopChannel.bulkDelete(100).catch((err) => console.log(err))
     
@@ -575,9 +536,9 @@ const postBids = async () => {
             `\n${master} --- Core Products --- ${master}`
         ]
     
-        const setsForSale = await Set.findAll({ 
+        const setsForSale = await ForgedSet.findAll({ 
             where: { 
-                for_sale: true
+                forSale: true
              },
              order: [['createdAt', 'DESC']]
         })
@@ -585,11 +546,11 @@ const postBids = async () => {
         for (let i = 0; i < setsForSale.length; i++) {
             const set = setsForSale[i]
             if (set.type === 'core') {
-                results.push(`${set.box_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Box`)
-                if (set.specs_for_sale) results.push(`${set.spec_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - SE`)
-                results.push(`${set.unit_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Pack`)
+                results.push(`${set.boxPrice}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Box`)
+                if (set.specs_forSale) results.push(`${set.specPrice}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - SE`)
+                results.push(`${set.unitPrice}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Pack`)
             } else if (set.type === 'mini') {
-                results.push(`${set.unit_price}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Pack`)
+                results.push(`${set.unitPrice}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Pack`)
             }
         }
     
@@ -597,17 +558,17 @@ const postBids = async () => {
             const set = setsForSale[i]
             if (set.type === 'starter_deck') {
                 if (set.name === 'Starter Series 1') {
-                    results.push(`${set.unit_price}${eval(set.currency)} - Fish's Ire ${eval(set.emoji)} - Deck`)
-                    results.push(`${set.unit_price}${eval(set.currency)} - Rock's Foundation ${eval(set.alt_emoji)} - Deck`)
+                    results.push(`${set.unitPrice}${eval(set.currency)} - Fish's Ire ${eval(set.emoji)} - Deck`)
+                    results.push(`${set.unitPrice}${eval(set.currency)} - Rock's Foundation ${eval(set.altEmoji)} - Deck`)
                 } else if (set.name === 'Starter Series 2') {
-                    results.push(`${set.unit_price}${eval(set.currency)} - Dinosaur's Power ${eval(set.emoji)} - Deck`)
-                    results.push(`${set.unit_price}${eval(set.currency)} - Plant's Harmony ${eval(set.alt_emoji)} - Deck`)
+                    results.push(`${set.unitPrice}${eval(set.currency)} - Dinosaur's Power ${eval(set.emoji)} - Deck`)
+                    results.push(`${set.unitPrice}${eval(set.currency)} - Plant's Harmony ${eval(set.altEmoji)} - Deck`)
                 } else if (set.name === 'Starter Series 3') {
-                    results.push(`${set.unit_price}${eval(set.currency)} - Dragon's Inferno ${eval(set.emoji)} - Deck`)
-                    results.push(`${set.unit_price}${eval(set.currency)} - Spellcaster's Art ${eval(set.alt_emoji)} - Deck`)
+                    results.push(`${set.unitPrice}${eval(set.currency)} - Dragon's Inferno ${eval(set.emoji)} - Deck`)
+                    results.push(`${set.unitPrice}${eval(set.currency)} - Spellcaster's Art ${eval(set.altEmoji)} - Deck`)
                 } else if (set.name === 'Starter Series 4') {
-                    results.push(`${set.unit_price}${eval(set.currency)} - Reptile's Charm ${eval(set.emoji)} - Deck`)
-                    results.push(`${set.unit_price}${eval(set.currency)} - Warrior's Legend ${eval(set.alt_emoji)} - Deck`)
+                    results.push(`${set.unitPrice}${eval(set.currency)} - Reptile's Charm ${eval(set.emoji)} - Deck`)
+                    results.push(`${set.unitPrice}${eval(set.currency)} - Warrior's Legend ${eval(set.altEmoji)} - Deck`)
                 }
             }
         }
@@ -615,55 +576,56 @@ const postBids = async () => {
         results.push(`\n💰 --- Singles Auction --- 💰`)
 
         const auctions = await Auction.findAll({ 
-            include: Print,
-            order: [[Print, 'market_price', 'DESC']]
+            include: ForgedPrint,
+            order: [[ForgedPrint, 'marketPrice', 'DESC']]
         })
     
-        const auction_printIds = auctions.map((a) => a.printId)
+        // const auction_printIds = auctions.map((a) => a.printId)
 
         if (!auctions.length) results.push('N/A')
         for (let i = 0; i < auctions.length; i++) {
-            const card_code = auctions[i].card_code
-            const inv = await Inventory.findOne({
+            const cardCode = auctions[i].cardCode
+            const inv = await ForgedInventory.findOne({
                 where: {
                     quantity: {
                         [Op.gte]: 1
                     },
                     playerId: merchbotId,
-                    card_code
-                }, include: Print
+                    cardCode: cardCode
+                }, include: ForgedPrint
             })
 
             if (!inv) continue
-            const market_price = inv.print.market_price
-            const selling_price = Math.ceil(market_price * 1.1)
-            const buying_price = Math.ceil(market_price * 0.7)
-            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(inv.print.rarity)}${inv.card_code} - ${inv.print.card_name} - ${inv.quantity}`) 
+            const marketPrice = inv.forgedPrint.marketPrice
+            const sellingPrice = Math.ceil(marketPrice * 1.1)
+            const buyingPrice = Math.ceil(marketPrice * 0.7)
+            results.push(`${sellingPrice}${stardust}| ${buyingPrice}${stardust}-${eval(inv.forgedPrint.rarity)}${inv.cardCode} - ${inv.cardName} - ${inv.quantity}`) 
         }
 
-        const shopInv = await Inventory.findAll({ 
-            where: { 
-                playerId: merchbotId,
-                quantity: {
-                    [Op.gte]: 1
-                }
-             },
-            include: Print,
-            order: [[Print, 'market_price', 'DESC']]
-        })
+        // const shopInvs = await ForgedInventory.findAll({ 
+        //     where: { 
+        //         playerId: 'ZXyLL1wTcEZXSZYtegEuTr',
+        //         quantity: {
+        //             [Op.gte]: 1
+        //         }
+        //      },
+        //     include: ForgedPrint,
+        //     order: [[ForgedPrint, 'marketPrice', 'DESC']]
+        // })
 
-        results.push(`\n${ygocard} --- Single Cards --- ${ygocard}`)
+        // results.push(`\n${ygocard} --- Single Cards --- ${ygocard}`)
     
-        for (let i = 0; i < shopInv.length; i++) {
-            const inv = shopInv[i]
-            const print = inv.print
-            const excluded = !!auction_printIds.includes(print.id)
-            if (excluded) continue
-            const market_price = print.market_price
-            const buying_price = Math.floor(market_price * 0.7) > 0 ? Math.floor(market_price * 0.7) : 1
-            const selling_price = Math.floor(market_price * 1.1) > buying_price ? Math.floor(market_price * 1.1) : buying_price + 1
-            results.push(`${selling_price}${stardust}| ${buying_price}${stardust}-${eval(print.rarity)}${inv.card_code} - ${print.card_name} - ${inv.quantity}${print.frozen ? " - ❄️" : print.trending_up ? ` - ${upward}` : ''}${print.trending_down ? ` - ${downward}` : ''}`) 
-        }
+        // for (let i = 0; i < shopInvs.length; i++) {
+        //     const inv = shopInvs[i]
+        //     const print = inv.forgedPrint
+        //     if (!print) continue
+        //     const excluded = !!auction_printIds.includes(print.id)
+        //     if (excluded) continue
+        //     const marketPrice = print.marketPrice
+        //     const buyingPrice = Math.floor(marketPrice * 0.7) > 0 ? Math.floor(marketPrice * 0.7) : 1
+        //     const sellingPrice = Math.floor(marketPrice * 1.1) > buyingPrice ? Math.floor(marketPrice * 1.1) : buyingPrice + 1
+        //     results.push(`${sellingPrice}${stardust}| ${buyingPrice}${stardust}-${eval(print.rarity)}${inv.cardCode} - ${print.cardName} - ${inv.quantity}${print.trendingUp ? ` - ${upward}` : ''}${print.trendingDown ? ` - ${downward}` : ''}`) 
+        // }
     
         for (let i = 0; i < results.length; i += 10) {
             shopChannel.send({ content: results.slice(i, i+10).join('\n').toString() })
@@ -672,9 +634,9 @@ const postBids = async () => {
 }
 
 // ASK FOR DUMP CONFIRMATION
-const askForDumpConfirmation = async (message, set, cards, compensation, count) => {
-    const prompt = set && set.emoji === set.alt_emoji ? `${set.code} ${eval(set.emoji)}` :
-    set && set.emoji !== set.alt_emoji ? `${set.code} ${eval(set.emoji)}${eval(set.alt_emoji)}` :
+export const askForDumpConfirmation = async (message, set, cards, compensation, count) => {
+    const prompt = set && set.emoji === set.altEmoji ? `${set.code} ${eval(set.emoji)}` :
+    set && set.emoji !== set.altEmoji ? `${set.code} ${eval(set.emoji)}${eval(set.altEmoji)}` :
     ''
 
     cards.unshift(`Are you sure you want to sell the following ${count} ${prompt} cards:`)
@@ -699,7 +661,7 @@ const askForDumpConfirmation = async (message, set, cards, compensation, count) 
 }
 
 // GET DUMP RARITY
-const getDumpRarity = async (message) => {
+export const getDumpRarity = async (message) => {
     const filter = m => m.author.id === message.member.user.id
 	message.channel.send({ content: `What rarity would you like to bulk sell?\n(1) all\n(2) common\n(3) rare\n(4) super\n(5) ultra\n(6) secret`})
     return await message.channel.awaitMessages({ filter,
@@ -724,7 +686,7 @@ const getDumpRarity = async (message) => {
 }
 
 // GET DUMP QUANTITY
-const getDumpQuantity = async (message, rarity) => {
+export const getDumpQuantity = async (message, rarity) => {
     const filter = m => m.author.id === message.member.user.id
 	message.channel.send({ content: `How many of each ${rarity === 'all' ? 'card' : eval(rarity)} do you want to keep?`})
     return await message.channel.awaitMessages({ filter,
@@ -748,7 +710,7 @@ const getDumpQuantity = async (message, rarity) => {
 
 
 // ASK FOR EXCLUSIONS
-const askForExclusions = async (message) => {
+export const askForExclusions = async (message) => {
     const filter = m => m.author.id === message.member.user.id
 	message.channel.send({ content: `Do you want to exclude any cards?`})
     return await message.channel.awaitMessages({ 
@@ -773,10 +735,10 @@ const askForExclusions = async (message) => {
 
 
 // GET EXCLUSIONS
-const getExclusions = async (message, rarity, set) => {
+export const getExclusions = async (message, rarity, set) => {
     const filter = m => m.author.id === message.member.user.id
-    const prompt = set && set.emoji === set.alt_emoji ? `${set.code} ${eval(set.emoji)}` :
-        set && set.emoji !== set.alt_emoji ? `${set.code} ${eval(set.emoji)}${eval(set.alt_emoji)}` :
+    const prompt = set && set.emoji === set.altEmoji ? `${set.code} ${eval(set.emoji)}` :
+        set && set.emoji !== set.altEmoji ? `${set.code} ${eval(set.emoji)}${eval(set.altEmoji)}` :
         ''
 
 	message.channel.send({ content: `Please provide a list of ${rarity === 'all' ? '' : eval(rarity)}${prompt} cards you do not want to bulk sell.`})
@@ -800,19 +762,19 @@ const getExclusions = async (message, rarity, set) => {
 
 
 // GET EXCLUDED PRINTS
-const getExcludedPrintIds = async (message, rarity, set, exclusions, fuzzyPrints) => {
+export const getExcludedPrintIds = async (message, rarity, set, exclusions, fuzzyPrints) => {
     const playerId = message.author.id
     const printIds = []
 
     for (let i = 0; i < exclusions.length; i++) {
         const query = exclusions[i].split(' ').filter((el) => el !== '').join(' ')
-		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-		const card_name = await findCard(query, fuzzyPrints)
-		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
+		const cardCode = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
+		const cardName = await findCard(query, fuzzyPrints)
+		const validCardCode = !!(cardCode.length === 7 && isFinite(cardCode.slice(-3)) && await ForgedSet.count({where: { code: cardCode.slice(0, 3) }}))
 	
-		const print = valid_card_code ? await Print.findOne({ where: { card_code: card_code }}) :
-                    card_name && set ? await Print.findOne({ where: { card_name: card_name, set_code: set.code }}) :
-                    card_name && !set ? await selectPrint(message, playerId, card_name) :
+		const print = validCardCode ? await ForgedPrint.findOne({ where: { cardCode: cardCode }}) :
+                    cardName && set ? await ForgedPrint.findOne({ where: { cardName: cardName, setCode: set.code }}) :
+                    cardName && !set ? await selectPrint(message, playerId, cardName) :
                     null
 		
         if (!print) {
@@ -820,8 +782,8 @@ const getExcludedPrintIds = async (message, rarity, set, exclusions, fuzzyPrints
             return false
         }
 
-        if ((set && print.setId !== set.id) || (rarity !== 'all' && print.rarity !== rarity)) {
-            message.channel.send({ content: `Sorry, "${query}" A.K.A. ${print.card_name} is not a ${rarity === 'all' ? '' : eval(rarity)}${set.code} ${set.emoji === set.alt_emoji ? eval(set.emoji) : eval(set.emoji), eval(set.alt_emoji)} card.`})
+        if ((set && print.forgedSetId !== set.id) || (rarity !== 'all' && print.rarity !== rarity)) {
+            message.channel.send({ content: `Sorry, "${query}" A.K.A. ${print.cardName} is not a ${rarity === 'all' ? '' : eval(rarity)}${set.code} ${set.emoji === set.altEmoji ? eval(set.emoji) : eval(set.emoji), eval(set.altEmoji)} card.`})
             return false
         }
 
@@ -832,7 +794,7 @@ const getExcludedPrintIds = async (message, rarity, set, exclusions, fuzzyPrints
 }
 
 // GET BARTER DIRECTION
-const getBarterDirection = async (message) => {
+export const getBarterDirection = async (message) => {
     const options = [
         `(1) A Card`,
         `(2) Vouchers`,
@@ -846,7 +808,7 @@ const getBarterDirection = async (message) => {
     }).then((collected) => {
         const response = collected.first().content.toLowerCase()
         if(response.includes('1') || response.includes('card')) {
-            return 'get_card'
+            return 'getCard'
         } else if(response.includes('2') || response.includes('vouch')) {
             return 'get_vouchers'
         } else {
@@ -861,7 +823,7 @@ const getBarterDirection = async (message) => {
 }
 
 // GET VOUCHER
-const getVoucher = async (message) => {
+export const getVoucher = async (message) => {
     const options = [
         `(1) Forgestones ${forgestone}`,
         `(2) Mushrooms ${mushroom}`,
@@ -927,7 +889,7 @@ const getVoucher = async (message) => {
 
 
 // GET TRIBE
-const getTribe = async (message, player) => {
+export const getTribe = async (message, player) => {
     const options = [
         `(1) Beast ${beast}`,
         `(2) Rock ${rock}`,
@@ -990,7 +952,7 @@ const getTribe = async (message, player) => {
 
 
 // GET BARTER CARD
-const getBarterCard = async (message, voucher, medium_complete) => {
+export const getBarterCard = async (message, voucher, mediumComplete) => {
     const wares = {
         mushroom: {
             original: [[10, 'APC-001', `(1) ${ult}APC-001 - Desmanian Devil - 10 ${mushroom}`]],
@@ -1071,7 +1033,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
     }
 
     if (!wares[voucher]) return false
-    const options = medium_complete ? [...wares[voucher].original, ...wares[voucher].unlocked] : [...wares[voucher].original]
+    const options = mediumComplete ? [...wares[voucher].original, ...wares[voucher].unlocked] : [...wares[voucher].original]
     if (options.length === 1) return options[0]
     const cards = options.map((o) => o[2])
     
@@ -1100,7 +1062,7 @@ const getBarterCard = async (message, voucher, medium_complete) => {
 
 
 // GET BARTER QUERY
-const getBarterQuery = async (message) => {
+export const getBarterQuery = async (message) => {
     const filter = m => m.author.id === message.member.user.id
 	message.channel.send({ content: `Which card would you like to exchange ${forgestone} for?`})
     return await message.channel.awaitMessages({ filter,
@@ -1118,7 +1080,7 @@ const getBarterQuery = async (message) => {
 
 
 // GET TRADE-IN CARD
-const getTradeInCard = async (message, medium_complete) => {
+export const getTradeInCard = async (message, mediumComplete) => {
     const options = [
         [10, 'APC-001', `(1) ${ult}APC-001 - Desmanian Devil - 10 ${mushroom}`, 'mushroom'],
         [10, 'APC-002', `(2) ${ult}APC-002 - Koa'ki Meiru Guardian - 10 ${moai}`, 'moai'],
@@ -1184,8 +1146,8 @@ const getTradeInCard = async (message, medium_complete) => {
 
 
 // ASK FOR BARTER CONFIRMATION
-const askForBarterConfirmation = async (message, voucher, card, price, direction) => {
-    const prompt = direction === 'get_card' ? `Are you sure you want to exchange ${price} ${eval(voucher)} for a copy of ${card}?` :
+export const askForBarterConfirmation = async (message, voucher, card, price, direction) => {
+    const prompt = direction === 'getCard' ? `Are you sure you want to exchange ${price} ${eval(voucher)} for a copy of ${card}?` :
         `Are you sure you want to exchange a copy of ${card} for ${price} ${eval(voucher)}?`
         
     const filter = m => m.author.id === message.author.id
@@ -1204,28 +1166,28 @@ const askForBarterConfirmation = async (message, voucher, card, price, direction
 }
 
 
-module.exports = {
-    applyPriceDecay,
-    askForBarterConfirmation,
-    askForDumpConfirmation,
-    askForExclusions,
-    checkShopOpen,
-    checkShopShouldBe,
-    clearDailies,
-    closeShop,
-    getBarterCard,
-    getBarterQuery,
-    getBarterDirection,
-    getDumpRarity,
-    getDumpQuantity,
-    getExclusions,
-    getExcludedPrintIds,
-    getMidnightCountdown,
-    getShopCountdown,
-    getTradeInCard,
-    getTribe,
-    getVoucher,
-    openShop,
-    postBids,
-    updateShop
-}
+// module.exports = {
+//     applyPriceDecay,
+//     askForBarterConfirmation,
+//     askForDumpConfirmation,
+//     askForExclusions,
+//     checkShopOpen,
+//     checkShopShouldBe,
+//     clearDailies,
+//     closeShop,
+//     getBarterCard,
+//     getBarterQuery,
+//     getBarterDirection,
+//     getDumpRarity,
+//     getDumpQuantity,
+//     getExclusions,
+//     getExcludedPrintIds,
+//     getMidnightCountdown,
+//     getShopCountdown,
+//     getTradeInCard,
+//     getTribe,
+//     getVoucher,
+//     openShop,
+//     postBids,
+//     updateShop
+// }

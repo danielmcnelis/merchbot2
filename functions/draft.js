@@ -1,13 +1,13 @@
 
 
 
-const Canvas = require('canvas')
+import * as Canvas from 'canvas'
 const Discord = require('discord.js')
 const fs = require('fs')
-const { Card, Draft, Diary, Info, Player, Pool, Print, Profile, Set, Wallet, Match, Inventory } = require('../db')
-const { Op } = require('sequelize')
+const { Card, Draft, Diary, Info, Player, Pool, Print, Profile, Set, Wallet, Match, Inventory } = require('../database/index.js')
+import { Op } from 'sequelize'
 const { yescom, nocom } = require('../static/commands.json')
-const { forgestone, galaxy, king, shrine, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, DRT, fiend, thunder, zombie, diamond, dinosaur, DOC, LPK, dragon, draft, egg, emptybox, evil, FiC, skull, familiar, battery, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, spellcaster, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
+const { forgestone, galaxy, king, shrine, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, DRT, fiend, thunder, zombie, diamond, dinosaur, DOC, LPK, dragon, draft, egg, emptybox, evil, FiC, skull, familiar, battery, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, spellcaster, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, dimmadome, sup, tix, ult, wokefrog, yellow, yes, ygocard } = require('../static/emojis.json')
 const { draftRole } = require('../static/roles.json')
 const { draftChannelId } = require('../static/channels.json')
 const { client } = require('../static/clients.js')
@@ -15,7 +15,7 @@ const { findCard } = require('./search.js')
 const { shuffleArray, getRandomElement, getRandomSubset, capitalize } = require('./utility.js')
 
 //START DRAFT
-const startDraft = async(fuzzyPrints) => {
+export const startDraft = async(fuzzyPrints) => {
     const channel = client.channels.cache.get(draftChannelId)
     channel.send({ content: `Draft players, please check your DMs!`})
     const entries = await Draft.findAll({ include: Player })
@@ -98,7 +98,7 @@ const startDraft = async(fuzzyPrints) => {
 }
 
 //GET CONFIRMATION
-const getConfirmation = async (entry, contestant) => {
+export const getConfirmation = async (entry, contestant) => {
     const draftChannel = client.channels.cache.get(draftChannelId)
     const playerId = entry.playerId
     const guild = client.guilds.cache.get("842476300022054913")
@@ -138,7 +138,7 @@ const getConfirmation = async (entry, contestant) => {
 }
 
 //ASSIGN DRAFT ROLES
-const assignDraftRoles = (entries) => {
+export const assignDraftRoles = (entries) => {
     const guild = client.guilds.cache.get("842476300022054913")
     entries.forEach((entry) => {
         const member = guild.members.cache.get(entry.playerId)
@@ -148,7 +148,7 @@ const assignDraftRoles = (entries) => {
 
 
 //CREATE PACKS
-const createPacks = async (fuzzyPrints) => {
+export const createPacks = async (fuzzyPrints) => {
     const channel = client.channels.cache.get(draftChannelId)
     const set = await Set.findOne({ where: { code: 'GL1' } })
     if (!set) return channel.send({ content: `Could not find set.`})
@@ -164,24 +164,24 @@ const createPacks = async (fuzzyPrints) => {
 			setId: set.id,
 			rarity: "com"
 		},
-		order: [['card_slot', 'ASC']]
-	})].map((p) => p.card_code)
+		order: [['cardSlot', 'ASC']]
+	})].map((p) => p.cardCode)
 
 	const rares = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "rar"
 		},
-		order: [['card_slot', 'ASC']]
-	})].map((p) => p.card_code)
+		order: [['cardSlot', 'ASC']]
+	})].map((p) => p.cardCode)
 
 	const supers = [...await Print.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "sup"
 		},
-		order: [['card_slot', 'ASC']]
-	})].map((p) => p.card_code)
+		order: [['cardSlot', 'ASC']]
+	})].map((p) => p.cardCode)
 
 
     for (let j = 0; j < 4; j++) {
@@ -189,17 +189,17 @@ const createPacks = async (fuzzyPrints) => {
         const pack_rares = getRandomSubset(rares, 5).sort()
 		const pack_super = getRandomElement(supers)
         const pack = [pack_super, ...pack_rares, ...pack_commons]
-        const pack_code = `pack_${j + 1}`
+        const packCode = `pack_${j + 1}`
 
         for (let i = 0; i < pack.length; i++) {
-            const card_code = pack[i]
-            const print = await Print.findOne({ where: { card_code: card_code }})
-            if (!print.id) return channel.send({ content: `${card_code} does not exist in the Print database.`})
+            const cardCode = pack[i]
+            const print = await Print.findOne({ where: { cardCode: cardCode }})
+            if (!print.id) return channel.send({ content: `${cardCode} does not exist in the Print database.`})
     
             const pool = await Pool.create({ 
-                pack_code: pack_code,
-                card_code: print.card_code,
-                card_name: print.card_name,
+                packCode: packCode,
+                cardCode: print.cardCode,
+                cardName: print.cardName,
                 printId: print.id
             })
 
@@ -211,13 +211,13 @@ const createPacks = async (fuzzyPrints) => {
 }
 
 // DRAFT CARDS
-const draftCards = async (fuzzyPrints) => {
+export const draftCards = async (fuzzyPrints) => {
     const info = await Info.findOne({ where: { element: 'draft' }})
     const entries = await Draft.findAll({ include: Player, order: [['contestant', 'ASC']] })
-    const pack_1 = await Pool.findAll({ where: { pack_code: 'pack_1' }, include: Print, order: [['id', 'ASC']] })
-    const pack_2 = await Pool.findAll({ where: { pack_code: 'pack_2' }, include: Print, order: [['id', 'ASC']] })
-    const pack_3 = await Pool.findAll({ where: { pack_code: 'pack_3' }, include: Print, order: [['id', 'ASC']] })
-    const pack_4 = await Pool.findAll({ where: { pack_code: 'pack_4' }, include: Print, order: [['id', 'ASC']] })
+    const pack_1 = await Pool.findAll({ where: { packCode: 'pack_1' }, include: Print, order: [['id', 'ASC']] })
+    const pack_2 = await Pool.findAll({ where: { packCode: 'pack_2' }, include: Print, order: [['id', 'ASC']] })
+    const pack_3 = await Pool.findAll({ where: { packCode: 'pack_3' }, include: Print, order: [['id', 'ASC']] })
+    const pack_4 = await Pool.findAll({ where: { packCode: 'pack_4' }, include: Print, order: [['id', 'ASC']] })
 
     const P1_pack = info.count % 4 === 1 ? pack_1 :
         info.count % 4 === 2 && info.round % 2 === 1 ? pack_2 :
@@ -275,7 +275,7 @@ const draftCards = async (fuzzyPrints) => {
 }
 
 //SEND INVENTORIES
-const sendInventories = async (entries, round) => {
+export const sendInventories = async (entries, round) => {
     const guild = client.guilds.cache.get("842476300022054913")
 
     for (let i = 0; i < entries.length; i++) {
@@ -293,7 +293,7 @@ const sendInventories = async (entries, round) => {
                 }
             },
            include: Print,
-           order: [['card_code', 'ASC']]
+           order: [['cardCode', 'ASC']]
         })
 
         const ydk = []
@@ -306,7 +306,7 @@ const sendInventories = async (entries, round) => {
 		for (let i = 0; i < invs.length; i++) {
 			const inv = invs[i]
 			const print = inv.print
-			results.push(`${eval(print.rarity)}${print.card_code} - ${print.card_name} - ${inv.quantity}`)
+			results.push(`${eval(print.rarity)}${print.cardCode} - ${print.cardName} - ${inv.quantity}`)
 
             const color = print.color
             if (color === 'yellow') yellows.push(inv)
@@ -317,9 +317,9 @@ const sendInventories = async (entries, round) => {
 		}
 
         const compare = (a, b) => {
-            if (a.print.card_name > b.print.card_name) {
+            if (a.print.cardName > b.print.cardName) {
                 return 1
-            } else if (a.print.card_name < b.print.card_name) {
+            } else if (a.print.cardName < b.print.cardName) {
                 return -1
             } else {
                 return 0
@@ -334,25 +334,25 @@ const sendInventories = async (entries, round) => {
 
         yellows.forEach((inv) => {
             for (let i = 0; i < inv.quantity; i++) {
-                ydk.push(inv.print.konami_code)
+                ydk.push(inv.print.konamiCode)
             }
         })
 
         oranges.forEach((inv) => {
             for (let i = 0; i < inv.quantity; i++) {
-                ydk.push(inv.print.konami_code)
+                ydk.push(inv.print.konamiCode)
             }
         })
 
         greens.forEach((inv) => {
             for (let i = 0; i < inv.quantity; i++) {
-                ydk.push(inv.print.konami_code)
+                ydk.push(inv.print.konamiCode)
             }
         })
 
         violets.forEach((inv) => {
             for (let i = 0; i < inv.quantity; i++) {
-                ydk.push(inv.print.konami_code)
+                ydk.push(inv.print.konamiCode)
             }
         })
 
@@ -366,7 +366,7 @@ const sendInventories = async (entries, round) => {
 
         purples.forEach((inv) => {
             for (let i = 0; i < inv.quantity; i++) {
-                ydk.splice(ydk.indexOf('!side'), 0, inv.print.konami_code)
+                ydk.splice(ydk.indexOf('!side'), 0, inv.print.konamiCode)
             }
         })
 
@@ -396,7 +396,7 @@ const sendInventories = async (entries, round) => {
 }
 
 //SEND UNIVERSAL STAPLES
-const sendUniversalStaples = async (entries) => {
+export const sendUniversalStaples = async (entries) => {
     const guild = client.guilds.cache.get("842476300022054913")
 
     for (let i = 0; i < entries.length; i++) {
@@ -404,7 +404,7 @@ const sendUniversalStaples = async (entries) => {
         const playerId = entry.playerId
                 
         await Inventory.create({
-            card_code: 'GL1-US1',
+            cardCode: 'GL1-US1',
             quantity: 1,
             draft: true,
             playerId: playerId,
@@ -412,7 +412,7 @@ const sendUniversalStaples = async (entries) => {
         })
 
         await Inventory.create({
-            card_code: 'GL1-US2',
+            cardCode: 'GL1-US2',
             quantity: 1,
             draft: true,
             playerId: playerId,
@@ -420,7 +420,7 @@ const sendUniversalStaples = async (entries) => {
         })
 
         await Inventory.create({
-            card_code: 'GL1-US3',
+            cardCode: 'GL1-US3',
             quantity: 1,
             draft: true,
             playerId: playerId,
@@ -428,7 +428,7 @@ const sendUniversalStaples = async (entries) => {
         })
 
         await Inventory.create({
-            card_code: 'GL1-US4',
+            cardCode: 'GL1-US4',
             quantity: 1,
             draft: true,
             playerId: playerId,
@@ -436,7 +436,7 @@ const sendUniversalStaples = async (entries) => {
         })
 
         await Inventory.create({
-            card_code: 'GL1-US5',
+            cardCode: 'GL1-US5',
             quantity: 1,
             draft: true,
             playerId: playerId,
@@ -444,7 +444,7 @@ const sendUniversalStaples = async (entries) => {
         })
 
         await Inventory.create({
-            card_code: 'GL1-US6',
+            cardCode: 'GL1-US6',
             quantity: 1,
             draft: true,
             playerId: playerId,
@@ -460,24 +460,24 @@ const sendUniversalStaples = async (entries) => {
                 playerId: playerId
             },
             include: Print
-        })].map((i) => `${eval(i.print.rarity)}${i.card_code} - ${i.print.card_name} - ${i.quantity}`)
+        })].map((i) => `${eval(i.print.rarity)}${i.cardCode} - ${i.print.cardName} - ${i.quantity}`)
 
         member.send({ content: `Your Draft Inventory begins with the 6 universal staples:\n` + draft_inv.join('\n') + `\n\nThere will be 4 rounds of opening and passing around Galaxy Packs ${galaxy}, in which each player selects 16 cards. At the end, you will have 64 drafted cards + 6 universal staples to construct a 40 card deck and side deck. Best of luck!`})
     }
 }
 
 //GET PICK
-const getPick = async (fuzzyPrints, entry, pack, count) => {
+export const getPick = async (fuzzyPrints, entry, pack, count) => {
     const playerId = entry.playerId
     const guild = client.guilds.cache.get("842476300022054913")
     const member = guild.members.cache.get(playerId)
     if (!member || playerId !== member.user.id) return
-    const cards = pack.map((p, index) => `(${index + 1}) ${eval(p.print.rarity)}${p.card_code} - ${p.card_name}` )
+    const cards = pack.map((p, index) => `(${index + 1}) ${eval(p.print.rarity)}${p.cardCode} - ${p.cardName}` )
 
-    const pack_code = pack[0].pack_code
-    const letter = pack_code === 'pack_1' ? 'A' : 
-        pack_code === 'pack_2' ? 'B' : 
-        pack_code === 'pack_3' ? 'C' : 
+    const packCode = pack[0].packCode
+    const letter = packCode === 'pack_1' ? 'A' : 
+        packCode === 'pack_2' ? 'B' : 
+        packCode === 'pack_3' ? 'C' : 
         'D'
 
     const images = []
@@ -485,7 +485,7 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
         const pool = pack[i]
         const print = pool.print
         const card = await Card.findOne({ where: {
-            name: print.card_name
+            name: print.cardName
         }})
 
         images.push(`${card.image_file}`)
@@ -494,16 +494,16 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
     const card_width = 57
     const cards_per_row = pack.length > 9 ? Math.ceil(pack.length / 2) : pack.length
     const card_height = 80
-    const rows_per_pack = pack.length > 9 ? 2 : 1
-    const canvas = Canvas.createCanvas(card_width * cards_per_row, card_height * rows_per_pack)
+    const rowsPerPack = pack.length > 9 ? 2 : 1
+    const canvas = Canvas.createCanvas(card_width * cards_per_row, card_height * rowsPerPack)
     const context = canvas.getContext('2d')
 
     for (let i = 0; i < pack.length; i++) {
         const card = fs.existsSync(`./public/card_images/${images[i]}`) ? 
         await Canvas.loadImage(`./public/card_images/${images[i]}`) :
         await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[i]}`)
-        const dx = i + 1 > cards_per_row && rows_per_pack > 1 ? card_width * (i - cards_per_row) : card_width * i
-        const dy = i + 1 > cards_per_row && rows_per_pack > 1 ? 80 : 0
+        const dx = i + 1 > cards_per_row && rowsPerPack > 1 ? card_width * (i - cards_per_row) : card_width * i
+        const dy = i + 1 > cards_per_row && rowsPerPack > 1 ? 80 : 0
         if (canvas && context && card) context.drawImage(card, dx, dy, card_width, card_height)
     }
 
@@ -520,27 +520,27 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
 		time: (24 - count) * 1000
 	}).then(async (collected) => {
 		const response = collected.first().content
-        const card_name = await findCard(response, fuzzyPrints)
+        const cardName = await findCard(response, fuzzyPrints)
         let pool_selection
         let auto_draft = false
-        if (pack.length > 0 && (response.replace(/[^0-9]/g, '') === '1' || card_name === pack[0].card_name)) pool_selection = pack[0]
-        if (pack.length > 1 && (response.replace(/[^0-9]/g, '') === '2' || card_name === pack[1].card_name)) pool_selection = pack[1]
-        if (pack.length > 2 && (response.replace(/[^0-9]/g, '') === '3' || card_name === pack[2].card_name)) pool_selection = pack[2]
-        if (pack.length > 3 && (response.replace(/[^0-9]/g, '') === '4' || card_name === pack[3].card_name)) pool_selection = pack[3]
-        if (pack.length > 4 && (response.replace(/[^0-9]/g, '') === '5' || card_name === pack[4].card_name)) pool_selection = pack[4]
-        if (pack.length > 5 && (response.replace(/[^0-9]/g, '') === '6' || card_name === pack[5].card_name)) pool_selection = pack[5]
-        if (pack.length > 6 && (response.replace(/[^0-9]/g, '') === '7' || card_name === pack[6].card_name)) pool_selection = pack[6]
-        if (pack.length > 7 && (response.replace(/[^0-9]/g, '') === '8' || card_name === pack[7].card_name)) pool_selection = pack[7]
-        if (pack.length > 8 && (response.replace(/[^0-9]/g, '') === '9' || card_name === pack[8].card_name)) pool_selection = pack[8]
-        if (pack.length > 9 && (response.replace(/[^0-9]/g, '') === '10' || card_name === pack[9].card_name)) pool_selection = pack[9]
-        if (pack.length > 10 && (response.replace(/[^0-9]/g, '') === '11' || card_name === pack[10].card_name)) pool_selection = pack[10]
-        if (pack.length > 11 && (response.replace(/[^0-9]/g, '') === '12' || card_name === pack[11].card_name)) pool_selection = pack[11]
-        if (pack.length > 12 && (response.replace(/[^0-9]/g, '') === '13' || card_name === pack[12].card_name)) pool_selection = pack[12]
-        if (pack.length > 13 && (response.replace(/[^0-9]/g, '') === '14' || card_name === pack[13].card_name)) pool_selection = pack[13]
-        if (pack.length > 14 && (response.replace(/[^0-9]/g, '') === '15' || card_name === pack[14].card_name)) pool_selection = pack[14]
-        if (pack.length > 15 && (response.replace(/[^0-9]/g, '') === '16' || card_name === pack[15].card_name)) pool_selection = pack[15]
-        if (pack.length > 16 && (response.replace(/[^0-9]/g, '') === '17' || card_name === pack[16].card_name)) pool_selection = pack[16]
-        if (pack.length > 17 && (response.replace(/[^0-9]/g, '') === '18' || card_name === pack[17].card_name)) pool_selection = pack[17]
+        if (pack.length > 0 && (response.replace(/[^0-9]/g, '') === '1' || cardName === pack[0].cardName)) pool_selection = pack[0]
+        if (pack.length > 1 && (response.replace(/[^0-9]/g, '') === '2' || cardName === pack[1].cardName)) pool_selection = pack[1]
+        if (pack.length > 2 && (response.replace(/[^0-9]/g, '') === '3' || cardName === pack[2].cardName)) pool_selection = pack[2]
+        if (pack.length > 3 && (response.replace(/[^0-9]/g, '') === '4' || cardName === pack[3].cardName)) pool_selection = pack[3]
+        if (pack.length > 4 && (response.replace(/[^0-9]/g, '') === '5' || cardName === pack[4].cardName)) pool_selection = pack[4]
+        if (pack.length > 5 && (response.replace(/[^0-9]/g, '') === '6' || cardName === pack[5].cardName)) pool_selection = pack[5]
+        if (pack.length > 6 && (response.replace(/[^0-9]/g, '') === '7' || cardName === pack[6].cardName)) pool_selection = pack[6]
+        if (pack.length > 7 && (response.replace(/[^0-9]/g, '') === '8' || cardName === pack[7].cardName)) pool_selection = pack[7]
+        if (pack.length > 8 && (response.replace(/[^0-9]/g, '') === '9' || cardName === pack[8].cardName)) pool_selection = pack[8]
+        if (pack.length > 9 && (response.replace(/[^0-9]/g, '') === '10' || cardName === pack[9].cardName)) pool_selection = pack[9]
+        if (pack.length > 10 && (response.replace(/[^0-9]/g, '') === '11' || cardName === pack[10].cardName)) pool_selection = pack[10]
+        if (pack.length > 11 && (response.replace(/[^0-9]/g, '') === '12' || cardName === pack[11].cardName)) pool_selection = pack[11]
+        if (pack.length > 12 && (response.replace(/[^0-9]/g, '') === '13' || cardName === pack[12].cardName)) pool_selection = pack[12]
+        if (pack.length > 13 && (response.replace(/[^0-9]/g, '') === '14' || cardName === pack[13].cardName)) pool_selection = pack[13]
+        if (pack.length > 14 && (response.replace(/[^0-9]/g, '') === '15' || cardName === pack[14].cardName)) pool_selection = pack[14]
+        if (pack.length > 15 && (response.replace(/[^0-9]/g, '') === '16' || cardName === pack[15].cardName)) pool_selection = pack[15]
+        if (pack.length > 16 && (response.replace(/[^0-9]/g, '') === '17' || cardName === pack[16].cardName)) pool_selection = pack[16]
+        if (pack.length > 17 && (response.replace(/[^0-9]/g, '') === '18' || cardName === pack[17].cardName)) pool_selection = pack[17]
         
         if (!pool_selection) {
             auto_draft = true
@@ -548,10 +548,10 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
             if (!pool_selection) pool_selection = pack[0]
         }
 
-        const card = `${eval(pool_selection.print.rarity)}${pool_selection.card_code} - ${pool_selection.card_name}`
+        const card = `${eval(pool_selection.print.rarity)}${pool_selection.cardCode} - ${pool_selection.cardName}`
 
         const inv = await Inventory.findOne({ where: {
-            card_code: pool_selection.card_code,
+            cardCode: pool_selection.cardCode,
             draft: true,
             printId: pool_selection.printId,
             playerId: playerId
@@ -562,7 +562,7 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
             await inv.save()
         } else {
             await Inventory.create({ 
-                card_code: pool_selection.card_code,
+                cardCode: pool_selection.cardCode,
                 quantity: 1,
                 draft: true,
                 printId: pool_selection.printId,
@@ -576,9 +576,9 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
 	}).catch(async (err) => {
         console.log(err)
         const pool_selection = await autoDraft(pack)
-        const card = `${eval(pool_selection.print.rarity)}${pool_selection.card_code} - ${pool_selection.card_name}`
+        const card = `${eval(pool_selection.print.rarity)}${pool_selection.cardCode} - ${pool_selection.cardName}`
         const inv = await Inventory.findOne({ where: {
-            card_code: pool_selection.card_code,
+            cardCode: pool_selection.cardCode,
             draft: true,
             printId: pool_selection.printId,
             playerId: playerId
@@ -589,7 +589,7 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
             await inv.save()
         } else {
             await Inventory.create({ 
-                card_code: pool_selection.card_code,
+                cardCode: pool_selection.cardCode,
                 quantity: 1,
                 draft: true,
                 printId: pool_selection.printId,
@@ -605,7 +605,7 @@ const getPick = async (fuzzyPrints, entry, pack, count) => {
 }
 
 //AUTO DRAFT
-const autoDraft = async (pack) => {
+export const autoDraft = async (pack) => {
     const supers = []
     const rares = []
     const commons = []
@@ -630,7 +630,7 @@ const autoDraft = async (pack) => {
 
 
 //START DRAFT ROUND
-const startDraftRound = async (info, entries) => {
+export const startDraftRound = async (info, entries) => {
     const channel = client.channels.cache.get(draftChannelId)
 
     if (info.round === 4) {
@@ -659,7 +659,7 @@ const startDraftRound = async (info, entries) => {
             wallet.forgestone += quantity
             await wallet.save()
 
-            channel.send({ content: `Congratulations to <@${playerId}> on a dazzling victory! You truly deserve these ${quantity} beautiful Forgestones${forgestone}! ${wokeaf}`})
+            channel.send({ content: `Congratulations to <@${playerId}> on a dazzling victory! You truly deserve these ${quantity} beautiful Forgestones${forgestone}! ${wokefrog}`})
             return endDraft(info, entries)
         } else if ((entries[0].score === entries[1].score) && entries[1].score > entries[2].score) {
         //2 way tie
@@ -680,7 +680,7 @@ const startDraftRound = async (info, entries) => {
                 const wallet = await Wallet.findOne({ where: { playerId: playerId }})
                 wallet.forgestone += quantity
                 await wallet.save()
-                channel.send({ content: `Congratulations to <@${playerId}> on a dazzling performance! You truly deserve these ${quantity} beautiful Forgestones${forgestone}! ${wokeaf}`})
+                channel.send({ content: `Congratulations to <@${playerId}> on a dazzling performance! You truly deserve these ${quantity} beautiful Forgestones${forgestone}! ${wokefrog}`})
             }
 
             return endDraft(info, entries)
@@ -701,7 +701,7 @@ const startDraftRound = async (info, entries) => {
                 const wallet = await Wallet.findOne({ where: { playerId: playerId }})
                 wallet.forgestone += quantity
                 await wallet.save()
-                channel.send({ content: `Congratulations to <@${playerId}> on a dazzling performance! You truly deserve these ${quantity} beautiful Forgestones${forgestone}! ${wokeaf}`})
+                channel.send({ content: `Congratulations to <@${playerId}> on a dazzling performance! You truly deserve these ${quantity} beautiful Forgestones${forgestone}! ${wokefrog}`})
             }
 
             return endDraft(info, entries)
@@ -809,7 +809,7 @@ const postStandings = async (info, entries) => {
 }
 
 //END DRAFT
-const endDraft = async (info, entries) => {
+export const endDraft = async (info, entries) => {
     const pools = await Pool.findAll()
 
     for (let i = 0; i < pools.length; i++) {
@@ -840,7 +840,7 @@ const endDraft = async (info, entries) => {
 }
 
 //RESET DRAFT
-const resetDraft = async (info, entries) => {
+export const resetDraft = async (info, entries) => {
     info.status = 'pending'
     info.round = null
     await info.save()
@@ -857,7 +857,7 @@ const resetDraft = async (info, entries) => {
 }
 
 //CHECK DRAFT PROGRESS
-const checkDraftProgress = async (info) => {
+export const checkDraftProgress = async (info) => {
     const channel = client.channels.cache.get(draftChannelId)
     const entries = await Draft.findAll({ include: Player, order: [["score", "DESC"]]})
     if (!entries) return channel.send({ content: `Critical error. Missing entries in the database.`}) 
@@ -873,15 +873,4 @@ const checkDraftProgress = async (info) => {
     const sum = scores.reduce((a, b) => a + b)
 
     if (sum % 2 === 0 && !progress_report.includes(true)) return setTimeout(() => postStandings(info, entries), 3000)
-}
-
-module.exports = {
-    checkDraftProgress,
-    createPacks,
-    draftCards,
-    endDraft,
-    resetDraft,
-    sendInventories,
-    startDraft,
-    startDraftRound
 }

@@ -1,6 +1,6 @@
 {
     "fish": {
-        "set_code":"SS1",
+        "setCode":"SS1",
         "name":"Fish's Ire",
         "cards": {
             "SS1-001":3,
@@ -28,7 +28,7 @@
         }
     },
     "rock": {
-        "set_code":"SS1",
+        "setCode":"SS1",
         "name":"Rock's Foundation",
         "cards": {
             "SS1-008":3,
@@ -56,7 +56,7 @@
         }
     },
     "dinosaur": {
-        "set_code":"SS2",
+        "setCode":"SS2",
         "name":"Dinosaur's Power",
         "cards": {
             "SS2-001":3,
@@ -96,7 +96,7 @@
         }
     },
     "plant": {
-        "set_code":"SS2",
+        "setCode":"SS2",
         "name":"Plant's Harmony",
         "cards": {
             "SS2-008":3,
@@ -136,7 +136,7 @@
         }
     },
     "dragon": {
-        "set_code":"SS3",
+        "setCode":"SS3",
         "name":"Dragon's Inferno",
         "cards": {
             "SS3-001":3,
@@ -180,7 +180,7 @@
         }
     },
     "spellcaster": {
-        "set_code":"SS3",
+        "setCode":"SS3",
         "name":"Spellcaster's Art",
         "cards": {
             "SS3-007":3,
@@ -224,7 +224,7 @@
         }
     },
     "reptile": {
-        "set_code":"SS4",
+        "setCode":"SS4",
         "name":"Reptile's Charm",
         "cards": {
             "SS4-001":3,
@@ -268,7 +268,7 @@
         }
     },
     "warrior": {
-        "set_code":"SS4",
+        "setCode":"SS4",
         "name":"Warrior's Legend",
         "cards": {
             "SS4-006":1,

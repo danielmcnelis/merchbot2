@@ -1,8 +1,8 @@
 
 
 //TRADE FUNCTIONS
-const { Inventory, Set, Trade, Print } = require('../db')
-const { Op } = require('sequelize')
+const { Inventory, Set, Trade, Print } = require('../database/index.js')
+import { Op } from 'sequelize'
 const { yescom } = require('../static/commands.json')
 const { stardust, com, rar, sup, ult, scr, skull, familiar, battery, egg, cactus, hook, moai, mushroom, rose, orb, gem, swords } = require('../static/emojis.json')
 const { findCard } = require('./search.js')
@@ -127,20 +127,20 @@ const getTradeSummary = async (message, inputs, player, fuzzyPrints) => {
 		if (query === 'familiar' || query === 'familiars' ) walletField = 'familiar'
 		if (query === 'battery' || query === 'batteries' ) walletField = 'battery'
 
-		const card_code = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
-		const card_name = await findCard(query, fuzzyPrints)
-		const valid_card_code = !!(card_code.length === 7 && isFinite(card_code.slice(-3)) && await Set.count({where: { code: card_code.slice(0, 3) }}))
-		const print = valid_card_code && !walletField ? await Print.findOne({ where: { card_code: card_code }}) :
-		card_name && !walletField ? await selectPrint(message, player.id, card_name, private = false, inInv = true) :
+		const cardCode = `${query.slice(0, 3).toUpperCase()}-${query.slice(-3)}`
+		const cardName = await findCard(query, fuzzyPrints)
+		const validCardCode = !!(cardCode.length === 7 && isFinite(cardCode.slice(-3)) && await Set.count({where: { code: cardCode.slice(0, 3) }}))
+		const print = validCardCode && !walletField ? await Print.findOne({ where: { cardCode: cardCode }}) :
+		cardName && !walletField ? await selectPrint(message, player.id, cardName, discrete = false, inInv = true) :
 		null
 
-		if (card_name && !print) {
-			message.channel.send({ content: `You do not have any copies of ${card_name}.`})
+		if (cardName && !print) {
+			message.channel.send({ content: `You do not have any copies of ${cardName}.`})
 			return false
 		} else if (!print && !walletField) {
 			message.channel.send({ content: `Sorry, I do not recognize the card: "${query}".`})
 			return false
-		} else if (print && print.set_code === 'FPC') {
+		} else if (print && print.setCode === 'FPC') {
 			message.channel.send({ content: `You cannot trade prize cards.`})
 			return false
 		}
@@ -151,7 +151,7 @@ const getTradeSummary = async (message, inputs, player, fuzzyPrints) => {
 		}
 
 		const card = walletField ? `${eval(walletField)} ${capitalize(walletField)}` :
-		`${eval(print.rarity)}${print.card_code} - ${print.card_name}`
+		`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`
 
 		const inv = print && !walletField ? await Inventory.findOne({ 
 			where: { 
@@ -198,7 +198,7 @@ const getTradeSummary = async (message, inputs, player, fuzzyPrints) => {
 }
 
 //PROCESS TRADE
-const processTrade = async (message, transaction_id, initiatorSummary, receiverSummary, initiatingPlayer, receivingPlayer) => {
+const processTrade = async (message, transactionId, initiatorSummary, receiverSummary, initiatingPlayer, receivingPlayer) => {
 	const initiator_wallet = initiatingPlayer.wallet
 	const initiator_print_quants = initiatorSummary.printQuantities
 	const initiator_prints = initiatorSummary.prints
@@ -220,12 +220,12 @@ const processTrade = async (message, transaction_id, initiatorSummary, receiverS
 		const print = initiator_prints[i]
 
 		await Trade.create({
-			sender_name: initiatingPlayer.name,
+			senderName: initiatingPlayer.name,
 			senderId: initiatingPlayer.id,
-			receiver_name: receivingPlayer.name,
+			receiverName: receivingPlayer.name,
 			receiverId: receivingPlayer.id,
-			transaction_id: transaction_id,
-			item: inv.card_code,
+			transactionId: transactionId,
+			item: inv.cardCode,
 			quantity: quantity
 		})
 
@@ -236,7 +236,7 @@ const processTrade = async (message, transaction_id, initiatorSummary, receiverS
 	
 		const mirror_inv = await Inventory.findOne({ 
 			where: { 
-				card_code: print.card_code,
+				cardCode: print.cardCode,
 				printId: print.id,
 				playerId: receivingPlayer.id
 			}
@@ -247,7 +247,7 @@ const processTrade = async (message, transaction_id, initiatorSummary, receiverS
 			await mirror_inv.save()
 		} else {
 			await Inventory.create({ 
-				card_code: print.card_code,
+				cardCode: print.cardCode,
 				quantity: quantity,
 				printId: print.id,
 				playerId: receivingPlayer.id
@@ -256,7 +256,7 @@ const processTrade = async (message, transaction_id, initiatorSummary, receiverS
 			if (print.rarity === 'scr') completeTask(message.channel, receivingPlayer.id, 'm4')
 		}
 
-		if (print.set_code === 'APC' && ( (mirror_inv && mirror_inv.quantity >= 3) ||  quantity >= 3 ) ) completeTask(message.channel, receivingPlayer.id, 'h5', 4000)
+		if (print.setCode === 'APC' && ( (mirror_inv && mirror_inv.quantity >= 3) ||  quantity >= 3 ) ) completeTask(message.channel, receivingPlayer.id, 'h5', 4000)
 	}
 
 	//INITIATOR CURRENCIES PROCESSED
@@ -265,11 +265,11 @@ const processTrade = async (message, transaction_id, initiatorSummary, receiverS
 		const quantity = initiator_wallet_quants[i]
 
 		await Trade.create({
-			sender_name: initiatingPlayer.name,
+			senderName: initiatingPlayer.name,
 			senderId: initiatingPlayer.id,
-			receiver_name: receivingPlayer.name,
+			receiverName: receivingPlayer.name,
 			receiverId: receivingPlayer.id,
-			transaction_id: transaction_id,
+			transactionId: transactionId,
 			item: field,
 			quantity: quantity
 		})
@@ -288,12 +288,12 @@ const processTrade = async (message, transaction_id, initiatorSummary, receiverS
 		const print = receiver_prints[i]
 
 		await Trade.create({
-			sender_name: receivingPlayer.name,
+			senderName: receivingPlayer.name,
 			senderId: receivingPlayer.id,
-			receiver_name: initiatingPlayer.name,
+			receiverName: initiatingPlayer.name,
 			receiverId: initiatingPlayer.id,
-			transaction_id: transaction_id,
-			item: inv.card_code,
+			transactionId: transactionId,
+			item: inv.cardCode,
 			quantity: quantity
 		})
 
@@ -304,7 +304,7 @@ const processTrade = async (message, transaction_id, initiatorSummary, receiverS
 
 		const mirror_inv = await Inventory.findOne({ 
 			where: { 
-				card_code: print.card_code,
+				cardCode: print.cardCode,
 				printId: print.id,
 				playerId: initiatingPlayer.id
 			}
@@ -315,7 +315,7 @@ const processTrade = async (message, transaction_id, initiatorSummary, receiverS
 			await mirror_inv.save()
 		} else {
 			await Inventory.create({ 
-				card_code: print.card_code,
+				cardCode: print.cardCode,
 				quantity: quantity,
 				printId: print.id,
 				playerId: initiatingPlayer.id
@@ -324,7 +324,7 @@ const processTrade = async (message, transaction_id, initiatorSummary, receiverS
 			if (print.rarity === 'scr') completeTask(message.channel, initiatingPlayer.id, 'm4')
 		}
 
-		if (print.set_code === 'APC' && ( (mirror_inv && mirror_inv.quantity >= 3) ||  quantity >= 3 ) ) completeTask(message.channel, initiatingPlayer.id, 'h5', 4000)
+		if (print.setCode === 'APC' && ( (mirror_inv && mirror_inv.quantity >= 3) ||  quantity >= 3 ) ) completeTask(message.channel, initiatingPlayer.id, 'h5', 4000)
 	}
 
 	//RECEIVER CURRENCIES PROCESSED
@@ -333,11 +333,11 @@ const processTrade = async (message, transaction_id, initiatorSummary, receiverS
 		const quantity = receiver_wallet_quants[i]
 
 		await Trade.create({
-			sender_name: receivingPlayer.name,
+			senderName: receivingPlayer.name,
 			senderId: receivingPlayer.id,
-			receiver_name: initiatingPlayer.name,
+			receiverName: initiatingPlayer.name,
 			receiverId: initiatingPlayer.id,
-			transaction_id: transaction_id,
+			transactionId: transactionId,
 			item: field,
 			quantity: quantity
 		})

@@ -1,8 +1,8 @@
 
 //PROFILE FUNCTIONS
-const { Inventory, Print } = require('../db')
+const { Inventory, Print } = require('../database/index.js')
 const { yescom, nocom } = require('../static/commands.json')
-const { com, rar, sup, ult, scr, blue, champion, FiC, leatherbound, legend, megaphone, sherthonk, stoned, yellow, wtf } = require('../static/emojis.json')
+const { com, rar, sup, ult, scr, blue, champion, FiC, leatherbound, legend, megaphone, sherthonk, dimmadome, yellow, wtf } = require('../static/emojis.json')
 const { findCard } = require('./search.js')
 
 const askToChangeProfile = async (message, field) => {
@@ -101,11 +101,11 @@ const getFavoriteCard = async (message, fuzzyPrints) => {
 	}).then(async (collected) => {
 		const response = collected.first().content
 		if (response === 'none') return 'none'
-		const favorite_card = await findCard(response, fuzzyPrints)
-		const print = await Print.findOne({ where: { card_name: favorite_card }})
+		const favoriteCard = await findCard(response, fuzzyPrints)
+		const print = await Print.findOne({ where: { cardName: favoriteCard }})
 		const count = await Inventory.count({ where: { printId: print.id }})
-		if (!favorite_card || !count) message.channel.send({ content: `Could not find card: "${response}".`})
-		return favorite_card
+		if (!favoriteCard || !count) message.channel.send({ content: `Could not find card: "${response}".`})
+		return favoriteCard
 	}).catch((err) => {
 		console.log(err)
         message.channel.send({ content: `Sorry, time's up.`})
@@ -116,7 +116,7 @@ const getFavoriteCard = async (message, fuzzyPrints) => {
 // GET RESET CONFIRMATION
 const getResetConfirmation = async (message, attempt = 1) => {
 	const prompt = attempt === 1 ? `You are allowed to do a clean reset of your ${FiC} account every 30 days. Are you sure you want to do a reset? ${sherthonk}` :
-		attempt === 2 ? `Seriously. This cannot ${stoned} be undone. All your cards ${com} ${rar} ${sup} ${ult} ${scr} will be donated to The Shop. Your achievements ${legend} ${champion} ${leatherbound} will be erased. Are you sure you want to reset your ${FiC} acccount? ${yellow}` :
+		attempt === 2 ? `Seriously. This cannot ${dimmadome} be undone. All your cards ${com} ${rar} ${sup} ${ult} ${scr} will be donated to The Shop. Your achievements ${legend} ${champion} ${leatherbound} will be erased. Are you sure you want to reset your ${FiC} acccount? ${yellow}` :
 		`${wtf} HOMIE, THIS IS YOUR ${megaphone} **FINAL CHANCE** ${megaphone} TO BACK OUT. ARE YOU **COMPLETELY** 💯 ABOUT THIS? ${blue}`
 
 	const filter = m => m.author.id === message.author.id

@@ -1,0 +1,160 @@
+
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from 'discord.js'
+import { ForgedInventory, ForgedPrint, ForgedSet, Player, Wallet } from '../database/index.js'
+import { Op } from 'sequelize'
+import { isMod } from '../functions/utility.js'
+import { awardPacks } from '../functions/packs.js'
+import emojis from '../static/emojis.json' with { type: 'json' }
+const {AOD, com, rar, sup, ult, scr, stardust, starchips, koolaid} = emojis
+
+export default {
+	data: new SlashCommandBuilder()
+		.setName('award')
+		.setDescription('Admin Only - Award something to a player. 🏅')
+        .addNumberOption(option =>
+            option
+                .setName('quantity')
+                .setDescription('How much do you wish to award?')
+                .setRequired(true)
+        )
+        .addStringOption(option =>
+            option
+                .setName('item')
+                .setDescription('What do you wish to award?')
+				.setAutocomplete(true)
+                .setRequired(true)
+        )
+        .addUserOption(option =>
+            option
+                .setName('player')
+                .setDescription('Tag the player to award.')
+                .setRequired(true)
+        ),
+        async autocomplete(interaction) {
+            try {
+                const focusedValue = interaction.options.getFocused()
+
+                const prints = [...await ForgedPrint.findAll({
+                    where: {
+                        [Op.or]: {
+                            cardName: {[Op.iLike]: `${focusedValue}%`},
+                            cardCode: {[Op.iLike]: `${focusedValue}%`}
+                        }
+                    },
+                    limit: 5,
+                    order: [["cardName", "ASC"], ["createdAt", "ASC"]]
+                })].map((p) => `${p.cardName} (${p.cardCode})`)
+
+                const packs = [...await ForgedSet.findAll({
+                    where: {
+                        forSale: true
+                    },
+                    order: [['createdAt', 'DESC']]
+                })].map((s) => `Pack(s) of ${s.name}`)
+
+                // const boxes = [...await ForgedSet.findAll({
+                //     where: {
+                //         forSale: true
+                //     },
+                //     order: [['createdAt', 'DESC']]
+                // })].map((s) => `Box(es) of ${s.name}`)
+
+                if ('starchips'.includes(focusedValue.toLowerCase())) {
+                    prints.push('StarChips')
+                }
+
+                if ('stardust'.includes(focusedValue.toLowerCase())) {
+                    prints.push('StarDust')
+                }
+
+                if ('pack(s) of '.includes(focusedValue.toLowerCase())) {
+                    prints.push(...packs)
+                }
+
+                await interaction.respond(
+                    prints.map(print => ({ name: print, value: print })),
+                )
+            } catch (err) {
+                console.log(err)
+            }
+        },
+	async execute(interaction) {
+        try {      
+            if (!isMod(interaction.member)) return interaction.reply({ content: "You do not have permission to do that."})
+            const quantity = interaction.options.getNumber('quantity')
+            if (quantity < 1) return interaction.reply({ content: `You cannot award less than 1 item.`})
+            const item = interaction.options.getString('item')
+            const cardCode = item.includes('(') ? item.slice(-8, -1) : null
+            const print = cardCode ? await ForgedPrint.findOne({ where: { cardCode }}) : null
+            const card = print ? `${eval(print.rarity)}${print.cardCode} - ${print.cardName}` : null
+            const currency = item === 'StarDust' || item === 'StarChips' ? item.toLowerCase() : null
+            const set = await ForgedSet.findOne({ where: { name: item.slice(11) }})
+            const loot = card ? card :
+                currency ? eval(currency) :
+                set ? ` ${item}${eval(set.code)}` :
+                ''
+
+            const user = interaction.options.getUser('player')
+            const discordId = user.id
+            if (interaction.user.id === discordId) return interaction.reply({ content: `You cannot award ${koolaid} things to yourself.`})
+            const player = await Player.findByDiscordId(discordId)
+            const member = interaction.guild.members.cache.get(discordId)
+            const wallet = await Wallet.findOne({ where: { playerId: player.id }})
+            const inv = await ForgedInventory.findOne({ where: { cardCode: cardCode, playerId: player.id }})
+
+            const row = new ActionRowBuilder()
+                .addComponents(new ButtonBuilder()
+                    .setCustomId(`Award-Yes`)
+                    .setLabel('Yes')
+                    .setStyle(ButtonStyle.Primary)
+                )
+
+                .addComponents(new ButtonBuilder()
+                    .setCustomId(`Award-No`)
+                    .setLabel('No')
+                    .setStyle(ButtonStyle.Primary)
+                )
+
+            await interaction.reply({ content: `Are you sure you want to award ${quantity}${loot} to ${player.name}? ${koolaid}`, components: [row] })
+
+            const filter = i => i.customId.startsWith('Award-') && i.user.id === interaction.user.id;
+
+            try {
+                const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
+                if (confirmation.customId.includes('Yes')) {
+                    await confirmation.update({ components: [] })
+                    if (card && inv) {
+                        inv.quantity+=quantity
+                        await inv.save()
+                    } else if (card && !inv) {
+                        await ForgedInventory.create({
+                            cardName: print.cardName,
+                            cardCode: cardCode,
+                            forgedPrintId: print.id,
+                            quantity: quantity,
+                            playerName: player.name,
+                            playerId: player.id
+                        })
+                    } else if (currency) {
+                        wallet[currency]+=quantity
+                        await wallet.save()
+                    } else if (item.includes('Pack(s) of ')) {
+                        await awardPacks(interaction, member, set, quantity)
+                    } else {
+                        return interaction.editReply({ content: `Error: unable to find inventory or currency for ${player.name}.`})
+                    }
+
+                    return interaction.editReply({ content: `You awarded ${quantity}${loot} to ${player.name}. ${koolaid}`, components: [] });        
+                } else {
+                    await confirmation.update({ components: [] })
+                    await confirmation.editReply({ content: `Not a problem. ${quantity}${loot} ${quantity === 1 ? 'was' : 'were'} not awarded to ${player.name}.`, components: [] })
+                }
+            } catch (err) {
+                console.log(err)
+                await interaction.editReply({ content: `Sorry, time's up. ${quantity}${loot} ${quantity === 1 ? 'was' : 'were'} not awarded to ${player.name}.`, components: [] });
+            }
+        } catch (err) {
+            console.log(err)
+        }
+	}
+}

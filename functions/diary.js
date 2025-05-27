@@ -1,13 +1,13 @@
 
 
-const { Daily, Diary, Inventory, Set, Profile, Wallet } = require('../db')
-const { Op } = require('sequelize')
-const { awardPack } = require('./packs.js')
-const { beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, LPK, DRT, fiend, thunder, zombie, egg, emptybox, skull, familiar, battery, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, stoned, sup, tix, ult, wokeaf, yellow, yes, ygocard } = require('../static/emojis.json')
+const { Daily, Diary, Inventory, Set, Profile, Wallet } = require('../database/index.js')
+import { Op } from 'sequelize'
+const { awardPacks } = require('./packs.js')
+const { beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, diamond, dinosaur, DOC, LPK, DRT, fiend, thunder, zombie, egg, emptybox, skull, familiar, battery, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, dimmadome, sup, tix, ult, wokefrog, yellow, yes, ygocard } = require('../static/emojis.json')
 const diaries = require('../static/diaries.json')
 const merchbotId = '584215266586525696'
 
-const checkCoreSetComplete = async (playerId, quantity = 1) => {
+export const checkCoreSetComplete = async (playerId, quantity = 1) => {
     const task = quantity === 1 ? 'h4' : 'l3'
 
     const count = await Diary.count({
@@ -26,7 +26,7 @@ const checkCoreSetComplete = async (playerId, quantity = 1) => {
         const setInv = await Inventory.findAll({
             where: {
                 playerId: playerId,
-                card_code: {
+                cardCode: {
                     [Op.startsWith]: set.code
                 },
                 quantity: {
@@ -42,7 +42,7 @@ const checkCoreSetComplete = async (playerId, quantity = 1) => {
 }
 
 
-const check6TribesComplete = async (playerId, goal = 1) => {
+export const check6TribesComplete = async (playerId, goal = 1) => {
     const task = goal === 1 ? 'h8' : 'l6'
 
     const count = await Diary.count({
@@ -72,7 +72,7 @@ const check6TribesComplete = async (playerId, goal = 1) => {
 }
 
 
-const completeTask = async (channel, playerId, task, milliseconds = 2000) => {
+export const completeTask = async (channel, playerId, task, milliseconds = 2000) => {
     if (playerId === merchbotId) return
     const count = await Diary.count({
         where: {
@@ -115,7 +115,7 @@ const completeTask = async (channel, playerId, task, milliseconds = 2000) => {
     }, milliseconds)
 }
 
-const checkDiaryComplete = async (channel, playerId, diary, difficulty) => {
+export const checkDiaryComplete = async (channel, playerId, diary, difficulty) => {
     if (
         ( 
             difficulty === 'Easy' &&
@@ -135,15 +135,10 @@ const checkDiaryComplete = async (channel, playerId, diary, difficulty) => {
             channel.send({ content: `<@${playerId}>, Congrats! You completed your ${difficulty} Diary${leatherbound}!`})
             channel.send({ content: `\n${blue} ${koolaid} ${legend} ${cavebob} ${cultured}`})
 
-            const gotSecret = await awardPack(channel, playerId, null)
+            const gotSecret = await awardPacks(channel, playerId, null)
 			if (gotSecret) await completeTask(channel, playerId, 'm4')
             return
         }, 2000)
     }
 }
 
-module.exports = {
-    check6TribesComplete,
-    checkCoreSetComplete,
-    completeTask
-}

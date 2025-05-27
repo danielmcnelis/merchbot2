@@ -1,7 +1,7 @@
 {
-   "announcementsChannelId":"842476554339876944",
+   "announcementsChannelId":"1372580979545477292",
    "arenaChannelId":"842477447676035102",
-   "botSpamChannelId":"858828012731498557",
+   "botSpamChannelId":"1372581346165129282",
    "bugreportsChannelId":"842480974955806800",
    "discussionChannelId":"858890435661266964",
    "draftChannelId":"842477525858516993",
@@ -11,16 +11,16 @@
    "gutterChannelId":"842477670608404521",
    "introChannelId":"859877114362462268",
    "keeperChannelId":"842477569021575188",
-   "marketPlaceChannelId":"842476832905232415",
+   "marketPlaceChannelId":"1372581273406799953",
    "pauperChannelId":"877692769970298880",
    "registrationChannelId":"845016654467432499",
    "replaysChannelId": "854570066224611328",
    "rulesChannelId":"842476533067415592",
    "rulingsChannelId":"842509124566515763",
-   "staffChannelId":"845016437885632512",
-   "shopChannelId":"842476731118256189",
+   "staffChannelId":"1372581750584381451",
+   "shopChannelId":"1372581063242809475",
    "suggestionsChannelId":"842480989283811379",
-   "tournamentChannelId":"846615566198374400",
+   "tournamentChannelId":"1372581327756460193",
    "triviaChannelId":"889047209448964146",
-   "welcomeChannelId":"842476300807176214"
+   "welcomeChannelId":"1372580824595173416"
 }

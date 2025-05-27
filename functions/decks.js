@@ -5,15 +5,15 @@ const firefox = require('selenium-webdriver/firefox')
 const fs = require('fs')
 const errors = require('../static/errors.json')
 const { soldier } = require('../static/emojis.json')
-const { Op } = require('sequelize')
+import { Op } from 'sequelize'
 const { clearStatus, convertArrayToObject } = require('./utility.js')
 const { fetchAllForgedCards, getInventorySummary } = require('./search.js')
-const { Auction, Bid, Card, Print, Set, Inventory,  Tournament, Status } = require('../db')
+const { Auction, Bid, Card, Print, Set, Inventory,  Tournament, Status } = require('../database/index.js')
 const decks = require('../static/decks.json')
 const { exec } = require('child_process')
 
 //GET SHOP DECK
-const getShopDeck = async (message, tribe = '') => {
+export const getShopDeck = async (message, tribe = '') => {
     if(tribe.includes('dino')) return 'dinosaur' 
     if(tribe.includes('plant')) return 'plant'
     if(tribe.includes('fish')) return 'fish'
@@ -49,16 +49,16 @@ const getShopDeck = async (message, tribe = '') => {
 
 
 // AWARD STARTER DECK
-const awardStarterDeck = async (playerId, starter) => {
+export const awardStarterDeck = async (playerId, starter) => {
     const keys = Object.keys(decks[starter].cards)
 
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i]
-        const print = await Print.findOne( { where: { card_code: key } })
+        const print = await Print.findOne( { where: { cardCode: key } })
         if (!print.id) return console.log(`${key} does not exist in the Print database.`)
     
         const inv = await Inventory.findOne({ where: { 
-            card_code: print.card_code,
+            cardCode: print.cardCode,
             printId: print.id,
             playerId: playerId
         }})
@@ -68,7 +68,7 @@ const awardStarterDeck = async (playerId, starter) => {
             await inv.save()
         } else {
             await Inventory.create({ 
-                card_code: print.card_code,
+                cardCode: print.cardCode,
                 quantity: decks[starter].cards[key],
                 printId: print.id,
                 playerId: playerId
@@ -78,7 +78,7 @@ const awardStarterDeck = async (playerId, starter) => {
 }
 
 //SAVE YDK
-const saveYDK = async (player, url, tournamentName = 'other') => {
+export const saveYDK = async (player, url, tournamentName = 'other') => {
     let deck_arr = []
     const options = new firefox.Options()
     options.addArguments("-headless")
@@ -115,8 +115,8 @@ const saveYDK = async (player, url, tournamentName = 'other') => {
         console.log(`Loading ${player.tag}'s deck at ${url}...`)
         await driver.get(url)
         console.log('driver got Url')
-        await driver.wait(until.elementLocated(By.id('deck_card1')), 60000)
-        console.log('driver found deck_card1')
+        await driver.wait(until.elementLocated(By.id('deckCard1')), 60000)
+        console.log('driver found deckCard1')
         deck_arr = await driver.executeScript(get_deck)
         console.log('driver executed script')
     } catch (err) {
@@ -147,11 +147,11 @@ const saveYDK = async (player, url, tournamentName = 'other') => {
     const cards_arr = deck_arr.filter(el => el.charAt(0) !== '#' && el.charAt(0) !== '!' && el !== '').sort()
     const cards_obj = convertArrayToObject(cards_arr)    
 
-    const forbiddenCardIds = [...await Status.findAll({ where: { current: 'forbidden' }})].map(s => s.konami_code)
-    const limitedCardIds = [...await Status.findAll({ where: { current: 'limited' }})].map(s => s.konami_code)
-    const semiLimitedCardIds = [...await Status.findAll({ where: { current: 'semi-limited' }})].map(s => s.konami_code)
+    const forbiddenCardIds = [...await Status.findAll({ where: { current: 'forbidden' }})].map(s => s.konamiCode)
+    const limitedCardIds = [...await Status.findAll({ where: { current: 'limited' }})].map(s => s.konamiCode)
+    const semiLimitedCardIds = [...await Status.findAll({ where: { current: 'semi-limited' }})].map(s => s.konamiCode)
     const allForgedCards = await fetchAllForgedCards()
-    const cardIds = allForgedCards.map(c => c.konami_code)
+    const cardIds = allForgedCards.map(c => c.konamiCode)
     const { singleIds, doubleIds, tripleIds } = await getInventorySummary(allForgedCards, player.id)
     
     const illegalCards = []
@@ -163,32 +163,32 @@ const saveYDK = async (player, url, tournamentName = 'other') => {
 
     const keys = Object.keys(cards_obj)
     for (let i = 0; i < keys.length; i++) {
-        let konami_code = keys[i]
-        while (konami_code.length < 8) konami_code = '0' + konami_code 
-        if (!cardIds.includes(konami_code)) {
-            const card = await Card.findOne({ where: { konami_code: konami_code } })
+        let konamiCode = keys[i]
+        while (konamiCode.length < 8) konamiCode = '0' + konamiCode 
+        if (!cardIds.includes(konamiCode)) {
+            const card = await Card.findOne({ where: { konamiCode: konamiCode } })
             if (card) {
                 illegalCards.push(card.name)
             } else {
-                unrecognizedCards.push(konami_code)
+                unrecognizedCards.push(konamiCode)
             }
-        } else if (forbiddenCardIds.includes(konami_code)) {
-            const card = await Card.findOne({ where: { konami_code: konami_code } })
+        } else if (forbiddenCardIds.includes(konamiCode)) {
+            const card = await Card.findOne({ where: { konamiCode: konamiCode } })
             if (card) forbiddenCards.push(card.name)
-        } else if (limitedCardIds.includes(konami_code) && cards_obj[konami_code] > 1) {
-            const card = await Card.findOne({ where: { konami_code: konami_code } })
+        } else if (limitedCardIds.includes(konamiCode) && cards_obj[konamiCode] > 1) {
+            const card = await Card.findOne({ where: { konamiCode: konamiCode } })
             if (card) limitedCards.push(card.name)
-        } else if (semiLimitedCardIds.includes(konami_code) && cards_obj[konami_code] > 2) {
-            const card = await Card.findOne({ where: { konami_code: konami_code } })
+        } else if (semiLimitedCardIds.includes(konamiCode) && cards_obj[konamiCode] > 2) {
+            const card = await Card.findOne({ where: { konamiCode: konamiCode } })
             if (card) semiLimitedCards.push(card.name)
-        } else if (!tripleIds.includes(konami_code) && cards_obj[konami_code] >= 3) {
-            const card = await Card.findOne({ where: { konami_code: konami_code } })
+        } else if (!tripleIds.includes(konamiCode) && cards_obj[konamiCode] >= 3) {
+            const card = await Card.findOne({ where: { konamiCode: konamiCode } })
             if (card) phantomCards.push(card.name)
-        } else if (!doubleIds.includes(konami_code) && cards_obj[konami_code] >= 2) {
-            const card = await Card.findOne({ where: { konami_code: konami_code } })
+        } else if (!doubleIds.includes(konamiCode) && cards_obj[konamiCode] >= 2) {
+            const card = await Card.findOne({ where: { konamiCode: konamiCode } })
             if (card) phantomCards.push(card.name)
-        } else if (!singleIds.includes(konami_code) && cards_obj[konami_code] >= 1) {
-            const card = await Card.findOne({ where: { konami_code: konami_code } })
+        } else if (!singleIds.includes(konamiCode) && cards_obj[konamiCode] >= 1) {
+            const card = await Card.findOne({ where: { konamiCode: konamiCode } })
             if (card) phantomCards.push(card.name)
         } 
     }
@@ -222,7 +222,7 @@ const saveYDK = async (player, url, tournamentName = 'other') => {
 }
 
 //SAVE ALL YDKs
-const saveAllYDK = async () => {
+export const saveAllYDK = async () => {
     const allDecks = await Tournament.findAll()
 
     for (let i = 0; i < allDecks.length; i++) {
@@ -245,7 +245,7 @@ const saveAllYDK = async () => {
 }
 
 //CHECK DECK LIST
-const checkDeckList = async (client, message, member, formatName, formatEmoji, formatDate, formatList) => {  
+export const checkDeckList = async (client, message, member, formatName, formatEmoji, formatDate, formatList) => {  
     const filter = m => m.author.id === member.user.id
     const msg = await member.user.send({ content: `Please provide a duelingbook.com/deck link for the ${formatName} Format ${formatEmoji} deck you would like to check for legality.`}).catch((err) => console.log(err))
     if (!msg || !msg.channel) return false
@@ -281,7 +281,7 @@ const checkDeckList = async (client, message, member, formatName, formatEmoji, f
 
 
 //GET DECK TYPE
-const getDeckType = async (player, tournamentName = 'other') => {
+export const getDeckType = async (player, tournamentName = 'other') => {
     const file = `./decks/${tournamentName}/${player.tag.replace(/[^\ws]/gi, "_").replace(/ /g,'')}.ydk`
     const raw = fs.readFileSync(file, 'utf8')
     if (!raw) return
@@ -292,13 +292,4 @@ const getDeckType = async (player, tournamentName = 'other') => {
     const deckType =  'other'
 
     return deckType
-}
-
-module.exports = {
-    awardStarterDeck,
-    checkDeckList,
-    getDeckType,
-    getShopDeck,
-    saveAllYDK,
-    saveYDK
 }

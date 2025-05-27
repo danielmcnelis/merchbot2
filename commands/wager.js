@@ -3,7 +3,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } fro
 import { Daily, Player, Wallet, ForgedInventory, ForgedPrint, ForgedSet} from '../database/index.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
 import { drawCardImage, getRandomElement, isSameDay } from '../functions/utility.js'
-const { AOD, stardust, cavebob, dimmadome, blue, wokefrog, koolaid, com, rar, sup, ult, scr } = emojis
+const { AOD, stardust, cavebob, dimmadome, blue, scheming, koolaid, com, rar, sup, ult, scr } = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -119,8 +119,8 @@ export default {
                     await daily.save()
     
                     const attachment = await drawCardImage(print.cardName)
-                    const enthusiasm = rarity === "com" ? `Ho-Hum.` : rarity === "rar" ? `Not bad.` : rarity === 'sup' ? `Cool beans!` : rarity === 'ult' ? `Now *that's* based!` : `Holy $#%t balls!`
-                    const emoji = rarity === "com" ? cavebob : rarity === "rar" ? dimmadome : rarity === 'sup' ? blue : rarity === 'ult' ? wokefrog : koolaid
+                    const enthusiasm = rarity === "com" ? `Ho-Hum.` : rarity === "rar" ? `Not bad.` : rarity === 'sup' ? `Cool beans!` : rarity === 'ult' ? `Now *that's* sick!` : `Holy $#%t balls!`
+                    const emoji = rarity === "com" ? cavebob : rarity === "rar" ? dimmadome : rarity === 'sup' ? blue : rarity === 'ult' ? scheming : koolaid
                 
                     interaction.editReply({ content: `1... 2...`})
                     return setTimeout(() => interaction.channel.send({ content: `${enthusiasm} ${player.name} won ${eval(print.rarity)}${print.cardCode} - ${print.cardName} off their wager! ${emoji}`, files: [attachment] }), 2000)            

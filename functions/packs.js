@@ -302,18 +302,18 @@ export const makeCanvasAttachment = async (artworkIds = [], width = 57, height =
 
 // DRAW PACK
 export const drawPack = async (artworkIds = []) => {
-    const packAttachment = await makeCanvasAttachment(artworkIds, 57, 80, 9)
+    const packAttachment = await makeCanvasAttachment(artworkIds, 105, 158, 9)
     return packAttachment
 }
 
 // DRAW CARD IMAGE
 export const drawCardImage = async (cardId) => {
     try {
-        const canvas = Canvas.createCanvas(105, 158)
+        const canvas = Canvas.createCanvas(57, 80)
         const context = canvas.getContext('2d')
         const card = await Card.findOne({ where: { id: cardId }})
         const image = await Canvas.loadImage(`https://cdn.formatlibrary.com/images/cards/${card.artworkId}.jpg`)
-        context.drawImage(image, 0, 0, 105, 158)
+        context.drawImage(image, 0, 0, 57, 80)
         const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: `${card.name}` })
         return attachment
     } catch (err) {

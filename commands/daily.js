@@ -4,7 +4,7 @@ import { Daily, ForgedInventory, ForgedPrint, ForgedSet, Player } from '../datab
 import { drawCardImage, getRandomElement, isSameDay} from '../functions/utility.js'
 import {awardPacks} from '../functions/packs.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { cavebob, dimmadome, blue, wokefrog, koolaid, com, rar, sup, ult, scr } = emojis
+const { cavebob, dimmadome, blue, scheming, koolaid, com, rar, sup, ult, scr } = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -85,8 +85,8 @@ export default {
 
             const luck = getRandomElement(odds)
             const yourCard = getRandomElement(eval(luck))
-            const enthusiasm = luck === "commons" ? `Ho-Hum.` : luck === "rares" ? `Not bad.` : luck === 'supers' ? `Cool beans!` : luck === 'ultras' ? `Now *that's* based!` : `Holy $#%t balls!`
-            const emoji = luck === "commons" ? cavebob : luck === "rares" ? dimmadome : luck === 'supers' ? blue : luck === 'ultras' ? wokefrog : koolaid
+            const enthusiasm = luck === "commons" ? `Ho-Hum.` : luck === "rares" ? `Not bad.` : luck === 'supers' ? `Cool beans!` : luck === 'ultras' ? `Now *that's* sick!` : `Holy $#%t balls!`
+            const emoji = luck === "commons" ? cavebob : luck === "rares" ? dimmadome : luck === 'supers' ? blue : luck === 'ultras' ? scheming : koolaid
 
             const print = await ForgedPrint.findOne({ where: {
                 cardCode: yourCard

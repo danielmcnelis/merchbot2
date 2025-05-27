@@ -4,7 +4,7 @@ import pgPassword from '../secrets.json' with { type: "json" }
 
 export const db = new Sequelize(
   'formatlibrary',
-  'danielmcnelis',
+  'ubuntu',
   pgPassword,
   { 
     host: 'localhost',

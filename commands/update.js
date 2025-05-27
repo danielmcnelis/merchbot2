@@ -22,8 +22,8 @@ export default {
                     status: "open"
                 })
 
-                const player = await createPlayer(merchbot)
-                if (!player) return interaction.reply('Unable to create MerchBot player.')
+                // const player = await createPlayer(merchbot)
+                // if (!player) return interaction.reply('Unable to create MerchBot player.')
                 await Wallet.create({ playerId: player.id, playerName: player.name })
                 await Daily.create({ playerId: player.id, playerName: player.name })
                 await interaction.reply({ content: `You initialized The Shop!`})

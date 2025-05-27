@@ -128,7 +128,6 @@ export const awardPacks = async (interaction, member, set, num = 1) => {
 }
 
 export const awardPacksToShop = async (num, core = true) => {
-    num = 48
 	const botSpamChannel = client.channels.cache.get(botSpamChannelId)
     if (!botSpamChannel) return console.log('Could not find #bot-spam channel.')
 

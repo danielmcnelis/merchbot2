@@ -112,8 +112,8 @@ export default {
                 rarity === 'rar' ? 12 :
                 rarity === 'sup' ? 35 :
                 rarity === 'ult' && set.code === "APC" ? 360 :
-                rarity === 'ult' ? 202 :
-                rarity === 'scr' ? 900 :
+                rarity === 'ult' ? 240 :
+                rarity === 'scr' ? 714 :
                 20
         
             const print = {

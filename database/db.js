@@ -1,6 +1,7 @@
 
 import { Sequelize } from 'sequelize'
-import pgPassword from '../secrets.json' with { type: "json" }
+import secrets from '../secrets.json' with { type: "json" }
+const {pgPassword} = secrets
 
 export const db = new Sequelize(
   'formatlibrary',

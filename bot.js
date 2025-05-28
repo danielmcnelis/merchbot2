@@ -77,6 +77,64 @@ client.on('ready', async () => {
 	}
 })
 
+// SUBSCRIPTION
+client.on('guildMemberUpdate', async (oldMember, newMember) => {
+    try {
+        if (oldMember.guild.id !== '1372580468297568458') return
+        const oldRoles = oldMember.roles.cache
+        const newRoles = newMember.roles.cache
+    
+        const wasSubscriber = oldRoles.has('1375131866847252544')
+        const isSubscriber = newRoles.has('1375131866847252544')
+    
+        if (wasSubscriber && !isSubscriber) {
+            const programmer = await client.users.fetch('194147938786738176')
+                        
+            const player = await Player.findOne({
+                where: {
+                    discordId: oldMember.id
+                }
+            })
+    
+            const subscriberTier = player.forgedSubscriberTier
+            await player.update({ isForgedSubscriber: false, forgedSubscriberTier: null })
+            return await programmer.send({ content: `${oldMember.user?.username} is no longer a Subscriber (${subscriberTier}).` })
+        } else if (!wasSubscriber && isSubscriber) {
+            const programmer = await client.users.fetch('194147938786738176')
+            
+            const player = await Player.findOne({
+                where: {
+                    discordId: oldMember.id
+                }
+            })
+    
+            const isSupporter = newRoles.has('1375131869036810302')
+            const isPatron = newRoles.has('1375132712070811689')
+            const isBenefactor = newRoles.has('1375133829521608784')
+            
+            if (isSupporter) {
+                await player.update({ isForgedSubscriber: true, forgedSubscriberTier: 'Supporter' })
+                console.log(`Welcome ${oldMember.user?.username} to the Supporter Tier!`)
+                return await programmer.send({ content: `Welcome ${oldMember.user?.username} to the Supporter Tier!` })
+            } else if (isPatron) {
+                await player.update({ isForgedSubscriber: true, forgedSubscriberTier: 'Patron' })
+                console.log(`Welcome ${oldMember.user?.username} to the Patron Tier!`)
+                return await programmer.send({ content: `Welcome ${oldMember.user?.username} to the Premium Tier!` })
+            } else if (isBenefactor) {
+                await player.update({ isForgedSubscriber: true, forgedSubscriberTier: 'Benefactor' })
+                console.log(`Welcome ${oldMember.user?.username} to the Benefactor Tier!`)
+                return await programmer.send({ content: `Welcome ${oldMember.user?.username} to the Benefactor Tier!` })
+            } else {
+                await player.update({ isForgedSubscriber: true, forgedSubscriberTier: 'Unknown' })
+                console.log(`Welcome ${oldMember.user?.username} to the Subscribers(?)!`)
+                return await programmer.send({ content: `Welcome ${oldMember.user?.username} to the Subscribers(?)!` })
+            }
+        }
+    } catch (err) {
+        console.log(err)
+    }
+});
+
 // COMMANDS
 client.on(Events.InteractionCreate, async interaction => {
     try {

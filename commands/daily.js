@@ -23,7 +23,6 @@ export default {
             if (daily.lastDaily && isSameDay(daily.lastDaily, date)) return interaction.reply({ content: `You already used **/daily** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`})
 
             const daysPassed = daily.lastDaily ? Math.round( ( date.setHours(0, 0, 0, 0) - daily.lastDaily.setHours(0, 0, 0, 0) ) / (1000*60*60*24) ) : 1
-            console.log('daysPassed', daysPassed)
 
             const sets = await ForgedSet.findAll({ 
                 where: { 
@@ -111,10 +110,14 @@ export default {
                 })
             }
 
-            console.log('daily.cobbleProgress', daily.cobbleProgress)
             if ((daily.cobbleProgress + daysPassed) >= 7) {
                 daily.cobbleProgress = 0
-                const num = 1
+
+                const num = player.forgedSubscriptionTier === 'Supporter' ? 2 :
+                    player.forgedSubscriptionTier === 'Patron' ? 3 :
+                    player.forgedSubscriptionTier === 'Benefactor' ? 4 :
+                    1
+                    
                 const packImage = new AttachmentBuilder(`./public/7outof7.png`, { name: `pack.png` })
                 // let num = masterComplete ? 5 : eliteComplete ? 4 : hardComplete ? 3 : mediumComplete ? 2 : 1
                 if (num) setTimeout(async () => {

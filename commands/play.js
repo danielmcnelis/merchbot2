@@ -14,7 +14,7 @@ export default {
             const player = await Player.findByDiscordId(interaction.member.user.id)
             const walletExists = await Wallet.count({ where: { playerId: player.id }})
             if (walletExists) return await interaction.reply({ content: `Error: You already began the game!` })
-            await Wallet.create({ playerId: player.id, playerName: player.name })
+            await Wallet.create({ playerId: player.id, playerName: player.name, starchips: 10, stardust: 100 })
             await Daily.create({ playerId: player.id, playerName: player.name })
             const set = await ForgedSet.findOne({ where: { code: 'AOD' }})
             await awardPacks(interaction, interaction.member, set, 8)

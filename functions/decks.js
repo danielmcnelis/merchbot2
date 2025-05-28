@@ -302,7 +302,6 @@ export const sendInventoryYDK = async (interaction, player) => {
             playerId: player.id,
             quantity: {[Op.gt]: 0}
         },
-        include: Card,
         order: [['cardCode', 'ASC']]
     })
 
@@ -312,7 +311,8 @@ export const sendInventoryYDK = async (interaction, player) => {
 
     for (let i = 0; i < invs.length; i++) {
         const inv = invs[i]
-        const konamiCode = inv.card.konamiCode
+        const card = await Card.findOne({ where: { name: inv.cardName } })
+        const konamiCode = card.konamiCode
         if (inv.quantity >= 3) {
             konamiCodes.push(konamiCode, konamiCode, konamiCode)
         } else if (inv.quantity === 2) {

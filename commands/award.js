@@ -92,7 +92,7 @@ export default {
             const set = await ForgedSet.findOne({ where: { name: item.slice(11) }})
             const loot = card ? card :
                 currency ? eval(currency) :
-                set && quantity !== 24 ? ` ${item}${eval(set.code)}` :
+                set ? `${item}${eval(set.code)}` :
                 ''
 
             const award = item.includes('Pack(s) of ') && quantity === 24 ? `a Box of ${set.name} ${eval(set.code)}` : `${quantity}${loot}`
@@ -118,7 +118,7 @@ export default {
                     .setStyle(ButtonStyle.Primary)
                 )
 
-            await interaction.reply({ content: `Are you sure you want to award ${quantity}${loot} to ${player.name}? ${koolaid}`, components: [row] })
+            await interaction.reply({ content: `Are you sure you want to award ${award} to ${player.name}? ${koolaid}`, components: [row] })
 
             const filter = i => i.customId.startsWith('Award-') && i.user.id === interaction.user.id;
 

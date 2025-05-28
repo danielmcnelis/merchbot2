@@ -230,7 +230,7 @@ export const awardBox = async (interaction, member, set) => {
             }
 
             const attachment = await drawPack(yourCardArtworkIds) || []
-            interaction.user.send({ content: `${results.join('\n').toString()}`, files: [attachment] }).catch((err) => console.log(err))
+            member.user.send({ content: `${results.join('\n').toString()}`, files: [attachment] }).catch((err) => console.log(err))
         } catch (err) {
             console.log(err)
         }

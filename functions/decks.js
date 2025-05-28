@@ -3,6 +3,7 @@
 // const {Builder, By, until} = require('selenium-webdriver')
 // const firefox = require('selenium-webdriver/firefox')
 import fs from 'fs'
+import {AttachmentBuilder} from 'discord.js'
 // const errors = require('../static/errors.json')
 import emojis from '../static/emojis.json' with { type: 'json' }
 const { soldier } = emojis
@@ -331,6 +332,7 @@ export const sendInventoryYDK = async (interaction, player) => {
         }
     }
 
-    const ydk = `#main\n${mainKonamiCodes.join('\n')}#extra\n!side\n${sideKonamiCodes.join('\n')}\n`
-    return interaction.user.send({ content: ydk })
+    const ydk = `#main\n${mainKonamiCodes.join('\n')}\n#extra\n!side\n${sideKonamiCodes.join('\n')}\n`
+    const ydkFile = new AttachmentBuilder(Buffer.from(ydk), { name: `${player.name}_inventory.ydk` })
+    return interaction.user.send({ files: [ydkFile] })
 }

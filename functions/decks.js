@@ -296,7 +296,7 @@ export const getDeckType = async (player, tournamentName = 'other') => {
 }
 
 // SEND INVENTORY YDK
-export const sendInventoryYDK = async (interaction, member) => {
+export const sendInventoryYDK = async (interaction, player) => {
     const invs = await ForgedInventory.findAll({
         where: {
             playerId: player.id,

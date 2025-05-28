@@ -3,7 +3,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } fro
 import { ForgedInventory, ForgedPrint, ForgedSet, Player, Wallet } from '../database/index.js'
 import { Op } from 'sequelize'
 import { isMod } from '../functions/utility.js'
-import { awardPacks } from '../functions/packs.js'
+import { awardBox, awardPacks } from '../functions/packs.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
 const {AOD, com, rar, sup, ult, scr, stardust, starchips, koolaid} = emojis
 
@@ -84,6 +84,7 @@ export default {
             const quantity = interaction.options.getNumber('quantity')
             if (quantity < 1) return interaction.reply({ content: `You cannot award less than 1 item.`})
             const item = interaction.options.getString('item')
+            if (item.includes('Pack(s) of ') && quantity > 24) return interaction.reply({ content: `You cannot award more than 24 packs at a time.`}) 
             const cardCode = item.includes('(') ? item.slice(-8, -1) : null
             const print = cardCode ? await ForgedPrint.findOne({ where: { cardCode }}) : null
             const card = print ? `${eval(print.rarity)}${print.cardCode} - ${print.cardName}` : null
@@ -91,8 +92,10 @@ export default {
             const set = await ForgedSet.findOne({ where: { name: item.slice(11) }})
             const loot = card ? card :
                 currency ? eval(currency) :
-                set ? ` ${item}${eval(set.code)}` :
+                set && quantity !== 24 ? ` ${item}${eval(set.code)}` :
                 ''
+
+            const award = item.includes('Pack(s) of ') && quantity === 24 ? `a Box of ${set.name} ${eval(set.code)}` : `${quantity}${loot}`
 
             const user = interaction.options.getUser('player')
             const discordId = user.id
@@ -139,19 +142,23 @@ export default {
                         wallet[currency]+=quantity
                         await wallet.save()
                     } else if (item.includes('Pack(s) of ')) {
-                        await awardPacks(interaction, member, set, quantity)
+                        if (quantity === 24) {
+                            awardBox(interaction, member, set)
+                        } else {
+                            awardPacks(interaction, member, set, quantity)
+                        }
                     } else {
                         return interaction.editReply({ content: `Error: unable to find inventory or currency for ${player.name}.`})
                     }
 
-                    return interaction.editReply({ content: `You awarded ${quantity}${loot} to ${player.name}. ${koolaid}`, components: [] });        
+                    return interaction.editReply({ content: `You awarded ${award} to ${player.name}. ${koolaid}`, components: [] });        
                 } else {
                     await confirmation.update({ components: [] })
-                    await confirmation.editReply({ content: `Not a problem. ${quantity}${loot} ${quantity === 1 ? 'was' : 'were'} not awarded to ${player.name}.`, components: [] })
+                    await confirmation.editReply({ content: `Not a problem. ${award} ${quantity === 1 ? 'was' : 'were'} not awarded to ${player.name}.`, components: [] })
                 }
             } catch (err) {
                 console.log(err)
-                await interaction.editReply({ content: `Sorry, time's up. ${quantity}${loot} ${quantity === 1 ? 'was' : 'were'} not awarded to ${player.name}.`, components: [] });
+                await interaction.editReply({ content: `Sorry, time's up. ${award} ${quantity === 1 ? 'was' : 'were'} not awarded to ${player.name}.`, components: [] });
             }
         } catch (err) {
             console.log(err)

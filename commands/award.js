@@ -154,11 +154,11 @@ export default {
                     return interaction.editReply({ content: `You awarded ${award} to ${player.name}. ${koolaid}`, components: [] });        
                 } else {
                     await confirmation.update({ components: [] })
-                    await confirmation.editReply({ content: `Not a problem. ${award} ${quantity === 1 ? 'was' : 'were'} not awarded to ${player.name}.`, components: [] })
+                    await confirmation.editReply({ content: `Not a problem. ${award} ${quantity === 1 || award.includes('Box of') ? 'was' : 'were'} not awarded to ${player.name}.`, components: [] })
                 }
             } catch (err) {
                 console.log(err)
-                await interaction.editReply({ content: `Sorry, time's up. ${award} ${quantity === 1 ? 'was' : 'were'} not awarded to ${player.name}.`, components: [] });
+                await interaction.editReply({ content: `Sorry, time's up. ${award} ${quantity === 1 || award.includes('Box of') ? 'was' : 'were'} not awarded to ${player.name}.`, components: [] });
             }
         } catch (err) {
             console.log(err)

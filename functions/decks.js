@@ -9,7 +9,7 @@ const { soldier } = emojis
 import { Op } from 'sequelize'
 import { clearStatus, convertArrayToObject } from './utility.js'
 import { fetchAllForgedCards, getInventorySummary } from './search.js'
-import { Auction, Bid, Card, Print, Set, Inventory,  Tournament, Status, ForgedInventory } from '../database/index.js'
+import { Auction, Bid, Card, ForgedPrint, ForgedSet, Tournament, Status, ForgedInventory } from '../database/index.js'
 import decks from '../static/decks.json' with { type: 'json' }
 // const { exec } = require('child_process')
 

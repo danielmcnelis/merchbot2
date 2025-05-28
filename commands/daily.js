@@ -2,7 +2,7 @@
 import { AttachmentBuilder, SlashCommandBuilder } from 'discord.js'
 import { Daily, ForgedInventory, ForgedPrint, ForgedSet, Player } from '../database/index.js'
 import { drawCardImage, getRandomElement, isSameDay} from '../functions/utility.js'
-import {awardPacks} from '../functions/packs.js'
+import { awardBox, awardPacks } from '../functions/packs.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
 const { cavebob, dimmadome, blue, scheming, koolaid, com, rar, sup, ult, scr } = emojis
 
@@ -121,7 +121,11 @@ export default {
                 const packImage = new AttachmentBuilder(`./public/7outof7.png`, { name: `pack.png` })
                 // let num = masterComplete ? 5 : eliteComplete ? 4 : hardComplete ? 3 : mediumComplete ? 2 : 1
                 if (num) setTimeout(async () => {
-                    awardPacks(interaction, interaction.member, set, num)
+                    if (num === 24) {
+                        awardBox(interaction, interaction.member, set)
+                    } else {
+                        awardPacks(interaction, interaction.member, set, num)
+                    }
                     interaction.channel.send({ content: `Oh look, ${daily.playerName}, you cobbled together a pack!`, files: [packImage]})
                 }, 4000)
             } else {

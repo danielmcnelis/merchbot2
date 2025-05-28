@@ -95,7 +95,7 @@ export default {
                 set ? `${item}${eval(set.code)}` :
                 ''
 
-            const award = item.includes('Pack(s) of ') && quantity === 24 ? `a Box of ${set.name} ${eval(set.code)}` : `${quantity}${loot}`
+            const award = item.includes('Pack(s) of ') && quantity === 24 ? `1 Box of ${set.name} ${eval(set.code)}` : `${quantity}${loot}`
 
             const user = interaction.options.getUser('player')
             const discordId = user.id

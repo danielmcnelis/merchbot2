@@ -12,6 +12,7 @@ import { Event } from './Event.js'
 import { ForgedInventory } from './ForgedInventory.js'
 import { ForgedPrint } from './ForgedPrint.js'
 import { ForgedSet } from './ForgedSet.js'
+import { Stats } from './Stats.js'
 import { Status } from './Status.js'
 import { Info } from './Info.js'
 import { Match } from './Match.js'
@@ -76,6 +77,9 @@ Binder.belongsTo(Player)
 Player.hasOne(Wishlist)
 Wishlist.belongsTo(Player)
 
+Stats.belongsTo(Player)
+Player.hasMany(Stats)
+
 export {
   db,
   Auction,
@@ -90,6 +94,7 @@ export {
   ForgedInventory,
   ForgedPrint,
   ForgedSet,
+  Stats,
   Status,
   Info,
   Match,

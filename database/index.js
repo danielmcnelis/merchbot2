@@ -25,6 +25,9 @@ import { Trade } from './Trade.js'
 import { Wallet } from './Wallet.js'
 import { Wishlist } from './Wishlist.js'
 
+Card.hasMany(ForgedPrint)
+ForgedPrint.belongsTo(Card)
+
 Card.hasMany(Status)
 Status.belongsTo(Card)
 

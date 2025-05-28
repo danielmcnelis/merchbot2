@@ -71,8 +71,8 @@ export default {
                     const matrix = new Array(3600)
                         matrix.fill(1, 0, 3463)
                         matrix.fill(2, 3463, 3559)
-                        matrix.fill(3, 3559, 3591)
-                        matrix.fill(4, 3591, 3599)
+                        matrix.fill(3, 3559, 3595)
+                        matrix.fill(4, 3595, 3599)
                         matrix.fill(5, 3599, 3600)
     
                     for (let i = 0; i < x; i++) {

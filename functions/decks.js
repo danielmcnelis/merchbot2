@@ -8,7 +8,7 @@ const { soldier } = require('../static/emojis.json')
 import { Op } from 'sequelize'
 const { clearStatus, convertArrayToObject } = require('./utility.js')
 const { fetchAllForgedCards, getInventorySummary } = require('./search.js')
-const { Auction, Bid, Card, Print, Set, Inventory,  Tournament, Status } = require('../database/index.js')
+const { Auction, Bid, Card, Print, Set, Inventory,  Tournament, Status, ForgedInventory } = require('../database/index.js')
 const decks = require('../static/decks.json')
 const { exec } = require('child_process')
 
@@ -292,4 +292,44 @@ export const getDeckType = async (player, tournamentName = 'other') => {
     const deckType =  'other'
 
     return deckType
+}
+
+// SEND INVENTORY YDK
+export const sendInventoryYDK = async (interaction, member) => {
+    const invs = await ForgedInventory.findAll({
+        where: {
+            playerId: player.id,
+            quantity: {[Op.gt]: 0}
+        },
+        include: Card,
+        order: [['cardCode', 'ASC']]
+    })
+
+    const konamiCodes = []
+    const mainKonamiCodes = []
+    const sideKonamiCodes = []
+
+    for (let i = 0; i < invs.length; i++) {
+        const inv = invs[i]
+        const konamiCode = inv.card.konamiCode
+        if (inv.quantity >= 3) {
+            konamiCodes.push(konamiCode, konamiCode, konamiCode)
+        } else if (inv.quantity === 2) {
+            konamiCodes.push(konamiCode, konamiCode)
+        } else {
+            konamiCodes.push(konamiCode)
+        }
+    }
+
+    for (let i = 0; i < konamiCodes.length; i++) {
+        const konamiCode = konamiCodes[i]
+        if (i <= 60) {
+            mainKonamiCodes.push(konamiCode)
+        } else {
+            sideKonamiCodes.push(konamiCode)
+        }
+    }
+
+    const ydk = `#main\n${mainKonamiCodes.join('\n')}#extra\n!side\n${sideKonamiCodes.join('\n')}\n`
+    return interaction.user.send({ content: ydk })
 }

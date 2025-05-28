@@ -113,11 +113,11 @@ export default {
             if ((daily.cobbleProgress + daysPassed) >= 7) {
                 daily.cobbleProgress = 0
 
-                const num = player.forgedSubscriptionTier === 'Supporter' ? 2 :
-                    player.forgedSubscriptionTier === 'Patron' ? 3 :
-                    player.forgedSubscriptionTier === 'Benefactor' ? 4 :
+                const num = player.forgedSubscriberTier === 'Supporter' ? 2 :
+                    player.forgedSubscriberTier === 'Patron' ? 3 :
+                    player.forgedSubscriberTier === 'Benefactor' ? 4 :
                     1
-                    
+
                 const packImage = new AttachmentBuilder(`./public/7outof7.png`, { name: `pack.png` })
                 // let num = masterComplete ? 5 : eliteComplete ? 4 : hardComplete ? 3 : mediumComplete ? 2 : 1
                 if (num) setTimeout(async () => {

@@ -20,6 +20,7 @@ import { Op } from 'sequelize'
 // FUNCTION IMPORTS
 import { fetchAllCardNames, fetchAllUniquePrintNames } from './functions/search.js'
 import { createPlayer, isNewUser } from './functions/utility.js'
+import { awardPacks } from './functions/packs.js'
 import { applyPriceDecay, checkShopShouldBe, getMidnightCountdown, getShopCountdown, openShop, closeShop, checkShopOpen, postBids, updateShop, clearDailies } from './functions/shop.js'
 
 // STATIC IMPORTS
@@ -86,6 +87,22 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
     
         const wasSubscriber = oldRoles.has('1375131866847252544')
         const isSubscriber = newRoles.has('1375131866847252544')
+        const hadForgedFlamethrowers1 = oldRoles.has('1375306119789936671')
+        const gotForgedFlamethrowers1 = newRoles.has('1375306119789936671')
+
+        if (!hadForgedFlamethrowers1 && gotForgedFlamethrowers1) {
+            const set = await Set.findOne({
+                where: {
+                    type: 'core',
+                    forSale: true,
+                },
+                order: [['createdAt', 'DESC']]
+            })
+
+            const guild = client.guilds.cache.get('1372580468297568458')
+            const channel = guild.channels.cache.get('1372580469039693976')
+            awardPacks(channel, newMember, set, 3)
+        }
     
         if (wasSubscriber && !isSubscriber) {
             const programmer = await client.users.fetch('194147938786738176')

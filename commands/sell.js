@@ -5,6 +5,8 @@ import { calculateNewMarketPrice, getBuyerConfirmation } from '../functions/tran
 import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
 const {com, rar, sup, ult, scr, stardust, merchant, scheming} = emojis
+import channels from '../static/channels.json' with { type: 'json' }
+const { marketPlaceChannelId, botSpamChannelId } = channels
 
 export default {
 	data: new SlashCommandBuilder()
@@ -59,6 +61,7 @@ export default {
         },
 	async execute(interaction) {
         try {
+            if (interaction.channel.id !== botSpamChannelId && interaction.channel.id !== marketPlaceChannelId) return interaction.reply({ content: `Command not valid outside of <#${marketPlaceChannelId}> or <#${botSpamChannelId}>.` })
             const quantity = interaction.options.getNumber('quantity')
             if (quantity < 1) return interaction.reply({ content: `You cannot sell less than 1 card.`})
             const printId = interaction.options.getNumber('print')

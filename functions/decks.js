@@ -333,6 +333,6 @@ export const sendInventoryYDK = async (interaction, player) => {
     }
 
     const ydk = `#main\n${mainKonamiCodes.join('\n')}\n#extra\n!side\n${sideKonamiCodes.join('\n')}\n`
-    const ydkFile = new AttachmentBuilder(Buffer.from(ydk), { name: `${player.name}_inventory.ydk` })
+    const ydkFile = new AttachmentBuilder(Buffer.from(ydk), { name: `${player.name}_first_packs.ydk` })
     return interaction.user.send({ files: [ydkFile] })
 }

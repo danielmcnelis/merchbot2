@@ -143,9 +143,9 @@ export default {
                         await wallet.save()
                     } else if (item.includes('Pack(s) of ')) {
                         if (quantity === 24) {
-                            awardBox(interaction, member, set)
+                            awardBox(interaction.channel, member, set)
                         } else {
-                            awardPacks(interaction, member, set, quantity)
+                            awardPacks(interaction.channel, member, set, quantity)
                         }
                     } else {
                         return interaction.editReply({ content: `Error: unable to find inventory or currency for ${player.name}.`})

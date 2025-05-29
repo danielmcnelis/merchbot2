@@ -18,7 +18,7 @@ import emojis from '../static/emojis.json' with { type: 'json' }
 const { AOD, beast, blue, bronze, cactus, cavebob, DRT, fiend, skull, familiar, battery, thunder, zombie, checkmark, com, credits, cultured, diamond, dinosaur, DOC, LPK, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, dimmadome, sup, tix, ult, wokefrog, yellow, yes, ygocard } = emojis
 
 // AWARD PACKS
-export const awardPacks = async (interaction, member, set, num = 1) => {
+export const awardPacks = async (channel, member, set, num = 1) => {
     const player = await Player.findByDiscordId(member.user.id)
 	
     const commons = [...await ForgedPrint.findAll({ 
@@ -124,11 +124,11 @@ export const awardPacks = async (interaction, member, set, num = 1) => {
         }
     }
 
-    return interaction.channel.send({ content: `<@${member.user.id}> was awarded ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'} of ${set.name}.${eval(set.code)} Congratulations!`})
+    return channel.send({ content: `<@${member.user.id}> was awarded ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'} of ${set.name}.${eval(set.code)} Congratulations!`})
 }
 
 // AWARD PACKS
-export const awardBox = async (interaction, member, set) => {
+export const awardBox = async (channel, member, set) => {
     const num = 24
     const player = await Player.findByDiscordId(member.user.id)
 	
@@ -236,7 +236,7 @@ export const awardBox = async (interaction, member, set) => {
         }
     }
 
-    return interaction.channel.send({ content: `<@${member.user.id}> was awarded a Box of ${set.name}.${eval(set.code)} Congratulations!`})
+    return channel.send({ content: `<@${member.user.id}> was awarded a Box of ${set.name}.${eval(set.code)} Congratulations!`})
 }
 
 export const awardPacksToShop = async (num, core = true) => {

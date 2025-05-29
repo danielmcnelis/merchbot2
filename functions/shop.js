@@ -204,12 +204,16 @@ export const checkShopShouldBe = () => {
 	const hours = date.getHours()
     
     let shopShouldBe
+    // Open from 2pm Saturday to 4pm Tuesday
     if ((day === 6 && hours >= 14) || day === 0 || day === 1 || (day === 2 && hours < 16)) {
         shopShouldBe = 'open'
+    // Closed from 4pm Tuesday to 8am Wednesday
     } else if ((day === 2 && hours >= 16) || (day === 3 && hours < 8)) {
         shopShouldBe = 'closed'
+    // Open from 8am Wednesday to 10pm Friday
     } else if ((day === 3 && hours >= 8) || day === 4 || (day === 5 && hours < 22)) {
         shopShouldBe = 'open'
+    // Closed from 10pm Friday to 2pm Saturday
     } else if ((day === 5 && hours >= 22) || (day === 6 && hours < 14)) {
         shopShouldBe = 'closed'
     } else {

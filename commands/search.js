@@ -4,6 +4,8 @@ import { Binder, ForgedPrint, Wishlist, Player} from '../database/index.js'
 import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
 const {com, rar, sup, ult, scr} = emojis
+import channels from '../static/channels.json' with { type: 'json' }
+const { marketPlaceChannelId, botSpamChannelId } = channels
 
 export default {
 	data: new SlashCommandBuilder()
@@ -39,7 +41,8 @@ export default {
             }
         },
 	async execute(interaction) {
-        try {        
+        try { 
+            if (interaction.channel.id !== botSpamChannelId && interaction.channel.id !== marketPlaceChannelId) return interaction.reply({ content: `Command not valid outside of <#${marketPlaceChannelId}> or <#${botSpamChannelId}>.` })       
             const printId = interaction.options.getNumber('print')
             const print = await ForgedPrint.findOne({ where: { id: printId }})
             const card = `${eval(print.rarity)}${print.cardCode} - ${print.cardName}`

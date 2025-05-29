@@ -18,9 +18,9 @@ export default {
             await Daily.create({ playerId: player.id, playerName: player.name })
             await Stats.create({ playerId: player.id, formatName: 'Forged in Chaos', formatId: 197, elo: 400, bestElo: 400, classicElo: 400, seasonalElo: 400, bestSeasonalElo: 400, serverId: '414551319031054346' })
             const set = await ForgedSet.findOne({ where: { code: 'AOD' }})
-            await awardPacks(interaction, interaction.member, set, 8)
-            await sendInventoryYDK(interaction, player)
-            return interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 8 packs, then try out the command **/inventory**!` })
+            interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 8 packs and a YDK file of your starting inventory!` })
+            await awardPacks(interaction.channel, interaction.member, set, 8)
+            return await sendInventoryYDK(interaction, player)
         } catch (err) {
             console.log(err)
         }

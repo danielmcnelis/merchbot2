@@ -122,9 +122,9 @@ export default {
                 // let num = masterComplete ? 5 : eliteComplete ? 4 : hardComplete ? 3 : mediumComplete ? 2 : 1
                 if (num) setTimeout(async () => {
                     if (num === 24) {
-                        awardBox(interaction, interaction.member, set)
+                        awardBox(interaction.channel, interaction.member, set)
                     } else {
-                        awardPacks(interaction, interaction.member, set, num)
+                        awardPacks(interaction.channel, interaction.member, set, num)
                     }
                     interaction.channel.send({ content: `Oh look, ${daily.playerName}, you cobbled together a pack!`, files: [packImage]})
                 }, 4000)

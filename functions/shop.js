@@ -498,9 +498,9 @@ export const updateShop = async () => {
             if (!print) continue
             const excluded = !!auction_printIds.includes(print.id)
             const marketPrice = print.marketPrice
-            const buyingPrice = Math.floor(marketPrice * 0.7) > 0 ? Math.floor(marketPrice * 0.7) : 1
-            const sellingPrice = Math.floor(marketPrice * 1.1) > buyingPrice ? Math.floor(marketPrice * 1.1) : buyingPrice + 1
-            results.push(`${sellingPrice}${stardust}| ${buyingPrice}${stardust}-${eval(print.rarity)}${inv.cardCode} - ${print.cardName} - ${inv.quantity}${print.trendingUp ? ` - ${upward}` : ''}${print.trendingDown ? ` - ${downward}` : ''}${excluded ? ` - ${no}` : ''}`) 
+            const shopBuyingPrice = Math.floor(marketPrice * 0.7) > 0 ? Math.floor(marketPrice * 0.7) : 1
+            const shopSellingPrice = Math.floor(marketPrice * 1.1) > shopBuyingPrice ? Math.floor(marketPrice * 1.1) : buyingPrice + 1
+            results.push(`${shopSellingPrice}${stardust}| ${shopBuyingPrice}${stardust}-${eval(print.rarity)}${inv.cardCode} - ${print.cardName} - ${inv.quantity}${print.trendingUp ? ` - ${upward}` : ''}${print.trendingDown ? ` - ${downward}` : ''}${excluded ? ` - ${no}` : ''}`) 
         }
     
         for (let i = 0; i < results.length; i += 10) {
@@ -602,9 +602,9 @@ export const postBids = async () => {
 
             if (!inv) continue
             const marketPrice = inv.forgedPrint.marketPrice
-            const sellingPrice = Math.ceil(marketPrice * 1.1)
-            const buyingPrice = Math.ceil(marketPrice * 0.7)
-            results.push(`${sellingPrice}${stardust}| ${buyingPrice}${stardust}-${eval(inv.forgedPrint.rarity)}${inv.cardCode} - ${inv.cardName} - ${inv.quantity}`) 
+            const shopSellingPrice = Math.ceil(marketPrice * 1.1)
+            const shopBuyingPrice = Math.ceil(marketPrice * 0.7)
+            results.push(`${shopSellingPrice}${stardust}| ${shopBuyingPrice}${stardust}-${eval(inv.forgedPrint.rarity)}${inv.cardCode} - ${inv.cardName} - ${inv.quantity}`) 
         }
 
         // const shopInvs = await ForgedInventory.findAll({ 

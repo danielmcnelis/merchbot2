@@ -8,7 +8,7 @@ const {com, rar, sup, ult, scr, stardust, merchant, scheming} = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { marketPlaceChannelId, botSpamChannelId } = channels
 
-function areNumbersMoreThan50PercentApart(num1, num2) {
+function areNumbersMoreThan3xApart(num1, num2) {
     if (typeof num1 !== 'number' || typeof num2 !== 'number') {
       return false; // Handle cases where inputs are not numbers
     }
@@ -21,7 +21,7 @@ function areNumbersMoreThan50PercentApart(num1, num2) {
     const average = (num1 + num2) / 2;
     const percentageDifference = (difference / average) * 100;
       
-    return percentageDifference > 50;
+    return percentageDifference > 300;
 }
 
 export default {
@@ -255,11 +255,11 @@ export default {
             })
 
             if (existingProposal) {
-                if (areNumbersMoreThan50PercentApart(existingProposal.totalValue, totalValue)){
+                if (areNumbersMoreThan3xApart(existingProposal.totalValue, totalValue)){
                     await interaction.reply({ content: `Error: this trade is too lopsided.`})
                     return await existingProposal.destroy()
                 }
-                
+
                 const existingProposalPrintA = await ForgedPrint.findOne({ where: { id: existingProposal.forgedPrintAId }})
                 const existingProposalCardA = `${eval(existingProposalPrintA.rarity)}${existingProposalPrintA.cardCode} - ${existingProposalPrintA.cardName}`
 

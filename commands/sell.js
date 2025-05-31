@@ -83,7 +83,7 @@ export default {
             const info = await Info.findOne({ where: { element: 'shop'} })
             if (shopSale && info.status === 'closed') return interaction.reply({ content: `Sorry, The Shop ${merchant} is currently closed.` })
             const shopBuyingPrice = Math.floor(print.marketPrice * 0.7) > 0 ? Math.floor(print.marketPrice * 0.7) : 1			
-            const price = shopSale ? shopBuyingPrice : interaction.options.getNumber('price')
+            const price = shopSale ? quantity * shopBuyingPrice : interaction.options.getNumber('price')
             if (shopSale && interaction.options.getNumber('price') && interaction.options.getNumber('price') !== price) return interaction.reply({ content: `Please leave the "price" option blank when selling cards to The Shop. ${merchant}` })
             if (!shopSale && !price) return interaction.reply({ content: `Please specifiy the price.`})
             const shopBuybackPrice = Math.ceil(print.marketPrice * 0.7)

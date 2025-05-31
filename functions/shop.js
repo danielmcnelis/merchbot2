@@ -199,7 +199,6 @@ export const getMidnightCountdown = () => {
 
 //CHECK SHOP SHOULD BE
 export const checkShopShouldBe = () => {
-    return 'open'
 	const date = new Date()
 	const day = date.getDay()
 	const hours = date.getHours()

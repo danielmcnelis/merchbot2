@@ -43,7 +43,7 @@ export const Proposal = db.define('proposals', {
         type: Sequelize.INTEGER
     },
     totalValue: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
     }
 })
 

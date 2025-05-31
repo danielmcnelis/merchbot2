@@ -255,7 +255,11 @@ export default {
             })
 
             if (existingProposal) {
-                if (areNumbersMoreThan50PercentApart(existingProposal.totalValue, totalValue)) return interaction.reply({ content: `Error: this trade is too lopsided.`})
+                if (areNumbersMoreThan50PercentApart(existingProposal.totalValue, totalValue)){
+                    await interaction.reply({ content: `Error: this trade is too lopsided.`})
+                    return await existingProposal.destroy()
+                }
+                
                 const existingProposalPrintA = await ForgedPrint.findOne({ where: { id: existingProposal.forgedPrintAId }})
                 const existingProposalCardA = `${eval(existingProposalPrintA.rarity)}${existingProposalPrintA.cardCode} - ${existingProposalPrintA.cardName}`
 

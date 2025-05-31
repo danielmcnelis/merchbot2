@@ -41,6 +41,9 @@ export const Proposal = db.define('proposals', {
     },
     stardustQuantity: {
         type: Sequelize.INTEGER
+    },
+    totalValue: {
+        type: Sequelize.INTEGER
     }
 })
 

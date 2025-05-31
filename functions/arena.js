@@ -1,6 +1,7 @@
 
 const { Arena, Diary, Info, Player, Profile, Wallet, Match } = require('../database/index.js')
 import { Op } from 'sequelize'
+import { ArenaEntry } from '../database/ArenaEntry.js'
 const { yescom, nocom } = require('../static/commands.json')
 const { DRT, fiend, thunder, zombie, king, shrine, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, skull, familiar, battery, com, credits, cultured, diamond, dinosaur, DOC, LPK, dragon, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, spellcaster, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, dimmadome, sup, tix, ult, wokefrog, yellow, yes, ygocard } = require('../static/emojis.json')
 const { arenaRole } = require('../static/roles.json')
@@ -457,4 +458,83 @@ export const checkArenaProgress = async (info) => {
     const sum = scores.reduce((a, b) => a + b)
 
     if (sum % 2 === 0 && !progress_report.includes(true)) return setTimeout(() => postStandings(info, entries), 3000)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//INITIATE ARENA
+export const initiateArena = async (interaction) => {
+    interaction.channel.send({ content: `Arena players, please check your DMs!`})
+    const entries = await ArenaEntry.findAll({ include: Player })
+    for (let i = 0; i < entries.length; i++) getArenaConfirmation(interaction, entries[i])
+    let round = 1
+
+    for (let i = 1; i < 12; i ++) {
+        setTimeout(async () => {
+            const playing = await ArenaEntry.count({ where: { status: 'playing' }})
+            if (playing) return
+            const unconfirmed = await ArenaEntry.count({ where: { isConfirmed: false }})
+
+            if (!unconfirmed) {
+                for (let j = 0; j < entries.length; j++) {
+                    const entry = entries[j]
+                    await entry.update({ status: 'playing' })
+                }
+
+                assignArenaRoles(entries)
+                setTimeout(() => {
+                    interaction.channel.send({ content: `<@&${arenaRole}>, look alive gamers! The Arena starts in 10 seconds. ${skipper}\n\nP.S. If you aren't playing within 5 minutes of this message, it's a game loss!`})
+                }, 1000)
+
+                return setTimeout(() => { return askQuestion(interaction, round, questions) }, 11000)
+            }
+        }, i * 5000)
+    }
+
+    return setTimeout(async () => {
+        const playing = await TriviaEntry.count({ where: { status: 'playing' }})
+        if (playing) return
+
+        const missingEntries = await TriviaEntry.findAll({ where: { isConfirmed: false }})
+        const missingNames = missingEntries.map((entry) => entry.playerName)
+
+        for (let i = 0; i < missingEntries.length; i++) {
+            const entry = missingEntries[i]
+            await entry?.destroy()
+        }
+
+        const remainingEntries = await TriviaEntry.findAll({ where: { isConfirmed: true }})
+
+        if (remainingEntries.length < 4) {    
+            for (let i = 0; i < remainingEntries.length; i++) {
+                const entry = remainingEntries[i]
+                await entry?.update({ status: 'pending', isConfirmed: false })
+            }
+
+            return interaction.channel.send({ content: `Unfortunately, Trivia cannot begin without at least 4 players. 📚 🐛\n\nThe following players have been removed from the queue:\n${missingNames.sort().join("\n")}`})
+        } else {
+            for (let i = 0; i < remainingEntries.length; i++) {
+                const entry = entries[i]
+                await entry?.update({ status: 'playing' })
+            }
+
+            assignTriviaRoles(entries)
+            setTimeout(() => {
+                interaction.channel.send({ content: `<@&${triviaRole}>, look alive bookworms! Trivia starts in 10 seconds. ${emojis.skipper}`})
+            }, 1000)
+
+            return setTimeout(() => { return askQuestion(interaction, round, questions) }, 11000)
+        }
+    }, 61000)
 }

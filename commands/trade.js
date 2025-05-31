@@ -8,6 +8,22 @@ const {com, rar, sup, ult, scr, stardust, merchant, scheming} = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { marketPlaceChannelId, botSpamChannelId } = channels
 
+function areNumbersMoreThan50PercentApart(num1, num2) {
+    if (typeof num1 !== 'number' || typeof num2 !== 'number') {
+      return false; // Handle cases where inputs are not numbers
+    }
+  
+    if (num1 === 0 && num2 === 0) {
+      return false; // Avoid division by zero if both numbers are zero
+    }
+      
+    const difference = Math.abs(num1 - num2);
+    const average = (num1 + num2) / 2;
+    const percentageDifference = (difference / average) * 100;
+      
+    return percentageDifference > 50;
+}
+
 export default {
     data: new SlashCommandBuilder()
         .setName('trade')
@@ -93,6 +109,7 @@ export default {
             if (quantityA < 1) return interaction.reply({ content: `You cannot trade less than 1 card.`})
             const printAId = interaction.options.getNumber('print-a')
             const printA = await ForgedPrint.findOne({ where: { id: printAId }})
+            const valueA = printA.marketPrice
             const cardA = `${eval(printA.rarity)}${printA.cardCode} - ${printA.cardName}`
             
             // PRINT B
@@ -101,6 +118,7 @@ export default {
             if ((!quantityB && printBId) || (quantityB && !printBId)) return interaction.reply({ content: `Trade form incomplete. Please try again.` })
             if (quantityB && quantityB < 1) return interaction.reply({ content: `You cannot trade less than 1 card.`})
             const printB = printBId ? await ForgedPrint.findOne({ where: { id: printBId }}) : null
+            const valueB = printB ? printB.marketPrice : 0
             const cardB = printB ? `${eval(printB.rarity)}${printB.cardCode} - ${printB.cardName}` : null
 
             // PRINT C
@@ -109,11 +127,15 @@ export default {
             if ((!quantityC && printCId) || (quantityC && !printCId)) return interaction.reply({ content: `Trade form incomplete. Please try again.` })
             if (quantityC && quantityC < 1) return interaction.reply({ content: `You cannot trade less than 1 card.`})
             const printC = printCId ? await ForgedPrint.findOne({ where: { id: printCId }}) : null
+            const valueC = printC ? printC.marketPrice : 0
             const cardC = printC ? `${eval(printC.rarity)}${printC.cardCode} - ${printC.cardName}` : null
 
             // STARDUST
-            const stardustQuantity = interaction.options.getNumber('stardust')
+            const stardustQuantity = interaction.options.getNumber('stardust') || 0
             if (stardustQuantity && stardustQuantity < 1) return interaction.reply({ content: `You cannot trade less than 1${stardust}.`})
+
+            // TOTAL VALUE
+            const totalValue = valueA + valueB + valueC + stardustQuantity
 
             // TRADER A
             const traderADiscordId = interaction.user.id
@@ -182,6 +204,7 @@ export default {
                 }
             }
 
+            // PRINT C INVENTORY CHECKS
             let traderAPrintCInv
             let traderBPrintCInv
             if (printC) {
@@ -208,21 +231,18 @@ export default {
                 }
             }
 
-            // const traderAPackage = [{type: 'card', printId: printAId, quantity: quantityA}]
+            // PUT TOGETHER TRADER A PACKAGE SUMMARY
             const traderAPackageSummary = [`${quantityA} ${cardA}`]
 
             if (printB) {
-                // traderAPackage.push({type: 'card', printId: printBId, quantity: quantityB})
                 traderAPackageSummary.push(`${quantityB} ${cardB}`)
             }
 
             if (printC) {
-                // traderAPackage.push({type: 'card', printId: printCId, quantity: quantityC})
                 traderAPackageSummary.push(`${quantityC} ${cardC}`)
             }
 
             if (stardustQuantity) {
-                // traderAPackage.push({type: 'stardust', printId: null, quantity: stardustQuantity})
                 traderAPackageSummary.push(`${stardustQuantity}${stardust}`)
             }
 
@@ -235,6 +255,7 @@ export default {
             })
 
             if (existingProposal) {
+                if (areNumbersMoreThan50PercentApart(existingProposal.totalValue, totalValue)) return interaction.reply({ content: `Error: this trade is too lopsided.`})
                 const existingProposalPrintA = await ForgedPrint.findOne({ where: { id: existingProposal.forgedPrintAId }})
                 const existingProposalCardA = `${eval(existingProposalPrintA.rarity)}${existingProposalPrintA.cardCode} - ${existingProposalPrintA.cardName}`
 
@@ -375,7 +396,8 @@ export default {
                             quantityB: quantityB,
                             forgedPrintCId: printCId,
                             quantityC: quantityC,
-                            stardustQuantity: stardustQuantity
+                            stardustQuantity: stardustQuantity,
+                            totalValue: totalValue
                         })
 
                         await interaction.editReply({ content: `Okay, waiting for ${traderB.name}'s trade confirmation.`, components: [] });        
@@ -421,7 +443,8 @@ export default {
                             quantityB: quantityB,
                             forgedPrintCId: printCId,
                             quantityC: quantityC,
-                            stardustQuantity: stardustQuantity
+                            stardustQuantity: stardustQuantity,
+                            totalValue: totalValue
                         })
 
                         await interaction.editReply({ content: `Okay, waiting for ${traderB.name}'s offer. `, components: [] })

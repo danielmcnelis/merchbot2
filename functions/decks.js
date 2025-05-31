@@ -325,7 +325,7 @@ export const sendInventoryYDK = async (interaction, player) => {
 
     for (let i = 0; i < konamiCodes.length; i++) {
         const konamiCode = konamiCodes[i]
-        if (i <= 60) {
+        if (i < 60) {
             mainKonamiCodes.push(konamiCode)
         } else {
             sideKonamiCodes.push(konamiCode)

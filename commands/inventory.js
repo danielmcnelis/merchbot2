@@ -50,7 +50,7 @@ export default {
                         sets.map(set => ({ name: `${set.name} (${set.code})`, value: set.code })),
                     )
                 } else if (focusedValue.name === 'card') {
-                    const cards = await ForgedPrint.findAll({
+                    const prints = await ForgedPrint.findAll({
                         where: {
                             cardName: {[Op.iLike]: `${focusedValue.value}%`},
                         },
@@ -59,7 +59,7 @@ export default {
                     })
 
                     await interaction.respond(
-                        cards.map(card => ({ name: card.name, value: card.name })),
+                        prints.map(print => ({ name: print.cardName, value: print.cardName })),
                     )
                 }
             } catch (err) {

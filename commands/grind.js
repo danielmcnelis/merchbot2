@@ -1,5 +1,5 @@
 
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from 'discord.js'
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import {Player, Wallet} from '../database/index.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
 const {starchips, stardust} = emojis
@@ -13,7 +13,8 @@ export default {
                 .setName('starchips')
                 .setDescription('How many StarChips do you wish to grind?')
                 .setRequired(true)
-        ),
+        )
+    	.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
         try {
             const x = interaction.options.getNumber('starchips')

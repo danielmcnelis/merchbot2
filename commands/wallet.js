@@ -1,5 +1,5 @@
 
-import { SlashCommandBuilder } from 'discord.js'
+import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { Player, Wallet } from '../database/index.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
 const {FiC, stardust, starchips} = emojis
@@ -14,7 +14,7 @@ export default {
                 .setDescription('The player you want to check.')
                 .setRequired(false)
         )
-        .setDMPermission(false),
+    	.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
         try {
             const user = interaction.options.getUser('player') || interaction.user

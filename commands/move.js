@@ -1,5 +1,5 @@
 
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from 'discord.js'
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { Card, ForgedPrint, Status } from '../database/index.js'
 import { Op } from 'sequelize'
 import { convertDateToYYYYMMDD, isAdmin } from '../functions/utility.js'
@@ -26,7 +26,8 @@ export default {
                     { name: 'Semi-Limited', value: 'semi-limited' },
                     { name: 'Unlimited', value: 'unlimited' },
                 )
-        ),
+        )
+    	.setContexts(InteractionContextType.Guild),
         async autocomplete(interaction) {
             try {
                 const focusedValue = interaction.options.getFocused()

@@ -1,5 +1,5 @@
 
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from 'discord.js'
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { isAdmin } from '../functions/utility.js'
 import { Wallet } from '../database/index.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
@@ -8,7 +8,8 @@ const {starchips, stardust} = emojis
 export default {
 	data: new SlashCommandBuilder()
 		.setName('grindall')
-		.setDescription('Admin Only - Grind all starchips into stardust. 🙊'),
+		.setDescription('Admin Only - Grind all starchips into stardust. 🙊')
+    	.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
         try {
             if (!isAdmin(interaction.member)) return interaction.reply({ content: `You do not have permission to do that.`})

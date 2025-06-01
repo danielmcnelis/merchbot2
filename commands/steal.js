@@ -1,5 +1,5 @@
 
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from 'discord.js'
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { ForgedInventory, ForgedPrint, Player, Wallet } from '../database/index.js'
 import { Op } from 'sequelize'
 import { isMod } from '../functions/utility.js'
@@ -28,7 +28,8 @@ export default {
                 .setName('player')
                 .setDescription('Tag the player to steal from.')
                 .setRequired(true)
-        ),
+        )
+    	.setContexts(InteractionContextType.Guild),
         async autocomplete(interaction) {
             try {
                 const focusedValue = interaction.options.getFocused()

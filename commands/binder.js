@@ -1,5 +1,5 @@
 
-import { SlashCommandBuilder } from 'discord.js'
+import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import {ForgedPrint, Binder, Player, ForgedInventory} from '../database/index.js'
 import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
@@ -33,7 +33,8 @@ export default {
                     { name: 'Yes', value: 'yes' },
                     { name: 'No', value: 'no' },
                 )
-        ),
+        )
+    	.setContexts(InteractionContextType.Guild),
         async autocomplete(interaction) {
             try {
                 const focusedValue = interaction.options.getFocused()

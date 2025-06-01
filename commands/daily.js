@@ -1,5 +1,5 @@
 
-import { AttachmentBuilder, SlashCommandBuilder } from 'discord.js'
+import { AttachmentBuilder, InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { Daily, ForgedInventory, ForgedPrint, ForgedSet, Player } from '../database/index.js'
 import { drawCardImage, getRandomElement, isSameDay} from '../functions/utility.js'
 import { awardBox, awardPacks } from '../functions/packs.js'
@@ -9,7 +9,8 @@ const { cavebob, dimmadome, blue, scheming, koolaid, com, rar, sup, ult, scr } =
 export default {
 	data: new SlashCommandBuilder()
 		.setName('daily')
-		.setDescription('Receive your daily bonus! 🎁'),
+		.setDescription('Receive your daily bonus! 🎁')
+    	.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
         try {             
             const player = await Player.findByDiscordId(interaction.user.id)

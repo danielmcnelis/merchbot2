@@ -1,5 +1,5 @@
 
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from 'discord.js'
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { Card, ForgedInventory, ForgedPrint, ForgedSet, Player, Wallet } from '../database/index.js'
 import { Op } from 'sequelize'
 import { drawPack } from '../functions/packs.js'
@@ -23,7 +23,8 @@ export default {
                 .setName('quantity')
                 .setDescription('How many packs?')
                 .setRequired(false)
-        ),
+        )
+    	.setContexts(InteractionContextType.Guild),
         async autocomplete(interaction) {
             try {
                 const focusedValue = interaction.options.getFocused()

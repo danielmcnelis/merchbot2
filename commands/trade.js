@@ -1,5 +1,5 @@
 
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from 'discord.js'
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { ForgedInventory, ForgedPrint, Player, Proposal, Wallet } from '../database/index.js'
 import { getTraderBConfirmation } from '../functions/transaction.js'
 import { Op } from 'sequelize'
@@ -78,7 +78,8 @@ export default {
                 .setName('stardust')
                 .setDescription('How much StarDust if any?')
                 .setRequired(false)
-        ),
+        )
+    	.setContexts(InteractionContextType.Guild),
         async autocomplete(interaction) {
             try {
                 const focusedValue = interaction.options.getFocused()

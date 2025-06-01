@@ -1,5 +1,5 @@
 
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from 'discord.js'
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, SlashCommandBuilder } from 'discord.js'
 // import { purgeDuplicatePrices, updateMinMedMaxRarities, assignSeasonalLadderRoles, downloadOriginalArtworks, purgeBetaCards, downloadMissingCardImages, recalculateStats, downloadNewCards, lookForAllPotentialPairs, cleanUpPools, manageSubscriptions, updateGlobalNames, updateMarketPrices, conductCensus, calculateStandings, updateAvatars, updateDeckThumbs, updateDeckType, updateDecks, updateBlogPosts, isProgrammer, runMonthlyTasks, runNightlyTasks, updateServers, runFrequentTasks } from '@fl/bot-functions'
 // import { emojis } from '@fl/bot-emojis'
 // import { client } from '../client'
@@ -14,7 +14,7 @@ export default {
     data: new SlashCommandBuilder()
         .setName('test')
         .setDescription('Admin Only - Performs a test. 🧪')
-        .setDMPermission(false),
+    	.setContexts(InteractionContextType.Guild),
     async execute(interaction) {
         try {
             await interaction.deferReply()

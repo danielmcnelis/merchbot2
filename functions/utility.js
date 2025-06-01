@@ -290,25 +290,25 @@ export const isNewUser = async (playerId) => {
 }
 
 //IS JAZZ?
-export const isProgrammer = (member) => member.user.id === '194147938786738176'
+export const isProgrammer = (member) => member && member.user.id === '194147938786738176'
 
 //IS ADMIN?
-export const isAdmin = (member) => member.roles.cache.some(role => role.id === adminRole || member.user.id === '194147938786738176')
+export const isAdmin = (member) => member && member.roles.cache.some(role => role.id === adminRole || member.user.id === '194147938786738176')
 
 //IS MOD?
-export const isMod = (member) => member.roles.cache.some(role => role.id === modRole || role.id === adminRole || member.user.id === '194147938786738176')
+export const isMod = (member) => member && member.roles.cache.some(role => role.id === modRole || role.id === adminRole || member.user.id === '194147938786738176')
 
 //IS AMBASSADOR?
-export const isAmbassador = (member) => member.roles.cache.some(role => role.id === ambassadorRole || role.id === modRole || role.id === adminRole || member.user.id === '194147938786738176')
+export const isAmbassador = (member) => member && member.roles.cache.some(role => role.id === ambassadorRole || role.id === modRole || role.id === adminRole || member.user.id === '194147938786738176')
 
 //IS ARENA PLAYER?
-export const isArenaPlayer = (member) => member.roles.cache.some(role => role.id === arenaRole)
+export const isArenaPlayer = (member) => member && member.roles.cache.some(role => role.id === arenaRole)
 
 //IS DRAFT PLAYER?
-export const isDraftPlayer = (member) => member.roles.cache.some(role => role.id === draftRole)
+export const isDraftPlayer = (member) => member && member.roles.cache.some(role => role.id === draftRole)
 
 //IS TOUR PLAYER?
-export const isTourPlayer = (member) => member.roles.cache.some(role => role.id === tourRole || role.id === '864960157758914570')
+export const isTourPlayer = (member) => member && member.roles.cache.some(role => role.id === tourRole || role.id === '864960157758914570')
 
 //HAS PROFILE?
 export const hasProfile = async (playerId) => {

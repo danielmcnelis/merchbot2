@@ -1,5 +1,5 @@
 
-import { SlashCommandBuilder } from 'discord.js'
+import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { Daily, ForgedSet, Player, Stats, Wallet } from '../database/index.js'
 import { sendInventoryYDK } from '../functions/decks.js'
 import { awardPacks } from '../functions/packs.js'
@@ -7,7 +7,8 @@ import { awardPacks } from '../functions/packs.js'
 export default {
 	data: new SlashCommandBuilder()
 		.setName('play')
-		.setDescription('Play the game! 🎮'),
+		.setDescription('Play the game! 🎮')
+    	.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
         try {
             await interaction.deferReply()

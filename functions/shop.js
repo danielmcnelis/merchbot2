@@ -7,7 +7,7 @@ import { Op } from 'sequelize'
 import commands from '../static/commands.json' with { type: 'json' }
 const { nocom, yescom } = commands
 import emojis from '../static/emojis.json' with { type: "json" } 
-const { AOD, downward, upward, forgestone, gem, orb, swords, beast, blue, bronze, DRT, fiend, thunder, zombie, skull, familiar, battery, cactus, cavebob, checkmark, closed, com, credits, cultured, diamond, dinosaur, DOC, LPK, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, open, ORF, TEB, FON, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, dimmadome, stonks, sup, tix, ult, wokefrog, yellow, yes, ygocard } = emojis
+const { AOD, falling, rising, forgestone, gem, orb, swords, beast, blue, bronze, DRT, fiend, thunder, zombie, skull, familiar, battery, cactus, cavebob, checkmark, closed, com, credits, cultured, diamond, dinosaur, DOC, LPK, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, open, ORF, TEB, FON, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, dimmadome, stonks, sup, tix, ult, wokefrog, yellow, yes, ygocard } = emojis
 import { awardPacksToShop } from './packs.js'
 // const adminId = '194147938786738176'
 import { client } from '../static/clients.js'
@@ -500,7 +500,7 @@ export const updateShop = async () => {
             const marketPrice = print.marketPrice
             const shopBuyingPrice = Math.floor(marketPrice * 0.7) > 0 ? Math.floor(marketPrice * 0.7) : 1
             const shopSellingPrice = Math.floor(marketPrice * 1.1) > shopBuyingPrice ? Math.floor(marketPrice * 1.1) : buyingPrice + 1
-            results.push(`${shopSellingPrice}${stardust}| ${shopBuyingPrice}${stardust}-${eval(print.rarity)}${inv.cardCode} - ${print.cardName} - ${inv.quantity}${print.trendingUp ? ` - ${upward}` : ''}${print.trendingDown ? ` - ${downward}` : ''}${excluded ? ` - ${no}` : ''}`) 
+            results.push(`${shopSellingPrice}${stardust}| ${shopBuyingPrice}${stardust}-${eval(print.rarity)}${inv.cardCode} - ${print.cardName} - ${inv.quantity}${print.trendingUp ? ` - ${rising}` : ''}${print.trendingDown ? ` - ${falling}` : ''}${excluded ? ` - ${no}` : ''}`) 
         }
     
         for (let i = 0; i < results.length; i += 10) {
@@ -629,7 +629,7 @@ export const postBids = async () => {
         //     const marketPrice = print.marketPrice
         //     const buyingPrice = Math.floor(marketPrice * 0.7) > 0 ? Math.floor(marketPrice * 0.7) : 1
         //     const sellingPrice = Math.floor(marketPrice * 1.1) > buyingPrice ? Math.floor(marketPrice * 1.1) : buyingPrice + 1
-        //     results.push(`${sellingPrice}${stardust}| ${buyingPrice}${stardust}-${eval(print.rarity)}${inv.cardCode} - ${print.cardName} - ${inv.quantity}${print.trendingUp ? ` - ${upward}` : ''}${print.trendingDown ? ` - ${downward}` : ''}`) 
+        //     results.push(`${sellingPrice}${stardust}| ${buyingPrice}${stardust}-${eval(print.rarity)}${inv.cardCode} - ${print.cardName} - ${inv.quantity}${print.trendingUp ? ` - ${rising}` : ''}${print.trendingDown ? ` - ${falling}` : ''}`) 
         // }
     
         for (let i = 0; i < results.length; i += 10) {

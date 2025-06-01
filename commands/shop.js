@@ -1,9 +1,9 @@
 
-import { SlashCommandBuilder } from 'discord.js'
+import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { ForgedInventory, ForgedPrint, Player } from '../database/index.js'
 import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { com, rar, sup, ult, scr, starchips, stardust, downward, upward } = emojis
+const { com, rar, sup, ult, scr, starchips, stardust, falling, rising } = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { marketPlaceChannelId, botSpamChannelId } = channels
 
@@ -17,7 +17,8 @@ export default {
                 .setDescription('Enter search query.')
 				.setAutocomplete(true)
                 .setRequired(true)
-        ),
+        )
+    	.setContexts(InteractionContextType.Guild),
         async autocomplete(interaction) {
             try {
                 const focusedValue = interaction.options.getFocused()
@@ -59,9 +60,9 @@ export default {
             const shopSellingPrice = Math.floor(marketPrice * 1.1) > shopBuyingPrice ? Math.floor(marketPrice * 1.1) : shopBuyingPrice + 1
     
             if (!inv) {
-                return interaction.reply({ content: `${shopSellingPrice}${stardust}| ${shopBuyingPrice}${stardust}-${card} - Out of Stock${print.trendingUp ? ` - ${upward}` : ''}${print.trendingDown ? ` - ${downward}` : ''}`})
+                return interaction.reply({ content: `${shopSellingPrice}${stardust}| ${shopBuyingPrice}${stardust}-${card} - Out of Stock${print.trendingUp ? ` - ${rising}` : ''}${print.trendingDown ? ` - ${falling}` : ''}`})
             } else {
-                return interaction.reply({ content: `${shopSellingPrice}${stardust}| ${shopBuyingPrice}${stardust}-${card} - ${inv.quantity}${print.trendingUp ? ` - ${upward}` : ''}${print.trendingDown ? ` - ${downward}` : ''}`})
+                return interaction.reply({ content: `${shopSellingPrice}${stardust}| ${shopBuyingPrice}${stardust}-${card} - ${inv.quantity}${print.trendingUp ? ` - ${rising}` : ''}${print.trendingDown ? ` - ${falling}` : ''}`})
             }
         } catch (err) {
             console.log(err)

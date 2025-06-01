@@ -1,12 +1,13 @@
 
-import { SlashCommandBuilder } from 'discord.js'
+import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { isAdmin } from '../functions/utility.js'
 import { openShop } from '../functions/shop.js'
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('open')
-		.setDescription('Admin Only - Open The Shop ☀️'),
+		.setDescription('Admin Only - Open The Shop ☀️')
+    	.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
         try {
             if (!isAdmin(interaction.member)) { 

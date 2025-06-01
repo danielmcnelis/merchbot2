@@ -8,7 +8,6 @@ import binder from './binder.js'
 import box from './box.js'
 import buy from './buy.js'
 import checklist from './checklist.js'
-import clear from './clear.js'
 import close from './close.js'
 import daily from './daily.js'
 import dump from './dump.js'
@@ -44,7 +43,6 @@ export default {
         box,
         buy,
         checklist,
-        clear,
         close,
         daily,
         dump,

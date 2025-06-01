@@ -1,5 +1,5 @@
 
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from 'discord.js'
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { Daily, Player, Wallet, ForgedInventory, ForgedPrint, ForgedSet} from '../database/index.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
 import { drawCardImage, getRandomElement, isSameDay } from '../functions/utility.js'
@@ -14,7 +14,8 @@ export default {
                 .setName('stardust')
                 .setDescription('How much StarDust do you wish to wager?')
                 .setRequired(true)
-        ),
+        )
+    	.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
         try {
             const x = interaction.options.getNumber('stardust')

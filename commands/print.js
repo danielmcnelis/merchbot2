@@ -1,5 +1,5 @@
 
-import { SlashCommandBuilder } from 'discord.js'
+import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { Op } from 'sequelize'
 import { isAdmin} from '../functions/utility.js'
 import { Card, Info, ForgedPrint, ForgedSet } from '../database/index.js'
@@ -30,7 +30,8 @@ export default {
 					{ name: 'Ultra Rare', value: 'ult' },		
 					{ name: 'Secret Rare', value: 'scr' },	
 			)
-        ),
+        )
+    	.setContexts(InteractionContextType.Guild),
         async autocomplete(interaction) {
             try {
                 const focusedValue = interaction.options.getFocused()

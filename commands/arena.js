@@ -1,5 +1,5 @@
 
-import { SlashCommandBuilder } from 'discord.js'
+import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { isAdmin } from '../functions/utility.js'
 import { closeShop } from '../functions/shop.js'
 import { ArenaEntry, Player } from '../database/index.js'
@@ -10,7 +10,8 @@ const { arena } = emojis
 export default {
 	data: new SlashCommandBuilder()
 		.setName('arena')
-		.setDescription('Join The Arena! 🏟️'),
+		.setDescription('Join The Arena! 🏟️')
+    	.setContexts(InteractionContextType.Guild),
     async execute(interaction) {
         try {
             if (interaction.channel.id !== '1378129840691220631') return await interaction.reply({ content: `Try using **/arena** in the <#1378129840691220631> channel. ${arena}`})

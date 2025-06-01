@@ -1,13 +1,14 @@
 
 import { Daily, Info, ForgedSet, Wallet } from '../database/index.js'
-import { SlashCommandBuilder } from 'discord.js'
+import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { createPlayer, isProgrammer } from '../functions/utility.js'
 // import { AOD } from '../static/emojis.json' with { type: 'json' }
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('update')
-		.setDescription('Admin Only - Update the game! 💾'),
+		.setDescription('Admin Only - Update the game! 💾')
+    	.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
         if (!isProgrammer(interaction.member)) return await interaction.editReply({ content: `You do not have permission to do that.`})
         

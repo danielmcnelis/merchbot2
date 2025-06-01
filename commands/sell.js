@@ -1,5 +1,5 @@
 
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from 'discord.js'
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { ForgedInventory, ForgedPrint, Info, Player, Wallet } from '../database/index.js'
 import { calculateNewMarketPrice, getBuyerConfirmation } from '../functions/transaction.js'
 import { Op } from 'sequelize'
@@ -36,7 +36,8 @@ export default {
                 .setName('price')
                 .setDescription('Enter the price you agreed to pay.')
                 .setRequired(false)
-        ),
+        )
+    	.setContexts(InteractionContextType.Guild),
         async autocomplete(interaction) {
             try {
                 const focusedValue = interaction.options.getFocused()

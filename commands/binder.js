@@ -73,15 +73,16 @@ export default {
 
             if (user) {
                 const player = await Player.findByDiscordId(user.id)
-                const prints = [...await Binder.findAll({
+                const binders = Binder.findAll({
                     where: {
                         playerId: player.id
                     },
                     include: ForgedPrint,
                     order: [[ForgedPrint, "createdAt", "DESC"], ["cardCode", "ASC"]]
-                })].map((b) => b.forgedPrint)
+                })]
 
-                const results = prints.map((print) => `${eval(print.rarity)}${print.cardCode} - ${print.cardName}`)
+                const results = binders.map((b) => `${b.quantity} ${eval(b.forgedPrint.rarity)}${b.forgedPrint.cardCode} - ${b.forgedPrint.cardName}`)
+                // const results = prints.map((print) => `${eval(print.rarity)}${print.cardCode} - ${print.cardName}`)
                 return interaction.reply({ content: `**${player.name}'s Binder ${binder_emoji}**\n${results.join('\n')}`})
             } else if (!user && printId) {
                 const player = await Player.findByDiscordId(interaction.user.id)
@@ -111,22 +112,24 @@ export default {
                             playerId: player.id
                         })
     
-                        return interaction.reply({ content: `You added ${`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`} to your binder! ${binder_emoji}` }) 
+                        return interaction.reply({ content: `You added ${quantity} ${`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`} to your binder! ${binder_emoji}` }) 
                     } else {
                         return interaction.reply({ content: `You do not own ${quantity} ${quantity === 1 ? 'copy' : 'copies'} of ${`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`}.` }) 
                     }
                 }
             } else if (!user && !printId && empty !== 'yes') {
                 const player = await Player.findByDiscordId(interaction.user.id)
-                const prints = [...await Binder.findAll({
+                const binders = await Binder.findAll({
                     where: {
                         playerId: player.id
                     },
                     include: ForgedPrint,
                     order: [["cardCode", "ASC"]]
-                })].map((b) => b.forgedPrint)
+                })
 
-                const results = prints.map((print) => `${eval(print.rarity)}${print.cardCode} - ${print.cardName}`)
+
+                const results = binders.map((b) => `${b.quantity} ${eval(b.forgedPrint.rarity)}${b.forgedPrint.cardCode} - ${b.forgedPrint.cardName}`)
+                // const results = prints.map((print) => `${eval(print.rarity)}${print.cardCode} - ${print.cardName}`)
                 return interaction.reply({ content: `**${player.name}'s Binder ${binder_emoji}**\n${results.join('\n')}`})
             } else if (!user && !printId && empty === 'yes') {
                 const player = await Player.findByDiscordId(interaction.user.id)

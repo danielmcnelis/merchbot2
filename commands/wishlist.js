@@ -73,15 +73,15 @@ export default {
 
             if (user) {
                 const player = await Player.findByDiscordId(user.id)
-                const prints = [...await Wishlist.findAll({
+                const wishtlists = await Wishlist.findAll({
                     where: {
                         playerId: player.id
                     },
                     include: ForgedPrint,
                     order: [[ForgedPrint, "createdAt", "DESC"], ["cardCode", "ASC"]]
-                })].map((b) => b.forgedPrint)
+                })
 
-                const results = prints.map((print) => `${eval(print.rarity)}${print.cardCode} - ${print.cardName}`)
+                const results = wishtlists.map((w) => `${w.quantity} ${eval(w.forgedPrint.rarity)}${w.forgedPrint.cardCode} - ${w.forgedPrint.cardName}`)
                 return interaction.reply({ content: `**${player.name}'s Wishlist ${wishlist_emoji}**\n${results.join('\n')}`})
             } else if (!user && printId) {
                 const player = await Player.findByDiscordId(interaction.user.id)
@@ -112,20 +112,20 @@ export default {
                             playerId: player.id
                         })
     
-                        return interaction.reply({ content: `You added ${`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`} to your wishlist! ${wishlist_emoji}` }) 
+                        return interaction.reply({ content: `You added ${quantity} ${`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`} to your wishlist! ${wishlist_emoji}` }) 
                     }
                 }
             } else if (!user && !printId && empty !== 'yes') {
                 const player = await Player.findByDiscordId(interaction.user.id)
-                const prints = [...await Wishlist.findAll({
+                const wishtlists = await Wishlist.findAll({
                     where: {
                         playerId: player.id
                     },
                     include: ForgedPrint,
-                    order: [["cardCode", "ASC"]]
-                })].map((b) => b.forgedPrint)
+                    order: [[ForgedPrint, "createdAt", "DESC"], ["cardCode", "ASC"]]
+                })
 
-                const results = prints.map((print) => `${eval(print.rarity)}${print.cardCode} - ${print.cardName}`)
+                const results = wishtlists.map((w) => `${w.quantity} ${eval(w.forgedPrint.rarity)}${w.forgedPrint.cardCode} - ${w.forgedPrint.cardName}`)
                 return interaction.reply({ content: `**${player.name}'s Wishlist ${wishlist_emoji}**\n${results.join('\n')}`})
             } else if (!user && !printId && empty === 'yes') {
                 const player = await Player.findByDiscordId(interaction.user.id)

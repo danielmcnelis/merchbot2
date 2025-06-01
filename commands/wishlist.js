@@ -1,6 +1,6 @@
 
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
-import {ForgedPrint, Wishlist, Player} from '../database/index.js'
+import {ForgedPrint, ForgedInventory, Wishlist, Player} from '../database/index.js'
 import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
 const {com, rar, sup, ult, scr, wishlist_emoji} = emojis

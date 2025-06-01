@@ -1,5 +1,5 @@
 
-import { Card, ForgedInventory, ForgedSet, Player, ForgedPrint, Wallet, Info, Auction, Status } from '../database/index.js'
+import { Binder, Card, ForgedInventory, ForgedSet, Player, ForgedPrint, Wallet, Info, Auction, Status } from '../database/index.js'
 const merchbotId = '584215266586525696'
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from 'discord.js'
 import { Op } from 'sequelize'
@@ -48,6 +48,21 @@ const processTradeComponent = async (interaction, sender, recipient, quantity, p
 
     senderInv.quantity-=quantity
     await senderInv.save()
+
+    if (senderInv.quantity === 0) {
+        const binder = await Binder.findOne({
+            where: {
+                playerId: sender.id,
+                forgedPrintId: print.id
+            }
+        })
+
+        if (binder) {
+            await binder.destroy()
+        }
+    }
+
+
     return console.log(`${sender.name} traded ${quantity} ${print.cardCode} - ${print.cardName} to ${recipient.name}`)
 }
 

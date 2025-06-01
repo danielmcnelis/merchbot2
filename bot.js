@@ -65,7 +65,7 @@ client.on('ready', async () => {
 		} else {
 			postBids()
 		}
-	}, 1000 * 60 * 10)
+	}, 1000 * 60 * 5)
 
 	if (!shopShouldBe) return client.channels.cache.get(staffChannelId).send({ content: `<@&${adminRole}>, The Shop status could not be read from the database.`})
 	if (!shopOpen && shopShouldBe === 'open') client.channels.cache.get(staffChannelId).send({ content: `<@&${modRole}>, The Shop is unexpectedly closed. Please use the command **/open** to open The Shop.`})

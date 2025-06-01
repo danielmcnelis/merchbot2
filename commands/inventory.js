@@ -55,7 +55,7 @@ export default {
                             cardName: {[Op.iLike]: `${focusedValue.value}%`},
                         },
                         limit: 5,
-                        order: [["name", "ASC"]]
+                        order: [["cardName", "ASC"]]
                     })
 
                     await interaction.respond(

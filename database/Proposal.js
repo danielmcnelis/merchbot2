@@ -39,6 +39,18 @@ export const Proposal = db.define('proposals', {
     quantityC: {
         type: Sequelize.INTEGER
     },
+    forgedPrintDId: {
+        type: Sequelize.INTEGER
+    },
+    quantityD: {
+        type: Sequelize.INTEGER
+    },
+    forgedPrintEId: {
+        type: Sequelize.INTEGER
+    },
+    quantityE: {
+        type: Sequelize.INTEGER
+    },
     stardustQuantity: {
         type: Sequelize.INTEGER
     },

@@ -73,13 +73,13 @@ export default {
 
             if (user) {
                 const player = await Player.findByDiscordId(user.id)
-                const binders = [...Binder.findAll({
+                const binders = await Binder.findAll({
                     where: {
                         playerId: player.id
                     },
                     include: ForgedPrint,
                     order: [[ForgedPrint, "createdAt", "DESC"], ["cardCode", "ASC"]]
-                })]
+                })
 
                 const results = binders.map((b) => `${b.quantity} ${eval(b.forgedPrint.rarity)}${b.forgedPrint.cardCode} - ${b.forgedPrint.cardName}`)
                 // const results = prints.map((print) => `${eval(print.rarity)}${print.cardCode} - ${print.cardName}`)
@@ -119,13 +119,13 @@ export default {
                 }
             } else if (!user && !printId && empty !== 'yes') {
                 const player = await Player.findByDiscordId(interaction.user.id)
-                const binders = [...await Binder.findAll({
+                const binders = await Binder.findAll({
                     where: {
                         playerId: player.id
                     },
                     include: ForgedPrint,
                     order: [["cardCode", "ASC"]]
-                })]
+                })
 
                 const results = binders.map((b) => `${b.quantity} ${eval(b.forgedPrint.rarity)}${b.forgedPrint.cardCode} - ${b.forgedPrint.cardName}`)
                 // const results = prints.map((print) => `${eval(print.rarity)}${print.cardCode} - ${print.cardName}`)

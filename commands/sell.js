@@ -110,7 +110,7 @@ export default {
                 return interaction.reply({ content: `${buyer.name} cannot acquire more than 3 copies of a card.`})
             } 
 
-            if (!sellersInv || sellersInv.quantity < quantity) return interaction.reply({ content: `Sorry, ${shopSale ? `The Shop ${merchant}` : buyer.name} does not have ${quantity} ${quantity === 1 ? 'copy' : 'copies'} of ${card}.`})
+            if (!sellersInv || sellersInv.quantity < quantity) return interaction.reply({ content: `Sorry, You do not have ${quantity} ${quantity === 1 ? 'copy' : 'copies'} of ${card}.`})
 
             const row = new ActionRowBuilder()
                 .addComponents(new ButtonBuilder()

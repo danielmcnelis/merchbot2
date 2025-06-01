@@ -53,12 +53,12 @@ export default {
                     order: [['createdAt', 'DESC']]
                 })].map((s) => `Pack(s) of ${s.name}`)
 
-                // const boxes = [...await ForgedSet.findAll({
-                //     where: {
-                //         forSale: true
-                //     },
-                //     order: [['createdAt', 'DESC']]
-                // })].map((s) => `Box(es) of ${s.name}`)
+                const boxes = [...await ForgedSet.findAll({
+                    where: {
+                        forSale: true
+                    },
+                    order: [['createdAt', 'DESC']]
+                })].map((s) => `Box(es) of ${s.name}`)
 
                 if ('starchips'.includes(focusedValue.toLowerCase())) {
                     prints.push('StarChips')
@@ -71,6 +71,11 @@ export default {
                 if ('pack(s) of '.includes(focusedValue.toLowerCase())) {
                     prints.push(...packs)
                 }
+
+                if ('box of '.includes(focusedValue.toLowerCase())) {
+                    prints.push(...boxes)
+                }
+
 
                 await interaction.respond(
                     prints.map(print => ({ name: print, value: print })),

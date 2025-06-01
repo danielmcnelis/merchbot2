@@ -97,7 +97,7 @@ export default {
             const discount = 1
 
             const money = wallet[set.currency]
-            if (money < (Math.round(set.boxPrice * discount))) return interaction.reply({ content: `Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Boxes cost ${Math.round(set.unitPrice * discount) * num}${eval(set.currency)}.`})
+            if (money < (Math.round(set.boxPrice * discount))) return interaction.reply({ content: `Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Boxes cost ${Math.round(set.boxPrice * discount) * num}${eval(set.currency)}.`})
             
             const row = new ActionRowBuilder()
                 .addComponents(new ButtonBuilder()

@@ -69,9 +69,9 @@ export default {
             const discordId = user.id
             const player = await Player.findByDiscordId(discordId)
             const wallet = await Wallet.findOne({ where: { playerId: player.id }})
-            const inv = await ForgedInventory.findOne({ where: { cardCode: cardCode }})
+            const inv = await ForgedInventory.findOne({ where: { cardCode: cardCode, playerId: player.id }})
 
-            if ((inv && inv.quantity < 1) || (currency && wallet[currency].quantity < 1)) {
+            if ((inv && inv.quantity < quantity) || (currency && wallet[currency].quantity < quantity)) {
                 return await interaction.reply({content: `Sorry, ${player.name} does not have ${quantity}${loot}.`})
             }
 
@@ -97,8 +97,12 @@ export default {
                 if (confirmation.customId.includes('Yes')) {
                     await confirmation.update({ components: [] })
                     if (inv) {
+                        console.log('quantity', quantity)
+                        console.log('inv.quantity', inv.quantity)
                         inv.quantity-=quantity
+                        console.log('inv.quantity', inv.quantity)
                         await inv.save()
+                        console.log('inv.quantity', inv.quantity)
                     } else if (currency) {
                         wallet[currency]-=quantity
                         await wallet.save()

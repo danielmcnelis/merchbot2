@@ -1,5 +1,5 @@
 
-import { Binder, Card, ForgedInventory, ForgedSet, Player, ForgedPrint, Wallet, Info, Auction, Status } from '../database/index.js'
+import { Binder, Wishlist, Card, ForgedInventory, ForgedSet, Player, ForgedPrint, Wallet, Info, Auction, Status } from '../database/index.js'
 const merchbotId = '584215266586525696'
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from 'discord.js'
 import { Op } from 'sequelize'
@@ -25,7 +25,7 @@ const processTradeComponent = async (interaction, sender, recipient, quantity, p
 
     if (senderInv.quantity < quantity) await interaction.channel.send(`ALERT: <@${sender.discordId}> no longer has ${quantity}${eval(print.rarity)}${print.cardCode} - ${print.cardName}.`)
 
-    const recipientInv = await ForgedInventory.findOne({
+    let recipientInv = await ForgedInventory.findOne({
         where: {
             forgedPrintId: print.id,
             playerId: recipient.id
@@ -36,7 +36,7 @@ const processTradeComponent = async (interaction, sender, recipient, quantity, p
         recipientInv.quantity+=quantity
         await recipientInv.save()
     } else {
-        await ForgedInventory.create({
+        recipientInv = await ForgedInventory.create({
             cardName: print.cardName,
             cardCode: print.cardCode,
             forgedPrintId: print.id,
@@ -45,23 +45,58 @@ const processTradeComponent = async (interaction, sender, recipient, quantity, p
             playerId: recipient.id
         })
     }
+    
 
     senderInv.quantity-=quantity
     await senderInv.save()
 
-    if (senderInv.quantity === 0) {
-        const binder = await Binder.findOne({
-            where: {
-                playerId: sender.id,
-                forgedPrintId: print.id
-            }
-        })
-
-        if (binder) {
+    console.log('senderInv.quantity', senderInv.quantity)
+    console.log('sender.id', sender.id)
+    console.log('print.id', print.id)
+    console.log('quantity', quantity)
+    const binder = await Binder.findOne({
+        where: {
+            playerId: sender.id,
+            forgedPrintId: print.id
+        }
+    })
+    
+    if (binder) {
+        console.log('binder.quantity', binder.quantity)
+        binder.quantity-=quantity
+        await binder.save()
+        console.log('binder.quantity', binder.quantity)
+    
+        if (binder.quantity <= 0) {
+            console.log('!!binder', !!binder)
             await binder.destroy()
+            console.log('destroyed binder')
         }
     }
 
+    console.log('recipient.quantity', recipientInv.quantity)
+    console.log('recipient.id', recipient.id)
+    console.log('print.id', print.id)
+    console.log('quantity', quantity)
+    const wishlist = await Wishlist.findOne({
+        where: {
+            playerId: recipient.id,
+            forgedPrintId: print.id
+        }
+    })
+    
+    if (wishlist) {
+        console.log('wishlist.quantity', wishlist.quantity)
+        wishlist.quantity-=quantity
+        await wishlist.save()
+        console.log('wishlist.quantity', wishlist.quantity)
+    
+        if (wishlist.quantity <= 0) {
+            console.log('!!wishlist', !!wishlist)
+            await wishlist.destroy()
+            console.log('destroyed wishlist')
+        }
+    }
 
     return console.log(`${sender.name} traded ${quantity} ${print.cardCode} - ${print.cardName} to ${recipient.name}`)
 }

@@ -9,6 +9,9 @@ export const Wishlist = db.define('wishlists', {
     cardCode: {
         type: Sequelize.STRING
     },
+    quantity: {
+        type: Sequelize.INTEGER
+    },
     playerName: {
         type: Sequelize.STRING
     },

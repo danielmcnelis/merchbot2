@@ -9,6 +9,9 @@ export const Binder = db.define('binders', {
     cardCode: {
         type: Sequelize.STRING
     },
+    quantity: {
+        type: Sequelize.INTEGER
+    },
     forgedPrintId: {
         type: Sequelize.INTEGER
     },

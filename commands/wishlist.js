@@ -18,6 +18,12 @@ export default {
                 .setAutocomplete(true)
                 .setRequired(false)
         )
+        .addNumberOption(option =>
+            option
+                .setName('quantity')
+                .setDescription('How many do you want to acquire?')
+                .setRequired(false)
+        )
         .addUserOption(option =>
             option
                 .setName('player')
@@ -62,6 +68,7 @@ export default {
             if (interaction.channel.id !== botSpamChannelId && interaction.channel.id !== marketPlaceChannelId) return interaction.reply({ content: `Command not valid outside of <#${marketPlaceChannelId}> or <#${botSpamChannelId}>.` })
             const user = interaction.options.getUser('player')
             const printId = interaction.options.getNumber('print')
+            const quantity = interaction.options.getNumber('quantity') || 1
             const empty = interaction.options.getString('empty')
 
             if (user) {
@@ -86,16 +93,27 @@ export default {
                 } else {
                     const count = await Wishlist.count({ where: { playerId: player.id } }) 
                     if (count >= 10) return interaction.reply({ content: `You cannot have more than 10 cards on your wishlist. ${wishlist_emoji}`})
-                    await Wishlist.create({
-                        cardName: print.cardName,
-                        cardCode: print.cardCode,
-                        forgedPrintId: print.id,
-                        playerName: player.name,
-                        playerId: player.id
+                    const inventory = await ForgedInventory.findOne({
+                        where: {
+                            forgedPrintId: print.id,
+                            playerId: player.id
+                        }
                     })
 
-                    return interaction.reply({ content: `You added ${`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`} to your wishlist! ${wishlist_emoji}` }) 
-                    
+                    if (inventory && ((inventory.quantity + quantity) > 3)) {
+                        return interaction.reply({ content: `You cannot acquire more than 3 copies of a card.` }) 
+                    } else {
+                        await Wishlist.create({
+                            cardName: print.cardName,
+                            cardCode: print.cardCode,
+                            quantity: quantity,
+                            forgedPrintId: print.id,
+                            playerName: player.name,
+                            playerId: player.id
+                        })
+    
+                        return interaction.reply({ content: `You added ${`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`} to your wishlist! ${wishlist_emoji}` }) 
+                    }
                 }
             } else if (!user && !printId && empty !== 'yes') {
                 const player = await Player.findByDiscordId(interaction.user.id)

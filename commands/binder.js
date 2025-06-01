@@ -18,6 +18,12 @@ export default {
                 .setAutocomplete(true)
                 .setRequired(false)
         )
+        .addNumberOption(option =>
+            option
+                .setName('quantity')
+                .setDescription('How many do you want to put in your binder?')
+                .setRequired(false)
+        )
         .addUserOption(option =>
             option
                 .setName('player')
@@ -62,6 +68,7 @@ export default {
             if (interaction.channel.id !== botSpamChannelId && interaction.channel.id !== marketPlaceChannelId) return interaction.reply({ content: `Command not valid outside of <#${marketPlaceChannelId}> or <#${botSpamChannelId}>.` })
             const user = interaction.options.getUser('player')
             const printId = interaction.options.getNumber('print')
+            const quantity = interaction.options.getNumber('quantity') || 1
             const empty = interaction.options.getString('empty')
 
             if (user) {
@@ -88,7 +95,7 @@ export default {
                     if (count >= 9) return interaction.reply({ content: `You cannot have more than 9 cards in your binder. ${binder_emoji}`})
                     const inventory = await ForgedInventory.findOne({
                         where: {
-                            quantity: {[Op.gte]: 1},
+                            quantity: {[Op.gte]: quantity},
                             forgedPrintId: print.id,
                             playerId: player.id
                         }
@@ -98,6 +105,7 @@ export default {
                         await Binder.create({
                             cardName: print.cardName,
                             cardCode: print.cardCode,
+                            quantity: quantity,
                             forgedPrintId: print.id,
                             playerName: player.name,
                             playerId: player.id
@@ -105,7 +113,7 @@ export default {
     
                         return interaction.reply({ content: `You added ${`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`} to your binder! ${binder_emoji}` }) 
                     } else {
-                        return interaction.reply({ content: `You do not own any copies of ${`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`}.` }) 
+                        return interaction.reply({ content: `You do not own ${quantity} ${quantity === 1 ? 'copy' : 'copies'} of ${`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`}.` }) 
                     }
                 }
             } else if (!user && !printId && empty !== 'yes') {

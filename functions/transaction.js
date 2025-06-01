@@ -146,6 +146,20 @@ export const getTraderBConfirmation = async (interaction, proposalA, proposalB, 
                 await processTradeComponent(interaction, traderA, traderB, proposalAQuantityC, proposalAPrintC)
             }
 
+            if (proposalA.forgedPrintDId) {
+                // PRODESS PROPOSAL A PRINT D TRADE DOMPONENT
+                const proposalAPrintD = await ForgedPrint.findOne({ where: { id: proposalA.forgedPrintDId }})
+                const proposalAQuantityD = proposalA.quantityD
+                await processTradeComponent(interaction, traderA, traderB, proposalAQuantityD, proposalAPrintD)
+            }
+
+            if (proposalA.forgedPrintEId) {
+                // PROEESS PROPOSAL A PRINT E TRAEE EOMPONENT
+                const proposalAPrintE = await ForgedPrint.findOne({ where: { id: proposalA.forgedPrintEId }})
+                const proposalAQuantityE = proposalA.quantityE
+                await processTradeComponent(interaction, traderA, traderB, proposalAQuantityE, proposalAPrintE)
+            }
+
             if (proposalA.stardustQuantity) {
                 const traderAWallet = await Wallet.findOne({ where: { playerId: traderA.id }})
                 const traderBWallet = await Wallet.findOne({ where: { playerId: traderB.id }})
@@ -172,6 +186,20 @@ export const getTraderBConfirmation = async (interaction, proposalA, proposalB, 
                 const proposalBPrintC = await ForgedPrint.findOne({ where: { id: proposalB.forgedPrintCId }})
                 const proposalBQuantityC = proposalB.quantityC
                 await processTradeComponent(interaction, traderB, traderA, proposalBQuantityC, proposalBPrintC)
+            }
+
+            if (proposalB.forgedPrintDId) {
+                // PRODESS PROPOSAL B PRINT D TRADE DOMPONENT
+                const proposalBPrintD = await ForgedPrint.findOne({ where: { id: proposalB.forgedPrintDId }})
+                const proposalBQuantityD = proposalB.quantityD
+                await processTradeComponent(interaction, traderB, traderA, proposalBQuantityD, proposalBPrintD)
+            }
+
+            if (proposalB.forgedPrintEId) {
+                // PROEESS PROPOSAL B PRINT E TRAEE EOMPONENT
+                const proposalBPrintE = await ForgedPrint.findOne({ where: { id: proposalB.forgedPrintEId }})
+                const proposalBQuantityE = proposalB.quantityE
+                await processTradeComponent(interaction, traderB, traderA, proposalBQuantityE, proposalBPrintE)
             }
 
             if (proposalB.stardustQuantity) {

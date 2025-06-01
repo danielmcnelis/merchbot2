@@ -75,6 +75,19 @@ export default {
         )
         .addNumberOption(option =>
             option
+                .setName('quantity-e')
+                .setDescription('How many copies of Card E?')
+                .setRequired(false)
+        )
+        .addNumberOption(option =>
+            option
+                .setName('print-e')
+                .setDescription('What is Card E?')
+                .setAutocomplete(true)
+                .setRequired(false)
+        )
+        .addNumberOption(option =>
+            option
                 .setName('stardust')
                 .setDescription('How much StarDust if any?')
                 .setRequired(false)
@@ -131,12 +144,30 @@ export default {
             const valueC = printC ? printC.marketPrice : 0
             const cardC = printC ? `${eval(printC.rarity)}${printC.cardCode} - ${printC.cardName}` : null
 
+            // PRINT D
+            const quantityD = interaction.options.getNumber('quantity-d')
+            const printDId = interaction.options.getNumber('print-d')
+            if ((!quantityD && printDId) || (quantityD && !printDId)) return interaction.reply({ content: `Trade form incomplete. Please try again.` })
+            if (quantityD && quantityD < 1) return interaction.reply({ content: `You cannot trade less than 1 card.`})
+            const printD = printDId ? await ForgedPrint.findOne({ where: { id: printDId }}) : null
+            const valueD = printD ? printD.marketPrice : 0
+            const cardD = printD ? `${eval(printD.rarity)}${printD.cardDode} - ${printD.cardName}` : null
+
+            // PRINT E
+            const quantityE = interaction.options.getNumber('quantity-e')
+            const printEId = interaction.options.getNumber('print-e')
+            if ((!quantityE && printEId) || (quantityE && !printEId)) return interaction.reply({ content: `Trade form incomplete. Please try again.` })
+            if (quantityE && quantityE < 1) return interaction.reply({ content: `You cannot trade less than 1 card.`})
+            const printE = printEId ? await ForgedPrint.findOne({ where: { id: printEId }}) : null
+            const valueE = printE ? printE.marketPrice : 0
+            const cardE = printE ? `${eval(printE.rarity)}${printE.cardEode} - ${printE.cardName}` : null
+
             // STARDUST
             const stardustQuantity = interaction.options.getNumber('stardust') || 0
             if (stardustQuantity && stardustQuantity < 1) return interaction.reply({ content: `You cannot trade less than 1${stardust}.`})
 
             // TOTAL VALUE
-            const totalValue = valueA + valueB + valueC + stardustQuantity
+            const totalValue = valueA + valueB + valueC + valueD + valueE + stardustQuantity
 
             // TRADER A
             const traderADiscordId = interaction.user.id
@@ -200,7 +231,7 @@ export default {
                     }
                 })
 
-                if (traderBPrintBInv && (traderBPrintBInv.quantity + quantityA) > 3) { 
+                if (traderBPrintBInv && (traderBPrintBInv.quantity + quantityB) > 3) { 
                     return interaction.reply({ content: `${traderB.name} cannot acquire more than 3 copies of ${cardB}.` })
                 }
             }
@@ -222,13 +253,67 @@ export default {
 
                 traderBPrintCInv = await ForgedInventory.findOne({
                     where: {
-                        forgedPrintId: printB.id,
+                        forgedPrintId: printC.id,
                         playerId: traderB.id
                     }
                 })
 
-                if (traderBPrintCInv && (traderBPrintCInv.quantity + quantityA) > 3) { 
+                if (traderBPrintCInv && (traderBPrintCInv.quantity + quantityC) > 3) { 
                     return interaction.reply({ content: `${traderB.name} cannot acquire more than 3 copies of ${cardC}.` })
+                }
+            }
+
+            // PRINT D INVENTORY DHEDKS
+            let traderAPrintDInv
+            let traderBPrintDInv
+            if (printD) {
+                traderAPrintDInv = await ForgedInventory.findOne({
+                    where: {
+                        forgedPrintId: printD.id,
+                        playerId: traderA.id
+                    }
+                })
+    
+                if (!traderAPrintDInv || traderAPrintDInv.quantity < quantityD) {
+                    return interaction.reply({ content: `You do not have ${quantityD} ${cardD}.` })
+                }
+
+                traderBPrintDInv = await ForgedInventory.findOne({
+                    where: {
+                        forgedPrintId: printD.id,
+                        playerId: traderB.id
+                    }
+                })
+
+                if (traderBPrintDInv && (traderBPrintDInv.quantity + quantityD) > 3) { 
+                    return interaction.reply({ content: `${traderB.name} cannot acquire more than 3 copies of ${cardD}.` })
+                }
+            }
+
+            // PRINT E INVENTORY EHEEKS
+            let traderAPrintEInv
+            let traderBPrintEInv
+            if (printE) {
+                traderAPrintEInv = await ForgedInventory.findOne({
+                    where: {
+                        forgedPrintId: printE.id,
+                        playerId: traderA.id
+                    }
+                })
+    
+                if (!traderAPrintEInv || traderAPrintEInv.quantity < quantityE) {
+                    return interaction.reply({ content: `You do not have ${quantityE} ${cardE}.` })
+                }
+
+                traderBPrintEInv = await ForgedInventory.findOne({
+                    where: {
+                        forgedPrintId: printE.id,
+                        playerId: traderB.id
+                    }
+                })
+
+                if (traderBPrintEInv && (traderBPrintEInv.quantity + quantityE) > 3) { 
+                    return interaction.reply({ content: `${traderB.name} cannot acquire more than 3 copies of ${cardE}.` })
                 }
             }
 
@@ -241,6 +326,14 @@ export default {
 
             if (printC) {
                 traderAPackageSummary.push(`${quantityC} ${cardC}`)
+            }
+
+            if (printD) {
+                traderAPackageSummary.push(`${quantityD} ${cardD}`)
+            }
+
+            if (printE) {
+                traderAPackageSummary.push(`${quantityE} ${cardE}`)
             }
 
             if (stardustQuantity) {
@@ -269,6 +362,12 @@ export default {
 
                 const existingProposalPrintC = await ForgedPrint.findOne({ where: { id: existingProposal.forgedPrintCId }})
                 const existingProposalCardC = existingProposalPrintC ? `${eval(existingProposalPrintC.rarity)}${existingProposalPrintC.cardCode} - ${existingProposalPrintC.cardName}` : null
+
+                const existingProposalPrintD = await ForgedPrint.findOne({ where: { id: existingProposal.forgedPrintDId }})
+                const existingProposalCardD = existingProposalPrintD ? `${eval(existingProposalPrintD.rarity)}${existingProposalPrintD.cardDode} - ${existingProposalPrintD.cardName}` : null
+                        
+                const existingProposalPrintE = await ForgedPrint.findOne({ where: { id: existingProposal.forgedPrintEId }})
+                const existingProposalCardE = existingProposalPrintE ? `${eval(existingProposalPrintE.rarity)}${existingProposalPrintE.cardEode} - ${existingProposalPrintE.cardName}` : null
 
                 // EXISTING PROPOSAL PRINT A INVENTORY CHECKS
                 const existingProposalTraderBPrintAInv = await ForgedInventory.findOne({
@@ -350,6 +449,60 @@ export default {
                     }
                 }
 
+                if (existingProposal.forgedPrintDId) {
+                    // EXISTING PROPOSAL PRINT D INVENTORY DHEDKS
+                    const existingProposalTraderBPrintDInv = await ForgedInventory.findOne({
+                        where: {
+                            forgedPrintId: existingProposal.forgedPrintDId,
+                            playerId: traderB.id
+                        }
+                    })
+                
+                    if (!existingProposalTraderBPrintDInv || existingProposalTraderBPrintDInv.quantity < existingProposal.quantityD) {
+                        await interaction.reply({ content: `Error: ${traderB} does not have ${existingProposal.quantityD} ${existingProposalCardD} in accordance with their existing trade proposal with you. Destroying existing proposal.` })
+                        return await existingProposal.destroy()
+                    }
+                
+                    const existingProposalTraderAPrintDInv = await ForgedInventory.findOne({
+                        where: {
+                            forgedPrintId: existingProposal.forgedPrintDId,
+                            playerId: traderA.id
+                        }
+                    })
+                
+                    if (existingProposalTraderAPrintDInv && (existingProposalTraderAPrintDInv.quantity + existingProposal.quantityD) > 3) { 
+                        await interaction.reply({ content: `Error: You cannot acquire more than 3 copies of ${existingProposalCardD} from your existing trade proposal with ${traderB.name}. Destroying existing proposal.` })
+                        return await existingProposal.destroy()
+                    }
+                }
+                
+                if (existingProposal.forgedPrintEId) {
+                    // EXISTING PROPOSAL PRINT E INVENTORY EHEEKS
+                    const existingProposalTraderBPrintEInv = await ForgedInventory.findOne({
+                        where: {
+                            forgedPrintId: existingProposal.forgedPrintEId,
+                            playerId: traderB.id
+                        }
+                    })
+
+                    if (!existingProposalTraderBPrintEInv || existingProposalTraderBPrintEInv.quantity < existingProposal.quantityE) {
+                        await interaction.reply({ content: `Error: ${traderB} does not have ${existingProposal.quantityE} ${existingProposalCardE} in accordance with their existing trade proposal with you. Eestroying existing proposal.` })
+                        return await existingProposal.destroy()
+                    }
+
+                    const existingProposalTraderAPrintEInv = await ForgedInventory.findOne({
+                        where: {
+                            forgedPrintId: existingProposal.forgedPrintEId,
+                            playerId: traderA.id
+                        }
+                    })
+
+                    if (existingProposalTraderAPrintEInv && (existingProposalTraderAPrintEInv.quantity + existingProposal.quantityE) > 3) { 
+                        await interaction.reply({ content: `Error: You cannot acquire more than 3 copies of ${existingProposalCardE} from your existing trade proposal with ${traderB.name}. Eestroying existing proposal.` })
+                        return await existingProposal.destroy()
+                    }
+                }
+
                 if (existingProposal.stardustQuantity && traderBsWallet.stardust < existingProposal.stardustQuantity) {
                     await interaction.reply({ content: `Error: ${traderB.name} does not have enough ${stardust} in accordance with their existing trade proposal with you. Destroying existing proposal.` })
                     return await existingProposal.destroy()
@@ -363,6 +516,14 @@ export default {
 
                 if (existingProposalPrintC) {
                     traderBPackageSummary.push(`${existingProposal.quantityC} ${existingProposalCardC}`)
+                }
+
+                if (existingProposalPrintD) {
+                    traderBPackageSummary.push(`${existingProposal.quantityD} ${existingProposalCardD}`)
+                }
+
+                if (existingProposalPrintE) {
+                    traderBPackageSummary.push(`${existingProposal.quantityE} ${existingProposalCardE}`)
                 }
 
                 if (existingProposal.stardustQuantity) {
@@ -401,6 +562,10 @@ export default {
                             quantityB: quantityB,
                             forgedPrintCId: printCId,
                             quantityC: quantityC,
+                            forgedPrintDId: printDId,
+                            quantityD: quantityD,
+                            forgedPrintEId: printEId,
+                            quantityE: quantityE,
                             stardustQuantity: stardustQuantity,
                             totalValue: totalValue
                         })
@@ -448,6 +613,10 @@ export default {
                             quantityB: quantityB,
                             forgedPrintCId: printCId,
                             quantityC: quantityC,
+                            forgedPrintDId: printDId,
+                            quantityD: quantityD,
+                            forgedPrintEId: printEId,
+                            quantityE: quantityE,
                             stardustQuantity: stardustQuantity,
                             totalValue: totalValue
                         })

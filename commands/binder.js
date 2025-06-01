@@ -79,7 +79,7 @@ export default {
                     },
                     include: ForgedPrint,
                     order: [[ForgedPrint, "createdAt", "DESC"], ["cardCode", "ASC"]]
-                })]
+                })
 
                 const results = binders.map((b) => `${b.quantity} ${eval(b.forgedPrint.rarity)}${b.forgedPrint.cardCode} - ${b.forgedPrint.cardName}`)
                 // const results = prints.map((print) => `${eval(print.rarity)}${print.cardCode} - ${print.cardName}`)

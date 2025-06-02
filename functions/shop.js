@@ -499,7 +499,7 @@ export const updateShop = async () => {
             const excluded = !!auction_printIds.includes(print.id)
             const marketPrice = print.marketPrice
             const shopBuyingPrice = Math.floor(marketPrice * 0.7) > 0 ? Math.floor(marketPrice * 0.7) : 1
-            const shopSellingPrice = Math.floor(marketPrice * 1.1) > shopBuyingPrice ? Math.floor(marketPrice * 1.1) : buyingPrice + 1
+            const shopSellingPrice = Math.floor(marketPrice * 1.1) > shopBuyingPrice ? Math.floor(marketPrice * 1.1) : shopBuyingPrice + 1
             results.push(`${shopSellingPrice}${stardust}| ${shopBuyingPrice}${stardust}-${eval(print.rarity)}${inv.cardCode} - ${print.cardName} - ${inv.quantity}${print.trendingUp ? ` - ${rising}` : ''}${print.trendingDown ? ` - ${falling}` : ''}${excluded ? ` - ${no}` : ''}`) 
         }
     

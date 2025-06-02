@@ -160,7 +160,7 @@ export default {
                     sellersWallet.stardust+=price
                     await sellersWallet.save()
 
-                    const newMarketPrice = calculateNewMarketPrice(quantity, price, print)
+                    const newMarketPrice = calculateNewMarketPrice(quantity, price / quantity, print)
                     await print.update({ marketPrice: newMarketPrice })
 
                     return interaction.editReply({ content: `You bought ${quantity} ${card} from The Shop ${merchant} for ${price}${stardust}!`, components: [] });        

@@ -276,7 +276,7 @@ export const getSellerConfirmation = async (interaction, buyer, seller, quantity
             sellersWallet.stardust+=price
             await sellersWallet.save()
 
-            const newMarketPrice = calculateNewMarketPrice(quantity, price, print)
+            const newMarketPrice = calculateNewMarketPrice(quantity, price / quantity, print)
             await print.update({ marketPrice: newMarketPrice })
 
             await confirmation.update({ components: [] })
@@ -336,7 +336,7 @@ export const getBuyerConfirmation = async (interaction, buyer, seller, quantity,
             sellersWallet.stardust+=price
             await sellersWallet.save()
 
-            const newMarketPrice = calculateNewMarketPrice(quantity, price, print)
+            const newMarketPrice = calculateNewMarketPrice(quantity, price / quantity, print)
             await print.update({ marketPrice: newMarketPrice })
 
             await confirmation.update({ components: [] })
@@ -691,7 +691,7 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
 // CALCULATE NEW MARKET PRICE
 export const calculateNewMarketPrice = (quantity, price, print) => {
     const newMarketPrice = quantity > 16 ? price / quantity :
-        ( price * quantity + ( (16 - quantity) * print.marketPrice ) ) / 16
+        ( price / quantity + ( (16 - quantity) * print.marketPrice ) ) / 16
 
     return newMarketPrice
 }

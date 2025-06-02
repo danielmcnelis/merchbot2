@@ -151,7 +151,7 @@ export default {
             if (quantityD && quantityD < 1) return interaction.reply({ content: `You cannot trade less than 1 card.`})
             const printD = printDId ? await ForgedPrint.findOne({ where: { id: printDId }}) : null
             const valueD = printD ? printD.marketPrice : 0
-            const cardD = printD ? `${eval(printD.rarity)}${printD.cardDode} - ${printD.cardName}` : null
+            const cardD = printD ? `${eval(printD.rarity)}${printD.cardCode} - ${printD.cardName}` : null
 
             // PRINT E
             const quantityE = interaction.options.getNumber('quantity-e')
@@ -160,7 +160,7 @@ export default {
             if (quantityE && quantityE < 1) return interaction.reply({ content: `You cannot trade less than 1 card.`})
             const printE = printEId ? await ForgedPrint.findOne({ where: { id: printEId }}) : null
             const valueE = printE ? printE.marketPrice : 0
-            const cardE = printE ? `${eval(printE.rarity)}${printE.cardEode} - ${printE.cardName}` : null
+            const cardE = printE ? `${eval(printE.rarity)}${printE.cardCode} - ${printE.cardName}` : null
 
             // STARDUST
             const stardustQuantity = interaction.options.getNumber('stardust') || 0
@@ -364,10 +364,10 @@ export default {
                 const existingProposalCardC = existingProposalPrintC ? `${eval(existingProposalPrintC.rarity)}${existingProposalPrintC.cardCode} - ${existingProposalPrintC.cardName}` : null
 
                 const existingProposalPrintD = await ForgedPrint.findOne({ where: { id: existingProposal.forgedPrintDId }})
-                const existingProposalCardD = existingProposalPrintD ? `${eval(existingProposalPrintD.rarity)}${existingProposalPrintD.cardDode} - ${existingProposalPrintD.cardName}` : null
+                const existingProposalCardD = existingProposalPrintD ? `${eval(existingProposalPrintD.rarity)}${existingProposalPrintD.cardCode} - ${existingProposalPrintD.cardName}` : null
                         
                 const existingProposalPrintE = await ForgedPrint.findOne({ where: { id: existingProposal.forgedPrintEId }})
-                const existingProposalCardE = existingProposalPrintE ? `${eval(existingProposalPrintE.rarity)}${existingProposalPrintE.cardEode} - ${existingProposalPrintE.cardName}` : null
+                const existingProposalCardE = existingProposalPrintE ? `${eval(existingProposalPrintE.rarity)}${existingProposalPrintE.cardCode} - ${existingProposalPrintE.cardName}` : null
 
                 // EXISTING PROPOSAL PRINT A INVENTORY CHECKS
                 const existingProposalTraderBPrintAInv = await ForgedInventory.findOne({

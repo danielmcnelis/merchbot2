@@ -154,6 +154,9 @@ export default {
                     sellersWallet.stardust+=price
                     await sellersWallet.save()
 
+                    await checkBinderForRemoval(seller.id, print.id, quantity)
+                    await checkWishlistForRemoval(buyer.id, print.id, quantity)
+
                     const newMarketPrice = calculateNewMarketPrice(quantity, price / quantity, print)
                     await print.update({ marketPrice: newMarketPrice })
 

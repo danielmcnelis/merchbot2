@@ -93,7 +93,7 @@ export default {
                     return interaction.reply({ content: `You removed ${`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`} from your binder. ${binder_emoji}` }) 
                 } else {
                     const count = await Binder.count({ where: { playerId: player.id } }) 
-                    if (count >= 9) return interaction.reply({ content: `You cannot have more than 9 cards in your binder. ${binder_emoji}`})
+                    if (count >= 18) return interaction.reply({ content: `You cannot have more than 18 cards in your binder. ${binder_emoji}`})
                     const inventory = await ForgedInventory.findOne({
                         where: {
                             quantity: {[Op.gte]: quantity},

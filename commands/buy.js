@@ -72,10 +72,6 @@ export default {
             const buyer = await Player.findByDiscordId(buyerDiscordId)
             const buyersWallet = await Wallet.findOne({ where: { playerId: buyer.id }})
             const merchbotDiscordId = '584215266586525696'
-            // const merchbot = await Player.findByDiscordId(merchbotDiscordId)
-            // const merchbotId = merchbot.id
-
-            // const sellerUser =
 
             const sellerDiscordId = interaction.options.getUser('seller')?.id || merchbotDiscordId
             const seller = await Player.findByDiscordId(sellerDiscordId)
@@ -159,6 +155,9 @@ export default {
                     await buyersWallet.save()
                     sellersWallet.stardust+=price
                     await sellersWallet.save()
+
+                    await checkBinderForRemoval(seller.id, print.id, quantity)
+                    await checkWishlistForRemoval(buyer.id, print.id, quantity)
 
                     const newMarketPrice = calculateNewMarketPrice(quantity, price / quantity, print)
                     await print.update({ marketPrice: newMarketPrice })

@@ -15,6 +15,42 @@ import { selectPrint } from './print.js'
 import { capitalize } from './utility.js'
 // import { completeTask } from './diary.js'
 
+export const checkBinderForRemoval = async (senderId, printId, quantity) => {
+    const binder = await Binder.findOne({
+        where: {
+            playerId: senderId,
+            forgedPrintId: printId
+        }
+    })
+    
+    if (binder) {
+        binder.quantity-=quantity
+        await binder.save()
+    
+        if (binder.quantity <= 0) {
+            await binder.destroy()
+        }
+    }
+}
+
+export const checkWishlistForRemoval = async (recipientId, printId, quantity) => {
+    const wishlist = await Wishlist.findOne({
+        where: {
+            playerId: recipientId,
+            forgedPrintId: printId
+        }
+    })
+    
+    if (wishlist) {
+        wishlist.quantity-=quantity
+        await wishlist.save()
+    
+        if (wishlist.quantity <= 0) {
+            await wishlist.destroy()
+        }
+    }
+}
+
 const processTradeComponent = async (interaction, sender, recipient, quantity, print) => {
     const senderInv = await ForgedInventory.findOne({
         where: {
@@ -45,58 +81,12 @@ const processTradeComponent = async (interaction, sender, recipient, quantity, p
             playerId: recipient.id
         })
     }
-    
 
     senderInv.quantity-=quantity
     await senderInv.save()
 
-    console.log('senderInv.quantity', senderInv.quantity)
-    console.log('sender.id', sender.id)
-    console.log('print.id', print.id)
-    console.log('quantity', quantity)
-    const binder = await Binder.findOne({
-        where: {
-            playerId: sender.id,
-            forgedPrintId: print.id
-        }
-    })
-    
-    if (binder) {
-        console.log('binder.quantity', binder.quantity)
-        binder.quantity-=quantity
-        await binder.save()
-        console.log('binder.quantity', binder.quantity)
-    
-        if (binder.quantity <= 0) {
-            console.log('!!binder', !!binder)
-            await binder.destroy()
-            console.log('destroyed binder')
-        }
-    }
-
-    console.log('recipient.quantity', recipientInv.quantity)
-    console.log('recipient.id', recipient.id)
-    console.log('print.id', print.id)
-    console.log('quantity', quantity)
-    const wishlist = await Wishlist.findOne({
-        where: {
-            playerId: recipient.id,
-            forgedPrintId: print.id
-        }
-    })
-    
-    if (wishlist) {
-        console.log('wishlist.quantity', wishlist.quantity)
-        wishlist.quantity-=quantity
-        await wishlist.save()
-        console.log('wishlist.quantity', wishlist.quantity)
-    
-        if (wishlist.quantity <= 0) {
-            console.log('!!wishlist', !!wishlist)
-            await wishlist.destroy()
-            console.log('destroyed wishlist')
-        }
-    }
+    await checkBinderForRemoval(sender.id, print.id, quantity)
+    await checkWishlistForRemoval(recipient.id, print.id, quantity)
 
     return console.log(`${sender.name} traded ${quantity} ${print.cardCode} - ${print.cardName} to ${recipient.name}`)
 }

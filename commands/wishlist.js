@@ -92,7 +92,7 @@ export default {
                     return interaction.reply({ content: `You removed ${`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`} from your wishlist. ${wishlist_emoji}` }) 
                 } else {
                     const count = await Wishlist.count({ where: { playerId: player.id } }) 
-                    if (count >= 10) return interaction.reply({ content: `You cannot have more than 10 cards on your wishlist. ${wishlist_emoji}`})
+                    if (count >= 18) return interaction.reply({ content: `You cannot have more than 18 cards on your wishlist. ${wishlist_emoji}`})
                     const inventory = await ForgedInventory.findOne({
                         where: {
                             forgedPrintId: print.id,

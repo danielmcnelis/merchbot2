@@ -1,7 +1,7 @@
 
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { ForgedInventory, ForgedPrint, Info, Player, Wallet } from '../database/index.js'
-import { calculateNewMarketPrice, getSellerConfirmation } from '../functions/transaction.js'
+import { calculateNewMarketPrice, getSellerConfirmation, checkBinderForRemoval, checkWishlistForRemoval } from '../functions/transaction.js'
 import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
 const {com, rar, sup, ult, scr, stardust, merchant, fry} = emojis

@@ -75,7 +75,7 @@ const askForBidCancellation = async (interaction, card, bid) => {
 
         try {
             const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
-            if (confirmation.customId.includes('Yes') && shopSale) {
+            if (confirmation.customId.includes('Yes')) {
                 await confirmation.update({ components: [] })
                 await bid.destroy()
 

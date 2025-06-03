@@ -116,7 +116,7 @@ export default {
 
                 const num = player.forgedSubscriberTier === 'Supporter' ? 6 :
                     player.forgedSubscriberTier === 'Patron' ? 12 :
-                    player.forgedSubscriberTier === 'Benefactor' ? 24 :
+                    player.forgedSubscriberTier === 'Benefactor' || player.id === 'Cc2FhYrRPctZ4y72Y79gKp' ? 24 :
                     1
 
                 const packImage = new AttachmentBuilder(`./public/7outof7.png`, { name: `pack.png` })

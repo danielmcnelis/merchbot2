@@ -51,7 +51,7 @@ export default {
 
             const alchemyUses = player.forgedSubscriberTier === 'Supporter' ? 2 :
                 player.forgedSubscriberTier === 'Patron' ? 3 :
-                player.forgedSubscriberTier === 'Benefactor' ? 4 :
+                player.forgedSubscriberTier === 'Benefactor' || player.id === 'Cc2FhYrRPctZ4y72Y79gKp'  ? 4 :
                 1
 
             console.log('player.forgedSubscriberTier', player.forgedSubscriberTier)

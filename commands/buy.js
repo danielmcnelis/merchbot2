@@ -108,9 +108,9 @@ export default {
                 }
             })
 
-            if (!shopSale && ((buyersInv && (buyersInv.quantity + quantity > 3)) || quantity > 3 )) {
+            if ((buyersInv && (buyersInv.quantity + quantity > 3)) || quantity > 3 ) {
                 return interaction.reply({ content: `You cannot acquire more than 3 copies of a card.`})
-            } 
+            }
 
             if (!sellersInv || sellersInv.quantity < quantity) return interaction.reply({ content: `Sorry, ${shopSale ? `The Shop ${merchant}` : seller.name} does not have ${quantity} ${quantity === 1 ? 'copy' : 'copies'} of ${card}.`})
 

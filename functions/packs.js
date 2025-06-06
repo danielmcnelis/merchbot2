@@ -128,7 +128,7 @@ export const awardPacks = async (channel, member, set, num = 1) => {
 }
 
 // AWARD PACKS
-export const awardBox = async (channel, member, set, offset = 0) => {
+export const awardBox = async (channel, member, set, offset = 24) => {
     let j = 24 - offset
     const partial = offset > 0
     const num = 24

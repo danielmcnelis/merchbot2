@@ -13,15 +13,16 @@ export default {
     	.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
         try {             
+            await interaction.deferReply()
             const player = await Player.findByDiscordId(interaction.user.id)
             const daily = await Daily.findOne({ where: { playerId: player.id } })
-            if (!daily) return interaction.reply({ content: `You are not in the database. Type **/play** to begin the game.`})
+            if (!daily) return interaction.editReply({ content: `You are not in the database. Type **/play** to begin the game.`})
 
             const date = new Date()
             const hoursLeftInDay = date.getMinutes() === 0 ? 24 - date.getHours() : 23 - date.getHours()
             const minsLeftInHour = date.getMinutes() === 0 ? 0 : 60 - date.getMinutes()
             
-            if (daily.lastDaily && isSameDay(daily.lastDaily, date)) return interaction.reply({ content: `You already used **/daily** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`})
+            if (daily.lastDaily && isSameDay(daily.lastDaily, date)) return interaction.editReply({ content: `You already used **/daily** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`})
 
             const daysPassed = daily.lastDaily ? Math.round( ( date.setHours(0, 0, 0, 0) - daily.lastDaily.setHours(0, 0, 0, 0) ) / (1000*60*60*24) ) : 1
 
@@ -34,7 +35,7 @@ export default {
             })
 
             const set = sets[0]
-            if (!set) return interaction.reply({ content: `No core set found.`})
+            if (!set) return interaction.editReply({ content: `No core set found.`})
 
             const commons = [...await ForgedPrint.findAll({ 
                 where: {
@@ -111,8 +112,16 @@ export default {
                 })
             }
 
+            const attachment = await drawCardImage(print.cardName)
+            interaction.editReply({ content: `1... 2...`})
+            setTimeout(() => interaction.channel.send({ content: `${enthusiasm} ${daily.playerName} pulled ${eval(print.rarity)}${print.cardCode} - ${print.cardName} from the grab bag! ${emoji}`, files: [attachment] }), 2000)
+
+            daily.lastDaily = date
+            await daily.save()
+            
             if ((daily.cobbleProgress + daysPassed) >= 7) {
                 daily.cobbleProgress = 0
+                await daily.save()
 
                 const num = player.forgedSubscriberTier === 'Supporter' ? 6 :
                     player.forgedSubscriberTier === 'Patron' ? 12 :
@@ -121,35 +130,28 @@ export default {
 
                 const packImage = new AttachmentBuilder(`./public/7outof7.png`, { name: `pack.png` })
                 // let num = masterComplete ? 5 : eliteComplete ? 4 : hardComplete ? 3 : mediumComplete ? 2 : 1
-                if (num) setTimeout(async () => {
-                    if (num === 24) {
-                        awardBox(interaction.channel, interaction.member, set)
-                    } else {
-                        awardPacks(interaction.channel, interaction.member, set, num)
-                    }
-                    interaction.channel.send({ content: `Oh look, ${daily.playerName}, you cobbled together a pack!`, files: [packImage]})
-                }, 4000)
+                if (num) {
+                    return setTimeout(async () => {
+                        interaction.channel.send({ content: `Oh look, ${daily.playerName}, you cobbled together a pack!`, files: [packImage]})
+                        if (num === 24) {
+                            return awardBox(interaction.channel, interaction.member, set)
+                        } else {
+                            return awardPacks(interaction.channel, interaction.member, set, num)
+                        }
+                    }, 4000)
+                } else {
+                    return
+                }
             } else {
                 daily.cobbleProgress += daysPassed
-                // const image = daily.cobbleProgress === 1 ? packImage1 :
-                //     daily.cobbleProgress === 2 ? packImage2 :
-                //     daily.cobbleProgress === 3 ? packImage3 :
-                //     daily.cobbleProgress === 4 ? packImage4 :
-                //     daily.cobbleProgress === 5 ? packImage5 :
-                //     packImage6
+                await daily.save()
 
                 const packImage = new AttachmentBuilder(`./public/${daily.cobbleProgress}outof7.png`, { name: `pack.png` })
-                setTimeout(() => {
+                return setTimeout(() => {
                     interaction.channel.send({ content: `Hey, ${daily.playerName}, keep cobblin', buddy.`, files: [packImage]})
                 }, 4000)
             }
 
-            daily.lastDaily = date
-            await daily.save()
-
-            const attachment = await drawCardImage(print.cardName)
-            interaction.reply({ content: `1... 2...`})
-            return setTimeout(() => interaction.channel.send({ content: `${enthusiasm} ${daily.playerName} pulled ${eval(print.rarity)}${print.cardCode} - ${print.cardName} from the grab bag! ${emoji}`, files: [attachment] }), 2000)
         } catch (err) {
             console.log(err)
         }

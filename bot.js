@@ -28,7 +28,7 @@ import channels from './static/channels.json' with { type: "json" }
 const { staffChannelId, welcomeChannelId } = channels
 import { client } from './static/clients.js'
 import roles from './static/roles.json' with { type: "json" }
-const { modRole } = roles
+const { modRole, adminRole } = roles
 
 import commands from './commands/index.js'
 client.commands = new Collection()
@@ -68,8 +68,8 @@ client.on('ready', async () => {
 	}, 1000 * 60 * 5)
 
 	if (!shopShouldBe) return client.channels.cache.get(staffChannelId).send({ content: `<@&${adminRole}>, The Shop status could not be read from the database.`})
-	if (!shopOpen && shopShouldBe === 'open') client.channels.cache.get(staffChannelId).send({ content: `<@&${modRole}>, The Shop is unexpectedly closed. Please use the command **/open** to open The Shop.`})
-	if (shopOpen && shopShouldBe === 'closed') client.channels.cache.get(staffChannelId).send({ content: `<@&${modRole}>, The Shop is unexpectedly open. Please use the command **/close** to close The Shop.`})
+	if (!shopOpen && shopShouldBe === 'open') client.channels.cache.get(staffChannelId).send({ content: `<@&${adminRole}>, The Shop is unexpectedly closed. Please use the command **/open** to open The Shop.`})
+	if (shopOpen && shopShouldBe === 'closed') client.channels.cache.get(staffChannelId).send({ content: `<@&${adminRole}>, The Shop is unexpectedly open. Please use the command **/close** to close The Shop.`})
 
 	if (shopShouldBe === 'closed') {
 		return setTimeout(() => openShop(), shopCountdown)

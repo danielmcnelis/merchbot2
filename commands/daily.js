@@ -130,11 +130,9 @@ export default {
                     setTimeout(async () => {
                         interaction.channel.send({ content: `Oh look, ${daily.playerName}, you cobbled together a pack!`, files: [packImage]})
                         if (num === 24) {
-                            awardBox(interaction.channel, interaction.member, set)
-                            return
+                            return awardBox(interaction.channel, interaction.member, set)
                         } else {
-                            awardPacks(interaction.channel, interaction.member, set, num)
-                            return
+                            return awardPacks(interaction.channel, interaction.member, set, num)
                         }
                     }, 4000)
                 } else {

@@ -54,9 +54,6 @@ export default {
                 player.forgedSubscriberTier === 'Benefactor' || player.id === 'Cc2FhYrRPctZ4y72Y79gKp'  ? 4 :
                 1
 
-            console.log('player.forgedSubscriberTier', player.forgedSubscriberTier)
-            console.log('alchemyUses', alchemyUses)
-            
             const date = new Date()
             const hoursLeftInDay = date.getMinutes() === 0 ? 24 - date.getHours() : 23 - date.getHours()
             const minsLeftInHour = date.getMinutes() === 0 ? 0 : 60 - date.getMinutes()
@@ -112,7 +109,7 @@ export default {
                     inv.quantity--
                     await inv.save()
 
-                    await updateBinder(player.id, print.id)
+                    await updateBinder(player.id, print.id, 1)
 
                     wallet.starchips += value
                     await wallet.save()

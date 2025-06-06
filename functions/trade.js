@@ -219,7 +219,7 @@ const processTrade = async (message, transactionId, initiatorSummary, receiverSu
 		const quantity = initiator_print_quants[i]
 		const print = initiator_prints[i]
 
-		await Trade.create({
+		const trade = await Trade.create({
 			senderName: initiatingPlayer.name,
 			senderId: initiatingPlayer.id,
 			receiverName: receivingPlayer.name,
@@ -232,7 +232,8 @@ const processTrade = async (message, transactionId, initiatorSummary, receiverSu
 		inv.quantity -= quantity
 		await inv.save()
 
-		await updateBinder(initiatingPlayer)
+		await updateBinder(trade.senderId, print.id, quantity)
+		await updateWishlist(trade.receiverId, print.id, quantity)
 	
 		const mirror_inv = await Inventory.findOne({ 
 			where: { 

@@ -16,13 +16,13 @@ export default {
             await interaction.deferReply()
             const player = await Player.findByDiscordId(interaction.user.id)
             const daily = await Daily.findOne({ where: { playerId: player.id } })
-            if (!daily) return interaction.reply({ content: `You are not in the database. Type **/play** to begin the game.`})
+            if (!daily) return interaction.editReply({ content: `You are not in the database. Type **/play** to begin the game.`})
 
             const date = new Date()
             const hoursLeftInDay = date.getMinutes() === 0 ? 24 - date.getHours() : 23 - date.getHours()
             const minsLeftInHour = date.getMinutes() === 0 ? 0 : 60 - date.getMinutes()
             
-            if (daily.lastDaily && isSameDay(daily.lastDaily, date)) return interaction.reply({ content: `You already used **/daily** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`})
+            if (daily.lastDaily && isSameDay(daily.lastDaily, date)) return interaction.editReply({ content: `You already used **/daily** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`})
 
             const daysPassed = daily.lastDaily ? Math.round( ( date.setHours(0, 0, 0, 0) - daily.lastDaily.setHours(0, 0, 0, 0) ) / (1000*60*60*24) ) : 1
 
@@ -35,7 +35,7 @@ export default {
             })
 
             const set = sets[0]
-            if (!set) return interaction.reply({ content: `No core set found.`})
+            if (!set) return interaction.editReply({ content: `No core set found.`})
 
             const commons = [...await ForgedPrint.findAll({ 
                 where: {
@@ -150,7 +150,7 @@ export default {
 
             const attachment = await drawCardImage(print.cardName)
             setTimeout(() => interaction.channel.send({ content: `${enthusiasm} ${daily.playerName} pulled ${eval(print.rarity)}${print.cardCode} - ${print.cardName} from the grab bag! ${emoji}`, files: [attachment] }), 2000)
-            return interaction.reply({ content: `1... 2...`})
+            return interaction.editReply({ content: `1... 2...`})
 
 
         } catch (err) {

@@ -128,7 +128,8 @@ export const awardPacks = async (channel, member, set, num = 1) => {
 }
 
 // AWARD PACKS
-export const awardBox = async (channel, member, set) => {
+export const awardBox = async (channel, member, set, j = 0) => {
+    const partial = j > 0
     const num = 24
     const player = await Player.findByDiscordId(member.user.id)
 	
@@ -172,7 +173,7 @@ export const awardBox = async (channel, member, set) => {
         order: [['cardSlot', 'ASC']]
     })].map((p) => p.cardCode)
 
-    for (let j = 0; j < num; j++) {
+    for (j; j < num; j++) {
         try {
             const results = [`\n${eval(set.emoji)} - ${set.name} Pack${num > 1 ? ` ${j + 1}` : ''} - ${eval(set.altEmoji)}`]
             const yourCommons = set.commonsPerPack > 1 ? getRandomSubset(commons, set.commonsPerPack) : set.commonsPerPack === 1 ? [getRandomElement(commons)] : []
@@ -193,8 +194,8 @@ export const awardBox = async (channel, member, set) => {
             const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil].filter((e) => !!e)
             
             let yourCardArtworkIds = []
-            for (let j = 0; j < yourPack.length; j++) {
-                const cardCode = yourPack[j]
+            for (let k = 0; k < yourPack.length; k++) {
+                const cardCode = yourPack[k]
                 const print = await ForgedPrint.findOne({ where: { cardCode }})
                 const card = await Card.findOne({ where: { name: print.cardName }})
                 yourCardArtworkIds.push(card.artworkId)
@@ -236,7 +237,7 @@ export const awardBox = async (channel, member, set) => {
         }
     }
 
-    return channel.send({ content: `<@${member.user.id}> was awarded a Box of ${set.name}.${eval(set.code)} Congratulations!`})
+    return channel.send({ content: `<@${member.user.id}> was awarded a ${partial ? 'partial ' : ''}Box of ${set.name}.${eval(set.code)} Congratulations!`})
 }
 
 export const awardPacksToShop = async (num, core = true) => {

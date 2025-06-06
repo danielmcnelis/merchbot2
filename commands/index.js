@@ -1,6 +1,7 @@
 import adjust from './adjust.js'
 import alchemy from './alchemy.js'
 import award from './award.js'
+import awardPartialBox from './award_partial_box.js'
 import banlist from './banlist.js'
 import bid from './bid.js'
 import bids from './bids.js'
@@ -36,6 +37,7 @@ export default {
         adjust,
         alchemy,
         award,
+        awardPartialBox,
         banlist,
         bid,
         bids,

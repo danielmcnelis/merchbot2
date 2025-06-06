@@ -88,6 +88,13 @@ export const applyPriceDecay = async () => {
 
     for (let i = 0; i < prints.length; i++) {
         const print = prints[i]
+        const auction = await Auction.count({
+            where: {
+                forgedPrintId: print.id
+            }
+        })
+
+        if (auction) continue
 
         const invs = await ForgedInventory.findAll({ where: {
             forgedPrintId: print.id,
@@ -227,8 +234,10 @@ export const checkShopShouldBe = () => {
 // PROCESS BIDS
 export const processBids = async () => {
     const announcementsChannel = client.channels.cache.get(announcementsChannelId)
-    const botSpamChannel = client.channels.cache.get(botSpamChannelId)
+    // const botSpamChannel = client.channels.cache.get(botSpamChannelId)
     const allBids = await Bid.findAll({ include: [Auction, ForgedPrint] , order: [["amount", "DESC"]] })
+
+    let results = []
 
     for (let i = 0; i < allBids.length; i++) {
         const bid = allBids[i]
@@ -244,11 +253,13 @@ export const processBids = async () => {
          } })
 
         if (!merchbotInv) {
-            announcementsChannel.send({ content: `${wallet.playerName} placed a ${bid.amount}${stardust} bid on ${print.cardName}, but they were outbid.`})
+            results.push(`${wallet.playerName} placed a ${bid.amount}${stardust} bid on ${print.cardName}, but they were outbid.`)
+            // announcementsChannel.send({ content: ``})
             continue
         }
         if (wallet.stardust < bid.amount) {
-            announcementsChannel.send({ content: `${wallet.player.name} would have won ${print.cardName} for ${bid.amount}${stardust}, but they are too poor.`}) 
+            results.push(`${wallet.playerName} would have won ${print.cardName} for ${bid.amount}${stardust}, but they are too poor.`)
+            // announcementsChannel.send({ content: }) 
             continue
         }
         
@@ -285,7 +296,7 @@ export const processBids = async () => {
         // if (print.rarity !== 'com' && print.rarity !== 'rar') completeTask(botSpamChannel, wallet.player.id, 'm5')
         // if (print.rarity === 'scr') completeTask(botSpamChannel, wallet.player.id, 'm4', 4000)
         // if (print.setCode === 'APC' && winnerInv && winnerInv.quantity >= 3) completeTask(botSpamChannel, wallet.player.id, 'h5', 4000)
-        announcementsChannel.send({ content: `<@${wallet.player.discordId}> won a copy of ${eval(print.rarity)}${print.cardCode} - ${print.cardName} for ${bid.amount}${stardust}. Congratulations!`}) 
+        results.push(`<@${wallet.player.discordId}> won a copy of ${eval(print.rarity)}${print.cardCode} - ${print.cardName} for ${bid.amount}${stardust}. Congratulations!`) 
     }
 
     const allAuctions = await Auction.findAll()
@@ -297,6 +308,10 @@ export const processBids = async () => {
     for (let i = 0; i < allBids.length; i++) {
         const bid = allBids[i]
         await bid.destroy()
+    }
+
+    for (let i = 0; i < results.length; i+=12) {
+        await announcementsChannel.send({ content: results.slice(i, i+12).join("\n")})
     }
 }
 

@@ -62,8 +62,6 @@ client.on('ready', async () => {
 		const shopOpen = await checkShopOpen()
 		if (shopOpen) {
 			updateShop()
-		} else {
-			postBids()
 		}
 	}, 1000 * 60 * 5)
 

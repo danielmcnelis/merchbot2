@@ -435,11 +435,11 @@ export const convertDateToYYYYMMDD = (date) => {
 // DRAW CARD IMAGE
 export const drawCardImage = async (cardName) => {
     try {
-        const canvas = Canvas.createCanvas(210, 316)
-        const context = canvas.getContext('2d')
+        const canvas = Canvas.createCanvas(420, 632)
+        const context = canvas.getContext('2d', {pixelFormat: 'RGB30'})
         const card = await Card.findOne({ where: { name: cardName }})
         const image = await Canvas.loadImage(`https://cdn.formatlibrary.com/images/cards/${card.artworkId}.jpg`)
-        context.drawImage(image, 0, 0, 210, 316)
+        context.drawImage(image, 0, 0, 420, 632)
         const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: `${card.name}.jpg` })
         return attachment
     } catch (err) {

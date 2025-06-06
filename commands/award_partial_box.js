@@ -25,14 +25,15 @@ export default {
         ),
 	async execute(interaction) {
         try {      
-            if (!isMod(interaction.member)) return interaction.reply({ content: "You do not have permission to do that."})
+            await interaction.deferReply()
+            if (!isMod(interaction.member)) return await interaction.editReply({ content: "You do not have permission to do that."})
             const quantity = interaction.options.getNumber('quantity')
-            if (quantity < 1) return interaction.reply({ content: `You cannot award less than 1 item.`})
+            if (quantity < 1) return await interaction.editReply({ content: `You cannot award less than 1 item.`})
             const set = await ForgedSet.findOne({ where: { name: 'Ascent of Dragons' }})
             const award = `${quantity} Pack(s) from a partial Box of ${set.name} ${eval(set.code)}`
             const user = interaction.options.getUser('player')
             const discordId = user.id
-            if (interaction.user.id === discordId) return interaction.reply({ content: `You cannot award ${koolaid} things to yourself.`})
+            if (interaction.user.id === discordId) return await interaction.editReply({ content: `You cannot award ${koolaid} things to yourself.`})
             const player = await Player.findByDiscordId(discordId)
             const member = interaction.guild.members.cache.get(discordId)
             
@@ -49,7 +50,7 @@ export default {
                     .setStyle(ButtonStyle.Primary)
                 )
 
-            await interaction.reply({ content: `Are you sure you want to award ${award} to ${player.name}? ${koolaid}`, components: [row] })
+            await interaction.editReply({ content: `Are you sure you want to award ${award} to ${player.name}? ${koolaid}`, components: [row] })
 
             const filter = i => i.customId.startsWith('Award-Partial-Box-') && i.user.id === interaction.user.id;
 
@@ -57,15 +58,15 @@ export default {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
                 if (confirmation.customId.includes('Yes')) {
                     await confirmation.update({ components: [] })
-                    awardBox(interaction.channel, member, set, quantity)
-                    return interaction.editReply({ content: `You awarded ${award} to ${player.name}. ${koolaid}`, components: [] });        
+                    await interaction.editReply({ content: `You awarded ${award} to ${player.name}. ${koolaid}`, components: [] })
+                    return awardBox(interaction.channel, member, set, quantity)     
                 } else {
                     await confirmation.update({ components: [] })
-                    await confirmation.editReply({ content: `Not a problem. ${award} ${quantity === 1 ? 'was' : 'were'} not awarded to ${player.name}.`, components: [] })
+                    return await confirmation.editReply({ content: `Not a problem. ${award} ${quantity === 1 ? 'was' : 'were'} not awarded to ${player.name}.`, components: [] })
                 }
             } catch (err) {
                 console.log(err)
-                await interaction.editReply({ content: `Sorry, time's up. ${award} ${quantity === 1 ? 'was' : 'were'} not awarded to ${player.name}.`, components: [] });
+                return await interaction.editReply({ content: `Sorry, time's up. ${award} ${quantity === 1 ? 'was' : 'were'} not awarded to ${player.name}.`, components: [] });
             }
         } catch (err) {
             console.log(err)

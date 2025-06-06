@@ -128,7 +128,7 @@ export default {
                 // let num = masterComplete ? 5 : eliteComplete ? 4 : hardComplete ? 3 : mediumComplete ? 2 : 1
                 if (num) {
                     setTimeout(async () => {
-                        interaction.channel.send({ content: `Oh look, ${daily.playerName}, you cobbled together a pack!`, files: [packImage]})
+                        await interaction.channel.send({ content: `Oh look, ${daily.playerName}, you cobbled together a pack!`, files: [packImage]})
                         if (num === 24) {
                             return awardBox(interaction.channel, interaction.member, set)
                         } else {
@@ -143,16 +143,14 @@ export default {
                 await daily.save()
 
                 const packImage = new AttachmentBuilder(`./public/${daily.cobbleProgress}outof7.png`, { name: `pack.png` })
-                setTimeout(() => {
-                    interaction.channel.send({ content: `Hey, ${daily.playerName}, keep cobblin', buddy.`, files: [packImage]})
+                setTimeout(async() => {
+                    await interaction.channel.send({ content: `Hey, ${daily.playerName}, keep cobblin', buddy.`, files: [packImage]})
                 }, 4000)
             }
 
             const attachment = await drawCardImage(print.cardName)
-            setTimeout(() => interaction.channel.send({ content: `${enthusiasm} ${daily.playerName} pulled ${eval(print.rarity)}${print.cardCode} - ${print.cardName} from the grab bag! ${emoji}`, files: [attachment] }), 2000)
-            return interaction.editReply({ content: `1... 2...`})
-
-
+            setTimeout(async() => await interaction.channel.send({ content: `${enthusiasm} ${daily.playerName} pulled ${eval(print.rarity)}${print.cardCode} - ${print.cardName} from the grab bag! ${emoji}`, files: [attachment] }), 2000)
+            return await interaction.editReply({ content: `1... 2...`})
         } catch (err) {
             console.log(err)
         }

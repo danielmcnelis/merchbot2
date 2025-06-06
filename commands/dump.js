@@ -66,7 +66,7 @@ export default {
         try {
             if (interaction.channel.id !== botSpamChannelId) return interaction.reply({ content: `Command not valid outside of <#${botSpamChannelId}>.` })
             const keep = interaction.options.getNumber('keep')
-            if (keep < 1) return interaction.reply({ content: `You cannot keep less than 1 card.`})
+            if (keep < 0) return interaction.reply({ content: `You cannot keep less than 0 cards.`})
             const rarity = interaction.options.getString('rarity')
             const setCode = interaction.options.getString('set')
             const sellerDiscordId = interaction.user.id

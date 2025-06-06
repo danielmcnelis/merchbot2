@@ -130,7 +130,7 @@ export const awardPacks = async (channel, member, set, num = 1) => {
 // AWARD PACKS
 export const awardBox = async (channel, member, set, offset = 24) => {
     let j = 24 - offset
-    const partial = offset > 0
+    const partial = offset !== 24
     const num = 24
     const player = await Player.findByDiscordId(member.user.id)
 	

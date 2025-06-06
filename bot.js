@@ -152,37 +152,45 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
     }
 });
 
-// COMMANDS
-client.on(Events.InteractionCreate, async interaction => {
-    try {
-        if (!interaction.isChatInputCommand()) return
-    
-        const command = interaction.client.commands.get(interaction.commandName)
-        if (!command) return console.error(`No command matching ${interaction.commandName} was found.`)
-    
-        if (command.data.name === 'card') {
-            return command.execute(interaction, fuzzyCards)
-        } else {
-            return command.execute(interaction)
+try {
+    // COMMANDS
+    client.on(Events.InteractionCreate, async interaction => {
+        try {
+            if (!interaction.isChatInputCommand()) return
+        
+            const command = interaction.client.commands.get(interaction.commandName)
+            if (!command) return console.error(`No command matching ${interaction.commandName} was found.`)
+        
+            if (command.data.name === 'card') {
+                return command.execute(interaction, fuzzyCards)
+            } else {
+                return command.execute(interaction)
+            }
+        } catch (err) {
+            console.log(err)
         }
-    } catch (err) {
-        console.log(err)
-    }
-})
+    })
+} catch (err) {
+    console.log(err)
+}
 
-// AUTO COMPLETE
-client.on(Events.InteractionCreate, async (interaction) => {
-    try {
-        if (!interaction.isAutocomplete()) return
+try {
+    // AUTO COMPLETE
+    client.on(Events.InteractionCreate, async (interaction) => {
+        try {
+            if (!interaction.isAutocomplete()) return
 
-        const command = interaction.client.commands.get(interaction.commandName)
-        if (!command) return console.error(`No command matching ${interaction.commandName} was found.`)
-    
-        return command.autocomplete(interaction)
-    } catch (err) {
-        console.log(err)
-    }
-})
+            const command = interaction.client.commands.get(interaction.commandName)
+            if (!command) return console.error(`No command matching ${interaction.commandName} was found.`)
+        
+            return command.autocomplete(interaction)
+        } catch (err) {
+            console.log(err)
+        }
+    })
+} catch (err) {
+    console.log(err)
+}
 
 // BUTTON SUBMIT
 // client.on(Events.InteractionCreate, async (interaction) => {

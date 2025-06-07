@@ -35,7 +35,7 @@ export const openShop = async (interaction) => {
         updateShop()
         client.channels.cache.get(announcementsChannelId).send({ content: `Good morning, The Shop ${merchant} is now open! ${open}`})
         const shopCountdown = getShopCountdown()
-		return setTimeout(() => closeShop(), shopCountdown)
+		return setTimeout(() => closeShop(interaction), shopCountdown)
 	} 
 }
 
@@ -58,7 +58,7 @@ export const closeShop = async (interaction) => {
         await restock()
 		client.channels.cache.get(announcementsChannelId).send({ content: `Good evening, The Shop ${merchant} is now closed! ${closed}`})
         const shopCountdown = getShopCountdown()
-        return setTimeout(() => openShop(), shopCountdown)
+        return setTimeout(() => openShop(interaction), shopCountdown)
 	} 
 }
 
@@ -269,7 +269,7 @@ export const processBids = async () => {
         }})
 
         if (winnerInv) {
-            winnerInv.quantity++
+            winnerInv.quantity = winnerInv.quantity + 1
             await winnerInv.save()
         } else {
             await ForgedInventory.create({ 
@@ -311,7 +311,7 @@ export const processBids = async () => {
     }
 
     for (let i = 0; i < results.length; i+=12) {
-        await announcementsChannel.send({ content: results.slice(i, i+12).join("\n")})
+        await announcementsChannel.send({ content: results.slice(i, i+12).join("\n")}).catch((err) => console.log(err))
     }
 }
 

@@ -13,7 +13,7 @@ export default {
             if (!isAdmin(interaction.member)) { 
                 return interaction.reply({ content: "You do not have permission to do that."})
             } else {
-                await closeShop()
+                await closeShop(interaction)
                 return interaction.reply({ content: 'Closing The Shop now.' })
             }
         } catch (err) {

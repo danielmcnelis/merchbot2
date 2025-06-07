@@ -180,9 +180,9 @@ export default {
             
             const auction = await Auction.findOne({ where: { id: auctionId }, include: ForgedPrint})
             const card = `${eval(auction.forgedPrint.rarity)}${auction.cardCode} - ${auction.cardName}`
-            const bids = await Bid.findAll({ where: { playerId: player.id }, order: [['amount', 'DESC']]})
+            const bids = await Bid.findAll({ where: { playerId: player.id }, include: ForgedPrint,  order: [['amount', 'DESC']]})
             const existingBid = await Bid.findOne({ where: { playerId: player.id, auctionId: auctionId }})
-            const bidsSummary = bids.map((b) => `- ${card} - ${b.amount}${stardust}`)
+            const bidsSummary = bids.map((b) => `- ${eval(b.forgedPrint.rarity)}${b.cardCode} - ${b.cardName} - ${b.amount}${stardust}`)
 
             if (existingBid) {
                 // return console.log('existing bid')

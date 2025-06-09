@@ -180,7 +180,7 @@ export default {
                         sellersWallet.stardust+=price
                         await sellersWallet.save()
     
-                        const newMarketPrice = calculateNewMarketPrice(difference, Math.ceil(sellersInv.forgedPrint.marketPrice * 0.7), print)
+                        const newMarketPrice = calculateNewMarketPrice(difference, price, print)
                         await print.update({ marketPrice: newMarketPrice })
                     }
 

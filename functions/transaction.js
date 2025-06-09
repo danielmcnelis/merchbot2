@@ -273,7 +273,7 @@ export const getSellerConfirmation = async (interaction, buyer, seller, quantity
             await checkBinderForRemoval(seller.id, print.id, quantity)
             await checkWishlistForRemoval(buyer.id, print.id, quantity)
 
-            const newMarketPrice = calculateNewMarketPrice(quantity, price / quantity, print)
+            const newMarketPrice = calculateNewMarketPrice(quantity, price, print)
             await print.update({ marketPrice: newMarketPrice })
 
             await confirmation.update({ components: [] })
@@ -338,7 +338,7 @@ export const getBuyerConfirmation = async (interaction, buyer, seller, quantity,
             await checkBinderForRemoval(seller.id, print.id, quantity)
             await checkWishlistForRemoval(buyer.id, print.id, quantity)
 
-            const newMarketPrice = calculateNewMarketPrice(quantity, price / quantity, print)
+            const newMarketPrice = calculateNewMarketPrice(quantity, price, print)
             await print.update({ marketPrice: newMarketPrice })
 
             await confirmation.update({ components: [] })

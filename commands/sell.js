@@ -159,7 +159,7 @@ export default {
                     await checkBinderForRemoval(seller.id, print.id, quantity)
                     await checkWishlistForRemoval(buyer.id, print.id, quantity)
 
-                    const newMarketPrice = calculateNewMarketPrice(quantity, price / quantity, print)
+                    const newMarketPrice = calculateNewMarketPrice(quantity, price, print)
                     await print.update({ marketPrice: newMarketPrice })
 
                     return interaction.editReply({ content: `You sold ${quantity} ${card} to The Shop ${merchant} for ${price}${stardust}!`, components: [] });        

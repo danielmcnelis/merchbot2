@@ -475,7 +475,7 @@ export const manageSubscriptions = async (client) => {
                 const player = players[i]
                 const member = await membersMap.get(player.discordId)
 
-                if (player.isForgedSubscriber && !member?._roles.includes(benefactorRoleId) && !member?._roles.includes(patronRoleId) && !member?._roles.includes(supporterRoleId)) {
+                if (player.isForgedSubscriber && player.discordId !== '379851431752237057' && player.discordId !== '626843317010694176' && !member?._roles.includes(benefactorRoleId) && !member?._roles.includes(patronRoleId) && !member?._roles.includes(supporterRoleId)) {
                     await programmer.send({ content: `${player.name} is no longer a Subscriber (${player.forgedSubscriberTier}).`})
                     console.log(`${player.name} is no longer a Subscriber (${player.forgedSubscriberTier}).`)
                     await player.update({ isForgedSubscriber: false, forgedSubscriberTier: null })
@@ -483,17 +483,17 @@ export const manageSubscriptions = async (client) => {
                 } else if (member?._roles.includes(benefactorRoleId) && (!player.isForgedSubscriber || player.forgedSubscriberTier !== 'Benefactor')) {
                     await programmer.send({ content: `Welcome ${player.name} to the Forged in Chaos Benefactor Tier!`})
                     console.log(`Welcome ${player.name} to the Forged in Chaos Benefactor Tier!`)
-                    await player.update({ isForgedSubscriber: true, subscriberTier: 'Benefactor' })
+                    await player.update({ isForgedSubscriber: true, forgedSubscriberTier: 'Benefactor' })
                     a++
                 } else if (member?._roles.includes(patronRoleId) && (!player.isForgedSubscriber || player.forgedSubscriberTier !== 'Patron')) {
                     await programmer.send({ content: `Welcome ${player.name} to the Forged in Chaos Patron Tier!`})
                     console.log(`Welcome ${player.name} to the Forged in Chaos Patron Tier!`)
-                    await player.update({ isForgedSubscriber: true, subscriberTier: 'Patron' })
+                    await player.update({ isForgedSubscriber: true, forgedSubscriberTier: 'Patron' })
                     a++
                 } else if (member?._roles.includes(supporterRoleId) && (!player.isForgedSubscriber || player.forgedSubscriberTier !== 'Supporter')) {
                     await programmer.send({ content: `Welcome ${player.name} to the Forged in Chaos Supporter Tier!`})
                     console.log(`Welcome ${player.name} to the Forged in Chaos Supporter Tier!`)
-                    await player.update({ isForgedSubscriber: true, subscriberTier: 'Supporter' })
+                    await player.update({ isForgedSubscriber: true, forgedSubscriberTier: 'Supporter' })
                     a++
                 }
             } catch (err) {

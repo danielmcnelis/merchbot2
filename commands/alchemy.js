@@ -86,6 +86,8 @@ export default {
                 }
             })
 
+            if (!inv) return interaction.reply({ content: `You do not have any copies of ${card}.` })
+
             const timestamp = new Date().getTime()
 
             const row = new ActionRowBuilder()
@@ -108,7 +110,7 @@ export default {
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
                 if (confirmation.customId.includes('Yes')) {
-                    inv.quantity--
+                    inv.quantity -= 1
                     await inv.save()
 
                     await updateBinder(player.id, print.id, 1)

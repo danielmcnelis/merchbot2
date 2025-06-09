@@ -19,7 +19,7 @@ import { Op } from 'sequelize'
 
 // FUNCTION IMPORTS
 import { fetchAllCardNames, fetchAllUniquePrintNames } from './functions/search.js'
-import { createPlayer, isNewUser } from './functions/utility.js'
+import { createPlayer, isNewUser, runFrequentTasks } from './functions/utility.js'
 import { awardPacks } from './functions/packs.js'
 import { applyPriceDecay, checkShopShouldBe, getMidnightCountdown, getShopCountdown, openShop, closeShop, checkShopOpen, postBids, updateShop, clearDailies } from './functions/shop.js'
 
@@ -48,6 +48,13 @@ client.on('ready', async () => {
 	// setTimeout(() => clearDailies(), midnightCountdown)
 	setTimeout(() => applyPriceDecay(), midnightCountdown + 10000)
 	
+    try {
+        // RUN FREQUENT TASKS
+        setTimeout(() => runFrequentTasks(client), 2 * 60 * 1000)
+    } catch (err) {
+        console.log(err)
+    }
+
 	const shopShouldBe = checkShopShouldBe()
 	const shopCountdown = getShopCountdown()
 	const shopOpen = await checkShopOpen()

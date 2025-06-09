@@ -446,3 +446,63 @@ export const drawCardImage = async (cardName) => {
         console.log(err)
     }
 }
+
+// RUN FREQUENT TASKS
+export const runFrequentTasks = async (client) => {
+    console.log('runSomewhatFrequentTasks()')
+    await manageSubscriptions(client)
+
+    return setTimeout(() => runFrequentTasks(client), 2 * 60 * 1000)
+}
+
+// MANAGE SUBSCRIBERS
+export const manageSubscriptions = async (client) => {
+    let a = 0
+    let b = 0
+
+    try {
+        const benefactorRoleId = '1375133829521608784'
+        const patronRoleId = '1375132712070811689'
+        const supporterRoleId = '1375131869036810302'
+
+        const guild = await client.guilds.fetch('1372580468297568458')
+        const membersMap = await guild.members.fetch()
+        const programmer = await client.users.fetch('194147938786738176')
+        const players = await Player.findAll()
+                        
+        for (let i = 0; i < players.length; i++) {
+            try {
+                const player = players[i]
+                const member = await membersMap.get(player.discordId)
+
+                if (player.isForgedSubscriber && !member?._roles.includes(benefactorRoleId) && !member?._roles.includes(patronRoleId) && !member?._roles.includes(supporterRoleId)) {
+                    await programmer.send({ content: `${player.name} is no longer a Subscriber (${player.forgedSubscriberTier}).`})
+                    console.log(`${player.name} is no longer a Subscriber (${player.forgedSubscriberTier}).`)
+                    await player.update({ isForgedSubscriber: false, forgedSubscriberTier: null })
+                    b++
+                } else if (member?._roles.includes(benefactorRoleId) && (!player.isForgedSubscriber || player.forgedSubscriberTier !== 'Benefactor')) {
+                    await programmer.send({ content: `Welcome ${player.name} to the Forged in Chaos Benefactor Tier!`})
+                    console.log(`Welcome ${player.name} to the Forged in Chaos Benefactor Tier!`)
+                    await player.update({ isForgedSubscriber: true, subscriberTier: 'Benefactor' })
+                    a++
+                } else if (member?._roles.includes(patronRoleId) && (!player.isForgedSubscriber || player.forgedSubscriberTier !== 'Patron')) {
+                    await programmer.send({ content: `Welcome ${player.name} to the Forged in Chaos Patron Tier!`})
+                    console.log(`Welcome ${player.name} to the Forged in Chaos Patron Tier!`)
+                    await player.update({ isForgedSubscriber: true, subscriberTier: 'Patron' })
+                    a++
+                } else if (member?._roles.includes(supporterRoleId) && (!player.isForgedSubscriber || player.forgedSubscriberTier !== 'Supporter')) {
+                    await programmer.send({ content: `Welcome ${player.name} to the Forged in Chaos Supporter Tier!`})
+                    console.log(`Welcome ${player.name} to the Forged in Chaos Supporter Tier!`)
+                    await player.update({ isForgedSubscriber: true, subscriberTier: 'Supporter' })
+                    a++
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+    } catch (err) {
+        console.log(err)
+    }
+
+    return console.log(`added ${a} new subscriptions and removed ${b} old subscriptions`)
+}

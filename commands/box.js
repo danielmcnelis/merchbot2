@@ -100,22 +100,24 @@ export default {
             const money = wallet[set.currency]
             if (money < (Math.round(set.boxPrice * discount))) return interaction.reply({ content: `Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Boxes cost ${Math.round(set.boxPrice * discount)}${eval(set.currency)}.`})
             
+            const timestamp = new Date().getTime()
+
             const row = new ActionRowBuilder()
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Box-Yes`)
+                    .setCustomId(`Box-${timestamp}-Yes`)
                     .setLabel('Yes')
                     .setStyle(ButtonStyle.Primary)
                 )
 
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Box-No`)
+                    .setCustomId(`Box-${timestamp}-No`)
                     .setLabel('No')
                     .setStyle(ButtonStyle.Primary)
                 )
 
             await interaction.reply({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.boxPrice * discount)}${eval(set.currency)} on a ${set.name} ${eval(set.emoji)} Box?`, components: [row] })
 
-            const filter = i => i.customId.startsWith('Box-') && i.user.id === interaction.user.id;
+            const filter = i => i.customId.startsWith(`Box-${timestamp}`) && i.user.id === interaction.user.id;
 
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })

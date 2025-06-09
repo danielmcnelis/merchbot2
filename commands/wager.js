@@ -45,21 +45,23 @@ export default {
             const set = sets[0]
             if (!set) return interaction.reply({ content: `No core set found.`})
 
+            const timestamp = new Date().getTime()
+            
             const row = new ActionRowBuilder()
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Wager-Yes`)
+                    .setCustomId(`Wager-${timestamp}-Yes`)
                     .setLabel('Yes')
                     .setStyle(ButtonStyle.Primary)
                 )
 
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Wager-No`)
+                    .setCustomId(`Wager-${timestamp}-No`)
                     .setLabel('No')
                     .setStyle(ButtonStyle.Primary)
                 )
 
             await interaction.reply({ content: `Are you sure you want to wager ${x}${stardust} on a random ${set.code} ${eval(set.emoji)} card?`, components: [row] })
-            const filter = i => i.customId.startsWith('Wager-') && i.user.id === interaction.user.id;
+            const filter = i => i.customId.startsWith(`Wager-${timestamp}`) && i.user.id === interaction.user.id;
 
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })

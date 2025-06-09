@@ -86,22 +86,24 @@ export default {
                 }
             })
 
+            const timestamp = new Date().getTime()
+
             const row = new ActionRowBuilder()
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Alchemy-Yes`)
+                    .setCustomId(`Alchemy-${timestamp}-Yes`)
                     .setLabel('Yes')
                     .setStyle(ButtonStyle.Primary)
                 )
 
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Alchemy-No`)
+                    .setCustomId(`Alchemy-${timestamp}-No`)
                     .setLabel('No')
                     .setStyle(ButtonStyle.Primary)
                 )
 
             await interaction.reply({ content: `Are you sure you want to transmute ${card} into ${value}${starchips}?`, components: [row] })
 
-            const filter = i => i.customId.startsWith('Alchemy-') && i.user.id === interaction.user.id;
+            const filter = i => i.customId.startsWith(`Alchemy-${timestamp}`) && i.user.id === interaction.user.id;
 
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })

@@ -56,22 +56,24 @@ const askForBidCancellation = async (interaction, card, bid) => {
         // const message = await interaction.user.send({ content: `Are you sure you want to cancel your ${bid.amount}${stardust} on ${card}?`}).catch((err) => console.log(err))
         // if (!message || !message.channel) return false
 
+        const timestamp = new Date().getTime()
+
         const row = new ActionRowBuilder()
             .addComponents(new ButtonBuilder()
-                .setCustomId(`Bid-Yes`)
+                .setCustomId(`Bid-${timestamp}-Yes`)
                 .setLabel('Yes')
                 .setStyle(ButtonStyle.Primary)
             )
 
             .addComponents(new ButtonBuilder()
-                .setCustomId(`Bid-No`)
+                .setCustomId(`Bid-${timestamp}-No`)
                 .setLabel('No')
                 .setStyle(ButtonStyle.Primary)
             )
 
         await interaction.user.send({ content: `Are you sure you want to cancel your ${bid.amount}${stardust} on ${card}?`, components: [row]})
 
-        const filter = i => i.customId.startsWith('Bid-') && i.user.id === interaction.user.id;
+        const filter = i => i.customId.startsWith(`Bid-${timestamp}`) && i.user.id === interaction.user.id;
 
         try {
             const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })

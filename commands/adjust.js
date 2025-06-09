@@ -57,22 +57,24 @@ export default {
 
             const card = `${eval(print.rarity)}${print.cardCode} - ${print.cardName}`
 
+            const timestamp = new Date().getTime()
+
             const row = new ActionRowBuilder()
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Adjust-Yes`)
+                    .setCustomId(`Adjust-${timestamp}-Yes`)
                     .setLabel('Yes')
                     .setStyle(ButtonStyle.Primary)
                 )
 
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Adjust-No`)
+                    .setCustomId(`Adjust-${timestamp}-No`)
                     .setLabel('No')
                     .setStyle(ButtonStyle.Primary)
                 )
 
             await interaction.reply({ content: `${card} is valued at ${print.marketPrice}${emojis.stardust}, do you wish to change it to ${newPrice}${emojis.stardust}?`, components: [row] })
 
-            const filter = i => i.customId.startsWith('Adjust-') && i.user.id === interaction.user.id;
+            const filter = i => i.customId.startsWith(`Adjust-${timestamp}`) && i.user.id === interaction.user.id;
 
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 60000 });

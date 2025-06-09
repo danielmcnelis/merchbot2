@@ -119,15 +119,17 @@ export default {
                 cards.push(`${difference}x ${eval(sellersInv.forgedPrint.rarity)}${sellersInv.cardName}`)
             }
         
+            const timestamp = new Date().getTime()
+
             const row = new ActionRowBuilder()
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Dump-Yes`)
+                    .setCustomId(`Dump-${timestamp}-Yes`)
                     .setLabel('Yes')
                     .setStyle(ButtonStyle.Primary)
                 )
 
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Dump-No`)
+                    .setCustomId(`Dump-${timestamp}-No`)
                     .setLabel('No')
                     .setStyle(ButtonStyle.Primary)
                 )
@@ -140,7 +142,7 @@ export default {
 
             await interaction.channel.send({ content: `Dump confirmed?`, components: [row] })
 
-            const filter = i => i.customId.startsWith('Dump-') && i.user.id === interaction.user.id;
+            const filter = i => i.customId.startsWith(`Dump-${timestamp}`) && i.user.id === interaction.user.id;
 
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })

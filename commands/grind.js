@@ -26,22 +26,24 @@ export default {
             if (!wallet) return interaction.reply({ content: `You are not in the database. Type **/play** to begin the game.`})
             if (x > wallet.starchips) return interaction.reply({ content: `You only have ${wallet.starchips}${starchips}.`})
 
+            const timestamp = new Date().getTime()
+
             const row = new ActionRowBuilder()
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Grind-Yes`)
+                    .setCustomId(`Grind-${timestamp}-Yes`)
                     .setLabel('Yes')
                     .setStyle(ButtonStyle.Primary)
                 )
 
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Grind-No`)
+                    .setCustomId(`Grind-${timestamp}-No`)
                     .setLabel('No')
                     .setStyle(ButtonStyle.Primary)
                 )
 
             await interaction.reply({ content: `Are you sure you wish to grind ${x}${starchips} into ${x * 10}${stardust}?`, components: [row] })
 
-            const filter = i => i.customId.startsWith('Grind-') && i.user.id === interaction.user.id;
+            const filter = i => i.customId.startsWith(`Grind-${timestamp}`) && i.user.id === interaction.user.id;
 
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })

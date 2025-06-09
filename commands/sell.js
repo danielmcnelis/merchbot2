@@ -112,22 +112,24 @@ export default {
 
             if (!sellersInv || sellersInv.quantity < quantity) return interaction.reply({ content: `Sorry, You do not have ${quantity} ${quantity === 1 ? 'copy' : 'copies'} of ${card}.`})
 
+            const timestamp = new Date().getTime()
+
             const row = new ActionRowBuilder()
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Sell-Yes`)
+                    .setCustomId(`Sell-${timestamp}-Yes`)
                     .setLabel('Yes')
                     .setStyle(ButtonStyle.Primary)
                 )
 
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Sell-No`)
+                    .setCustomId(`Sell-${timestamp}-No`)
                     .setLabel('No')
                     .setStyle(ButtonStyle.Primary)
                 )
 
             await interaction.reply({ content: `Are you sure you want to sell ${quantity} ${card} to ${shopSale ? `The Shop ${merchant}` : buyer.name} for ${price}${stardust}? ${scheming}`, components: [row] })
 
-            const filter = i => i.customId.startsWith('Sell-') && i.user.id === interaction.user.id;
+            const filter = i => i.customId.startsWith(`Sell-${timestamp}`) && i.user.id === interaction.user.id;
 
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
@@ -170,6 +172,7 @@ export default {
                 }
             } catch (err) {
                 console.log(err)
+                await confirmation.update({ components: [] })
                 await interaction.editReply({ content: `Sorry, time's up. Nothing was sold to ${shopSale ? `The Shop ${merchant}` : seller.name}.`, components: [] });
             }                        
         } catch (err) {

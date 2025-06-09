@@ -37,22 +37,24 @@ export default {
             const player = await Player.findByDiscordId(discordId)
             const member = interaction.guild.members.cache.get(discordId)
             
+            const timestamp = new Date().getTime()
+
             const row = new ActionRowBuilder()
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Award-Partial-Box-Yes`)
+                    .setCustomId(`Award-Partial-Box-${timestamp}-Yes`)
                     .setLabel('Yes')
                     .setStyle(ButtonStyle.Primary)
                 )
 
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Award-Partial-Box-No`)
+                    .setCustomId(`Award-Partial-Box-${timestamp}-No`)
                     .setLabel('No')
                     .setStyle(ButtonStyle.Primary)
                 )
 
             await interaction.editReply({ content: `Are you sure you want to award ${award} to ${player.name}? ${koolaid}`, components: [row] })
 
-            const filter = i => i.customId.startsWith('Award-Partial-Box-') && i.user.id === interaction.user.id;
+            const filter = i => i.customId.startsWith(`Award-Partial-Box-${timestamp}`) && i.user.id === interaction.user.id;
 
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })

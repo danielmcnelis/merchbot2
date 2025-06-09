@@ -67,22 +67,24 @@ export default {
 
             const oldStatus = oldStatusRow ? oldStatusRow.restriction : 'unlimited'
         
+            const timestamp = new Date().getTime()
+
             const row = new ActionRowBuilder()
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Move-Yes`)
+                    .setCustomId(`Move-${timestamp}-Yes`)
                     .setLabel('Yes')
                     .setStyle(ButtonStyle.Primary)
                 )
 
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Move-No`)
+                    .setCustomId(`Move-${timestamp}-No`)
                     .setLabel('No')
                     .setStyle(ButtonStyle.Primary)
                 )
 
             await interaction.reply({ content: `Are you sure you wish to move ${cardName} from ${oldStatus} to ${newStatus}?`, components: [row] })
 
-            const filter = i => i.customId.startsWith('Move-') && i.user.id === interaction.user.id;
+            const filter = i => i.customId.startsWith(`Move-${timestamp}`) && i.user.id === interaction.user.id;
 
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })

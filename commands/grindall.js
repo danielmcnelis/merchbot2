@@ -13,23 +13,25 @@ export default {
 	async execute(interaction) {
         try {
             if (!isAdmin(interaction.member)) return interaction.reply({ content: `You do not have permission to do that.`})
-                
+            
+            const timestamp = new Date().getTime()
+
             const row = new ActionRowBuilder()
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Grindall-Yes`)
+                    .setCustomId(`Grindall-${timestamp}-Yes`)
                     .setLabel('Yes')
                     .setStyle(ButtonStyle.Primary)
                 )
 
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Grindall-No`)
+                    .setCustomId(`Grindall-${timestamp}-No`)
                     .setLabel('No')
                     .setStyle(ButtonStyle.Primary)
                 )
 
             await interaction.reply({ content: `Are you sure you wish to grind every player's ${starchips} into ${stardust}?`, components: [row] })
 
-            const filter = i => i.customId.startsWith('Grindall-') && i.user.id === interaction.user.id;
+            const filter = i => i.customId.startsWith(`Grindall-${timestamp}`) && i.user.id === interaction.user.id;
 
             const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
             if (confirmation.customId.includes('Yes')) {

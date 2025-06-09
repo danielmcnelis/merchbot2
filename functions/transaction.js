@@ -95,22 +95,24 @@ const processTradeComponent = async (interaction, sender, recipient, quantity, p
 
 //GET TRADER B PACKAGE
 export const getTraderBConfirmation = async (interaction, proposalA, proposalB, traderA, traderB, traderAPackageSummary, traderBPackageSummary) => {
+    const timestamp = new Date().getTime()
+
     const row = new ActionRowBuilder()
         .addComponents(new ButtonBuilder()
-            .setCustomId(`Review-Trade-2of2-Yes`)
+            .setCustomId(`Review-Trade-2of2-${timestamp}-Yes`)
             .setLabel('Yes')
             .setStyle(ButtonStyle.Primary)
         )
 
         .addComponents(new ButtonBuilder()
-            .setCustomId(`Review-Trade-2of2-No`)
+            .setCustomId(`Review-Trade-2of2-${timestamp}-No`)
             .setLabel('No')
             .setStyle(ButtonStyle.Primary)
         )
 
     await interaction.channel.send({ content: `<@${traderB.discordId}>, Please review both sides of the trade proposal with ${traderA.name} and then confirm "Yes" or "No" that you wish to trade. ${hmmm}\nYou will send:\n${traderBPackageSummary.join('\n')}\n\nYou will receive:\n${traderAPackageSummary.join('\n')}`, components: [row] })
 
-    const filter = i => i.customId.startsWith('Review-Trade-2of2-') && i.user.id === traderB.discordId
+    const filter = i => i.customId.startsWith(`Review-Trade-2of2-${timestamp}`) && i.user.id === traderB.discordId
     
     try {
         const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
@@ -225,22 +227,24 @@ export const getTraderBConfirmation = async (interaction, proposalA, proposalB, 
 export const getSellerConfirmation = async (interaction, buyer, seller, quantity, print, card, price, buyersInv, sellersInv, buyersWallet, sellersWallet) => {
     const sellerDiscordId = seller.discordId
 
+    const timestamp = new Date().getTime()
+
     const row = new ActionRowBuilder()
         .addComponents(new ButtonBuilder()
-            .setCustomId(`Sell-Yes`)
+            .setCustomId(`Sell-${timestamp}-Yes`)
             .setLabel('Yes')
             .setStyle(ButtonStyle.Primary)
         )
 
         .addComponents(new ButtonBuilder()
-            .setCustomId(`Sell-No`)
+            .setCustomId(`Sell-${timestamp}-No`)
             .setLabel('No')
             .setStyle(ButtonStyle.Primary)
         )
 
     await interaction.channel.send({ content: `<@${sellerDiscordId}> are you sure you want to sell ${quantity}${card} to ${buyer.name} for ${price}${stardust}? ${hmmm}`, components: [row] })
 
-    const filter = i => i.customId.startsWith('Sell-') && i.user.id === sellerDiscordId
+    const filter = i => i.customId.startsWith(`Sell-${timestamp}`) && i.user.id === sellerDiscordId
     
     try {
         const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
@@ -287,23 +291,25 @@ export const getSellerConfirmation = async (interaction, buyer, seller, quantity
 //GET BUYER CONFIRMATION
 export const getBuyerConfirmation = async (interaction, buyer, seller, quantity, print, card, price, buyersInv, sellersInv, buyersWallet, sellersWallet) => {
     const buyerDiscordId = buyer.discordId
-
+    
+    const timestamp = new Date().getTime()
+                
     const row = new ActionRowBuilder()
         .addComponents(new ButtonBuilder()
-            .setCustomId(`Buy-Yes`)
+            .setCustomId(`Buy-${timestamp}-Yes`)
             .setLabel('Yes')
             .setStyle(ButtonStyle.Primary)
         )
 
         .addComponents(new ButtonBuilder()
-            .setCustomId(`Buy-No`)
+            .setCustomId(`Buy-${timestamp}-No`)
             .setLabel('No')
             .setStyle(ButtonStyle.Primary)
         )
 
     await interaction.channel.send({ content: `<@${buyerDiscordId}> are you sure you want to buy ${quantity}${card} from ${seller.name} for ${price}${stardust}? ${hmmm}`, components: [row] })
 
-    const filter = i => i.customId.startsWith('Buy-') && i.user.id === buyerDiscordId
+    const filter = i => i.customId.startsWith(`Buy-${timestamp}`) && i.user.id === buyerDiscordId
     
     try {
         const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
@@ -686,8 +692,8 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
 
 // CALCULATE NEW MARKET PRICE
 export const calculateNewMarketPrice = (quantity, price, print) => {
-    const newMarketPrice = quantity > 16 ? price / quantity :
-        ( price / quantity + ( (16 - quantity) * print.marketPrice ) ) / 16
+    const newMarketPrice = quantity >= 16 ? price / quantity :
+        ( price + ( (16 - quantity) * print.marketPrice ) ) / 16
 
     return newMarketPrice
 }

@@ -112,22 +112,24 @@ export default {
             const wallet = await Wallet.findOne({ where: { playerId: player.id }})
             const inv = await ForgedInventory.findOne({ where: { cardCode: cardCode, playerId: player.id }})
 
+            const timestamp = new Date().getTime()
+
             const row = new ActionRowBuilder()
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Award-Yes`)
+                    .setCustomId(`Award-${timestamp}-Yes`)
                     .setLabel('Yes')
                     .setStyle(ButtonStyle.Primary)
                 )
 
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Award-No`)
+                    .setCustomId(`Award-${timestamp}-No`)
                     .setLabel('No')
                     .setStyle(ButtonStyle.Primary)
                 )
 
             await interaction.editReply({ content: `Are you sure you want to award ${award} to ${player.name}? ${koolaid}`, components: [row] })
 
-            const filter = i => i.customId.startsWith('Award-') && i.user.id === interaction.user.id;
+            const filter = i => i.customId.startsWith(`Award-${timestamp}`) && i.user.id === interaction.user.id;
 
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })

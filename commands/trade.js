@@ -530,15 +530,18 @@ export default {
                     traderBPackageSummary.push(`${existingProposal.stardustQuantity}${stardust}`)
                 }
                     
+                
+                const timestamp = new Date().getTime()
+
                 const row = new ActionRowBuilder()
                     .addComponents(new ButtonBuilder()
-                        .setCustomId(`Review-Trade-1of2-Yes`)
+                        .setCustomId(`Review-Trade-1of2-${timestamp}-Yes`)
                         .setLabel('Yes')
                         .setStyle(ButtonStyle.Primary)
                     )
 
                     .addComponents(new ButtonBuilder()
-                        .setCustomId(`Review-Trade-1of2-No`)
+                        .setCustomId(`Review-Trade-1of2-${timestamp}-No`)
                         .setLabel('No')
                         .setStyle(ButtonStyle.Primary)
                     )
@@ -546,7 +549,7 @@ export default {
                 
                 await interaction.reply({ content: `There is an existing trade proposal from ${traderB.name}. Please review both sides of the trade proposal with ${traderB.name} and then confirm "Yes" or "No" that you wish to trade. ${scheming}\nYou will send:\n${traderAPackageSummary.join('\n')}\n\nYou will receive:\n${traderBPackageSummary.join('\n')}`, components: [row] })
 
-                const filter = i => i.customId.startsWith('Review-Trade-1of2-') && i.user.id === interaction.user.id;
+                const filter = i => i.customId.startsWith(`Review-Trade-1of2-${timestamp}`) && i.user.id === interaction.user.id;
     
                 try {
                     const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
@@ -579,25 +582,29 @@ export default {
                     }
                 } catch (err) {
                     console.log(err)
+                    await existingProposal.destroy()
+                    await confirmation.update({ components: [] })
                     await interaction.editReply({ content: `Sorry, time's up. Nothing was traded to ${traderB.name}.`, components: [] });
                 }   
             } else {
+                const timestamp = new Date().getTime()
+                
                 const row = new ActionRowBuilder()
                     .addComponents(new ButtonBuilder()
-                        .setCustomId(`Propose-Trade-Yes`)
+                        .setCustomId(`Propose-Trade-${timestamp}-Yes`)
                         .setLabel('Yes')
                         .setStyle(ButtonStyle.Primary)
                     )
 
                     .addComponents(new ButtonBuilder()
-                        .setCustomId(`Propose-Trade-No`)
+                        .setCustomId(`Propose-Trade-${timestamp}-No`)
                         .setLabel('No')
                         .setStyle(ButtonStyle.Primary)
                     )
 
                 await interaction.reply({ content: `Are you sure you want to trade the following to ${traderB.name}? ${scheming}\n${traderAPackageSummary.join('\n')}`, components: [row] })
 
-                const filter = i => i.customId.startsWith('Propose-Trade-') && i.user.id === interaction.user.id;
+                const filter = i => i.customId.startsWith(`Propose-Trade-${timestamp}`) && i.user.id === interaction.user.id;
     
                 try {
                     const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
@@ -624,11 +631,14 @@ export default {
                         await interaction.editReply({ content: `Okay, waiting for ${traderB.name}'s offer. `, components: [] })
                         return await interaction.channel.send(`<@${traderB.discordId}>, ${traderA.name} is offering you the following items listed below. Please use the **/trade** command to submit your side of the trade.\n${traderAPackageSummary.join('\n')}`)
                     } else {
+                        await existingProposal.destroy()
                         await confirmation.update({ components: [] })
                         await confirmation.editReply({ content: `Not a problem. Nothing was traded to ${traderA.name}.`, components: [] })
                     }
                 } catch (err) {
                     console.log(err)
+                    await existingProposal.destroy()
+                    await confirmation.update({ components: [] })
                     await interaction.editReply({ content: `Sorry, time's up. Nothing was traded to ${traderA.name}.`, components: [] });
                 }   
             }

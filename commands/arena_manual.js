@@ -2,7 +2,7 @@
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { ArenaEntry, Player, Wallet } from '../database/index.js'
 import { checkArenaProgress } from '../functions/arena.js'
-import emojis from '../static/emojis.json'
+import emojis from '../static/emojis.json' with { type: 'json' }
 const { arena } = emojis
 
 export default {

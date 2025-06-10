@@ -1,10 +1,10 @@
 
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
-import { isAdmin } from '../functions/utility.js'
-import { closeShop } from '../functions/shop.js'
+// import { isAdmin } from '../functions/utility.js'
+// import { closeShop } from '../functions/shop.js'
 import { ArenaEntry, Player } from '../database/index.js'
-import { getArenaConfirmations, endArena, resetArena, checkArenaProgress, postStandings, doubleForfeit, forfeit, startRound, assignArenaRoles, getArenaConfirmation, initiateArena, getTribe, getArenaSample } from '../functions/arena.js'
-import emojis from '../static/emojis.json'
+import { initiateArena } from '../functions/arena.js'
+import emojis from '../static/emojis.json' with { type: 'json' }
 const { arena } = emojis
 
 export default {

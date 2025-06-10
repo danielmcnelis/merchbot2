@@ -32,7 +32,7 @@ export const Bid = db.define('bids', {
         allowNull: false
     },
     wasProcessed: {
-        type: BOOLEAN,
+        type: Sequelize.BOOLEAN,
         defaultValue: false
     }
 })

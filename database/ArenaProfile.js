@@ -2,7 +2,7 @@
 import { Sequelize } from 'sequelize'
 import {db} from './db.js'
 
-export const ArenaEntry = db.define('arenaEntries', {
+export const ArenaProfile = db.define('arenaEntries', {
     playerName: {
         type: Sequelize.STRING
     },

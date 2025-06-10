@@ -1,34 +1,31 @@
 
-const { Arena, Diary, Info, Player, Profile, Wallet, Match } = require('../database/index.js')
 import { Op } from 'sequelize'
-import { ArenaEntry } from '../database/ArenaEntry.js'
-const { yescom, nocom } = require('../static/commands.json')
-const { DRT, fiend, thunder, zombie, king, shrine, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, skull, familiar, battery, com, credits, cultured, diamond, dinosaur, DOC, LPK, dragon, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, spellcaster, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, dimmadome, sup, tix, ult, wokefrog, yellow, yes, ygocard } = require('../static/emojis.json')
-const { arenaRole } = require('../static/roles.json')
-const { arenaChannelId } = require('../static/channels.json')
-const { client } = require('../static/clients.js')
-const { check6TribesComplete, completeTask } = require('./diary')
-const { shuffleArray, getRandomElement, capitalize } = require('./utility.js')
-const { awardCard } = require('./award.js')
-const { decks, vouchers, prizes, victories, apcs, verbs, encouragements } = require('../static/arenas.json')
+import { ArenaEntry, Info, Player, Profile, Wallet, ArenaMatch, ArenaProfile } from '../database/index.js'
+
+import roles from '../static/roles.json' with { type: 'json' }
+const { arenaRole } = roles
+import emojis from '../static/emojis.json' with { type: 'json' }
+const { cavebob, AOD, king, arena, beast, dragon, warrior, spellcaster, machine, zombie, starchips } = emojis
+import channels from '../static/channels.json' with { type: 'json' }
+const { arenaChannelId } = channels
+import arenas from '../static/arenas.json' with { type: 'json' }
+const { decks, vouchers, prizes, victories, apcs, verbs, encouragements } = arenas 
+
+import { client } from '../static/clients.js'
+import { shuffleArray, getRandomElement, capitalize } from './utility.js'
+import { awardCard } from './award.js'
 
 const tribes = [
     '(1) Beast', 
-    '(2) Dinosaur', 
-    '(3) Dragon', 
-    '(4) Fiend', 
-    '(5) Fish', 
-    '(6) Plant', 
-    '(7) Reptile', 
-    '(8) Rock', 
-    '(9) Spellcaster', 
-    '(10) Thunder', 
-    '(11) Warrior', 
-    '(12) Zombie'
+    '(2) Dinosaur',
+    '(3) Machine', 
+    '(4) Spellcaster', 
+    '(5) Warrior', 
+    '(6) Zombie'
 ]
 
 //GET ARENA SAMPLE DECK
-export const getArenaSample = async (message, query) => {
+export const getArenaSample = async (interaction, query) => {
     const directTribe = getTribe(query)
     if (directTribe) return directTribe
 
@@ -50,34 +47,39 @@ export const getArenaSample = async (message, query) => {
 
 // GET TRIBE
 export const getTribe = (query = '') => {
-    const tribe = query.includes('thun') || query.includes('10') ? 'thunder' :
-        query.includes('war') || query.includes('11') ? 'warrior' :
-        query.includes('zom') || query.includes('12') ? 'zombie' :
-        query.includes('bea') || query.includes('1') ? 'beast' :
-        query.includes('dino') || query.includes('2') ? 'dinosaur' :
-        query.includes('drag') || query.includes('3') ? 'dragon' :
-        query.includes('fiend') || query.includes('4') ? 'fiend' :
-        query.includes('fish') || query.includes('5') ? 'fish' :
-        query.includes('plant') || query.includes('6') ? 'plant' :
-        query.includes('rep') || query.includes('7') ? 'reptile' :
-        query.includes('rock') || query.includes('8') ? 'rock' :
-        query.includes('spell') || query.includes('cast') || query.includes('9') ? 'spellcaster' :
-        false
+    // MAKE THIS BUTTONS
 
-    return tribe
+
+    // const tribe = query.includes('thun') || query.includes('10') ? 'thunder' :
+    //     query.includes('war') || query.includes('11') ? 'warrior' :
+    //     query.includes('zom') || query.includes('12') ? 'zombie' :
+    //     query.includes('bea') || query.includes('1') ? 'beast' :
+    //     query.includes('dino') || query.includes('2') ? 'dinosaur' :
+    //     query.includes('drag') || query.includes('3') ? 'dragon' :
+    //     query.includes('fiend') || query.includes('4') ? 'fiend' :
+    //     query.includes('fish') || query.includes('5') ? 'fish' :
+    //     query.includes('plant') || query.includes('6') ? 'plant' :
+    //     query.includes('rep') || query.includes('7') ? 'reptile' :
+    //     query.includes('rock') || query.includes('8') ? 'rock' :
+    //     query.includes('spell') || query.includes('cast') || query.includes('9') ? 'spellcaster' :
+    //     false
+
+    // return tribe
 }
 
 //START ARENA
-export const startArena = async() => {
+export const initiateArena = async() => {
     const channel = client.channels.cache.get(arenaChannelId)
     channel.send({ content: `Arena players, please check your DMs!`})
-    const entries = await Arena.findAll({ include: Player })
-    const contestants = shuffleArray(["P1", "P2", "P3", "P4"])
+    const arenaEntries = await ArenaEntry.findAll({ include: Player })
+    const contestants = shuffleArray(["P1", "P2", "P3", "P4", "P5", "P6"])
     
-    getArenaConfirmation(entries[0], contestants[0])
-    getArenaConfirmation(entries[1], contestants[1])
-    getArenaConfirmation(entries[2], contestants[2])
-    getArenaConfirmation(entries[3], contestants[3])
+    getArenaConfirmation(arenaEntries[0], contestants[0])
+    getArenaConfirmation(arenaEntries[1], contestants[1])
+    getArenaConfirmation(arenaEntries[2], contestants[2])
+    getArenaConfirmation(arenaEntries[3], contestants[3])
+    getArenaConfirmation(arenaEntries[4], contestants[4])
+    getArenaConfirmation(arenaEntries[5], contestants[5])
 
     const info = await Info.findOne({ where: {
         element: 'arena'
@@ -85,7 +87,7 @@ export const startArena = async() => {
 
     for (let i = 1; i < 12; i ++) {
         setTimeout(async () => {
-            const count = await Arena.count({ where: {
+            const count = await ArenaEntry.count({ where: {
                 active: true
             } })
     
@@ -94,16 +96,16 @@ export const startArena = async() => {
                 status: 'active'
             } })
 
-            if (count === 4 && !active) {
+            if (count === 6 && !active) {
                 info.round = 1
                 info.status = 'active'
                 await info.save()
-                assignArenaRoles(entries)
+                assignArenaRoles(arenaEntries)
                 setTimeout(() => {
                     channel.send({ content: `<@&${arenaRole}>, square-up gamers! The Arena starts in 10 seconds. ${cavebob}\n\nP.S. If you aren't playing within 5 minutes of this message, **it's a game loss**!`})
                 }, 1000)
                 return setTimeout(() => {
-                    return startRound(info)
+                    return startRound()
                 }, 11000)
             }
         }, i * 5000)
@@ -119,21 +121,21 @@ export const startArena = async() => {
             status: 'active'
         } })
 
-        if (count !== 4 && !active) {
-            const missingArenaEntries = await Arena.findAll({ 
+        if (count !== 6 && !active) {
+            const missingArenaEntries = await ArenaEntry.findAll({ 
                 where: { 
                     active: false
                 },
                 include: Player
             })
 
-            const names = missingArenaEntries.map((entry) => entry.player.name)
+            const names = missingArenaEntries.map((arenaEntry) => arenaEntry.player.name)
 
-            await resetArena(info, entries)
+            await resetArena(arenaEntries)
 
             for (let i = 0; i < missingArenaEntries.length; i++) {
-                const entry = missingArenaEntries[i]
-                await entry.destroy()
+                const arenaEntry = missingArenaEntries[i]
+                await arenaEntry.destroy()
             }
             
             return channel.send({ content: `Unfortunately, The Arena cannot begin without 4 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`})
@@ -141,87 +143,134 @@ export const startArena = async() => {
             info.round = 1
             info.status = 'active'
             await info.save()
-            assignArenaRoles(entries)
+            assignArenaRoles(arenaEntries)
             setTimeout(() => {
                 channel.send({ content: `<@&${arenaRole}>, square-up gamers! The Arena starts in 10 seconds. ${cavebob}\n\nP.S. If you aren't playing within 5 minutes of this message, **it's a game loss**!`})
             }, 1000)
             return setTimeout(() => {
-                return startRound(info)
+                return startRound()
             }, 11000)
         }
     }, 61000)
 }
 
 //GET ARENA CONFIRMATION
-export const getArenaConfirmation = async (arena_entry, contestant) => {
+export const getArenaConfirmation = async (arenaEntry, contestant) => {
     const arenaChannel = client.channels.cache.get(arenaChannelId)
-    const guild = client.guilds.cache.get("842476300022054913")
-    const playerId = arena_entry.playerId
+    const guild = client.guilds.cache.get("1372580468297568458")
+    const playerId = arenaEntry.playerId
     const member = guild.members.cache.get(playerId)
-    if (!member || playerId !== member.user.id) return
-    const filter = m => m.author.id === playerId
-	const message = await member.send({ content: `Please confirm your participation in the Arena by selecting a tribe:\n${tribes.join('\n').toString()}`}).catch((err) => console.log(err))
-    console.log('!!message', !!message)
-    if (!message || !message.channel) return false
-    console.log('awaitMessages')
-	await message.channel.awaitMessages({ 
-        filter,
-        max: 1,
-		time: 60000
-	}).then(async (collected) => {
-        const response = collected.first().content.toLowerCase()
-        const tribe = getTribe(response)
+    if (!member) return interaction.channel.send({ content: `${arenaEntry.playerName} cannot be sent DMs.` })
+    
+    const timestamp = new Date().getTime()
 
-        const count = await Info.count({ where: {
-            element: 'arena',
-            status: 'confirming'
-        } })
+    const row1 = new ActionRowBuilder()
+        .addComponents(new ButtonBuilder()
+            .setCustomId(`Arena-${timestamp}-Beast`)
+            .setLabel('Beast')
+            .setStyle(ButtonStyle.Primary)
+        )
 
-        if (!count) return member.send({ content: `Sorry, time expired.`})
+        .addComponents(new ButtonBuilder()
+            .setCustomId(`Arena-${timestamp}-Dragon`)
+            .setLabel('Dragon')
+            .setStyle(ButtonStyle.Primary)
+        )
 
-        if (tribe) {
-            arena_entry.active = true
-            arena_entry.tribe = tribe
-            arena_entry.contestant = contestant
-            await arena_entry.save()
-            member.send({ content: `Thanks! This is your Arena deck (staples in the side). You may cut it down to 40 cards:\n${decks[tribe].url}\n${decks[tribe].screenshot}`})
-            return arenaChannel.send({ content: `${member.user.username} confirmed their participation in the Arena!`})
+        .addComponents(new ButtonBuilder()
+            .setCustomId(`Arena-${timestamp}-Machine`)
+            .setLabel('Machina')
+            .setStyle(ButtonStyle.Primary)
+        )
+
+        .addComponents(new ButtonBuilder()
+            .setCustomId(`Arena-${timestamp}-Spellcaster`)
+            .setLabel('Spellcaster')
+            .setStyle(ButtonStyle.Primary)
+        )
+
+    const row2 = new ActionRowBuilder()
+            .addComponents(new ButtonBuilder()
+                .setCustomId(`Arena-${timestamp}-Warrior`)
+                .setLabel('Warrior')
+                .setStyle(ButtonStyle.Primary)
+            )
+
+            .addComponents(new ButtonBuilder()
+                .setCustomId(`Arena-${timestamp}-Zombie`)
+                .setLabel('Zombie')
+                .setStyle(ButtonStyle.Primary)
+            )
+            
+            .addComponents(new ButtonBuilder()
+            .setCustomId(`Arena-${timestamp}-No`)
+            .setLabel('No')
+            .setStyle(ButtonStyle.Primary)
+        )
+            
+    await member.user.send({ content: `Please select a tribe for The Arena. ${arena} If you no longer want to play, press "No".`, components: [row1, row2] })
+
+    const filter = i => i.customId.includes(`Arena-${timestamp}`) && i.user.id === member.user.id;
+
+    try {
+        const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
+        if (!confirmation.customId.includes('No')) {
+            const count = await Info.count({ where: {
+                element: 'arena',
+                status: 'confirming'
+            } })
+
+            if (!count) return member.send({ content: `Sorry, time expired.`})
+            const tribe = confirmation.customId.slice(20)
+
+            await arenaEntry.update({
+                isConfirmed: true,
+                tribe: tribe,
+                contestant: contestant
+            })
+                
+            await confirmation.update({ components: [] })
+            member.send({ content: `Thanks! This is your Arena deck. You may cut it down to 40 cards:\n${decks[tribe].url}\n${decks[tribe].screenshot}`})
+            return await arenaChannel.send({ content: `${arenaEntry.playerName} confirmed their participation in The Arena! ${arena}` })
         } else {
-            message.channel.send({ content: `Please specify a valid tribe.`})
-            return getArenaConfirmation(arena_entry, contestant)
+            await confirmation.update({ components: [] })
+            return
         }
-	}).catch((err) => {
-		console.log(err)
-        return member.send({ content: `Sorry, time's up.`})
-	})
+    } catch (err) {
+        console.log(err)
+        await confirmation.update({ components: [] })
+        return
+    }
 }
 
 //ASSIGN ARENA ROLES
-export const assignArenaRoles = (entries) => {
-    const guild = client.guilds.cache.get("842476300022054913")
-    entries.forEach((entry) => {
-        const member = guild.members.cache.get(entry.playerId)
+export const assignArenaRoles = (arenaEntries) => {
+    const guild = client.guilds.cache.get("1372580468297568458")
+    arenaEntries.forEach((arenaEntry) => {
+        const member = guild.members.cache.get(arenaEntry.playerId)
         member.roles.add(arenaRole)
     })
 }
 
 //START ROUND
-export const startRound = async (info, entries) => {
+export const startRound = async (arenaEntries) => {
+    const info = await Info.findOne({ where: { name: 'arena' }})
     const channel = client.channels.cache.get(arenaChannelId)
-    const guild = client.guilds.cache.get("842476300022054913")
+    const guild = client.guilds.cache.get("1372580468297568458")
 
     if (info.round === 5) {
-        const voucher = vouchers[entries[1].tribe]
-        const quantity = 6
-        const wallet = await Wallet.findOne({ where: { playerId: entries[1].playerId }})
-        wallet[voucher] += quantity
-        await wallet.save()
-        channel.send({ content: `<@${entries[1].playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
+        // VOUCHERS
+        // const voucher = vouchers[arenaEntries[1].tribe]
+        // const quantity = 6
+        // const wallet = await Wallet.findOne({ where: { playerId: arenaEntries[1].playerId }})
+        // wallet[voucher] += quantity
+        // await wallet.save()
+        // channel.send({ content: `<@${arenaEntries[1].playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
         
-        const tribe = entries[0].tribe
-        const playerId = entries[0].playerId
-        const profile = await Profile.findOne({ where: { playerId } })
-        profile[`${tribe}_wins`]++
+        const tribe = arenaEntries[0].tribe
+        const playerId = arenaEntries[0].playerId
+        const profile = await ArenaProfile.findOne({ where: { playerId } })
+        profile[`${tribe}Wins`] += 1
         await profile.save()
         await awardCard(channel, playerId, prizes[tribe])
 
@@ -229,29 +278,30 @@ export const startRound = async (info, entries) => {
             ` with the ${capitalize(tribe)} ${eval(tribe)} deck.` +
             ` ${victories[tribe]}` +
             ` You truly deserve the ${apcs[tribe]}!`
-    })
+        })
 
-        completeTask(channel, playerId, 'm10', 12000)
-        if (await check6TribesComplete(playerId, 1)) completeTask(channel, playerId, 'h8', 4000)
-        if (await check6TribesComplete(playerId, 3)) completeTask(channel, playerId, 'l6', 5000)
-        return endArena(info, entries)
+        // completeTask(channel, playerId, 'm10', 12000)
+        // if (await check6TribesComplete(playerId, 1)) completeTask(channel, playerId, 'h8', 4000)
+        // if (await check6TribesComplete(playerId, 3)) completeTask(channel, playerId, 'l6', 5000)
+        return endArena(arenaEntries)
     } else if (info.round === 4) {
-        if (entries[0].score > entries[1].score) {
+        if (arenaEntries[0].score > arenaEntries[1].score) {
         //1st place outright
-            for (let i = 1; i < entries.length; i++) {
-                const entry = entries[i]
-                const voucher = vouchers[entry.tribe]
-                const quantity = entry.score + 2
-                const wallet = await Wallet.findOne({ where: { playerId: entry.playerId }})
-                wallet[voucher] += quantity
-                await wallet.save()
-                channel.send({ content: `<@${entry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
-            }
+            // VOUCHERS
+            // for (let i = 1; i < arenaEntries.length; i++) {
+            //     const arenaEntry = arenaEntries[i]
+            //     const voucher = vouchers[arenaEntry.tribe]
+            //     const quantity = arenaEntry.score + 2
+            //     const wallet = await Wallet.findOne({ where: { playerId: arenaEntry.playerId }})
+            //     wallet[voucher] += quantity
+            //     await wallet.save()
+            //     channel.send({ content: `<@${arenaEntry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
+            // }
 
-            const tribe = entries[0].tribe
-            const playerId = entries[0].playerId
-            const profile = await Profile.findOne({ where: { playerId } })
-            profile[`${tribe}_wins`]++
+            const tribe = arenaEntries[0].tribe
+            const playerId = arenaEntries[0].playerId
+            const profile = await ArenaProfile.findOne({ where: { playerId } })
+            profile[`${tribe}Wins`]++
             await profile.save()
             await awardCard(channel, playerId, prizes[tribe])
 
@@ -261,75 +311,81 @@ export const startRound = async (info, entries) => {
                 ` You truly deserve the ${apcs[tribe]}!`
         })
 
-            completeTask(channel, playerId, 'm10', 12000)
-            if (await check6TribesComplete(playerId, 1)) completeTask(channel, playerId, 'h8', 4000)
-            if (await check6TribesComplete(playerId, 3)) completeTask(channel, playerId, 'l6', 5000)
-            return endArena(info, entries)
-        } else if ((entries[0].score === entries[1].score) && entries[1].score > entries[2].score) {
+            // completeTask(channel, playerId, 'm10', 12000)
+            // if (await check6TribesComplete(playerId, 1)) completeTask(channel, playerId, 'h8', 4000)
+            // if (await check6TribesComplete(playerId, 3)) completeTask(channel, playerId, 'l6', 5000)
+            return endArena(arenaEntries)
+        } else if ((arenaEntries[0].score === arenaEntries[1].score) && arenaEntries[1].score > arenaEntries[2].score) {
         //2 way tie
-            for (let i = 2; i < entries.length; i++) {
-                const entry = entries[i]
-                const voucher = vouchers[entry.tribe]
-                const quantity = entry.score + 2
-                const wallet = await Wallet.findOne({ where: { playerId: entry.playerId }})
-                wallet[voucher] += quantity
-                await wallet.save()
-                channel.send({ content: `<@${entry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
-                const member = guild.members.cache.get(entry.playerId)
+            for (let i = 2; i < arenaEntries.length; i++) {
+                const arenaEntry = arenaEntries[i]
+                // VOUCHERS
+                // const voucher = vouchers[arenaEntry.tribe]
+                // const quantity = arenaEntry.score + 2
+                // const wallet = await Wallet.findOne({ where: { playerId: arenaEntry.playerId }})
+                // wallet[voucher] += quantity
+                // await wallet.save()
+                // channel.send({ content: `<@${arenaEntry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
+                const member = guild.members.cache.get(arenaEntry.playerId)
                 member.roles.remove(arenaRole)
-                entry.score = 0
-                await entry.save()
+                arenaEntry.score = 0
+                await arenaEntry.save()
             }
 
-            entries[0].score = 1
-            await entries[0].save()
+            arenaEntries[0].score = 1
+            await arenaEntries[0].save()
 
-            entries[1].score = 1
-            await entries[1].save()
+            arenaEntries[1].score = 1
+            await arenaEntries[1].save()
 
             const title = `<!> <!> <!> ARENA FINALS <!> <!> <!>` 
-            const match = `${eval(entries[0].tribe)} <@${entries[0].playerId}> ${eval(entries[0].tribe)}` +
-            ` vs ${eval(entries[1].tribe)} <@${entries[1].playerId}> ${eval(entries[1].tribe)}`
+            const match = `${eval(arenaEntries[0].tribe)} <@${arenaEntries[0].playerId}> ${eval(arenaEntries[0].tribe)}` +
+            ` vs ${eval(arenaEntries[1].tribe)} <@${arenaEntries[1].playerId}> ${eval(arenaEntries[1].tribe)}`
 
             return channel.send({ content: `${title}\n${match}`})
         } else {
         //3 way tie
-            for (let i = 0; i < entries.length; i++) {
-                const entry = entries[i]
-                const voucher = vouchers[entry.tribe]
-                const quantity = i < 3 ? entry.score + 5 : entry.score + 2
-                const wallet = await Wallet.findOne({ where: { playerId: entry.playerId }})
-                wallet[voucher] += quantity
-                await wallet.save()
-                channel.send({ content: `<@${entry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
-            }
+            // VOUCHERS
+            // for (let i = 0; i < arenaEntries.length; i++) {
+            //     const arenaEntry = arenaEntries[i]
+            //     const voucher = vouchers[arenaEntry.tribe]
+            //     const quantity = i < 3 ? arenaEntry.score + 5 : arenaEntry.score + 2
+            //     const wallet = await Wallet.findOne({ where: { playerId: arenaEntry.playerId }})
+            //     wallet[voucher] += quantity
+            //     await wallet.save()
+            //     channel.send({ content: `<@${arenaEntry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
+            // }
 
             channel.send({ content: `The shadows grew long over the battlefield, and the gladiators had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena.`})
-            return endArena(info, entries)
+            return endArena(arenaEntries)
         }
     } else {
-        const P1 = await Arena.findOne({ where: { contestant: "P1" }, include: Player})
-        const P2 = await Arena.findOne({ where: { contestant: "P2" }, include: Player})
-        const P3 = await Arena.findOne({ where: { contestant: "P3" }, include: Player})
-        const P4 = await Arena.findOne({ where: { contestant: "P4" }, include: Player})
+        const P1 = await ArenaEntry.findOne({ where: { contestant: "P1" }, include: Player})
+        const P2 = await ArenaEntry.findOne({ where: { contestant: "P2" }, include: Player})
+        const P3 = await ArenaEntry.findOne({ where: { contestant: "P3" }, include: Player})
+        const P4 = await ArenaEntry.findOne({ where: { contestant: "P4" }, include: Player})
+        const P5 = await ArenaEntry.findOne({ where: { contestant: "P5" }, include: Player})
+        const P6 = await ArenaEntry.findOne({ where: { contestant: "P6" }, include: Player})
     
-        if (!P1 || !P2 || !P3 || !P4) return channel.send({ content: `Critical error. Missing contestant in the database.`})
+        if (!P1 || !P2 || !P3 || !P4 || !P5 || !P6) return channel.send({ content: `Critical error. Missing contestant in the database.`})
     
-        const pairings = info.round === 1 ? [[P1, P2], [P3, P4]] :
-            info.round === 2 ? [[P1, P3], [P2, P4]] :
-            info.round === 3 ? [[P1, P4], [P2, P3]] : 
+        const pairings = info.round === 1 ? [[P1, P2], [P3, P4], [P5, P6]] :
+            info.round === 2 ? [[P1, P6], [P2, P3], [P4, P5]] :
+            info.round === 3 ? [[P1, P5], [P2, P4], [P3, P6]] :
+            info.round === 4 ? [[P1, P4], [P2, P6], [P3, P5]] :
+            info.round === 5 ? [[P1, P3], [P2, P5], [P4, P6]] : 
             null
     
-        const title = `${shrine}    ---------    Arena Round ${info.round}    ---------    ${shrine}\n${beast} ${dinosaur} ${dragon} ${fiend} ${fish} ${plant} ${reptile} ${rock} ${spellcaster} ${thunder} ${warrior} ${zombie}` 
+        const title = `${arena}    ---------    Arena Round ${info.round}    ---------    ${arena}\n${beast} ${dragon} ${machine} ${spellcaster} ${warrior} ${zombie}` 
         const matches = pairings.map((pairing, index) => {
             if (pairing[0].active === false && pairing[1].active === false) {
                 setTimeout(() => doubleForfeit(pairing[0].playerId, pairing[1].playerId), index * 1000 + 1000)
                 return `Match ${index + 1}: ~~<@${pairing[0].player.name}~~ vs ~~<@${pairing[1].player.name}>~~ (both forfeit)`
             } else if (pairing[0].active === false && pairing[1].active === true) {
-                setTimeout(() => forfeit(winnerId = pairing[1].playerId, loserId = pairing[0].playerId), index * 1000 + 1000)
+                setTimeout(() => forfeit(pairing[1].playerId, pairing[0].playerId), index * 1000 + 1000)
                 return `Match ${index + 1}: ~~<@${pairing[0].player.name}~~ vs <@${pairing[1].player.name}> (${pairing[0].player.name} forfeits)`
             } else if (pairing[0].active === true && pairing[1].active === false) {
-                setTimeout(() => forfeit(winnerId = pairing[0].playerId, loserId = pairing[1].playerId), index * 1000 + 1000)
+                setTimeout(() => forfeit(pairing[0].playerId, pairing[1].playerId), index * 1000 + 1000)
                 return `Match ${index + 1}: <@${pairing[0].playerId}> vs ~~<@${pairing[1].playerId}>~~ (${pairing[1].player.name} forfeits)`
             } else {
                 return `Match ${index + 1}: <@${pairing[0].playerId}> vs <@${pairing[1].playerId}>`
@@ -346,22 +402,24 @@ export const forfeit = async (winnerId, loserId) => {
         const info = await Info.findOne({ where: { element: 'arena' } })
 		if (!info) return channel.send({ content: `Error: could not find game: "arena".`})
 
-		const losingPlayer = await Player.findOne({ where: { id: loserId }, include: [Arena, Wallet] })
-		const winningPlayer = await Player.findOne({ where: { id: winnerId }, include: [Arena, Wallet] })
-		if (!winningPlayer || !losingPlayer) return channel.send({ content: `Could not process forfeiture.`})
+		const losingPlayer = await Player.findOne({ where: { id: loserId }, include: [Wallet] })
+        const losingEntry = await ArenaEntry.findOne({ where: { playerId: loserId }})
+		const winningPlayer = await Player.findOne({ where: { id: winnerId }, include: [Wallet] })
+        const winningEntry = await ArenaEntry.findOne({ where: { playerId: winnerId }})
+        if (!winningPlayer || !losingPlayer) return channel.send({ content: `Could not process forfeiture.`})
 		
-		winningPlayer.wallet.starchips += 5
+		winningPlayer.wallet.starchips += 4
 		await winningPlayer.wallet.save()
 
-		losingPlayer.arena.is_playing = false
-		await losingPlayer.arena.save()
+		losingEntry.isPlaying = false
+		await losingEntry.save()
 
-		winningPlayer.arena.score++
-		winningPlayer.arena.is_playing = false
-		await winningPlayer.arena.save()
+		winningEntry.score++
+		winningEntry.isPlaying = false
+		await winningEntry.save()
 
 		channel.send({ content: `${losingPlayer.name} (+0${starchips}), your Arena loss to ${winningPlayer.name} (+5${starchips}) has been recorded.`})
-		return checkArenaProgress(info) 
+		return checkArenaProgress() 
 }
 
 //DOUBLE FORFEIT
@@ -370,33 +428,34 @@ export const doubleForfeit = async (player1Id, player2Id) => {
     const info = await Info.findOne({ where: { element: 'arena' } })
     if (!info) return channel.send({ content: `Error: could not find game: "arena".`})
 
-    const contestant1 = await Player.findOne({ where: { id: player1Id }, include: Player })
-    const contestant2 = await Player.findOne({ where: { id: player2Id }, include: Player })
+    const contestant1 = await ArenaEntry.findOne({ where: { playerId: player1Id } })
+    const contestant2 = await ArenaEntry.findOne({ where: { playerId: player2Id } })
     if (!contestant1 || !contestant2) return channel.send({ content: `Could not process double forfeiture.`})
     
-    contestant1.is_playing = false
+    contestant1.isPlaying = false
     await contestant1.save()
 
-    contestant2.is_playing = false
+    contestant2.isPlaying = false
     await contestant2.save()
 
-    channel.send({ content: `The double Arena forfeiture between ${contestant1.player.name} (+0${starchips}) and ${contestant2.player.name} (+0${starchips}) has been recorded.`})
-    return checkArenaProgress(info) 
+    channel.send({ content: `The double Arena forfeiture between ${contestant1.playerName} (+0${starchips}) and ${contestant2.playerName} (+0${starchips}) has been recorded.`})
+    return checkArenaProgress() 
 }
 
 //POST STANDINGS
-export const postStandings = async (info, entries) => {
+export const postStandings = async (arenaEntries) => {
+    const info = await Info.findOne({ where: { name: 'arena' }})
     const channel = client.channels.cache.get(arenaChannelId)
 
-    for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i]
-        entry.is_playing = true
-        await entry.save()
+    for (let i = 0; i < arenaEntries.length; i++) {
+        const arenaEntry = arenaEntries[i]
+        arenaEntry.isPlaying = true
+        await arenaEntry.save()
     }
 
     const title = `${king}  ---  Arena Round ${info.round} Standings  ---  ${king} `
-    const standings = entries.map((entry, index) => {
-        return `${index + 1}. ${entry.player.name} ${eval(entry.tribe)} - ${entry.score} W`
+    const standings = arenaEntries.map((arenaEntry, index) => {
+        return `${index + 1}. ${arenaEntry.playerName} ${eval(arenaEntry.tribe)} - ${arenaEntry.score} W`
     })
 
     info.round++
@@ -405,136 +464,126 @@ export const postStandings = async (info, entries) => {
     channel.send({ content: `${title}\n${standings.join("\n")}`})
     
     return setTimeout(() => {
-        startRound(info, entries)
+        startRound(arenaEntries)
     }, 10000)
 }
 
 //END ARENA
-export const endArena = async (info, entries) => {
+export const endArena = async (arenaEntries) => {
+    const info = await Info.findOne({ where: { name: 'arena' }})
     info.status = 'pending'
     info.round = null
     await info.save()
-    const guild = client.guilds.cache.get("842476300022054913")
+    const guild = client.guilds.cache.get("1372580468297568458")
 
-    for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i]
-        const member = guild.members.cache.get(entry.playerId)
+    for (let i = 0; i < arenaEntries.length; i++) {
+        const arenaEntry = arenaEntries[i]
+        const member = guild.members.cache.get(arenaEntry.playerId)
         member.roles.remove(arenaRole)
-        await entry.destroy()
+        await arenaEntry.destroy()
     }
 }
 
 //RESET ARENA
-export const resetArena = async (info, entries) => {
+export const resetArena = async (arenaEntries) => {
+    const info = await Info.findOne({ where: { name: 'arena' }})
     info.status = 'pending'
     info.round = null
     await info.save()
-    const guild = client.guilds.cache.get("842476300022054913")
+    const guild = client.guilds.cache.get("1372580468297568458")
 
-    for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i]
-        const member = guild.members.cache.get(entry.playerId)
+    for (let i = 0; i < arenaEntries.length; i++) {
+        const arenaEntry = arenaEntries[i]
+        const member = guild.members.cache.get(arenaEntry.playerId)
         member.roles.remove(arenaRole)
-        entry.active = false
-        entry.tribe = null
-        entry.contestant = null
-        await entry.save()
+        arenaEntry.active = false
+        arenaEntry.tribe = null
+        arenaEntry.contestant = null
+        await arenaEntry.save()
     }
 }
 
 //CHECK ARENA PROGRESS
-export const checkArenaProgress = async (info) => {
-    const entries = await Arena.findAll({ include: Player, order: [["score", "DESC"]]})
-    if (!entries) return channel.send({ content: `Critical error. Missing entries in the database.`}) 
+export const checkArenaProgress = async () => {
+    const info = await Info.findOne({ where: { name: 'arena' }})
+    const arenaEntries = await ArenaEntry.findAll({ include: Player, order: [["score", "DESC"]]})
+    // if (!arenaEntries) return channel.send({ content: `Critical error. Missing arenaEntries in the database.`}) 
 
-    if (info.round === 4) {
-        info.round = 5
-        await info.save()
-        return setTimeout(() => startRound(info, entries), 3000)
-    }
+    // if (info.round === 4) {
+    //     info.round = 5
+    //     await info.save()
+    //     return setTimeout(() => startRound(arenaEntries), 3000)
+    // }
 
-    const scores = entries.map((entry) => entry.score)
-    const progress_report = entries.map((entry) => entry.is_playing)
+    const scores = arenaEntries.map((arenaEntry) => arenaEntry.score)
+    const progress_report = arenaEntries.map((arenaEntry) => arenaEntry.isPlaying)
     const sum = scores.reduce((a, b) => a + b)
 
-    if (sum % 2 === 0 && !progress_report.includes(true)) return setTimeout(() => postStandings(info, entries), 3000)
+    if (sum % 3 === 0 && !progress_report.includes(true)) return setTimeout(() => postStandings(arenaEntries), 3000)
 }
 
+//GET ARENA CONFIRMATIONS
+// export const getArenaConfirmations = async (interaction) => {
+//     interaction.channel.send({ content: `Arena players, please check your DMs!`})
+//     const arenaEntries = await ArenaEntry.findAll({ include: Player })
+//     for (let i = 0; i < arenaEntries.length; i++) getArenaConfirmation(interaction, arenaEntries[i])
+//     let round = 1
 
+//     for (let i = 1; i < 12; i ++) {
+//         setTimeout(async () => {
+//             const playing = await ArenaEntry.count({ where: { status: 'playing' }})
+//             if (playing) return
+//             const unconfirmed = await ArenaEntry.count({ where: { isConfirmed: false }})
 
+//             if (!unconfirmed) {
+//                 for (let j = 0; j < arenaEntries.length; j++) {
+//                     const arenaEntry = arenaEntries[j]
+//                     await arenaEntry.update({ status: 'playing' })
+//                 }
 
+//                 assignArenaRoles(arenaEntries)
+//                 setTimeout(() => {
+//                     interaction.channel.send({ content: `<@&${arenaRole}>, look alive gamers! The Arena starts in 10 seconds. ${skipper}\n\nP.S. If you aren't playing within 5 minutes of this message, it's a game loss!`})
+//                 }, 1000)
 
+//                 return setTimeout(() => { return askQuestion(interaction, round, questions) }, 11000)
+//             }
+//         }, i * 5000)
+//     }
 
+//     return setTimeout(async () => {
+//         const playing = await ArenaEntry.count({ where: { status: 'playing' }})
+//         if (playing) return
 
+//         const missingEntries = await ArenaEntry.findAll({ where: { isConfirmed: false }})
+//         const missingNames = missingEntries.map((arenaEntry) => arenaEntry.playerName)
 
+//         for (let i = 0; i < missingEntries.length; i++) {
+//             const arenaEntry = missingEntries[i]
+//             await arenaEntry?.destroy()
+//         }
 
+//         const remainingEntries = await ArenaEntry.findAll({ where: { isConfirmed: true }})
 
+//         if (remainingEntries.length < 6) {    
+//             for (let i = 0; i < remainingEntries.length; i++) {
+//                 const arenaEntry = remainingEntries[i]
+//                 await arenaEntry?.update({ status: 'pending', isConfirmed: false })
+//             }
 
+//             return interaction.channel.send({ content: `Unfortunately, The Arena ${arena} cannot begin without at least 6 players.\n\nThe following players have been removed from the queue:\n${missingNames.sort().join("\n")}`})
+//         } else {
+//             for (let i = 0; i < remainingEntries.length; i++) {
+//                 const arenaEntry = arenaEntries[i]
+//                 await arenaEntry?.update({ status: 'playing' })
+//             }
 
+//             assignArenaRoles(arenaEntries)
+//             setTimeout(() => {
+//                 interaction.channel.send({ content: `<@&${arenaRole}>, look alive gamers! The Arena starts in 10 seconds. ${cavebob}`})
+//             }, 1000)
 
-
-//INITIATE ARENA
-export const initiateArena = async (interaction) => {
-    interaction.channel.send({ content: `Arena players, please check your DMs!`})
-    const entries = await ArenaEntry.findAll({ include: Player })
-    for (let i = 0; i < entries.length; i++) getArenaConfirmation(interaction, entries[i])
-    let round = 1
-
-    for (let i = 1; i < 12; i ++) {
-        setTimeout(async () => {
-            const playing = await ArenaEntry.count({ where: { status: 'playing' }})
-            if (playing) return
-            const unconfirmed = await ArenaEntry.count({ where: { isConfirmed: false }})
-
-            if (!unconfirmed) {
-                for (let j = 0; j < entries.length; j++) {
-                    const entry = entries[j]
-                    await entry.update({ status: 'playing' })
-                }
-
-                assignArenaRoles(entries)
-                setTimeout(() => {
-                    interaction.channel.send({ content: `<@&${arenaRole}>, look alive gamers! The Arena starts in 10 seconds. ${skipper}\n\nP.S. If you aren't playing within 5 minutes of this message, it's a game loss!`})
-                }, 1000)
-
-                return setTimeout(() => { return askQuestion(interaction, round, questions) }, 11000)
-            }
-        }, i * 5000)
-    }
-
-    return setTimeout(async () => {
-        const playing = await TriviaEntry.count({ where: { status: 'playing' }})
-        if (playing) return
-
-        const missingEntries = await TriviaEntry.findAll({ where: { isConfirmed: false }})
-        const missingNames = missingEntries.map((entry) => entry.playerName)
-
-        for (let i = 0; i < missingEntries.length; i++) {
-            const entry = missingEntries[i]
-            await entry?.destroy()
-        }
-
-        const remainingEntries = await TriviaEntry.findAll({ where: { isConfirmed: true }})
-
-        if (remainingEntries.length < 4) {    
-            for (let i = 0; i < remainingEntries.length; i++) {
-                const entry = remainingEntries[i]
-                await entry?.update({ status: 'pending', isConfirmed: false })
-            }
-
-            return interaction.channel.send({ content: `Unfortunately, Trivia cannot begin without at least 4 players. 📚 🐛\n\nThe following players have been removed from the queue:\n${missingNames.sort().join("\n")}`})
-        } else {
-            for (let i = 0; i < remainingEntries.length; i++) {
-                const entry = entries[i]
-                await entry?.update({ status: 'playing' })
-            }
-
-            assignTriviaRoles(entries)
-            setTimeout(() => {
-                interaction.channel.send({ content: `<@&${triviaRole}>, look alive bookworms! Trivia starts in 10 seconds. ${emojis.skipper}`})
-            }, 1000)
-
-            return setTimeout(() => { return askQuestion(interaction, round, questions) }, 11000)
-        }
-    }, 61000)
+//             return setTimeout(() => { return sendArenaPairings(interaction, round) }, 11000)
+//         }
+//     }, 61000)
 }

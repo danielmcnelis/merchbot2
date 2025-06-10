@@ -1,52 +1,28 @@
 {
     "decks": {
         "beast": {
-            "url":"https://www.duelingbook.com/deck?id=8813287",
-            "screenshot":"https://i.imgur.com/GmbfzH2.png"
-        },
-        "dinosaur": {
-            "url":"https://www.duelingbook.com/deck?id=8813296",
-            "screenshot":"https://i.imgur.com/vyhUi7H.png"
+            "url":"https://www.duelingbook.com/deck?id=17523618",
+            "screenshot":"https://i.imgur.com/KZZ0MFn.jpeg"
         },
         "dragon": {
-            "url":"https://www.duelingbook.com/deck?id=8810411",
-            "screenshot":"https://i.imgur.com/ye5OWHy.png"
+            "url":"https://www.duelingbook.com/deck?id=17525329",
+            "screenshot":"https://i.imgur.com/PLgePJY.jpeg"
         },
-        "fiend": {
-            "url":"https://www.duelingbook.com/deck?id=9350876",
-            "screenshot":"https://i.imgur.com/UcOvRhq.png"
-        },
-        "fish": {
-            "url":"https://www.duelingbook.com/deck?id=8813309",
-            "screenshot":"https://i.imgur.com/j1nUdhH.png"
-        },
-        "plant": {
-            "url":"https://www.duelingbook.com/deck?id=8813315",
-            "screenshot":"https://i.imgur.com/aFBtQCJ.png"
-        },
-        "reptile": {
-            "url":"https://www.duelingbook.com/deck?id=8813339",
-            "screenshot":"https://i.imgur.com/7zOHRIf.png"
-        },
-        "rock": {
-            "url":"https://www.duelingbook.com/deck?id=8813367",
-            "screenshot":"https://i.imgur.com/r9K4wWK.png"
+        "machine": {
+            "url":"https://www.duelingbook.com/deck?id=17523539",
+            "screenshot":"https://i.imgur.com/CjjRBaL.jpeg"
         },
         "spellcaster": {
-            "url":"https://www.duelingbook.com/deck?id=8810412",
-            "screenshot":"https://i.imgur.com/k4p9pnW.png"
-        },
-        "thunder": {
-            "url":"https://www.duelingbook.com/deck?id=9350811",
-            "screenshot":"https://i.imgur.com/amhSPd7.png"
+            "url":"https://www.duelingbook.com/deck?id=17523396",
+            "screenshot":"https://i.imgur.com/B4ZZNp0.jpeg"
         },
         "warrior": {
-            "url":"https://www.duelingbook.com/deck?id=8810410",
-            "screenshot":"https://i.imgur.com/QMGnzBm.png"
+            "url":"https://www.duelingbook.com/deck?id=17525225",
+            "screenshot":"https://i.imgur.com/jxSaaGl.jpeg"
         },
         "zombie": {
-            "url":"https://www.duelingbook.com/deck?id=9350745",
-            "screenshot":"https://i.imgur.com/9Ee32sf.png"
+            "url":"https://www.duelingbook.com/deck?id=17525286",
+            "screenshot":"https://i.imgur.com/DgHSyeb.jpeg"
         }
     },
     "vouchers": {
@@ -65,24 +41,19 @@
     },
     "prizes": {
         "beast":"APC-001",
-        "dinosaur":"APC-005",
-        "dragon":"APC-009",
-        "fiend":"APC-011",
-        "fish":"APC-004",
-        "plant":"APC-003",
-        "reptile":"APC-006",
-        "rock":"APC-002",
-        "spellcaster":"APC-008",
-        "thunder":"APC-012",
-        "warrior":"APC-007",
-        "zombie":"APC-010"
+        "dinosaur":"APC-002",
+        "machine":"APC-003",
+        "spellcaster":"APC-004",
+        "warrior":"APC-005",
+        "zombie":"APC-006"
     },
     "victories": {
-        "beast":"Today, you attacked your foes with the ferocity of a wolverine!",
+        "beast":"Today, you attacked your foes with the ferocity of a tiger!",
         "dinosaur":"Today, you flattened your foes with the weight of a sauropod!",
         "dragon":"Today, you scorched your foes with the flames of legends!",
         "fiend":"Today, you tormented your foes with the cruelty of a demon!",
         "fish":"Today, you rushed your foes with the speed of a marlin!",
+        "machine":"Today, you hammered your foes with the strength of an alloy!",
         "plant":"Today, you astonished your foes with the beauty of a princess!",
         "reptile":"Today, you paralyzed your foes with the venom of a cobra!",
         "rock":"Today, you rolled over your foes with the ease of a boulder!",
@@ -92,18 +63,12 @@
         "zombie":"Today, you haunted your foes with the menace of a specter!"
     },
     "apcs": {
-        "beast":"<:ult:845483716888887297>APC-001 - Desmanian Devil",
-        "dinosaur":"<:ult:845483716888887297>APC-005 - Spacetime Transcendence",
-        "dragon":"<:ult:845483716888887297>APC-009 - Guardragon Cataclysm",
-        "fiend":"<:ult:845483716888887297>APC-011 - Graff, Malebranche of the Burning Abyss",
-        "fish":"<:ult:845483716888887297>APC-004 - Moray of Greed",
-        "plant":"<:ult:845483716888887297>APC-003 - Rose Lover",
-        "reptile":"<:ult:845483716888887297>APC-006 - Viper's Rebirth",
-        "rock":"<:ult:845483716888887297>APC-002 - Koa'ki Meiru Guardian",
-        "spellcaster":"<:ult:845483716888887297>APC-008 - Spellbook of Knowledge",
-        "thunder":"<:ult:845483716888887297>APC-012 - Thunder Dragondark",
-        "warrior":"<:ult:845483716888887297>APC-007 - Sublimation Knight",
-        "zombie":"<:ult:845483716888887297>APC-010 - Gozuki"
+        "beast":"<:ult:845483716888887297>APC-001 - Kittytail, Mystical Beast of the Forest",
+        "dragon":"<:ult:845483716888887297>APC-002 - Dragon Shrine",
+        "machine":"<:ult:845483716888887297>APC-003 - Gizmek Taniguku, the Immobile Intellect",
+        "spellcaster":"<:ult:845483716888887297>APC-004 - Spellbook of Secrets",
+        "warrior":"<:ult:845483716888887297>APC-005 - Reinforcement of the Army",
+        "zombie":"<:ult:845483716888887297>APC-006 -  Samurai Skull"
     },
     "verbs": [
         "absolutely deserved",

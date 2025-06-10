@@ -166,17 +166,17 @@ export const getShopCountdown = () => {
 	let hoursLeftInPeriod
 	const minsLeftInPeriod = 60 - mins
 
-	if ((day === 6 && hours >= 14) || day === 0 || day === 1 || (day === 2 && hours < 16)) {
-        hoursLeftInPeriod = day === 6 ? 23 - hours + 24 * 2 + 16 :
-			day === 0 ? 23 - hours + 24 + 16 :
-			day === 1 ? 23 - hours + 16 :
-			day === 2 ? 15 - hours :
+	if ((day === 6 && hours >= 14) || day === 0 || day === 1 || (day === 2 && hours < 19)) {
+        hoursLeftInPeriod = day === 6 ? 23 - hours + 24 * 2 + 19 :
+			day === 0 ? 23 - hours + 24 + 19 :
+			day === 1 ? 23 - hours + 19 :
+			day === 2 ? 18 - hours :
 			null
-	} else if ((day === 2 && hours >= 16) || (day === 3 && hours < 8)) {
-        hoursLeftInPeriod = day === 2 ? 23 - hours + 8 :
-            day === 3 ? 7 - hours :
+	} else if ((day === 2 && hours >= 19) || (day === 3 && hours < 11)) {
+        hoursLeftInPeriod = day === 2 ? 23 - hours + 11 :
+            day === 3 ? 10 - hours :
             null
-    } else if ((day === 3 && hours >= 8) || day === 4 || (day === 5 && hours < 22)) {
+    } else if ((day === 3 && hours >= 11) || day === 4 || (day === 5 && hours < 22)) {
         hoursLeftInPeriod = day === 3 ? 23 - hours + 24 + 22 :
 			day === 4 ? 23 - hours + 22 :
 			day === 5 ? 21 - hours :
@@ -206,20 +206,19 @@ export const getMidnightCountdown = () => {
 
 //CHECK SHOP SHOULD BE
 export const checkShopShouldBe = () => {
-    return 'open'
 	const date = new Date()
 	const day = date.getDay()
 	const hours = date.getHours()
     
     let shopShouldBe
     // Open from 2pm Saturday to 4pm Tuesday
-    if ((day === 6 && hours >= 14) || day === 0 || day === 1 || (day === 2 && hours < 16)) {
+    if ((day === 6 && hours >= 14) || day === 0 || day === 1 || (day === 2 && hours < 19)) {
         shopShouldBe = 'open'
     // Closed from 4pm Tuesday to 8am Wednesday
-    } else if ((day === 2 && hours >= 16) || (day === 3 && hours < 8)) {
+    } else if ((day === 2 && hours >= 19) || (day === 3 && hours < 11)) {
         shopShouldBe = 'closed'
     // Open from 8am Wednesday to 10pm Friday
-    } else if ((day === 3 && hours >= 8) || day === 4 || (day === 5 && hours < 22)) {
+    } else if ((day === 3 && hours >= 11) || day === 4 || (day === 5 && hours < 22)) {
         shopShouldBe = 'open'
     // Closed from 10pm Friday to 2pm Saturday
     } else if ((day === 5 && hours >= 22) || (day === 6 && hours < 14)) {
@@ -235,7 +234,7 @@ export const checkShopShouldBe = () => {
 export const processBids = async () => {
     const announcementsChannel = client.channels.cache.get(announcementsChannelId)
     // const botSpamChannel = client.channels.cache.get(botSpamChannelId)
-    const allBids = await Bid.findAll({ include: [Auction, ForgedPrint] , order: [["amount", "DESC"]] })
+    const allBids = await Bid.findAll({ where: { wasProcessed: false }, include: [Auction, ForgedPrint] , order: [["amount", "DESC"]] })
 
     let results = []
 
@@ -254,12 +253,9 @@ export const processBids = async () => {
 
         if (!merchbotInv) {
             results.push(`${wallet.playerName} placed a ${bid.amount}${stardust} bid on ${print.cardName}, but they were outbid.`)
-            // announcementsChannel.send({ content: ``})
             continue
-        }
-        if (wallet.stardust < bid.amount) {
+        } else if (wallet.stardust < bid.amount) {
             results.push(`${wallet.playerName} would have won ${print.cardName} for ${bid.amount}${stardust}, but they are too poor.`)
-            // announcementsChannel.send({ content: }) 
             continue
         }
         
@@ -282,21 +278,26 @@ export const processBids = async () => {
             })
         }
 
-        wallet.stardust -= bid.amount
+        wallet.stardust = wallet.stardust - bid.amount
         await wallet.save()
 
-        merchbotInv.quantity--
+        merchbotInv.quantity = merchbotInv.quantity - 1
         await merchbotInv.save()
 
         const newPrice = ( bid.amount + print.marketPrice ) / 2
         print.marketPrice = newPrice
         await print.save()
-        await bid.destroy()
+        await bid.update({ wasProcess: true })
+        // await bid.destroy()
 
         // if (print.rarity !== 'com' && print.rarity !== 'rar') completeTask(botSpamChannel, wallet.player.id, 'm5')
         // if (print.rarity === 'scr') completeTask(botSpamChannel, wallet.player.id, 'm4', 4000)
         // if (print.setCode === 'APC' && winnerInv && winnerInv.quantity >= 3) completeTask(botSpamChannel, wallet.player.id, 'h5', 4000)
         results.push(`<@${wallet.player.discordId}> won a copy of ${eval(print.rarity)}${print.cardCode} - ${print.cardName} for ${bid.amount}${stardust}. Congratulations!`) 
+    }
+
+    for (let i = 0; i < results.length; i+=12) {
+        await announcementsChannel.send({ content: results.slice(i, i+12).join("\n")}).catch((err) => console.log(err))
     }
 
     const allAuctions = await Auction.findAll()
@@ -308,10 +309,6 @@ export const processBids = async () => {
     for (let i = 0; i < allBids.length; i++) {
         const bid = allBids[i]
         await bid.destroy()
-    }
-
-    for (let i = 0; i < results.length; i+=12) {
-        await announcementsChannel.send({ content: results.slice(i, i+12).join("\n")}).catch((err) => console.log(err))
     }
 }
 

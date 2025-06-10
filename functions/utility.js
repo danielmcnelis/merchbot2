@@ -14,7 +14,7 @@ import {AttachmentBuilder} from 'discord.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
 const { mad, sad, rocks, bronze, silver, gold, platinum, diamond, master, legend, god } = emojis
 import roles from '../static/roles.json' with { type: 'json' }
-const { adminRole, ambassadorRole, arenaRole, draftRole, modRole, tourRole } = roles
+const { adminRole, judgeRole, arenaRole, draftRole, modRole, tourRole } = roles
 const merchbotId = '584215266586525696'
 import * as quotes from '../static/quotes.json' with { type: 'json' }
 
@@ -298,8 +298,8 @@ export const isAdmin = (member) => member && member.roles.cache.some(role => rol
 //IS MOD?
 export const isMod = (member) => member && member.roles.cache.some(role => role.id === modRole || role.id === adminRole || member.user.id === '194147938786738176')
 
-//IS AMBASSADOR?
-export const isAmbassador = (member) => member && member.roles.cache.some(role => role.id === ambassadorRole || role.id === modRole || role.id === adminRole || member.user.id === '194147938786738176')
+//IS Judge?
+export const isJudge = (member) => member && member.roles.cache.some(role => role.id === judgeRole || role.id === modRole || role.id === adminRole || member.user.id === '194147938786738176')
 
 //IS ARENA PLAYER?
 export const isArenaPlayer = (member) => member && member.roles.cache.some(role => role.id === arenaRole)

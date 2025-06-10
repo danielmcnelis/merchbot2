@@ -1,5 +1,8 @@
 import adjust from './adjust.js'
 import alchemy from './alchemy.js'
+import arena from './arena.js'
+import arena_loss from './arena_loss.js'
+import arena_manual from './arena_manual.js'
 import award from './award.js'
 import awardPartialBox from './award_partial_box.js'
 import banlist from './banlist.js'
@@ -36,6 +39,9 @@ export default {
     globalCommands: {
         adjust,
         alchemy,
+        arena,
+        arena_loss,
+        arena_manual,
         award,
         awardPartialBox,
         banlist,

@@ -30,6 +30,10 @@ export const Bid = db.define('bids', {
     playerId: {
         type: Sequelize.STRING,
         allowNull: false
+    },
+    wasProcessed: {
+        type: BOOLEAN,
+        defaultValue: false
     }
 })
 

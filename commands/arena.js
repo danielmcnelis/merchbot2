@@ -3,7 +3,7 @@ import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { isAdmin } from '../functions/utility.js'
 import { closeShop } from '../functions/shop.js'
 import { ArenaEntry, Player } from '../database/index.js'
-import { getArenaConfirmations, endArena, resetArena, checkArenaProgress, postStandings, doubleForfeit, forfeit, startRound, assignArenaRoles, getArenaConfirmation, startArena, getTribe, getArenaSample } from '../functions/arena.js'
+import { getArenaConfirmations, endArena, resetArena, checkArenaProgress, postStandings, doubleForfeit, forfeit, startRound, assignArenaRoles, getArenaConfirmation, initiateArena, getTribe, getArenaSample } from '../functions/arena.js'
 import emojis from '../static/emojis.json'
 const { arena } = emojis
 
@@ -34,7 +34,8 @@ export default {
 
                 const count = await ArenaEntry.count()
                 if (count === 6) {
-                    getArenaConfirmations(interaction)
+                    await interaction.reply({ content: `You joined the Arena queue. ${arena}`})
+                    return initiateArena(interaction)
                 } else if (count > 6) {
                     await arenaEntry.destroy() 
                     if (confirmationsInProgress) return interaction.reply({ content: `Sorry, there are already 6 people going through the confirmation process.`})

@@ -586,4 +586,4 @@ export const checkArenaProgress = async () => {
 //             return setTimeout(() => { return sendArenaPairings(interaction, round) }, 11000)
 //         }
 //     }, 61000)
-}
+// }

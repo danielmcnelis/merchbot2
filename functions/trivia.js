@@ -100,7 +100,7 @@ const getTriviaConfirmation = async (trivia_entry) => {
     const guild = client.guilds.cache.get("842476300022054913")
     const triviaChannel = client.channels.cache.get(triviaChannelId)
     const playerId = trivia_entry.playerId
-    const member = guild.members.cache.get(playerId)
+    const member = await guild.members.fetch(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
 	const message = await member.send({ content: `Do you still wish to play Trivia?`}).catch((err) => console.log(err))
@@ -136,7 +136,7 @@ const getTriviaConfirmation = async (trivia_entry) => {
 const getAnswer = async (entry, question, round) => {
     const guild = client.guilds.cache.get("842476300022054913")
     const playerId = entry.playerId
-    const member = guild.members.cache.get(playerId)
+    const member = await guild.members.fetch(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
 	const message = await member.send({ content: `${megaphone}  ------  Question #${round}  ------  ${dummy}\n${question}`}).catch((err) => console.log(err))
@@ -161,7 +161,7 @@ const getAnswer = async (entry, question, round) => {
 const assignTriviaRoles = (entries) => {    
     const guild = client.guilds.cache.get("842476300022054913")
     entries.forEach((entry) => {
-        const member = guild.members.cache.get(entry.playerId)
+        const member = await guild.members.fetch(entry.playerId)
         member.roles.add(triviaRole)
     })
 }
@@ -264,7 +264,7 @@ const endTrivia = async (info, entries) => {
     for (let i = 0; i < entries.length; i++) {
         const entry = entries[i]
         const score = entry.score
-        const member = guild.members.cache.get(entry.playerId)
+        const member = await guild.members.fetch(entry.playerId)
         member.roles.remove(triviaRole)
 
         if (score >= 3) {
@@ -300,7 +300,7 @@ const resetTrivia = async (info, entries) => {
 
     for (let i = 0; i < entries.length; i++) {
         const entry = entries[i]
-        const member = guild.members.cache.get(entry.playerId)
+        const member = await guild.members.fetch(entry.playerId)
         member.roles.remove(triviaRole)
         entry.active = false
         entry.score = 0

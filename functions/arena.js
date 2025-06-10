@@ -159,8 +159,8 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
     const arenaChannel = client.channels.cache.get(arenaChannelId)
     const guild = client.guilds.cache.get("1372580468297568458")
     const playerId = arenaEntry.playerId
-    const member = guild.members.cache.get(playerId)
-    if (!member) return interaction.channel.send({ content: `${arenaEntry.playerName} cannot be sent DMs.` })
+    const member = await guild.members.fetch(playerId)
+    if (!member) return arenaChannel.send({ content: `${arenaEntry.playerName} cannot be sent DMs.` })
     
     const timestamp = new Date().getTime()
 
@@ -247,14 +247,14 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
 export const assignArenaRoles = (arenaEntries) => {
     const guild = client.guilds.cache.get("1372580468297568458")
     arenaEntries.forEach((arenaEntry) => {
-        const member = guild.members.cache.get(arenaEntry.playerId)
+        const member = await guild.members.fetch(arenaEntry.playerId)
         member.roles.add(arenaRole)
     })
 }
 
 //START ROUND
 export const startRound = async (arenaEntries) => {
-    const info = await Info.findOne({ where: { name: 'arena' }})
+    const info = await Info.findOne({ where: { element: 'arena' }})
     const channel = client.channels.cache.get(arenaChannelId)
     const guild = client.guilds.cache.get("1372580468297568458")
 
@@ -326,7 +326,7 @@ export const startRound = async (arenaEntries) => {
                 // wallet[voucher] += quantity
                 // await wallet.save()
                 // channel.send({ content: `<@${arenaEntry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
-                const member = guild.members.cache.get(arenaEntry.playerId)
+                const member = await guild.members.fetch(arenaEntry.playerId)
                 member.roles.remove(arenaRole)
                 arenaEntry.score = 0
                 await arenaEntry.save()
@@ -444,7 +444,7 @@ export const doubleForfeit = async (player1Id, player2Id) => {
 
 //POST STANDINGS
 export const postStandings = async (arenaEntries) => {
-    const info = await Info.findOne({ where: { name: 'arena' }})
+    const info = await Info.findOne({ where: { element: 'arena' }})
     const channel = client.channels.cache.get(arenaChannelId)
 
     for (let i = 0; i < arenaEntries.length; i++) {
@@ -470,7 +470,7 @@ export const postStandings = async (arenaEntries) => {
 
 //END ARENA
 export const endArena = async (arenaEntries) => {
-    const info = await Info.findOne({ where: { name: 'arena' }})
+    const info = await Info.findOne({ where: { element: 'arena' }})
     info.status = 'pending'
     info.round = null
     await info.save()
@@ -478,7 +478,7 @@ export const endArena = async (arenaEntries) => {
 
     for (let i = 0; i < arenaEntries.length; i++) {
         const arenaEntry = arenaEntries[i]
-        const member = guild.members.cache.get(arenaEntry.playerId)
+        const member = await guild.members.fetch(arenaEntry.playerId)
         member.roles.remove(arenaRole)
         await arenaEntry.destroy()
     }
@@ -486,7 +486,7 @@ export const endArena = async (arenaEntries) => {
 
 //RESET ARENA
 export const resetArena = async (arenaEntries) => {
-    const info = await Info.findOne({ where: { name: 'arena' }})
+    const info = await Info.findOne({ where: { element: 'arena' }})
     info.status = 'pending'
     info.round = null
     await info.save()
@@ -494,7 +494,7 @@ export const resetArena = async (arenaEntries) => {
 
     for (let i = 0; i < arenaEntries.length; i++) {
         const arenaEntry = arenaEntries[i]
-        const member = guild.members.cache.get(arenaEntry.playerId)
+        const member = await guild.members.fetch(arenaEntry.playerId)
         member.roles.remove(arenaRole)
         arenaEntry.active = false
         arenaEntry.tribe = null
@@ -505,7 +505,7 @@ export const resetArena = async (arenaEntries) => {
 
 //CHECK ARENA PROGRESS
 export const checkArenaProgress = async () => {
-    const info = await Info.findOne({ where: { name: 'arena' }})
+    const info = await Info.findOne({ where: { element: 'arena' }})
     const arenaEntries = await ArenaEntry.findAll({ include: Player, order: [["score", "DESC"]]})
     // if (!arenaEntries) return channel.send({ content: `Critical error. Missing arenaEntries in the database.`}) 
 

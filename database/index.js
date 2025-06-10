@@ -1,5 +1,7 @@
 
 import { db } from './db.js'
+import { ArenaEntry } from './ArenaEntry.js'
+import { ArenaProfile } from './ArenaProfile.js'
 import { Auction } from './Auction.js'
 import { Bid } from './Bid.js'
 import { Binder } from './Binder.js'
@@ -32,6 +34,12 @@ ForgedPrint.belongsTo(Card)
 
 Card.hasMany(Status)
 Status.belongsTo(Card)
+
+ArenaProfile.belongsTo(Player)
+Player.hasOne(ArenaProfile)
+
+ArenaEntry.belongsTo(Player)
+Player.hasOne(ArenaEntry)
 
 Entry.belongsTo(Player)
 Player.hasOne(Entry)
@@ -86,6 +94,8 @@ Server.hasMany(Stats)
 
 export {
   db,
+  ArenaEntry,
+  ArenaProfile,
   Auction,
   Bid,
   Binder,

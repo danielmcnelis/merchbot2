@@ -1,6 +1,6 @@
 
 import { Sequelize } from 'sequelize'
-import { db } from './db'
+import {db} from './db.js'
 
 export const ArenaEntry = db.define('arenaEntries', {
     playerName: {

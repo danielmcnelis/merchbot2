@@ -102,7 +102,7 @@ export const getConfirmation = async (entry, contestant) => {
     const draftChannel = client.channels.cache.get(draftChannelId)
     const playerId = entry.playerId
     const guild = client.guilds.cache.get("842476300022054913")
-    const member = await guild.members.fetch(playerId)
+    const member = guild.members.fetch(playerId)
     if (!member || playerId !== member.user.id) return
     const filter = m => m.author.id === playerId
 	const message = await member.send({ content: `Do you still wish to participate in the Draft?`}).catch((err) => console.log(err))
@@ -141,7 +141,7 @@ export const getConfirmation = async (entry, contestant) => {
 export const assignDraftRoles = (entries) => {
     const guild = client.guilds.cache.get("842476300022054913")
     entries.forEach((entry) => {
-        const member = await guild.members.fetch(entry.playerId)
+        const member = guild.members.fetch(entry.playerId)
         member.roles.add(draftRole)
     })
 }
@@ -372,7 +372,7 @@ export const sendInventories = async (entries, round) => {
 
         const header = ['#created by ...', '#main']
 		const file = [...header, ...ydk].join('\n') + '\n'
-        const member = await guild.members.fetch(playerId)
+        const member = guild.members.fetch(playerId)
         if (!member || playerId !== member.user.id) continue
         const prompt = round ? `Slick drafting, ${name}! You get a ${20 + (round * 10)} second break before Round ${round}.` :
             `Draft complete! Take up to 5 minutes to build your deck, then find your opponent.`
@@ -451,7 +451,7 @@ export const sendUniversalStaples = async (entries) => {
             printId: 1078
         })
 
-        const member = await guild.members.fetch(playerId)
+        const member = guild.members.fetch(playerId)
         if (!member || playerId !== member.user.id) continue
         
         const draft_inv = [...await Inventory.findAll({ 
@@ -470,7 +470,7 @@ export const sendUniversalStaples = async (entries) => {
 export const getPick = async (fuzzyPrints, entry, pack, count) => {
     const playerId = entry.playerId
     const guild = client.guilds.cache.get("842476300022054913")
-    const member = await guild.members.fetch(playerId)
+    const member = guild.members.fetch(playerId)
     if (!member || playerId !== member.user.id) return
     const cards = pack.map((p, index) => `(${index + 1}) ${eval(p.print.rarity)}${p.cardCode} - ${p.cardName}` )
 
@@ -833,7 +833,7 @@ export const endDraft = async (info, entries) => {
 
     for (let i = 0; i < entries.length; i++) {
         const entry = entries[i]
-        const member = await guild.members.fetch(entry.playerId)
+        const member = guild.members.fetch(entry.playerId)
         member.roles.remove(draftRole)
         await entry.destroy()
     }
@@ -848,7 +848,7 @@ export const resetDraft = async (info, entries) => {
 
     for (let i = 0; i < entries.length; i++) {
         const entry = entries[i]
-        const member = await guild.members.fetch(entry.playerId)
+        const member = guild.members.fetch(entry.playerId)
         member.roles.remove(draftRole)
         entry.active = false
         entry.contestant = null

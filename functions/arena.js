@@ -88,7 +88,7 @@ export const initiateArena = async() => {
     for (let i = 1; i < 12; i ++) {
         setTimeout(async () => {
             const count = await ArenaEntry.count({ where: {
-                active: true
+                status: 'confirmed'
             } })
     
             const active = await Info.count({ where: {
@@ -112,8 +112,8 @@ export const initiateArena = async() => {
     }
 
     return setTimeout(async () => {
-        const count = await Arena.count({ where: {
-            active: true
+        const count = await ArenaEntry.count({ where: {
+            status: 'confirmed'
         } })
 
         const active = await Info.count({ where: {
@@ -123,8 +123,8 @@ export const initiateArena = async() => {
 
         if (count !== 6 && !active) {
             const missingArenaEntries = await ArenaEntry.findAll({ 
-                where: { 
-                    active: false
+                where: {
+                    status: {[Op.not]: 'confirmed' }
                 },
                 include: Player
             })
@@ -138,8 +138,8 @@ export const initiateArena = async() => {
                 await arenaEntry.destroy()
             }
             
-            return channel.send({ content: `Unfortunately, The Arena cannot begin without 4 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`})
-        } else if (count === 4 && !active) {
+            return channel.send({ content: `Unfortunately, The Arena cannot begin without 6 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`})
+        } else if (count === 6 && !active) {
             info.round = 1
             info.status = 'active'
             await info.save()

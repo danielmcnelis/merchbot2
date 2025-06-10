@@ -1,6 +1,6 @@
 
 import { Op } from 'sequelize'
-import { ArenaEntry, Info, Player, Profile, Wallet, ArenaMatch, ArenaProfile } from '../database/index.js'
+import { ArenaEntry, Info, Player, Wallet, ArenaProfile } from '../database/index.js'
 
 import roles from '../static/roles.json' with { type: 'json' }
 const { arenaRole } = roles

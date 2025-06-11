@@ -141,6 +141,15 @@ export const initiateArena = async(interaction) => {
                 await arenaEntry.destroy()
             }
 
+            for (let i = 0; i < arenaEntries.length; i++) {
+                const arenaEntry = arenaEntries[i]
+                await arenaEntry.update({
+                    tribe: null,
+                    contestant: null,
+                    isConfirmed: false
+                })
+            }
+
             await info.update({ status: 'pending' })
             
             return channel.send({ content: `Unfortunately, The Arena cannot begin without 6 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`})
@@ -216,9 +225,9 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
     const message = await member.user.send({ content: `Please select a tribe for The Arena. ${arena} If you no longer want to play, press "No".`, components: [row1, row2] })
 
     const filter = i => i.customId.includes(`Arena-${timestamp}`) && i.user.id === member.user.id;
-
+    let confirmation
     try {
-        const confirmation = await message.awaitMessageComponent({ filter, time: 120000 })
+        confirmation = await message.awaitMessageComponent({ filter, time: 120000 })
         if (!confirmation.customId.includes('No')) {
             const count = await Info.count({ where: {
                 element: 'arena',
@@ -239,11 +248,11 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
             return await arenaChannel.send({ content: `${arenaEntry.playerName} confirmed their participation in The Arena! ${arena}` })
         } else {
             await confirmation.update({ components: [] })
-            return
+            return await arenaChannel.send({ content: `Oh dear. ${arenaEntry.playerName} ducked :duck: out of The Arena. ${arena}` })
         }
     } catch (err) {
         console.log(err)
-        return
+        return await confirmation.update({ components: [] })
     }
 }
 

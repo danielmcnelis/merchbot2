@@ -4,7 +4,7 @@ import { Card, ForgedInventory, ForgedPrint, ForgedSet, Player } from '../databa
 import { Op } from 'sequelize'
 import { isMod } from '../functions/utility.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const {com, rar, sup, ult, scr, AOD} = emojis
+const {com, rar, sup, ult, scr, AOD, arena} = emojis
 
 export default {
 	data: new SlashCommandBuilder()

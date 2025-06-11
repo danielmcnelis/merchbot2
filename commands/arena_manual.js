@@ -1,6 +1,6 @@
 
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
-import { ArenaEntry, Player, Wallet } from '../database/index.js'
+import { ArenaEntry, Info, Player, Wallet } from '../database/index.js'
 import { checkArenaProgress } from '../functions/arena.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
 const { arena } = emojis
@@ -45,6 +45,8 @@ export default {
                 
             let correctPairing = false
 
+            const info = await Info.findOne({ where: { element: 'arena' }})
+
             const pairings = info.round === 1 ? [[P1, P2], [P3, P4], [P5, P6]] :
                 info.round === 2 ? [[P1, P6], [P2, P3], [P4, P5]] :
                 info.round === 3 ? [[P1, P5], [P2, P4], [P3, P6]] :
@@ -74,7 +76,7 @@ export default {
             await winnersWallet.update({ starchips: winnerNewChips })
             await losersWallet.update({ starchips: loserNewChips })
 
-            const content = `A manual Arena ${arena} loss by <@${losingPlayer.discordId}> (+2$<:starchips:1374362231109718117>) to <@${winningPlayer.discordId}> (+4<:starchips:1374362231109718117>) has been recorded.`
+            const content = `A manual Arena ${arena} loss by <@${losingPlayer.discordId}> (+2<:starchips:1374362231109718117>) to <@${winningPlayer.discordId}> (+4<:starchips:1374362231109718117>) has been recorded.`
             await interaction.editReply({ content })
             return checkArenaProgress()
         } catch (err) {

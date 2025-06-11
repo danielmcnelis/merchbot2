@@ -71,7 +71,7 @@ export default {
                 await interaction.reply({ content: `${card} is valued at ${print.marketPrice}${emojis.stardust}, do you wish to **unfreeze** the price? ☀️`, components: [row] })
             }
 
-            const filter = i => i.customId.startsWith(`Adjust-${timestamp}`) && i.user.id === interaction.user.id;
+            const filter = i => i.customId.startsWith(`Freeze-${timestamp}`) && i.user.id === interaction.user.id;
 
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 60000 });

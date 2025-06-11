@@ -12,7 +12,7 @@ export default {
 	async execute(interaction) {
         if (!isProgrammer(interaction.member)) return await interaction.editReply({ content: `You do not have permission to do that.`})
         
-        try {
+        // try {
         //     const merchbot = interaction.guild.members.cache.get('584215266586525696')
         //     console.log('merchbot', merchbot)
         //     if ((await Wallet.count({ where: { playerName: 'MerchBot' } }))) {

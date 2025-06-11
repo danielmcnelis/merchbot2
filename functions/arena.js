@@ -75,6 +75,11 @@ export const initiateArena = async(interaction) => {
     const arenaEntries = await ArenaEntry.findAll({ include: Player })
     const contestants = shuffleArray(["P1", "P2", "P3", "P4", "P5", "P6"])
     
+    const info = await Info.findOne({ where: {
+        element: 'arena'
+    }})
+    await info.update({ status: 'confirming' })
+
     getArenaConfirmation(arenaEntries[0], contestants[0])
     getArenaConfirmation(arenaEntries[1], contestants[1])
     getArenaConfirmation(arenaEntries[2], contestants[2])
@@ -82,9 +87,6 @@ export const initiateArena = async(interaction) => {
     getArenaConfirmation(arenaEntries[4], contestants[4])
     getArenaConfirmation(arenaEntries[5], contestants[5])
 
-    const info = await Info.findOne({ where: {
-        element: 'arena'
-    }})
 
     for (let i = 1; i < 12; i ++) {
         setTimeout(async () => {
@@ -138,6 +140,8 @@ export const initiateArena = async(interaction) => {
                 const arenaEntry = missingArenaEntries[i]
                 await arenaEntry.destroy()
             }
+
+            await info.update({ status: 'pending' })
             
             return channel.send({ content: `Unfortunately, The Arena cannot begin without 6 players.\n\nThe following players have been removed from the queue:\n${names.sort().join("\n")}`})
         } else if (count === 6 && !active) {

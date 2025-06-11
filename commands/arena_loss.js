@@ -43,24 +43,21 @@ export default {
 
             const info = await Info.findOne({ where: { element: 'arena' }})
 
-            const pairingMatrices = info.round === 1 ? [[P1, P2], [P3, P4], [P5, P6]] :
+            const pairings = info.round === 1 ? [[P1, P2], [P3, P4], [P5, P6]] :
                 info.round === 2 ? [[P1, P6], [P2, P3], [P4, P5]] :
                 info.round === 3 ? [[P1, P5], [P2, P4], [P3, P6]] :
                 info.round === 4 ? [[P1, P4], [P2, P6], [P3, P5]] :
                 info.round === 5 ? [[P1, P3], [P2, P5], [P4, P6]] : 
                 null
 
-            for (let i = 0; i < pairingMatrices.length; i++) {
-                const pairingMatrix = pairingMatrices[i]
-                for (let j = 0; j < pairingMatrix.length; j++) {
-                    const pairing = pairingMatrix[j]
-                    if (
-                        (pairing[0].playerId === winningPlayer.id && pairing[1].playerId === losingPlayer.id) ||
-                        (pairing[0].playerId === losingPlayer.id && pairing[1].playerId === winningPlayer.id)
-                    ) {
-                        correctPairing = true
-                        break
-                    }
+            for (let j = 0; j < pairings.length; j++) {
+                const pairing = pairings[j]
+                if (
+                    (pairing[0].playerId === winningPlayer.id && pairing[1].playerId === losingPlayer.id) ||
+                    (pairing[0].playerId === losingPlayer.id && pairing[1].playerId === winningPlayer.id)
+                ) {
+                    correctPairing = true
+                    break
                 }
             }
 

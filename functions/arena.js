@@ -91,7 +91,7 @@ export const initiateArena = async(interaction) => {
     for (let i = 1; i < 24; i ++) {
         setTimeout(async () => {
             const count = await ArenaEntry.count({ where: {
-                status: 'confirmed'
+                isConfirmed: true
             } })
     
             const active = await Info.count({ where: {
@@ -116,7 +116,7 @@ export const initiateArena = async(interaction) => {
 
     return setTimeout(async () => {
         const count = await ArenaEntry.count({ where: {
-            status: 'confirmed'
+            isConfirmed: true
         } })
 
         const active = await Info.count({ where: {

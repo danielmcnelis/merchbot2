@@ -78,7 +78,7 @@ export default {
             await winnersWallet.update({ starchips: winnerNewChips })
             await losersWallet.update({ starchips: loserNewChips })
 
-            const content = `A manual Arena ${arena} loss by <@${losingPlayer.discordId}> (+2<:starchips:1374362231109718117>) to <@${winningPlayer.discordId}> (+4<:starchips:1374362231109718117>) has been recorded.`
+            const content = `A manual Arena ${arena} loss by <@${losingPlayer.discordId}> to <@${winningPlayer.discordId}> (+4<:starchips:1374362231109718117>) has been recorded.`
             await interaction.editReply({ content })
             return checkArenaProgress()
         } catch (err) {

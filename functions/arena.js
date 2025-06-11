@@ -399,7 +399,7 @@ export const startRound = async (arenaEntries) => {
             info.round === 5 ? [[P1, P3], [P2, P5], [P4, P6]] : 
             null
     
-        const title = `${arena}    ---------    Arena Round ${info.round}    ---------    ${arena}\n${beast} ${dragon} ${machine} ${spellcaster} ${warrior} ${zombie}` 
+        const title = `${arena} - ${beast} ${dragon} ${machine} -- Arena Round ${info.round} - ${spellcaster} ${warrior} ${zombie} - ${arena}` 
         const matches = pairings.map((pairing, index) => {
             if (pairing[0].isActive === false && pairing[1].isActive === false) {
                 setTimeout(() => doubleForfeit(pairing[0].playerId, pairing[1].playerId), index * 1000 + 1000)

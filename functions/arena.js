@@ -88,7 +88,7 @@ export const initiateArena = async(interaction) => {
     getArenaConfirmation(arenaEntries[5], contestants[5])
 
 
-    for (let i = 1; i < 12; i ++) {
+    for (let i = 1; i < 24; i ++) {
         setTimeout(async () => {
             const count = await ArenaEntry.count({ where: {
                 status: 'confirmed'
@@ -127,12 +127,12 @@ export const initiateArena = async(interaction) => {
         if (count !== 6 && !active) {
             const missingArenaEntries = await ArenaEntry.findAll({ 
                 where: {
-                    status: {[Op.not]: 'confirmed' }
+                    isConfirmed: false
                 },
                 include: Player
             })
 
-            const names = missingArenaEntries.map((arenaEntry) => arenaEntry.player.name)
+            const names = missingArenaEntries.map((arenaEntry) => arenaEntry.playerName)
 
             await resetArena(arenaEntries)
 
@@ -156,7 +156,7 @@ export const initiateArena = async(interaction) => {
                 return startRound()
             }, 11000)
         }
-    }, 61000)
+    }, 121000)
 }
 
 //GET ARENA CONFIRMATION
@@ -385,15 +385,15 @@ export const startRound = async (arenaEntries) => {
         const matches = pairings.map((pairing, index) => {
             if (pairing[0].active === false && pairing[1].active === false) {
                 setTimeout(() => doubleForfeit(pairing[0].playerId, pairing[1].playerId), index * 1000 + 1000)
-                return `Match ${index + 1}: ~~<@${pairing[0].player.name}~~ vs ~~<@${pairing[1].player.name}>~~ (both forfeit)`
+                return `Match ${index + 1}: ~~<@${pairing[0].player.discordId}>~~ vs ~~<@${pairing[1].player.discordId}>~~ (both forfeit)`
             } else if (pairing[0].active === false && pairing[1].active === true) {
                 setTimeout(() => forfeit(pairing[1].playerId, pairing[0].playerId), index * 1000 + 1000)
-                return `Match ${index + 1}: ~~<@${pairing[0].player.name}~~ vs <@${pairing[1].player.name}> (${pairing[0].player.name} forfeits)`
+                return `Match ${index + 1}: ~~<@${pairing[0].player.discordId}>~~ vs <@${pairing[1].player.discordId}> (${pairing[0].playerName} forfeits)`
             } else if (pairing[0].active === true && pairing[1].active === false) {
                 setTimeout(() => forfeit(pairing[0].playerId, pairing[1].playerId), index * 1000 + 1000)
-                return `Match ${index + 1}: <@${pairing[0].playerId}> vs ~~<@${pairing[1].playerId}>~~ (${pairing[1].player.name} forfeits)`
+                return `Match ${index + 1}: <@${pairing[0].player.discordId}> vs ~~<@${pairing[1].player.discordId}>~~ (${pairing[1].playerName} forfeits)`
             } else {
-                return `Match ${index + 1}: <@${pairing[0].playerId}> vs <@${pairing[1].playerId}>`
+                return `Match ${index + 1}: <@${pairing[0].player.discordId}> vs <@${pairing[1].player.discordId}>`
             }
         })
 
@@ -423,7 +423,7 @@ export const forfeit = async (winnerId, loserId) => {
 		winningEntry.isPlaying = false
 		await winningEntry.save()
 
-		channel.send({ content: `${losingPlayer.name} (+0${starchips}), your Arena loss to ${winningPlayer.name} (+5${starchips}) has been recorded.`})
+		channel.send({ content: `${losingplayerName} (+0${starchips}), your Arena loss to ${winningplayerName} (+5${starchips}) has been recorded.`})
 		return checkArenaProgress() 
 }
 

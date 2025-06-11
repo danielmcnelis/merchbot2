@@ -8,7 +8,7 @@ const { com, rar, sup, ult, scr, stardust } = emojis
 
 export default {
 	data: new SlashCommandBuilder()
-		.setName('adjust')
+		.setName('freeze')
 		.setDescription('Admin Only - Freeze the price of a card. ❄️')
 		.addNumberOption(option =>
             option

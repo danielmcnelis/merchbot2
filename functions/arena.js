@@ -69,7 +69,7 @@ export const getTribe = (query = '') => {
 }
 
 //START ARENA
-export const initiateArena = async() => {
+export const initiateArena = async(interaction) => {
     const channel = client.channels.cache.get(arenaChannelId)
     channel.send({ content: `Arena players, please check your DMs!`})
     const arenaEntries = await ArenaEntry.findAll({ include: Player })
@@ -209,12 +209,12 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
             .setStyle(ButtonStyle.Primary)
         )
             
-    await member.user.send({ content: `Please select a tribe for The Arena. ${arena} If you no longer want to play, press "No".`, components: [row1, row2] })
+    const message = await member.user.send({ content: `Please select a tribe for The Arena. ${arena} If you no longer want to play, press "No".`, components: [row1, row2] })
 
     const filter = i => i.customId.includes(`Arena-${timestamp}`) && i.user.id === member.user.id;
 
     try {
-        const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
+        const confirmation = await message.awaitMessageComponent.awaitMessageComponent({ filter, time: 30000 })
         if (!confirmation.customId.includes('No')) {
             const count = await Info.count({ where: {
                 element: 'arena',

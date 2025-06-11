@@ -214,7 +214,7 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
     const filter = i => i.customId.includes(`Arena-${timestamp}`) && i.user.id === member.user.id;
 
     try {
-        const confirmation = await message.awaitMessageComponent.awaitMessageComponent({ filter, time: 30000 })
+        const confirmation = await message.awaitMessageComponent({ filter, time: 30000 })
         if (!confirmation.customId.includes('No')) {
             const count = await Info.count({ where: {
                 element: 'arena',
@@ -239,7 +239,6 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
         }
     } catch (err) {
         console.log(err)
-        await confirmation.update({ components: [] })
         return
     }
 }

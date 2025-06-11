@@ -692,10 +692,14 @@ const getInvoiceP2PSale = async (message, line_item, buyingPlayer, sellingPlayer
 
 // CALCULATE NEW MARKET PRICE
 export const calculateNewMarketPrice = (quantity, price, print) => {
-    const newMarketPrice = quantity >= 16 ? price / quantity :
-        ( price + ( (16 - quantity) * print.marketPrice ) ) / 16
-
-    return newMarketPrice
+    if (print.isFrozen) {
+        return print.marketPrice 
+    } else {
+        const newMarketPrice = quantity >= 16 ? price / quantity :
+            ( price + ( (16 - quantity) * print.marketPrice ) ) / 16
+    
+        return newMarketPrice
+    }
 }
 
 // PROCESS MERCHBOT SALE

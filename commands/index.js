@@ -3,6 +3,7 @@ import alchemy from './alchemy.js'
 import arena from './arena.js'
 import arena_loss from './arena_loss.js'
 import arena_manual from './arena_manual.js'
+import arena_noshow from './arena_noshow.js'
 import award from './award.js'
 import awardPartialBox from './award_partial_box.js'
 import banlist from './banlist.js'
@@ -15,6 +16,7 @@ import checklist from './checklist.js'
 import close from './close.js'
 import daily from './daily.js'
 import dump from './dump.js'
+import freeze from './freeze.js'
 import grind from './grind.js'
 import grindall from './grindall.js'
 import inventory from './inventory.js'
@@ -43,6 +45,7 @@ export default {
         arena,
         arena_loss,
         arena_manual,
+        arena_noshow,
         award,
         awardPartialBox,
         banlist,
@@ -55,6 +58,7 @@ export default {
         close,
         daily,
         dump,
+        freeze,
         grind,
         grindall,
         inventory,

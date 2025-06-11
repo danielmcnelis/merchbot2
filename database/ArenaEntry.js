@@ -13,6 +13,14 @@ export const ArenaEntry = db.define('arenaEntries', {
         type: Sequelize.BOOLEAN,
         defaultValue: false
     },
+    isPlaying: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+    },
+    isActive: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true
+    },
     status: {
         type: Sequelize.STRING,   
         defaultValue: 'pending'

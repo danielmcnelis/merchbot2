@@ -7,18 +7,19 @@ const { arena } = emojis
 
 export default {
 	data: new SlashCommandBuilder()
-		.setName('arena_manual')
-		.setDescription(`Mod Only - Manually report an Arena match result! 🔧`)
-    	.setContexts(InteractionContextType.Guild)
+		.setName('arena_noshow')
+        .setDescription(`Mod Only - Record an Arena no-show. 🙈`)
+    	.setContexts(InteractionContextType.Guild)            
+        .addUserOption(option =>
+            option
+                .setName('no-show')
+                .setDescription('Tag the user who did not show up.')
+                .setRequired(true)
+        )
         .addUserOption(option =>
             option
                 .setName('winner')
                 .setDescription('Tag the user who won.')
-                .setRequired(true))
-        .addUserOption(option =>
-            option
-                .setName('loser')
-                .setDescription('Tag the user who lost.')
                 .setRequired(true)
         ),
     async execute(interaction) {
@@ -26,11 +27,10 @@ export default {
             if (interaction.channel.id !== '1378129840691220631') return await interaction.reply({ content: `Try using **/arena** in the <#1378129840691220631> channel. ${arena}`})
             await interaction.deferReply()
             const winningUser = interaction.options.getUser('winner')            
-            const losingUser = interaction.options.getUser('loser')
+            const losingUser = interaction.options.getUser('no-show')
             const winningPlayer = await Player.findOne({ where: { discordId: winningUser.id } })
             const losingPlayer = await Player.findOne({ where: { discordId: losingUser.id } })
             const winnersWallet = await Wallet.findOne({ where: { playerId: winningPlayer.id }})
-            const losersWallet = await Wallet.findOne({ where: { playerId: losingPlayer.id }})
             const winningEntry = await ArenaEntry.findOne({ where: { playerId: winningPlayer.id }})
             const losingEntry = await ArenaEntry.findOne({ where: { playerId: losingPlayer.id }})
             if (!losingEntry.isPlaying) await interaction.editReply({ content: `Error: ${losingPlayer.name} has already played your Arena match for this round.` })
@@ -71,14 +71,12 @@ export default {
 
             const newScore = winningEntry.score + 1
             await winningEntry.update({ score: newScore, isPlaying: false })
-            await losingEntry.update({ isPlaying: false })
+            await losingEntry.update({ isPlaying: false, isActive: false })
 
             const winnerNewChips = winnersWallet.starchips + 4
-            const loserNewChips = losersWallet.starchips + 2
             await winnersWallet.update({ starchips: winnerNewChips })
-            await losersWallet.update({ starchips: loserNewChips })
 
-            const content = `A manual Arena ${arena} loss by <@${losingPlayer.discordId}> (+2<:starchips:1374362231109718117>) to <@${winningPlayer.discordId}> (+4<:starchips:1374362231109718117>) has been recorded.`
+            const content = `A no-show Arena ${arena} loss by <@${losingPlayer.discordId}> (+2<:starchips:1374362231109718117>) to <@${winningPlayer.discordId}> (+4<:starchips:1374362231109718117>) has been recorded. ${losingPlayer.name} has been removed from The Arena. ${arena}`
             await interaction.editReply({ content })
             return checkArenaProgress()
         } catch (err) {

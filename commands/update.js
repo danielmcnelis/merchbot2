@@ -13,26 +13,26 @@ export default {
         if (!isProgrammer(interaction.member)) return await interaction.editReply({ content: `You do not have permission to do that.`})
         
         try {
-            const merchbot = interaction.guild.members.cache.get('584215266586525696')
-            console.log('merchbot', merchbot)
-            if ((await Wallet.count({ where: { playerName: 'MerchBot' } }))) {
-               await interaction.reply({ content: `The Shop has already been initialized.` })
-            } else {
-                await Info.create({
-                    element: "shop",
-                    status: "open"
-                })
+        //     const merchbot = interaction.guild.members.cache.get('584215266586525696')
+        //     console.log('merchbot', merchbot)
+        //     if ((await Wallet.count({ where: { playerName: 'MerchBot' } }))) {
+        //        await interaction.reply({ content: `The Shop has already been initialized.` })
+        //     } else {
+        //         await Info.create({
+        //             element: "shop",
+        //             status: "open"
+        //         })
 
-                // const player = await createPlayer(merchbot)
-                // if (!player) return interaction.reply('Unable to create MerchBot player.')
-                await Wallet.create({ playerId: player.id, playerName: player.name })
-                await Daily.create({ playerId: player.id, playerName: player.name })
-                await interaction.reply({ content: `You initialized The Shop!`})
-            }
-        } catch (err) {
-            console.log(err)
-            await interaction.reply({ content: `Error: Unable to create The Shop.`})
-        }
+        //         // const player = await createPlayer(merchbot)
+        //         // if (!player) return interaction.reply('Unable to create MerchBot player.')
+        //         await Wallet.create({ playerId: player.id, playerName: player.name })
+        //         await Daily.create({ playerId: player.id, playerName: player.name })
+        //         await interaction.reply({ content: `You initialized The Shop!`})
+        //     }
+        // } catch (err) {
+        //     console.log(err)
+        //     await interaction.reply({ content: `Error: Unable to create The Shop.`})
+        // }
 
         try {
             const AOD = {

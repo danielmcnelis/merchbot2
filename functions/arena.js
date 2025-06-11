@@ -219,7 +219,7 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
             .addComponents(new ButtonBuilder()
             .setCustomId(`Arena-${timestamp}-No`)
             .setLabel('No')
-            .setStyle(ButtonStyle.Primary)
+            .setStyle(ButtonStyle.Danger)
         )
             
     const message = await member.user.send({ content: `Please select a tribe for The Arena. ${arena} If you no longer want to play, press "No".`, components: [row1, row2] })
@@ -347,9 +347,11 @@ export const startRound = async (arenaEntries) => {
             }
 
             arenaEntries[0].score = 1
+            arenaEntries[0].isPlaying = true
             await arenaEntries[0].save()
 
             arenaEntries[1].score = 1
+            arenaEntries[1].isPlaying = true
             await arenaEntries[1].save()
 
             const title = `<!> <!> <!> ARENA FINALS <!> <!> <!>` 
@@ -383,6 +385,13 @@ export const startRound = async (arenaEntries) => {
     
         if (!P1 || !P2 || !P3 || !P4 || !P5 || !P6) return channel.send({ content: `Critical error. Missing contestant in the database.`})
     
+        await P1.update({ isPlaying: true })
+        await P2.update({ isPlaying: true })
+        await P3.update({ isPlaying: true })
+        await P4.update({ isPlaying: true })
+        await P5.update({ isPlaying: true })
+        await P6.update({ isPlaying: true })
+
         const pairings = info.round === 1 ? [[P1, P2], [P3, P4], [P5, P6]] :
             info.round === 2 ? [[P1, P6], [P2, P3], [P4, P5]] :
             info.round === 3 ? [[P1, P5], [P2, P4], [P3, P6]] :
@@ -392,13 +401,13 @@ export const startRound = async (arenaEntries) => {
     
         const title = `${arena}    ---------    Arena Round ${info.round}    ---------    ${arena}\n${beast} ${dragon} ${machine} ${spellcaster} ${warrior} ${zombie}` 
         const matches = pairings.map((pairing, index) => {
-            if (pairing[0].active === false && pairing[1].active === false) {
+            if (pairing[0].isActive === false && pairing[1].isActive === false) {
                 setTimeout(() => doubleForfeit(pairing[0].playerId, pairing[1].playerId), index * 1000 + 1000)
                 return `Match ${index + 1}: ~~<@${pairing[0].player.discordId}>~~ vs ~~<@${pairing[1].player.discordId}>~~ (both forfeit)`
-            } else if (pairing[0].active === false && pairing[1].active === true) {
+            } else if (pairing[0].isActive === false && pairing[1].isActive === true) {
                 setTimeout(() => forfeit(pairing[1].playerId, pairing[0].playerId), index * 1000 + 1000)
                 return `Match ${index + 1}: ~~<@${pairing[0].player.discordId}>~~ vs <@${pairing[1].player.discordId}> (${pairing[0].playerName} forfeits)`
-            } else if (pairing[0].active === true && pairing[1].active === false) {
+            } else if (pairing[0].isActive === true && pairing[1].isActive === false) {
                 setTimeout(() => forfeit(pairing[0].playerId, pairing[1].playerId), index * 1000 + 1000)
                 return `Match ${index + 1}: <@${pairing[0].player.discordId}> vs ~~<@${pairing[1].player.discordId}>~~ (${pairing[1].playerName} forfeits)`
             } else {
@@ -432,7 +441,7 @@ export const forfeit = async (winnerId, loserId) => {
 		winningEntry.isPlaying = false
 		await winningEntry.save()
 
-		channel.send({ content: `${losingplayerName} (+0${starchips}), your Arena loss to ${winningplayerName} (+5${starchips}) has been recorded.`})
+		channel.send({ content: `${losingEntry.playerName} (+0${starchips}), your Arena loss to ${winningEntry.playerName} (+5${starchips}) has been recorded.`})
 		return checkArenaProgress() 
 }
 
@@ -510,7 +519,7 @@ export const resetArena = async (arenaEntries) => {
         const arenaEntry = arenaEntries[i]
         const member = await guild.members.fetch(arenaEntry.player.discordId)
         member.roles.remove(arenaRole)
-        arenaEntry.active = false
+        arenaEntry.isActive = false
         arenaEntry.tribe = null
         arenaEntry.contestant = null
         await arenaEntry.save()
@@ -519,7 +528,7 @@ export const resetArena = async (arenaEntries) => {
 
 //CHECK ARENA PROGRESS
 export const checkArenaProgress = async () => {
-    const info = await Info.findOne({ where: { element: 'arena' }})
+    // const info = await Info.findOne({ where: { element: 'arena' }})
     const arenaEntries = await ArenaEntry.findAll({ include: Player, order: [["score", "DESC"]]})
     // if (!arenaEntries) return channel.send({ content: `Critical error. Missing arenaEntries in the database.`}) 
 
@@ -529,11 +538,11 @@ export const checkArenaProgress = async () => {
     //     return setTimeout(() => startRound(arenaEntries), 3000)
     // }
 
-    const scores = arenaEntries.map((arenaEntry) => arenaEntry.score)
+    // const scores = arenaEntries.map((arenaEntry) => arenaEntry.score)
     const progress_report = arenaEntries.map((arenaEntry) => arenaEntry.isPlaying)
-    const sum = scores.reduce((a, b) => a + b)
+    // const sum = scores.reduce((a, b) => a + b)
 
-    if (sum % 3 === 0 && !progress_report.includes(true)) return setTimeout(() => postStandings(arenaEntries), 3000)
+    if (/*sum % 3 === 0 &&*/ !progress_report.includes(true)) return setTimeout(() => postStandings(arenaEntries), 3000)
 }
 
 //GET ARENA CONFIRMATIONS

@@ -21,14 +21,14 @@ export default {
             if (interaction.channel.id !== '1378129840691220631') return await interaction.reply({ content: `Try using **/arena** in the <#1378129840691220631> channel. ${arena}`})
             await interaction.deferReply()
             const winningUser = interaction.options.getUser('opponent')
-            const winningMember = await interaction.guild?.members.fetch(winningUser.id).catch((err) => console.log(err))
-            const losingMember = interaction.member
             const winningPlayer = await Player.findOne({ where: { discordId: winningUser.id } })
             const losingPlayer = await Player.findOne({ where: { discordId: interaction.user.id } })
             const winnersWallet = await Wallet.findOne({ where: { playerId: winningPlayer.id }})
             const losersWallet = await Wallet.findOne({ where: { playerId: losingPlayer.id }})
             const winningEntry = await ArenaEntry.findOne({ where: { playerId: winningPlayer.id }})
             const losingEntry = await ArenaEntry.findOne({ where: { playerId: losingPlayer.id }})
+            if (!losingEntry.isPlaying) await interaction.editReply({ content: `Error: You have already played your Arena match for this round.` })
+            if (!winningEntry.isPlaying) await interaction.editReply({ content: `Error: ${winningPlayer.name} has already played their Arena match for this round.` })
                 
             const P1 = await ArenaEntry.findOne({ where: { contestant: "P1" }, include: Player})
             const P2 = await ArenaEntry.findOne({ where: { contestant: "P2" }, include: Player})

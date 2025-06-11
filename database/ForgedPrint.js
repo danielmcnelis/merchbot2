@@ -42,5 +42,10 @@ export const ForgedPrint = db.define('forgedPrints', {
     type: Sequelize.BOOLEAN,
     defaultValue: false,
     allowNull: true
+  },
+  isFrozen: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+    allowNull: true
   }
 })

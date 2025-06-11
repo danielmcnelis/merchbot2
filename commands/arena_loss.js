@@ -27,8 +27,8 @@ export default {
             const losersWallet = await Wallet.findOne({ where: { playerId: losingPlayer.id }})
             const winningEntry = await ArenaEntry.findOne({ where: { playerId: winningPlayer.id }})
             const losingEntry = await ArenaEntry.findOne({ where: { playerId: losingPlayer.id }})
-            if (!losingEntry.isPlaying) await interaction.editReply({ content: `Error: You have already played your Arena match for this round.` })
-            if (!winningEntry.isPlaying) await interaction.editReply({ content: `Error: ${winningPlayer.name} has already played their Arena match for this round.` })
+            if (!losingEntry.isPlaying) return await interaction.editReply({ content: `Error: You have already played your Arena match for this round.` })
+            if (!winningEntry.isPlaying) return await interaction.editReply({ content: `Error: ${winningPlayer.name} has already played their Arena match for this round.` })
                 
             const P1 = await ArenaEntry.findOne({ where: { contestant: "P1" }, include: Player})
             const P2 = await ArenaEntry.findOne({ where: { contestant: "P2" }, include: Player})

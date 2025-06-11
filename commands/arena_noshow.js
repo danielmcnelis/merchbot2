@@ -71,7 +71,7 @@ export default {
 
             const newScore = winningEntry.score + 1
             await winningEntry.update({ score: newScore, isPlaying: false })
-            await losingEntry.update({ isPlaying: false, isActive: false })
+            await losingEntry.update({ isPlaying: false, isPlaying: false, isActive: false })
 
             const winnerNewChips = winnersWallet.starchips + 4
             await winnersWallet.update({ starchips: winnerNewChips })

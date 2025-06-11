@@ -92,7 +92,7 @@ export default {
             if (!shopSale && !price) return interaction.reply({ content: `Please specifiy the price.`})
             const shopBuybackPrice = Math.ceil(print.marketPrice * 0.7)
             if (price < 1) return interaction.reply({ content: `You cannot pay less than 1${stardust} for a card.` })
-            if (!shopSale && price < shopBuybackPrice) return interaction.reply({ content: `You cannot buy a card for less ${stardust} than The Shop ${merchant} would pay for it.` })
+            if (!shopSale && price < (shopBuybackPrice * quantity)) return interaction.reply({ content: `You cannot buy a card for less ${stardust} than The Shop ${merchant} would pay for it.` })
             if (price > buyersWallet.stardust) return interaction.reply({ content: `Sorry, you only have ${buyersWallet.stardust}${stardust}.` })
             const sellersInv = await ForgedInventory.findOne({
                 where: {

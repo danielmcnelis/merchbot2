@@ -10,5 +10,9 @@ export const Info = db.define('infos', {
     status: {
         type: Sequelize.STRING,
         allowNull: true
+    },
+    round: {
+        type: Sequelize.INTEGER,
+        allowNull: true
     }
 })

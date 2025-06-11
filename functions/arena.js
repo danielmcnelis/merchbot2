@@ -1,6 +1,7 @@
 
 import { Op } from 'sequelize'
 import { ArenaEntry, Info, Player, Wallet, ArenaProfile } from '../database/index.js'
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
 
 import roles from '../static/roles.json' with { type: 'json' }
 const { arenaRole } = roles

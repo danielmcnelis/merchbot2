@@ -1,6 +1,6 @@
 
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
-import { ArenaEntry, Player, Wallet } from '../database/index.js'
+import { ArenaEntry, Info, Player, Wallet } from '../database/index.js'
 import { checkArenaProgress } from '../functions/arena.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
 const { arena } = emojis
@@ -40,6 +40,8 @@ export default {
             if (!P1 || !P2 || !P3 || !P4 || !P5 || !P6) return channel.send({ content: `Critical error. Missing contestant in the database.`})
                 
             let correctPairing = false
+
+            const info = await Info.findOne({ where: { element: 'arena' }})
 
             const pairingMatrices = info.round === 1 ? [[P1, P2], [P3, P4], [P5, P6]] :
                 info.round === 2 ? [[P1, P6], [P2, P3], [P4, P5]] :

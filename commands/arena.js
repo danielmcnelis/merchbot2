@@ -10,7 +10,7 @@ const { arena } = emojis
 export default {
 	data: new SlashCommandBuilder()
 		.setName('arena')
-		.setDescription('Join The Arena! 🏟️')
+		.setDescription('Join The Arena! 🏆')
     	.setContexts(InteractionContextType.Guild),
     async execute(interaction) {
         try {

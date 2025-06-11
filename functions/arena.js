@@ -158,7 +158,7 @@ export const initiateArena = async() => {
 export const getArenaConfirmation = async (arenaEntry, contestant) => {
     const arenaChannel = client.channels.cache.get(arenaChannelId)
     const guild = client.guilds.cache.get("1372580468297568458")
-    const playerId = arenaEntry.playerId
+    const playerId = arenaEntry.player.discordId
     const member = await guild.members.fetch(playerId)
     if (!member) return arenaChannel.send({ content: `${arenaEntry.playerName} cannot be sent DMs.` })
     
@@ -248,7 +248,7 @@ export const assignArenaRoles = async (arenaEntries) => {
     const guild = client.guilds.cache.get("1372580468297568458")
     for (let i = 0; i < arenaEntries.length; i++) {
         const arenaEntry = arenaEntries[i]
-        const member = await guild.members.fetch(arenaEntry.playerId)
+        const member = await guild.members.fetch(arenaEntry.player.discordId)
         member.roles.add(arenaRole)
     }
 }
@@ -327,7 +327,7 @@ export const startRound = async (arenaEntries) => {
                 // wallet[voucher] += quantity
                 // await wallet.save()
                 // channel.send({ content: `<@${arenaEntry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
-                const member = await guild.members.fetch(arenaEntry.playerId)
+                const member = await guild.members.fetch(arenaEntry.player.discordId)
                 member.roles.remove(arenaRole)
                 arenaEntry.score = 0
                 await arenaEntry.save()
@@ -479,7 +479,7 @@ export const endArena = async (arenaEntries) => {
 
     for (let i = 0; i < arenaEntries.length; i++) {
         const arenaEntry = arenaEntries[i]
-        const member = await guild.members.fetch(arenaEntry.playerId)
+        const member = await guild.members.fetch(arenaEntry.player.discordId)
         member.roles.remove(arenaRole)
         await arenaEntry.destroy()
     }
@@ -495,7 +495,7 @@ export const resetArena = async (arenaEntries) => {
 
     for (let i = 0; i < arenaEntries.length; i++) {
         const arenaEntry = arenaEntries[i]
-        const member = await guild.members.fetch(arenaEntry.playerId)
+        const member = await guild.members.fetch(arenaEntry.player.discordId)
         member.roles.remove(arenaRole)
         arenaEntry.active = false
         arenaEntry.tribe = null

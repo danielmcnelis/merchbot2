@@ -8,7 +8,7 @@ const { arena } = emojis
 export default {
 	data: new SlashCommandBuilder()
 		.setName('arena_loss')
-		.setDescription('Report your loss in The Arena! 🤼‍♂️')
+		.setDescription('Report your loss in The Arena! 🤼')
     	.setContexts(InteractionContextType.Guild)
         .addUserOption(option =>
             option

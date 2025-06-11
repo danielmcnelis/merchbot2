@@ -24,6 +24,7 @@ import pack from './pack.js'
 import ping from './ping.js'
 import play from './play.js'
 import print from './print.js'
+import queue from './queue.js'
 import search from './search.js'
 import sell from './sell.js'
 import shop from './shop.js'
@@ -63,6 +64,7 @@ export default {
         ping,
         play,
         print,
+        queue,
         search,
         sell,
         shop,

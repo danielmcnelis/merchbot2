@@ -184,7 +184,7 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
 
         .addComponents(new ButtonBuilder()
             .setCustomId(`Arena-${timestamp}-Machine`)
-            .setLabel('Machina')
+            .setLabel('Machine')
             .setStyle(ButtonStyle.Primary)
         )
 
@@ -226,7 +226,7 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
             } })
 
             if (!count) return member.send({ content: `Sorry, time expired.`})
-            const tribe = confirmation.customId.slice(20)
+            const tribe = confirmation.customId.slice(20).toLowerCase()
 
             await arenaEntry.update({
                 isConfirmed: true,

@@ -56,7 +56,7 @@ export default {
                 info.round === 5 ? [[P1, P3], [P2, P5], [P4, P6]] : 
                 null
 
-            if (pairings && info.round > 5) {
+            if (pairings && info.round <= 5) {
                 for (let j = 0; j < pairings.length; j++) {
                     const pairing = pairings[j]
                     if (

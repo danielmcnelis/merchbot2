@@ -78,6 +78,7 @@ export const initiateArena = async(interaction) => {
     const info = await Info.findOne({ where: {
         element: 'arena'
     }})
+
     await info.update({ status: 'confirming' })
 
     getArenaConfirmation(arenaEntries[0], contestants[0])
@@ -527,13 +528,16 @@ export const resetArena = async (arenaEntries) => {
     const guild = client.guilds.cache.get("1372580468297568458")
 
     for (let i = 0; i < arenaEntries.length; i++) {
-        const arenaEntry = arenaEntries[i]
-        const member = await guild.members.fetch(arenaEntry.player.discordId)
-        member.roles.remove(arenaRole)
-        arenaEntry.isActive = false
-        arenaEntry.tribe = null
-        arenaEntry.contestant = null
-        await arenaEntry.save()
+        try {
+            const arenaEntry = arenaEntries[i]
+            const member = await guild.members.fetch(arenaEntry.player.discordId)
+            member.roles.remove(arenaRole)
+            arenaEntry.tribe = null
+            arenaEntry.contestant = null
+            await arenaEntry.save()
+        } catch (err) {
+            console.log(err)
+        }
     }
 }
 

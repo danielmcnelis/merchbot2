@@ -370,16 +370,32 @@ export const startRound = async (arenaEntries) => {
             ` vs ${eval(arenaEntries[1].tribe)} <@${arenaEntries[1].player?.discordId}> ${eval(arenaEntries[1].tribe)}`
 
             return channel.send({ content: `${title}\n${match}`})
+        } else if ((arenaEntries[0].score === arenaEntries[1].score === arenaEntries[2].score) && arenaEntries[2].score > arenaEntries[3].score) {
+            //3 way tie
+                // VOUCHERS
+                for (let i = 0; i < arenaEntries.length; i++) {
+                    const arenaEntry = arenaEntries[i]
+                    // const voucher = vouchers[arenaEntry.tribe]
+                    // const quantity = i < 3 ? arenaEntry.score + 5 : arenaEntry.score + 2
+                    const quantity = 10
+                    const wallet = await Wallet.findOne({ where: { playerId: arenaEntry.playerId }})
+                    wallet.starchips += quantity
+                    await wallet.save()
+                    channel.send({ content: `<@${arenaEntry.player.discordId}> ${getRandomElement(verbs)} ${quantity}${starchips} from the Arena. ${getRandomElement(encouragements)}`})
+                }
+    
+                channel.send({ content: `The shadows grew long over the battlefield, and the gladiators ${warrior} had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena. ${arena}`})
+                return endArena(arenaEntries)
         } else {
-        //3 way tie
+        //4 way tie
             // VOUCHERS
             for (let i = 0; i < arenaEntries.length; i++) {
                 const arenaEntry = arenaEntries[i]
                 // const voucher = vouchers[arenaEntry.tribe]
                 // const quantity = i < 3 ? arenaEntry.score + 5 : arenaEntry.score + 2
-                const quantity = 5
+                const quantity = 8
                 const wallet = await Wallet.findOne({ where: { playerId: arenaEntry.playerId }})
-                wallet.starchips += 10
+                wallet.starchips += quantity
                 await wallet.save()
                 channel.send({ content: `<@${arenaEntry.player.discordId}> ${getRandomElement(verbs)} ${quantity}${starchips} from the Arena. ${getRandomElement(encouragements)}`})
             }

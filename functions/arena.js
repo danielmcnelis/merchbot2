@@ -6,7 +6,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
 import roles from '../static/roles.json' with { type: 'json' }
 const { arenaRole } = roles
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { foxy, shrine, cavebob, AOD, king, arena, beast, dragon, warrior, spellcaster, machine, zombie, starchips, ult } = emojis
+const { gladiators, foxy, shrine, cavebob, AOD, king, arena, beast, dragon, warrior, spellcaster, machine, zombie, starchips, ult } = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { arenaChannelId } = channels
 import arenas from '../static/arenas.json' with { type: 'json' }
@@ -364,25 +364,26 @@ export const startRound = async (arenaEntries) => {
             arenaEntries[1].isPlaying = true
             await arenaEntries[1].save()
 
-            const title = `${shrine}  ${foxy}  ${king}  ${arena}  ARENA FINALS  ${arena}  ${king}  ${foxy}  ${shrine}` 
+            const title = `${shrine}  ${foxy}  ${gladiators}  ${arena}  ARENA FINALS  ${arena}  ${gladiators}  ${foxy}  ${shrine}` 
             const match = `${eval(arenaEntries[0].tribe)} <@${arenaEntries[0].player?.discordId}> ${eval(arenaEntries[0].tribe)}` +
             ` vs ${eval(arenaEntries[1].tribe)} <@${arenaEntries[1].player?.discordId}> ${eval(arenaEntries[1].tribe)}`
 
             return channel.send({ content: `${title}\n${match}`})
         } else {
         //3 way tie
-            // VOUCHERS
-            // for (let i = 0; i < arenaEntries.length; i++) {
-            //     const arenaEntry = arenaEntries[i]
-            //     const voucher = vouchers[arenaEntry.tribe]
-            //     const quantity = i < 3 ? arenaEntry.score + 5 : arenaEntry.score + 2
-            //     const wallet = await Wallet.findOne({ where: { playerId: arenaEntry.playerId }})
-            //     wallet[voucher] += quantity
-            //     await wallet.save()
-            //     channel.send({ content: `<@${arenaEntry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
-            // }
+            VOUCHERS
+            for (let i = 0; i < arenaEntries.length; i++) {
+                const arenaEntry = arenaEntries[i]
+                // const voucher = vouchers[arenaEntry.tribe]
+                // const quantity = i < 3 ? arenaEntry.score + 5 : arenaEntry.score + 2
+                const quantity = 5
+                const wallet = await Wallet.findOne({ where: { playerId: arenaEntry.playerId }})
+                wallet.starchips += 10
+                await wallet.save()
+                channel.send({ content: `<@${arenaEntry.player.discordId}> ${getRandomElement(verbs)} ${quantity}${starchips} from the Arena. ${getRandomElement(encouragements)}`})
+            }
 
-            channel.send({ content: `The shadows grew long over the battlefield, and the gladiators had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena.`})
+            channel.send({ content: `The shadows grew long over the battlefield, and the gladiators ${warrior} had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena. ${arena}`})
             return endArena(arenaEntries)
         }
     } else {

@@ -7,7 +7,7 @@ const { arena } = emojis
 
 export default {
 	data: new SlashCommandBuilder()
-		.setName('arena_noshow')
+		.setName('noshow')
         .setDescription(`Mod Only - Record an Arena no-show. 🙈`)
     	.setContexts(InteractionContextType.Guild)            
         .addUserOption(option =>

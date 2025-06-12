@@ -7,7 +7,7 @@ const { arena } = emojis
 
 export default {
 	data: new SlashCommandBuilder()
-		.setName('arena_manual')
+		.setName('manual')
 		.setDescription(`Mod Only - Manually report an Arena match result! 🔧`)
     	.setContexts(InteractionContextType.Guild)
         .addUserOption(option =>

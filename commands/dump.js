@@ -52,7 +52,7 @@ export default {
                         forSale: true
                     },
                     limit: 5,
-                    order: [["forSale", "ASC"], ["createdAt", "DESC"]]
+                    order: [["forSale", "DESC"], ["createdAt", "DESC"]]
                 })
 
                 await interaction.respond(

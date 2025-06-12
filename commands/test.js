@@ -5,7 +5,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 // import { client } from '../client'
 // import { s3FileExists } from '@fl/bot-functions'
 // import { Match, Tournament, Server, TriviaQuestion } from '@fl/models'
-import { ArenaEntry, Binder, Wishlist } from '../database/index.js'
+import { ArenaProfile, Binder, Wishlist } from '../database/index.js'
 import {isProgrammer} from '../functions/utility.js'
 // import axios from 'axios'
 // import { assignTournamentRoles, recalculateAllStats } from '../../../bot-functions/src'

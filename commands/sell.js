@@ -75,7 +75,6 @@ export default {
             const buyerDiscordId = interaction.options.getUser('buyer')?.id || merchbotDiscordId
             const buyer = await Player.findByDiscordId(buyerDiscordId)
             const buyersWallet = await Wallet.findOne({ where: { playerId: buyer.id }})
-            if (price > buyersWallet.stardust) return interaction.reply({ content: `Sorry, ${buyer.name} only has ${buyersWallet.stardust}${stardust}.` })
 
             if (sellerDiscordId === buyerDiscordId) return interaction.reply({ content: `You cannot sell cards to yourself.`})
             if (!sellersWallet) return interaction.reply({ content: `You are not in the database. Type **/play** to begin the game.`})
@@ -86,6 +85,7 @@ export default {
             if (shopSale && info.status === 'closed') return interaction.reply({ content: `Sorry, The Shop ${merchant} is currently closed.` })
             const shopBuyingPrice = Math.floor(print.marketPrice * 0.7) > 0 ? Math.floor(print.marketPrice * 0.7) : 1			
             const price = shopSale ? quantity * shopBuyingPrice : interaction.options.getNumber('price')
+            if (price > buyersWallet.stardust) return interaction.reply({ content: `Sorry, ${buyer.name} only has ${buyersWallet.stardust}${stardust}.` })
             if (shopSale && interaction.options.getNumber('price') && interaction.options.getNumber('price') !== price) return interaction.reply({ content: `Please leave the "price" option blank when selling cards to The Shop. ${merchant}` })
             if (!shopSale && !price) return interaction.reply({ content: `Please specifiy the price.`})
             const shopBuybackPrice = Math.ceil(print.marketPrice * 0.7)

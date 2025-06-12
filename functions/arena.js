@@ -12,6 +12,9 @@ const { arenaChannelId } = channels
 import arenas from '../static/arenas.json' with { type: 'json' }
 const { decks, vouchers, prizes, victories, apcs, verbs, encouragements } = arenas 
 
+import apcs from '../static/apcs.json' with { type: 'json' }
+import victories from '../static/victories.json' with { type: 'json' }
+
 import { client } from '../static/clients.js'
 import { shuffleArray, getRandomElement, capitalize } from './utility.js'
 import { awardCard } from './award.js'
@@ -283,8 +286,11 @@ export const startRound = async (arenaEntries) => {
         
         const tribe = arenaEntries[0].tribe
         const playerId = arenaEntries[0].playerId
+        const playerName = arenaEntries[0].playerName
         let profile = await ArenaProfile.findOne({ where: { playerId } })
-        if (!profile) profile = await ArenaProfile.create({ playerId, playerName: arenaEntries[0].playerName })
+        if (!profile) {
+            profile = await ArenaProfile.create({ playerId, playerName})
+        }
         profile[`${tribe}Wins`] += 1
         await profile.save()
         await awardCard(channel, playerId, prizes[tribe])
@@ -315,8 +321,11 @@ export const startRound = async (arenaEntries) => {
 
             const tribe = arenaEntries[0].tribe
             const playerId = arenaEntries[0].playerId
+            const playerName = arenaEntries[0].playerName
             let profile = await ArenaProfile.findOne({ where: { playerId } })
-            if (!profile) profile = await ArenaProfile.create({ playerId, playerName: arenaEntries[0].playerName })
+            if (!profile) {
+                profile = await ArenaProfile.create({ playerId, playerName})
+            }
             profile[`${tribe}Wins`]++
             await profile.save()
             await awardCard(channel, playerId, prizes[tribe])

@@ -71,7 +71,6 @@ export default {
             const buyerDiscordId = interaction.user.id
             const buyer = await Player.findByDiscordId(buyerDiscordId)
             const buyersWallet = await Wallet.findOne({ where: { playerId: buyer.id }})
-            if (price > buyersWallet.stardust) return interaction.reply({ content: `Sorry, you only have ${buyersWallet.stardust}${stardust}.` })
             const merchbotDiscordId = '584215266586525696'
 
             const sellerDiscordId = interaction.options.getUser('seller')?.id || merchbotDiscordId
@@ -89,6 +88,7 @@ export default {
             const shopBuyingPrice = Math.floor(marketPrice * 0.7) > 0 ? Math.floor(marketPrice * 0.7) : 1			
             const shopSellingPrice = Math.floor(marketPrice * 1.1) > shopBuyingPrice ? Math.floor(marketPrice * 1.1) : shopBuyingPrice + 1
             const price = shopSale ? quantity * shopSellingPrice : interaction.options.getNumber('price')
+            if (price > buyersWallet.stardust) return interaction.reply({ content: `Sorry, you only have ${buyersWallet.stardust}${stardust}.` })
             if (shopSale && interaction.options.getNumber('price') && interaction.options.getNumber('price') !== price) return interaction.reply({ content: `Please leave the "price" option blank when purchasing cards from The Shop. ${merchant}` })
             if (!shopSale && !price) return interaction.reply({ content: `Please specifiy the price.`})
             const shopBuybackPrice = Math.ceil(print.marketPrice * 0.7)

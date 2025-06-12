@@ -6,7 +6,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
 import roles from '../static/roles.json' with { type: 'json' }
 const { arenaRole } = roles
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { cavebob, AOD, king, arena, beast, dragon, warrior, spellcaster, machine, zombie, starchips } = emojis
+const { cavebob, AOD, king, arena, beast, dragon, warrior, spellcaster, machine, zombie, starchips, ult } = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { arenaChannelId } = channels
 import arenas from '../static/arenas.json' with { type: 'json' }

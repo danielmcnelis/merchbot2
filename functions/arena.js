@@ -292,7 +292,7 @@ export const startRound = async (arenaEntries) => {
         }
         profile[`${tribe}Wins`] += 1
         await profile.save()
-        await awardCard(channel, arenaEntries[0].playerId, prizes[tribe])
+        await awardCard(channel, arenaEntries[0].playerId, arenaEntries[0].player.discordId, prizes[tribe])
 
         channel.send({ content: `Congratulations to <@${arenaEntries[0].player.discordId}> on a brilliant victory` +
             ` with the ${capitalize(tribe)} ${eval(tribe)} deck.` +
@@ -327,7 +327,7 @@ export const startRound = async (arenaEntries) => {
             }
             profile[`${tribe}Wins`]++
             await profile.save()
-            await awardCard(channel, arenaEntries[0].playerId, prizes[tribe])
+            await awardCard(channel, arenaEntries[0].playerId, arenaEntries[0].player.discordId, prizes[tribe])
 
             channel.send({ content: `Congratulations to <@${arenaEntries[0].discordId}> on a brilliant victory` +
                 ` with the ${capitalize(tribe)} ${eval(tribe)} deck.` +

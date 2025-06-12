@@ -2,7 +2,7 @@
 import { SlashCommandBuilder } from 'discord.js'
 import arenas from '../static/arenas.json' with { type: 'json' }
 const { decks } = arenas 
-import { capitalize } from '../functions/utility'
+import { capitalize } from '../functions/utility.js'
 
 export default {
     data: new SlashCommandBuilder()

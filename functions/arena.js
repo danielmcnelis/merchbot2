@@ -6,7 +6,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
 import roles from '../static/roles.json' with { type: 'json' }
 const { arenaRole } = roles
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { cavebob, AOD, king, arena, beast, dragon, warrior, spellcaster, machine, zombie, starchips, ult } = emojis
+const { foxy, shrine, cavebob, AOD, king, arena, beast, dragon, warrior, spellcaster, machine, zombie, starchips, ult } = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { arenaChannelId } = channels
 import arenas from '../static/arenas.json' with { type: 'json' }
@@ -281,6 +281,8 @@ export const startRound = async (arenaEntries) => {
         // await wallet.save()
         // channel.send({ content: `<@${arenaEntries[1].playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
         
+        console.log('arenaEntries[0].tribe', arenaEntries[0].tribe)
+        console.log('arenaEntries[0].player', arenaEntries[0].player)
         const tribe = arenaEntries[0].tribe
         const playerId = arenaEntries[0].playerId
         const playerName = arenaEntries[0].playerName
@@ -290,9 +292,9 @@ export const startRound = async (arenaEntries) => {
         }
         profile[`${tribe}Wins`] += 1
         await profile.save()
-        await awardCard(channel, arenaEntries[0].discordId, prizes[tribe])
+        await awardCard(channel, arenaEntries[0].playerId, prizes[tribe])
 
-        channel.send({ content: `Congratulations to <@${arenaEntries[0].discordId}> on a brilliant victory` +
+        channel.send({ content: `Congratulations to <@${arenaEntries[0].player.discordId}> on a brilliant victory` +
             ` with the ${capitalize(tribe)} ${eval(tribe)} deck.` +
             ` ${victories[tribe]}` +
             ` You truly deserve the ${apcs[tribe]}!`
@@ -325,7 +327,7 @@ export const startRound = async (arenaEntries) => {
             }
             profile[`${tribe}Wins`]++
             await profile.save()
-            await awardCard(channel, arenaEntries[0].discordId, prizes[tribe])
+            await awardCard(channel, arenaEntries[0].playerId, prizes[tribe])
 
             channel.send({ content: `Congratulations to <@${arenaEntries[0].discordId}> on a brilliant victory` +
                 ` with the ${capitalize(tribe)} ${eval(tribe)} deck.` +
@@ -362,9 +364,9 @@ export const startRound = async (arenaEntries) => {
             arenaEntries[1].isPlaying = true
             await arenaEntries[1].save()
 
-            const title = `<!> <!> <!> ARENA FINALS <!> <!> <!>` 
-            const match = `${eval(arenaEntries[0].tribe)} <@${arenaEntries[0].playerId}> ${eval(arenaEntries[0].tribe)}` +
-            ` vs ${eval(arenaEntries[1].tribe)} <@${arenaEntries[1].playerId}> ${eval(arenaEntries[1].tribe)}`
+            const title = `${shrine}  ${foxy}  ${king}  ${arena}  ARENA FINALS  ${arena}  ${king}  ${foxy}  ${shrine}` 
+            const match = `${eval(arenaEntries[0].tribe)} <@${arenaEntries[0].player?.discordId}> ${eval(arenaEntries[0].tribe)}` +
+            ` vs ${eval(arenaEntries[1].tribe)} <@${arenaEntries[1].player?.discordId}> ${eval(arenaEntries[1].tribe)}`
 
             return channel.send({ content: `${title}\n${match}`})
         } else {
@@ -439,7 +441,7 @@ export const forfeit = async (winnerId, loserId) => {
         const winningEntry = await ArenaEntry.findOne({ where: { playerId: winnerId }})
         if (!winningPlayer || !losingPlayer) return channel.send({ content: `Could not process forfeiture.`})
 		
-		winningPlayer.wallet.starchips += 4
+		winningPlayer.wallet.starchips += 5
 		await winningPlayer.wallet.save()
 
 		losingEntry.isPlaying = false
@@ -538,7 +540,7 @@ export const resetArena = async (arenaEntries) => {
 export const checkArenaProgress = async () => {
     const info = await Info.findOne({ where: { element: 'arena' }})
     const arenaEntries = await ArenaEntry.findAll({ include: Player, order: [["score", "DESC"]]})
-    if (!arenaEntries) return channel.send({ content: `Critical error. Missing arenaEntries in the database.`}) 
+    // if (!arenaEntries) return channel.send({ content: `Critical error. Missing arenaEntries in the database.`}) 
 
     if (info.round === 6) {
         info.round = 7

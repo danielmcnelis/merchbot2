@@ -12,9 +12,6 @@ const { arenaChannelId } = channels
 import arenas from '../static/arenas.json' with { type: 'json' }
 const { decks, vouchers, prizes, victories, apcs, verbs, encouragements } = arenas 
 
-import apcs from '../static/apcs.json' with { type: 'json' }
-import victories from '../static/victories.json' with { type: 'json' }
-
 import { client } from '../static/clients.js'
 import { shuffleArray, getRandomElement, capitalize } from './utility.js'
 import { awardCard } from './award.js'

@@ -314,7 +314,8 @@ export const startRound = async (arenaEntries) => {
 
             const tribe = arenaEntries[0].tribe
             const playerId = arenaEntries[0].playerId
-            const profile = await ArenaProfile.findOne({ where: { playerId } })
+            let profile = await ArenaProfile.findOne({ where: { playerId } })
+            if (!profile) profile = await ArenaProfile.create({ playerId, playerName: arenaEntries[0].playerName })
             profile[`${tribe}Wins`]++
             await profile.save()
             await awardCard(channel, playerId, prizes[tribe])

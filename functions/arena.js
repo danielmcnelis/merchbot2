@@ -372,7 +372,7 @@ export const startRound = async (arenaEntries) => {
             return channel.send({ content: `${title}\n${match}`})
         } else {
         //3 way tie
-            VOUCHERS
+            // VOUCHERS
             for (let i = 0; i < arenaEntries.length; i++) {
                 const arenaEntry = arenaEntries[i]
                 // const voucher = vouchers[arenaEntry.tribe]

@@ -50,7 +50,7 @@ export default {
                     where: {
                         forSale: true
                     },
-                    order: [['createdAt', 'DESC']]
+                    order: [["createdAt", "DESC"]]
                 })].map((s) => `Pack(s) of ${s.name}`)
 
                 // const boxes = [...await ForgedSet.findAll({

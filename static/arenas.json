@@ -40,10 +40,10 @@
         "zombie":"skull"
     },
     "prizes": {
-        "beast":"APC-001",
-        "dinosaur":"APC-002",
+        "beast":"APC-004",
+        "dragon":"APC-002",
         "machine":"APC-003",
-        "spellcaster":"APC-004",
+        "spellcaster":"APC-001",
         "warrior":"APC-005",
         "zombie":"APC-006"
     },

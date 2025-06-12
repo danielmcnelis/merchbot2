@@ -1,9 +1,9 @@
 import adjust from './adjust.js'
 import alchemy from './alchemy.js'
 import arena from './arena.js'
-import arena_loss from './arena_loss.js'
-import arena_manual from './arena_manual.js'
-import arena_noshow from './arena_noshow.js'
+import loss from './loss.js'
+import manual from './manual.js'
+import noshow from './noshow.js'
 import award from './award.js'
 import awardPartialBox from './award_partial_box.js'
 import banlist from './banlist.js'
@@ -43,9 +43,9 @@ export default {
         adjust,
         alchemy,
         arena,
-        arena_loss,
-        arena_manual,
-        arena_noshow,
+        loss,
+        manual,
+        noshow,
         award,
         awardPartialBox,
         banlist,

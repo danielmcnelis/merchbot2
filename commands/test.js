@@ -5,7 +5,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 // import { client } from '../client'
 // import { s3FileExists } from '@fl/bot-functions'
 // import { Match, Tournament, Server, TriviaQuestion } from '@fl/models'
-import { Binder, Wishlist } from '../database/index.js'
+import { ArenaEntry, Binder, Wishlist } from '../database/index.js'
 import {isProgrammer} from '../functions/utility.js'
 // import axios from 'axios'
 // import { assignTournamentRoles, recalculateAllStats } from '../../../bot-functions/src'
@@ -21,17 +21,12 @@ export default {
         try {
             await interaction.deferReply()
             if (isProgrammer(interaction.member)) {
-                await interaction.editReply('🧪 🧪 🧪')
-                const binders = await Binder.findAll({})
-                for (let i = 0; i < binders.length; i++) {
-                    const binder = binders[i]
-                    await binder.update({ quantity: 1 })
-                }
-
-                const wishlists = await Wishlist.findAll({})
-                for (let i = 0; i < wishlists.length; i++) {
-                    const wishlist = wishlists[i]
-                    await wishlist.update({ quantity: 1 })
+                const playerName = 'Jazz'
+                const playerId = 'UeyvnNBD6CD53gsqRQsxCY'
+                let profile = await ArenaProfile.findOne({ where: { playerId } })
+                if (!profile) {
+                    console.log('creating...')
+                    profile = await ArenaProfile.create({ playerId, playerName})
                 }
             } else {
                 await interaction.editReply('🧪')

@@ -1,5 +1,7 @@
 // const { Auction, Bid, Print, Set, Inventory, Player, Wallet } = require('../database/index.js')
 import { ForgedInventory, ForgedPrint } from '../database/index.js'
+import emojis from '../static/emojis.json' with { type: 'json' }
+const { com, rar, sup, ult, scr } = emojis
 // const { yescom, nocom } = require('../static/commands.json')
 // const { findCard } = require('./search.js')
 // const { completeTask } = require('./diary.js')

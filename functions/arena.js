@@ -330,7 +330,7 @@ export const startRound = async (arenaEntries) => {
             await profile.save()
             await awardCard(channel, arenaEntries[0].playerId, arenaEntries[0].player.discordId, prizes[tribe])
 
-            channel.send({ content: `Congratulations to <@${arenaEntries[0].discordId}> on a brilliant victory` +
+            channel.send({ content: `Congratulations to <@${arenaEntries[0].player.discordId}> on a brilliant victory` +
                 ` with the ${capitalize(tribe)} ${eval(tribe)} deck.` +
                 ` ${victories[tribe]}` +
                 ` You truly deserve the ${apcs[tribe]}!`
@@ -384,7 +384,7 @@ export const startRound = async (arenaEntries) => {
                     channel.send({ content: `<@${arenaEntry.player.discordId}> ${getRandomElement(verbs)} ${quantity}${starchips} from the Arena. ${getRandomElement(encouragements)}`})
                 }
     
-                channel.send({ content: `The shadows grew long over the battlefield, and the gladiators ${warrior} had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena. ${arena}`})
+                channel.send({ content: `The shadows grew long over the battlefield, and the gladiators ${gladiators} had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena. ${arena}`})
                 return endArena(arenaEntries)
         } else {
         //4 way tie
@@ -400,7 +400,7 @@ export const startRound = async (arenaEntries) => {
                 channel.send({ content: `<@${arenaEntry.player.discordId}> ${getRandomElement(verbs)} ${quantity}${starchips} from the Arena. ${getRandomElement(encouragements)}`})
             }
 
-            channel.send({ content: `The shadows grew long over the battlefield, and the gladiators ${warrior} had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena. ${arena}`})
+            channel.send({ content: `The shadows grew long over the battlefield, and the gladiators ${gladiators} had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena. ${arena}`})
             return endArena(arenaEntries)
         }
     } else {

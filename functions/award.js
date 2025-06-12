@@ -35,5 +35,5 @@ export const awardCard = async (channel, playerId, discordId, cardCode, quantity
     }
 
     // if (print.setCode === 'APC' && ((inv && inv.quantity >= 3) || quantity >=3 )) completeTask(channel, playerId, 'h5')
-    return channel.send({ content: `<@${playerId}> was awarded ${quantity} ${card}. Congratulations!`})
+    return channel.send({ content: `<@${discordId}> was awarded ${quantity} ${card}. Congratulations!`})
 }

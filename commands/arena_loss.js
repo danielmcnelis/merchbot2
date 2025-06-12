@@ -49,19 +49,21 @@ export default {
                 info.round === 4 ? [[P1, P4], [P2, P6], [P3, P5]] :
                 info.round === 5 ? [[P1, P3], [P2, P5], [P4, P6]] : 
                 null
-
-            for (let j = 0; j < pairings.length; j++) {
-                const pairing = pairings[j]
-                if (
-                    (pairing[0].playerId === winningPlayer.id && pairing[1].playerId === losingPlayer.id) ||
-                    (pairing[0].playerId === losingPlayer.id && pairing[1].playerId === winningPlayer.id)
-                ) {
-                    correctPairing = true
-                    break
+            
+            if (pairings && info.round > 5) {
+                for (let j = 0; j < pairings.length; j++) {
+                    const pairing = pairings[j]
+                    if (
+                        (pairing[0].playerId === winningPlayer.id && pairing[1].playerId === losingPlayer.id) ||
+                        (pairing[0].playerId === losingPlayer.id && pairing[1].playerId === winningPlayer.id)
+                    ) {
+                        correctPairing = true
+                        break
+                    }
                 }
+    
+                if (!correctPairing) return interaction.editReply({ content: `Sorry, ${winningPlayer.name} and ${losingPlayer.name} are not Arena opponents.`})
             }
-
-            if (!correctPairing) return interaction.editReply({ content: `Sorry, ${winningPlayer.name} is not your Arena opponent.`})
 
             const newScore = winningEntry.score + 1
             await winningEntry.update({ score: newScore, isPlaying: false })

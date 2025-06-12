@@ -536,21 +536,21 @@ export const resetArena = async (arenaEntries) => {
 
 //CHECK ARENA PROGRESS
 export const checkArenaProgress = async () => {
-    // const info = await Info.findOne({ where: { element: 'arena' }})
+    const info = await Info.findOne({ where: { element: 'arena' }})
     const arenaEntries = await ArenaEntry.findAll({ include: Player, order: [["score", "DESC"]]})
-    // if (!arenaEntries) return channel.send({ content: `Critical error. Missing arenaEntries in the database.`}) 
+    if (!arenaEntries) return channel.send({ content: `Critical error. Missing arenaEntries in the database.`}) 
 
-    // if (info.round === 4) {
-    //     info.round = 5
-    //     await info.save()
-    //     return setTimeout(() => startRound(arenaEntries), 3000)
-    // }
+    if (info.round === 6) {
+        info.round = 7
+        await info.save()
+        return setTimeout(() => startRound(arenaEntries), 3000)
+    }
 
-    // const scores = arenaEntries.map((arenaEntry) => arenaEntry.score)
+    const scores = arenaEntries.map((arenaEntry) => arenaEntry.score)
     const progress_report = arenaEntries.map((arenaEntry) => arenaEntry.isPlaying)
-    // const sum = scores.reduce((a, b) => a + b)
+    const sum = scores.reduce((a, b) => a + b)
 
-    if (/*sum % 3 === 0 &&*/ !progress_report.includes(true)) return setTimeout(() => postStandings(arenaEntries), 3000)
+    if (sum % 3 === 0 && !progress_report.includes(true)) return setTimeout(() => postStandings(arenaEntries), 3000)
 }
 
 //GET ARENA CONFIRMATIONS

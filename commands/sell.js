@@ -75,6 +75,7 @@ export default {
             const buyerDiscordId = interaction.options.getUser('buyer')?.id || merchbotDiscordId
             const buyer = await Player.findByDiscordId(buyerDiscordId)
             const buyersWallet = await Wallet.findOne({ where: { playerId: buyer.id }})
+            if (price > buyersWallet.stardust) return interaction.reply({ content: `Sorry, ${buyer.name} only has ${buyersWallet.stardust}${stardust}.` })
 
             if (sellerDiscordId === buyerDiscordId) return interaction.reply({ content: `You cannot sell cards to yourself.`})
             if (!sellersWallet) return interaction.reply({ content: `You are not in the database. Type **/play** to begin the game.`})

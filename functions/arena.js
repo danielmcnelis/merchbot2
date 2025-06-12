@@ -272,7 +272,7 @@ export const startRound = async (arenaEntries) => {
     const channel = client.channels.cache.get(arenaChannelId)
     const guild = client.guilds.cache.get("1372580468297568458")
 
-    if (info.round === 5) {
+    if (info.round === 7) {
         // VOUCHERS
         // const voucher = vouchers[arenaEntries[1].tribe]
         // const quantity = 6
@@ -298,7 +298,7 @@ export const startRound = async (arenaEntries) => {
         // if (await check6TribesComplete(playerId, 1)) completeTask(channel, playerId, 'h8', 4000)
         // if (await check6TribesComplete(playerId, 3)) completeTask(channel, playerId, 'l6', 5000)
         return endArena(arenaEntries)
-    } else if (info.round === 4) {
+    } else if (info.round === 6) {
         if (arenaEntries[0].score > arenaEntries[1].score) {
         //1st place outright
             // VOUCHERS

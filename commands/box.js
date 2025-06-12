@@ -122,6 +122,21 @@ export default {
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
                 if (confirmation.customId.includes('Yes')) {
+
+                    const updatedWallet = await Wallet.findOne({ where: { playerId: player.id }})
+
+                    const updateMoney = updatedWallet[set.currency]
+                    if (updateMoney < (Math.round(set.boxPrice * discount))) return interaction.editReply({ content: `Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and a Box of ${set.name} ${eval(set.emoji)} costs ${Math.round(set.boxPrice * discount)}${eval(set.currency)}.`})
+                    
+                    updatedWallet[set.currency] -= (Math.round(set.boxPrice * discount))
+                    await updatedWallet.save()
+
+                    merchbotWallet.stardust += set.currency === 'stardust' ? set.boxPrice * discount : set.boxPrice * discount * 10
+                    await merchbotWallet.save()
+
+                    set.unitSales += num
+                    await set.save()
+
                     interaction.editReply({ content: `Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Box.`, components: []})
                     // const boxes = Math.floor(num / set.packsPerBox)
                     // const packsFromBoxes = boxes * set.packsPerBox

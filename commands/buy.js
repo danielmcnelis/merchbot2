@@ -71,6 +71,7 @@ export default {
             const buyerDiscordId = interaction.user.id
             const buyer = await Player.findByDiscordId(buyerDiscordId)
             const buyersWallet = await Wallet.findOne({ where: { playerId: buyer.id }})
+            if (price > buyersWallet.stardust) return interaction.reply({ content: `Sorry, you only have ${buyersWallet.stardust}${stardust}.` })
             const merchbotDiscordId = '584215266586525696'
 
             const sellerDiscordId = interaction.options.getUser('seller')?.id || merchbotDiscordId

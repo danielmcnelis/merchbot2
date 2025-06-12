@@ -130,8 +130,23 @@ export default {
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
                 if (confirmation.customId.includes('Yes')) {
-                    interaction.editReply({ content: `Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}.`, components: []})
+
+                    const updatedWallet = await Wallet.findOne({ where: { playerId: player.id }})
+
+                    const updateMoney = updatedWallet[set.currency]
+                    if (updateMoney < (Math.round(set.unitPrice * discount) * num)) return interaction.editReply({ content: `Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${num > 1 ? `${num} ` : ''}${set.name} ${eval(set.emoji)} Packs cost ${Math.round(set.unitPrice * discount) * num}${eval(set.currency)}.`})
                     
+                    updatedWallet[set.currency] -= (Math.round(set.unitPrice * discount) * num)
+                    await updatedWallet.save()
+
+                    merchbotWallet.stardust += set.currency === 'stardust' ? set.unitPrice * discount * num : set.unitPrice * num * 10
+                    await merchbotWallet.save()
+
+                    set.unitSales += num
+                    await set.save()
+                    
+                    interaction.editReply({ content: `Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}.`, components: []})
+                        
                     for (let j = 0; j < num; j++) {
                         const results = [`\n${eval(set.emoji)} - ${set.name} Pack${num > 1 ? ` ${j + 1}` : ''} - ${eval(set.altEmoji)}`]
                         const yourCommons = set.commonsPerPack > 1 ? getRandomSubset(commons, set.commonsPerPack) : set.commonsPerPack === 1 ? [getRandomElement(commons)] : []
@@ -192,14 +207,6 @@ export default {
                         interaction.user.send({ content: `${results.join('\n').toString()}`, files: [attachment] }).catch((err) => console.log(err))
                     }
 
-                    wallet[set.currency] -= (Math.round(set.unitPrice * discount) * num)
-                    await wallet.save()
-
-                    merchbotWallet.stardust += set.currency === 'stardust' ? set.unitPrice * discount * num : set.unitPrice * num * 10
-                    await merchbotWallet.save()
-
-                    set.unitSales += num
-                    await set.save()
                     return
                 } else {
                     await confirmation.update({ components: [] })

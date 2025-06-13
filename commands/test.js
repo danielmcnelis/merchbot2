@@ -7,6 +7,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 // import { Match, Tournament, Server, TriviaQuestion } from '@fl/models'
 import { ArenaProfile, Binder, Wishlist } from '../database/index.js'
 import {isProgrammer} from '../functions/utility.js'
+import {applyPriceDecay} from '../functions/shop.js'
 // import axios from 'axios'
 // import { assignTournamentRoles, recalculateAllStats } from '../../../bot-functions/src'
 // import { Stats } from '../../../models/src'
@@ -21,14 +22,7 @@ export default {
         try {
             await interaction.deferReply()
             if (isProgrammer(interaction.member)) {
-                const playerName = 'Jazz'
-                const playerId = 'UeyvnNBD6CD53gsqRQsxCY'
-                let profile = await ArenaProfile.findOne({ where: { playerId } })
-                if (!profile) {
-                    console.log('creating...')
-                    profile = await ArenaProfile.create({ playerId, playerName})
-                }
-            } else {
+                await applyPriceDecay()
                 await interaction.editReply('🧪')
             }
         } catch (err) {

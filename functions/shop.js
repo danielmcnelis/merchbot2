@@ -82,7 +82,7 @@ export const applyPriceDecay = async () => {
         return setTimeout(async () => applyPriceDecay(), 24 * 60 * 60 * 1000)
     }
 
-	const prints = await ForgedPrint.findAll()
+	const prints = await ForgedPrint.findAll({ order: [["marketPrice", "DESC"]] })
     let a = 0
     let b = 0
 

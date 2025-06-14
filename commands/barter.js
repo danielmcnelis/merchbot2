@@ -4,7 +4,7 @@ import { ForgedInventory, ForgedPrint, Info, Player, Wallet } from '../database/
 import { calculateNewMarketPrice, getSellerConfirmation, checkBinderForRemoval, checkWishlistForRemoval } from '../functions/transaction.js'
 import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
-import arenas from '../static/arena.json' with { type: 'json' }
+import arenas from '../static/arenas.json' with { type: 'json' }
 const { vouchers } = arenas
 const {com, rar, sup, ult, scr, stardust, merchant, blue, mushrooms, gems, bolts, orbs, shields, skulls} = emojis
 import channels from '../static/channels.json' with { type: 'json' }

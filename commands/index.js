@@ -7,6 +7,7 @@ import noshow from './noshow.js'
 import award from './award.js'
 import awardPartialBox from './award_partial_box.js'
 import banlist from './banlist.js'
+import barter from './barter.js'
 import bid from './bid.js'
 import bids from './bids.js'
 import binder from './binder.js'
@@ -51,6 +52,7 @@ export default {
         award,
         awardPartialBox,
         banlist,
+        barter,
         bid,
         bids,
         binder,

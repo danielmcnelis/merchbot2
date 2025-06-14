@@ -26,18 +26,27 @@
         }
     },
     "vouchers": {
-        "beast":"mushroom",
+        "beast":"mushrooms",
         "dinosaur":"egg",
-        "dragon":"gem",
+        "dragon":"gems",
         "fiend":"familiar",
         "fish":"hook",
+        "machine":"bolts",
         "plant":"rose",
         "reptile":"cactus",
         "rock":"moai",
-        "spellcaster":"orb",
+        "spellcaster":"orbs",
         "thunder":"battery",
-        "warrior":"swords",
-        "zombie":"skull"
+        "warrior":"shields",
+        "zombie":"skulls"
+    },
+    "barters": {
+        "APC-004":"mushrooms",
+        "APC-002":"gems",
+        "APC-003":"bolts",
+        "APC-001":"orbs",
+        "APC-005":"shields",
+        "APC-006":"zombie"
     },
     "prizes": {
         "beast":"APC-004",

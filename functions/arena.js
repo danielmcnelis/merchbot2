@@ -6,7 +6,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
 import roles from '../static/roles.json' with { type: 'json' }
 const { arenaRole } = roles
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { gladiators, foxy, shrine, cavebob, AOD, king, arena, beast, dragon, warrior, spellcaster, machine, zombie, starchips, ult } = emojis
+const { gladiators, foxy, shrine, cavebob, AOD, king, arena, beast, dragon, warrior, spellcaster, machine, zombie, starchips, ult, mushrooms, gems, bolts, orbs, shields, skulls } = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { arenaChannelId } = channels
 import arenas from '../static/arenas.json' with { type: 'json' }
@@ -275,12 +275,12 @@ export const startRound = async (arenaEntries) => {
 
     if (info.round === 7) {
         // VOUCHERS
-        // const voucher = vouchers[arenaEntries[1].tribe]
-        // const quantity = 6
-        // const wallet = await Wallet.findOne({ where: { playerId: arenaEntries[1].playerId }})
-        // wallet[voucher] += quantity
-        // await wallet.save()
-        // channel.send({ content: `<@${arenaEntries[1].playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
+        const voucher = vouchers[arenaEntries[1].tribe]
+        const quantity = 5
+        const wallet = await Wallet.findOne({ where: { playerId: arenaEntries[1].playerId }})
+        wallet[voucher] += quantity
+        await wallet.save()
+        channel.send({ content: `<@${arenaEntries[1].player.discordId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
         
         console.log('arenaEntries[0].tribe', arenaEntries[0].tribe)
         console.log('arenaEntries[0].player', arenaEntries[0].player)
@@ -309,15 +309,15 @@ export const startRound = async (arenaEntries) => {
         if (arenaEntries[0].score > arenaEntries[1].score) {
         //1st place outright
             // VOUCHERS
-            // for (let i = 1; i < arenaEntries.length; i++) {
-            //     const arenaEntry = arenaEntries[i]
-            //     const voucher = vouchers[arenaEntry.tribe]
-            //     const quantity = arenaEntry.score + 2
-            //     const wallet = await Wallet.findOne({ where: { playerId: arenaEntry.playerId }})
-            //     wallet[voucher] += quantity
-            //     await wallet.save()
-            //     channel.send({ content: `<@${arenaEntry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
-            // }
+            for (let i = 1; i < arenaEntries.length; i++) {
+                const arenaEntry = arenaEntries[i]
+                const voucher = vouchers[arenaEntry.tribe]
+                const quantity = arenaEntry.score
+                const wallet = await Wallet.findOne({ where: { playerId: arenaEntry.playerId }})
+                wallet[voucher] += quantity
+                await wallet.save()
+                channel.send({ content: `<@${arenaEntry.player.discordId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
+            }
 
             const tribe = arenaEntries[0].tribe
             const playerId = arenaEntries[0].playerId
@@ -345,12 +345,12 @@ export const startRound = async (arenaEntries) => {
             for (let i = 2; i < arenaEntries.length; i++) {
                 const arenaEntry = arenaEntries[i]
                 // VOUCHERS
-                // const voucher = vouchers[arenaEntry.tribe]
-                // const quantity = arenaEntry.score + 2
-                // const wallet = await Wallet.findOne({ where: { playerId: arenaEntry.playerId }})
-                // wallet[voucher] += quantity
-                // await wallet.save()
-                // channel.send({ content: `<@${arenaEntry.playerId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
+                const voucher = vouchers[arenaEntry.tribe]
+                const quantity = arenaEntry.score
+                const wallet = await Wallet.findOne({ where: { playerId: arenaEntry.playerId }})
+                wallet[voucher] += quantity
+                await wallet.save()
+                channel.send({ content: `<@${arenaEntry.player.discordId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
                 const member = await guild.members.fetch(arenaEntry.player.discordId)
                 member.roles.remove(arenaRole)
                 arenaEntry.score = 0
@@ -375,13 +375,12 @@ export const startRound = async (arenaEntries) => {
                 // VOUCHERS
                 for (let i = 0; i < arenaEntries.length; i++) {
                     const arenaEntry = arenaEntries[i]
-                    // const voucher = vouchers[arenaEntry.tribe]
-                    // const quantity = i < 3 ? arenaEntry.score + 5 : arenaEntry.score + 2
-                    const quantity = 10
+                    const voucher = vouchers[arenaEntry.tribe]
+                    const quantity = i < 3 ? arenaEntry.score + 2 : arenaEntry.score
                     const wallet = await Wallet.findOne({ where: { playerId: arenaEntry.playerId }})
-                    wallet.starchips += quantity
-                    await wallet.save()
-                    channel.send({ content: `<@${arenaEntry.player.discordId}> ${getRandomElement(verbs)} ${quantity}${starchips} from the Arena. ${getRandomElement(encouragements)}`})
+                    wallet[voucher] += quantity
+                await wallet.save()
+                    channel.send({ content: `<@${arenaEntry.player.discordId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
                 }
     
                 channel.send({ content: `The shadows grew long over the battlefield, and the gladiators ${gladiators} had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena. ${arena}`})
@@ -391,13 +390,12 @@ export const startRound = async (arenaEntries) => {
             // VOUCHERS
             for (let i = 0; i < arenaEntries.length; i++) {
                 const arenaEntry = arenaEntries[i]
-                // const voucher = vouchers[arenaEntry.tribe]
-                // const quantity = i < 3 ? arenaEntry.score + 5 : arenaEntry.score + 2
-                const quantity = 8
+                const voucher = vouchers[arenaEntry.tribe]
+                const quantity = i < 4 ? arenaEntry.score + 2 : arenaEntry.score
                 const wallet = await Wallet.findOne({ where: { playerId: arenaEntry.playerId }})
-                wallet.starchips += quantity
+                wallet[voucher] += quantity
                 await wallet.save()
-                channel.send({ content: `<@${arenaEntry.player.discordId}> ${getRandomElement(verbs)} ${quantity}${starchips} from the Arena. ${getRandomElement(encouragements)}`})
+                channel.send({ content: `<@${arenaEntry.player.discordId}> ${getRandomElement(verbs)} ${quantity}${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
             }
 
             channel.send({ content: `The shadows grew long over the battlefield, and the gladiators ${gladiators} had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena. ${arena}`})

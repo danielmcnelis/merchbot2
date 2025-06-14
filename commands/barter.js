@@ -47,7 +47,6 @@ export default {
         },
 	async execute(interaction) {
         try {
-            if (interaction.channel.id !== botSpamChannelId && interaction.channel.id !== marketPlaceChannelId) return interaction.reply({ content: `Command not valid outside of <#${marketPlaceChannelId}> or <#${botSpamChannelId}>.` })
             const printId = interaction.options.getNumber('print')
             const print = await ForgedPrint.findOne({ where: { id: printId }})
             const card = `${eval(print.rarity)}${print.cardCode} - ${print.cardName}`

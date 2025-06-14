@@ -47,7 +47,8 @@ export default {
         },
 	async execute(interaction) {
         try {
-            const printId = interaction.options.getNumber('print')
+            const printId = interaction.options.getNumber('card')
+            console.log(printId)
             const print = await ForgedPrint.findOne({ where: { id: printId }})
             const card = `${eval(print.rarity)}${print.cardCode} - ${print.cardName}`
             const voucher = print.cardCode === 'APC04' ? 'mushrooms' :

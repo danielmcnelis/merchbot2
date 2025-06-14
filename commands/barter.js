@@ -101,7 +101,7 @@ export default {
 
             await interaction.reply({ content: `Are you sure you want to exchange 10 ${eval(voucher)} for ${card}? ${blue}`, components: [row] })
 
-            const filter = i => i.customId.startsWith(`Buy-${timestamp}`) && i.user.id === interaction.user.id;
+            const filter = i => i.customId.startsWith(`Barter-${timestamp}`) && i.user.id === interaction.user.id;
             
             let confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 }).catch(async (err) => {
                 console.log(err)

@@ -26,7 +26,7 @@ export const awardCard = async (channel, player, cardCode, quantity = 1) => {
     } else {
         await ForgedInventory.create({
             playerId: player.id,
-            playerName: 
+            playerName: player.name,
             cardCode,
             cardName: print.cardName,
             cardId: print.cardId,

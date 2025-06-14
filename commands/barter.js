@@ -73,7 +73,7 @@ export default {
             if (!sellersWallet) return interaction.reply({ content: `That user is not in the database.`})
 
             const info = await Info.findOne({ where: { element: 'shop'} })
-            if (info.status === 'closed') return interaction.reply({ content: `Sorry, The Shop ${merchant} is currently closed.` })
+            // if (info.status === 'closed') return interaction.reply({ content: `Sorry, The Shop ${merchant} is currently closed.` })
             if (10 > buyersWallet[voucher]) return interaction.reply({ content: `Sorry, you only have ${buyersWallet[voucher]} ${eval(voucher)}.` })
             
             const buyersInv = await ForgedInventory.findOne({

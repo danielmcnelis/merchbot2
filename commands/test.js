@@ -5,7 +5,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 // import { client } from '../client'
 // import { s3FileExists } from '@fl/bot-functions'
 // import { Match, Tournament, Server, TriviaQuestion } from '@fl/models'
-import { ArenaProfile, Binder, Wishlist } from '../database/index.js'
+import { ArenaProfile, Binder, ForgedInventory, Wishlist } from '../database/index.js'
 import {isProgrammer} from '../functions/utility.js'
 import {applyPriceDecay} from '../functions/shop.js'
 // import axios from 'axios'
@@ -22,7 +22,23 @@ export default {
         try {
             await interaction.deferReply()
             if (isProgrammer(interaction.member)) {
-                await applyPriceDecay()
+                const invs = await ForgedInventory.findAll({ 
+                    order: ['playerName', 'ASC', 'cardCode', 'ASC']
+                })
+                
+                for (let i = 0; i < invs.length; i++) {
+                    const inv = invs[i]
+                    const dup = await ForgedInventory.findOne({
+                        where: {
+                            id: {[Op.not]: inv.id},
+                            cardCode: inv.cardCode,
+                            playerId: inv.playerId
+                        }
+                    })
+
+                    if (dup) console.log(`${inv.playerName} has a duplicate of ${inv.cardCode} - ${inv.cardName}`)
+                }
+
                 await interaction.editReply('🧪')
             }
         } catch (err) {

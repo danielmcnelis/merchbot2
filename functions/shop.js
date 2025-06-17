@@ -271,6 +271,7 @@ export const processBids = async () => {
             await ForgedInventory.create({ 
                 cardName: bid.cardName,
                 cardCode: bid.cardCode,
+                cardId: print.cardId,
                 quantity: 1,
                 forgedPrintId: bid.forgedPrintId,
                 playerId: bid.playerId,

@@ -75,6 +75,7 @@ const processTradeComponent = async (interaction, sender, recipient, quantity, p
         recipientInv = await ForgedInventory.create({
             cardName: print.cardName,
             cardCode: print.cardCode,
+            cardId: print.cardId,
             forgedPrintId: print.id,
             quantity: quantity,
             playerName: recipient.name,
@@ -256,6 +257,7 @@ export const getSellerConfirmation = async (interaction, buyer, seller, quantity
                 await ForgedInventory.create({
                     cardName: print.cardName,
                     cardCode: print.cardCode,
+                    cardId: print.cardId,
                     forgedPrintId: print.id,
                     quantity: quantity,
                     playerName: buyer.name,
@@ -321,6 +323,7 @@ export const getBuyerConfirmation = async (interaction, buyer, seller, quantity,
                 await ForgedInventory.create({
                     cardName: print.cardName,
                     cardCode: print.cardCode,
+                    cardId: print.cardId,
                     forgedPrintId: print.id,
                     quantity: quantity,
                     playerName: buyer.name,
@@ -738,6 +741,7 @@ const processMerchBotSale = async (message, invoice, buyingPlayer, sellingPlayer
             await Inventory.create({ 
                 cardCode: print.cardCode,
                 printId: print.id,
+                cardId: print.cardId,
                 playerId: buyerId
             })
         }
@@ -820,6 +824,7 @@ const processP2PSale = async (message, invoice, buyingPlayer, sellingPlayer) => 
             await Inventory.create({ 
                 cardCode: print.cardCode,
                 printId: print.id,
+                cardId: print.cardId,
                 playerId: buyerId
             })
         }

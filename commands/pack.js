@@ -195,6 +195,7 @@ export default {
                                 await ForgedInventory.create({ 
                                     cardName: print.cardName,
                                     cardCode: print.cardCode,
+                                    cardId: print.cardId,
                                     quantity: 1,
                                     forgedPrintId: print.id,
                                     playerName: player.name,

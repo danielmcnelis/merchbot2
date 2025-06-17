@@ -248,7 +248,9 @@ const processTrade = async (message, transactionId, initiatorSummary, receiverSu
 			await mirror_inv.save()
 		} else {
 			await Inventory.create({ 
+                cardName: print.cardName,
 				cardCode: print.cardCode,
+                cardId: print.cardId,
 				quantity: quantity,
 				printId: print.id,
 				playerId: receivingPlayer.id
@@ -316,7 +318,9 @@ const processTrade = async (message, transactionId, initiatorSummary, receiverSu
 			await mirror_inv.save()
 		} else {
 			await Inventory.create({ 
+                cardName: print.cardName,
 				cardCode: print.cardCode,
+                cardId: print.cardId,
 				quantity: quantity,
 				printId: print.id,
 				playerId: initiatingPlayer.id

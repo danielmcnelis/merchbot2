@@ -71,6 +71,7 @@ export const awardStarterDeck = async (playerId, starter) => {
         } else {
             await Inventory.create({ 
                 cardCode: print.cardCode,
+                cardId: print.cardId,
                 quantity: decks[starter].cards[key],
                 printId: print.id,
                 playerId: playerId

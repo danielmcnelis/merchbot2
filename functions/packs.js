@@ -109,6 +109,7 @@ export const awardPacks = async (channel, member, set, num = 1) => {
                     await ForgedInventory.create({ 
                         cardName: print.cardName,
                         cardCode: print.cardCode,
+                        cardId: print.cardId,
                         quantity: 1,
                         forgedPrintId: print.id,
                         playerName: player.name,
@@ -223,6 +224,7 @@ export const awardBox = async (channel, member, set, offset = 24) => {
                     await ForgedInventory.create({ 
                         cardName: print.cardName,
                         cardCode: print.cardCode,
+                        cardId: print.cardId,
                         quantity: 1,
                         forgedPrintId: print.id,
                         playerName: player.name,
@@ -362,6 +364,7 @@ export const awardPacksToShop = async (num, core = true) => {
                     await ForgedInventory.create({ 
                         cardCode: print.cardCode,
                         cardName: print.cardName,
+                        cardId: print.cardId,
                         quantity: 1,
                         forgedPrintId: print.id,
                         playerName: 'MerchBot',

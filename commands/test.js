@@ -23,9 +23,9 @@ export default {
             await interaction.deferReply()
             if (isProgrammer(interaction.member)) {
                 const invs = await ForgedInventory.findAll({ 
-                    order: ['playerName', 'ASC', 'cardCode', 'ASC']
+                    order: [['playerName', 'ASC'], ['cardCode', 'ASC']]
                 })
-                
+
                 for (let i = 0; i < invs.length; i++) {
                     const inv = invs[i]
                     const dup = await ForgedInventory.findOne({

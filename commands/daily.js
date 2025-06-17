@@ -28,6 +28,7 @@ export default {
 
             const sets = await ForgedSet.findAll({ 
                 where: { 
+                    code: 'AOD',
                     type: 'core',
                     forSale: true
                 },

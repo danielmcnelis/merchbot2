@@ -47,9 +47,10 @@ export default {
             await Wallet.create({ playerId: player.id, playerName: player.name, starchips, stardust })
 
             const set = await ForgedSet.findOne({ where: { code: 'AOD' }})
-            interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 8 packs and a YDK file of your starting inventory!` })
-            await awardPacks(interaction.channel, interaction.member, set, 8)
-            return await sendInventoryYDK(interaction, player)
+            await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 24 packs and us the command **/inventory** to view your inventory!` })
+            // await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 8 packs and a YDK file of your starting inventory!` })
+            return await awardBox(interaction.channel, interaction.member, set, 24)
+            // return await sendInventoryYDK(interaction, player)
         } catch (err) {
             console.log(err)
         }

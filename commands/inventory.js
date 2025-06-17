@@ -123,6 +123,7 @@ export default {
                 }
             }
 
+            interaction.user.send({ content: `Browse your Inventory: https://formatlibrary.com/forged-inventory/${player.id}` })
             return interaction.reply({ content: `I messaged you the Inventory you requested.`})
         } catch (err) {
             console.log(err)

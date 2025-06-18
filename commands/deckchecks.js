@@ -15,6 +15,14 @@ import {applyPriceDecay} from '../functions/shop.js'
 // import { Stats } from '../../../models/src'
 // import { config } from '@fl/config'
 
+
+//CONVERT ARRAY TO OBJECT
+export const convertArrayToObject = (arr = []) => {
+    const obj = {}
+    arr.forEach(e => obj[e] ? obj[e]++ : obj[e] = 1)
+    return obj
+}
+
 // GET FORGED ISSUES
 export const getForgedIssues = async (player, deckArr) => {
     const deck = convertArrayToObject(deckArr)   

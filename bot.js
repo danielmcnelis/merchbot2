@@ -77,21 +77,20 @@ client.on('ready', async () => {
 	if (shopOpen && shopShouldBe === 'closed') client.channels.cache.get(staffChannelId).send({ content: `<@&${adminRole}>, The Shop is unexpectedly open. Please use the command **/close** to close The Shop.`})
 
 	if (shopShouldBe === 'closed') {
-		return setTimeout(() => openShop(), shopCountdown)
+		setTimeout(() => openShop(), shopCountdown)
 	} else if (shopShouldBe === 'open') {
-		return setTimeout(() => closeShop(), shopCountdown)
+		setTimeout(() => closeShop(), shopCountdown)
 	}
 
     // CHECK DAILY RATE LIMITER
     const daily = await Daily.findOne({ where: {
         isProcessing: true
     }})
-    console.log('!!daily', !!daily)
 
     if (daily) {
         await daily.update({ isProcessing: false })
         const programmer = await client.users.fetch('194147938786738176')
-        return await programmer.send({ content: `${daily.playerName}'s daily (cobble progress ${daily.cobbleProgress}) was interrupted.` })
+        await programmer.send({ content: `${daily.playerName}'s daily (cobble progress ${daily.cobbleProgress}) was interrupted.` })
     }
 })
 

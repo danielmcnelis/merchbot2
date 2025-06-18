@@ -85,7 +85,7 @@ export const getForgedIssues = async (player, deckArr) => {
         }
 
         if (quantityOwned < totalQuantities[quantityKey]) {
-            if (quantityOwned === 0 && !illegalCards.includes(quantityKey)) {
+            if (quantityOwned === 0) {
                 zeroCopiesOwned.push(quantityKey)
             } else if (quantityOwned === 1) {
                 oneCopyOwned.push(quantityKey)

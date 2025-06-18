@@ -17,12 +17,22 @@ export default {
             const player = await Player.findByDiscordId(interaction.user.id)
             const daily = await Daily.findOne({ where: { playerId: player.id } })
             if (!daily) return interaction.editReply({ content: `You are not in the database. Type **/play** to begin the game.`})
-
             const date = new Date()
             const hoursLeftInDay = date.getMinutes() === 0 ? 24 - date.getHours() : 23 - date.getHours()
-            const minsLeftInHour = date.getMinutes() === 0 ? 0 : 60 - date.getMinutes()
-            
+            const minsLeftInHour = date.getMinutes() === 0 ? 0 : 60 - date.getMinutes()            
             if (daily.lastDaily && isSameDay(daily.lastDaily, date)) return interaction.editReply({ content: `You already used **/daily** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`})
+
+            const someoneElseIsProcessing = await Daily.count({
+                where: {
+                    isProcessing: true
+                }
+            })
+
+            if (someoneElseIsProcessing) {
+                return interaction.editReply({ content: `Someone else is using the **/daily** command. Please try again in a moment.`})
+            } else {
+                await daily.update({ isProcessing: true })
+            }
 
             const daysPassed = daily.lastDaily ? Math.round( ( date.setHours(0, 0, 0, 0) - daily.lastDaily.setHours(0, 0, 0, 0) ) / (1000*60*60*24) ) : 1
 
@@ -132,9 +142,11 @@ export default {
                     setTimeout(async () => {
                         await interaction.channel.send({ content: `Oh look, ${daily.playerName}, you cobbled together a pack!`, files: [packImage]})
                         if (num === 24) {
-                            return awardBox(interaction.channel, interaction.member, set)
+                            await awardBox(interaction.channel, interaction.member, set)
+                            return await daily.update({ isProcessing: false })
                         } else {
-                            return awardPacks(interaction.channel, interaction.member, set, num)
+                            await awardPacks(interaction.channel, interaction.member, set, num)
+                            return await daily.update({ isProcessing: false })
                         }
                     }, 4000)
                 } else {
@@ -147,6 +159,7 @@ export default {
                 const packImage = new AttachmentBuilder(`./public/${daily.cobbleProgress}outof7.png`, { name: `pack.png` })
                 setTimeout(async() => {
                     await interaction.channel.send({ content: `Hey, ${daily.playerName}, keep cobblin', buddy.`, files: [packImage]})
+                    return await daily.update({ isProcessing: false })
                 }, 4000)
             }
 

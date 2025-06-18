@@ -13,6 +13,10 @@ export const Daily = db.define('dailies', {
         type: Sequelize.BOOLEAN,
         defaultValue: false
     },
+    isProcessing: {
+        type: Sequelize.DATE,
+        defaultValue: false
+    },
     lastDaily: {
         type: Sequelize.DATE,
         allowNull: true

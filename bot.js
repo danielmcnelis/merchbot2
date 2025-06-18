@@ -81,6 +81,17 @@ client.on('ready', async () => {
 	} else if (shopShouldBe === 'open') {
 		return setTimeout(() => closeShop(), shopCountdown)
 	}
+
+    // CHECK DAILY RATE LIMITER
+    const daily = await Daily.findOne({ where: {
+        isProcessing: true
+    }})
+
+    if (daily) {
+        await daily.update({ isProcessing: false })
+        const programmer = await client.users.fetch('194147938786738176')
+        return await programmer.send({ content: `${daily.playerName}'s daily (cobble progress ${daily.cobbleProgress}) was interrupted.` })
+    }
 })
 
 // SUBSCRIPTION

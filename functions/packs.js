@@ -234,7 +234,7 @@ export const awardBox = async (channel, member, set, offset = 24) => {
             }
 
             const attachment = await drawPack(yourCardArtworkIds) || []
-            member.user.send({ content: `${results.join('\n').toString()}`, files: [attachment] }).catch((err) => console.log(err))
+            await member.user.send({ content: `${results.join('\n').toString()}`, files: [attachment] }).catch((err) => console.log(err))
         } catch (err) {
             console.log(err)
         }

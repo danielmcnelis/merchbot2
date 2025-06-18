@@ -86,6 +86,7 @@ client.on('ready', async () => {
     const daily = await Daily.findOne({ where: {
         isProcessing: true
     }})
+    console.log('!!daily', !!daily)
 
     if (daily) {
         await daily.update({ isProcessing: false })

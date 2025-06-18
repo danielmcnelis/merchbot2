@@ -16,45 +16,44 @@ import {applyPriceDecay} from '../functions/shop.js'
 // import { config } from '@fl/config'
 
 // GET FORGED ISSUES
-export const getForgedIssues = async (player, deckArr, format) => {
+export const getForgedIssues = async (player, deckArr) => {
     const deck = convertArrayToObject(deckArr)   
     const cardIds = [...await ForgedPrint.findAll({ include: Card })].flatMap(fp => [fp.card.konamiCode, fp.card.ypdId])
-    const forbiddenIds = [...await Status.findAll({ where: { banlist: format.banlist, category: 'Forged', restriction: 'forbidden' }, include: Card })].flatMap(s => [s.card.konamiCode, s.card.ydpId])
-    const limitedIds = [...await Status.findAll({ where: { banlist: format.banlist, category: 'Forged', restriction: 'limited' }, include: Card })].flatMap(s => [s.card.konamiCode, s.card.ydpId])
-    const semiIds = [...await Status.findAll({ where: { banlist: format.banlist, category: 'Forged', restriction: 'semi-limited' }, include: Card })].flatMap(s => [s.card.konamiCode, s.card.ydpId])
+    // const forbiddenIds = [...await Status.findAll({ where: { banlist: format.banlist, category: 'Forged', restriction: 'forbidden' }, include: Card })].flatMap(s => [s.card.konamiCode, s.card.ydpId])
+    // const limitedIds = [...await Status.findAll({ where: { banlist: format.banlist, category: 'Forged', restriction: 'limited' }, include: Card })].flatMap(s => [s.card.konamiCode, s.card.ydpId])
+    // const semiIds = [...await Status.findAll({ where: { banlist: format.banlist, category: 'Forged', restriction: 'semi-limited' }, include: Card })].flatMap(s => [s.card.konamiCode, s.card.ydpId])
     
-    const illegalCards = []
-    const forbiddenCards = []
-    const limitedCards = []
-    const semiLimitedCards = []
-    const unrecognizedCards = []
+    // const illegalCards = []
+    // const forbiddenCards = []
+    // const limitedCards = []
+    // const semiLimitedCards = []
+    // const unrecognizedCards = []
 
-    const totalQuantities = {}
+    // const totalQuantities = {}
 
-    const keys = Object.keys(deck)
-    for (let i = 0; i < keys.length; i++) {
-        const key = keys[i]
-        let konamiCode = keys[i]
-        while (konamiCode.length < 8) konamiCode = '0' + konamiCode 
-        if (konamiCode === '00000000' && format.name === 'Advanced') continue
-        const card = await Card.findOne({ where: { [Op.or]: { konamiCode: konamiCode, ypdId: konamiCode } } })
+    // const keys = Object.keys(deck)
+    // for (let i = 0; i < keys.length; i++) {
+    //     const key = keys[i]
+    //     let konamiCode = keys[i]
+    //     while (konamiCode.length < 8) konamiCode = '0' + konamiCode 
+    //     const card = await Card.findOne({ where: { [Op.or]: { konamiCode: konamiCode, ypdId: konamiCode } } })
 
-        totalQuantities[card.name] = deck[key]
+    //     totalQuantities[card.name] = deck[key]
 
-        if (!cardIds.includes(konamiCode)) {
-            if (card) {
-                illegalCards.push(card.name)
-            } else {
-                unrecognizedCards.push(konamiCode)
-            }
-        } else if (forbiddenIds.includes(konamiCode)) {
-            if (card) forbiddenCards.push(card.name)
-        } else if ((format.isHighlander || limitedIds.includes(konamiCode)) && deck[key] > 1) {
-            if (card) limitedCards.push(card.name)
-        } else if (semiIds.includes(konamiCode) && deck[key] > 2) {
-            if (card) semiLimitedCards.push(card.name)
-        }
-    }
+    //     if (!cardIds.includes(konamiCode)) {
+    //         if (card) {
+    //             illegalCards.push(card.name)
+    //         } else {
+    //             unrecognizedCards.push(konamiCode)
+    //         }
+    //     } else if (forbiddenIds.includes(konamiCode)) {
+    //         if (card) forbiddenCards.push(card.name)
+    //     } else if ((format.isHighlander || limitedIds.includes(konamiCode)) && deck[key] > 1) {
+    //         if (card) limitedCards.push(card.name)
+    //     } else if (semiIds.includes(konamiCode) && deck[key] > 2) {
+    //         if (card) semiLimitedCards.push(card.name)
+    //     }
+    // }
 
     const quantityKeys = Object.keys(totalQuantities)
     const zeroCopiesOwned = []
@@ -88,21 +87,21 @@ export const getForgedIssues = async (player, deckArr, format) => {
         }
     }
     
-    illegalCards.sort()
-    forbiddenCards.sort()
-    limitedCards.sort()
-    semiLimitedCards.sort()
-    unrecognizedCards.sort()
+    // illegalCards.sort()
+    // forbiddenCards.sort()
+    // limitedCards.sort()
+    // semiLimitedCards.sort()
+    // unrecognizedCards.sort()
     zeroCopiesOwned.sort()
     oneCopyOwned.sort()
     twoCopiesOwned.sort()
 
     const issues = {
-        illegalCards,
-        forbiddenCards,
-        limitedCards,
-        semiLimitedCards,
-        unrecognizedCards,
+        // illegalCards,
+        // forbiddenCards,
+        // limitedCards,
+        // semiLimitedCards,
+        // unrecognizedCards,
         zeroCopiesOwned,
         oneCopyOwned,
         twoCopiesOwned
@@ -150,7 +149,7 @@ export default {
             await interaction.deferReply()
             if (isProgrammer(interaction.member)) {
                 const tournamentId = interaction.options.getString('tournament')
-                const format = await Format.findOne({ where: { name: 'Forged in Chaos' }})
+                // const format = await Format.findOne({ where: { name: 'Forged in Chaos' }})
                 const entries = await Entry.findAll({ where: { tournamentId }, include: Player, order: [['playerName', 'ASC']]})
                 for (let i = 0; i < entries.length; i++) {
                     const entry = entries[i]
@@ -161,12 +160,12 @@ export default {
                     const side = ydk.split('!side')[1].split(/[\s]+/).map((e) => e.replace(/\D/g,'')).filter((e) => e.length)    
 
                     const deckArr = [...main, ...extra, ...side,]
-                    const issues = await getForgedIssues(entry.player, deckArr, format)
+                    const issues = await getForgedIssues(entry.player, deckArr)
         
                     const { zeroCopiesOwned, oneCopyOwned, twoCopiesOwned } = issues
                     
                     if (zeroCopiesOwned?.length || oneCopyOwned?.length || twoCopiesOwned?.length) {
-                        await interaction.channel.send({ content: `High Alert: <@${entry.player.discordId}> does not own every card in their deck.`}).catch((err) => console.log(err))
+                        await interaction.channel.send({ content: `High Alert: <@ ${entry.player.discordId}> does not own every card in their deck.`}).catch((err) => console.log(err))
                     } else {
                         await interaction.channel.send({ content: `${entry.player} owns all the cards in their deck.`}).catch((err) => console.log(err))
                     } 

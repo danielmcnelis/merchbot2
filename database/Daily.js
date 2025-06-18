@@ -14,7 +14,7 @@ export const Daily = db.define('dailies', {
         defaultValue: false
     },
     isProcessing: {
-        type: Sequelize.DATE,
+        type: Sequelize.BOOLEAN,
         defaultValue: false
     },
     lastDaily: {

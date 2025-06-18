@@ -115,7 +115,7 @@ export default {
     data: new SlashCommandBuilder()
         .setName('deckchecks')
         .setDescription('Admin Only - Check tournament decks. 🧪')
-        .addNumberOption(option =>
+        .addStringOption(option =>
             option
                 .setName('tournament')
                 .setDescription('Which tournament do you wish to check?')
@@ -149,7 +149,7 @@ export default {
         try {
             await interaction.deferReply()
             if (isProgrammer(interaction.member)) {
-                const tournamentId = interaction.options.getNumber('tournament')
+                const tournamentId = interaction.options.getString('tournament')
                 const entries = await Entry.findAll({ where: { tournamentId }, include: Player, order: [['playerName', 'ASC']]})
                 for (let i = 0; i < entries.length; i++) {
                     const entry = entries[i]

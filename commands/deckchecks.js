@@ -6,7 +6,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 // import { client } from '../client'
 // import { s3FileExists } from '@fl/bot-functions'
 // import { Match, Tournament, Server, TriviaQuestion } from '@fl/models'
-import { ArenaProfile, Binder, Card, Entry, Format, ForgedInventory, ForgedPrint, Player, Status, Tournament, Wishlist } from '../database/index.js'
+import { ArenaProfile, Binder, Card, Entry, ForgedInventory, ForgedPrint, Player, Status, Tournament, Wishlist } from '../database/index.js'
 import { Op } from 'sequelize'
 import {isProgrammer} from '../functions/utility.js'
 import {applyPriceDecay} from '../functions/shop.js'

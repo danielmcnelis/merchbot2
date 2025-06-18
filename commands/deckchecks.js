@@ -173,7 +173,7 @@ export default {
                     const { zeroCopiesOwned, oneCopyOwned, twoCopiesOwned } = issues
                     
                     if (zeroCopiesOwned?.length || oneCopyOwned?.length || twoCopiesOwned?.length) {
-                        await interaction.channel.send({ content: `High Alert: <@${entry.player.discordId}> does not own every card in their deck.`}).catch((err) => console.log(err))
+                        await interaction.channel.send({ content: `High Alert: <@${entry.player.discordId}> does not own every card in their deck. <a:high_alert:1384949884221919392>`}).catch((err) => console.log(err))
                     } else {
                         await interaction.channel.send({ content: `${entry.playerName} owns all the cards in their deck.`}).catch((err) => console.log(err))
                     } 

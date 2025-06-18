@@ -139,7 +139,7 @@ export default {
                 })
 
                 await interaction.respond(
-                    tournaments.map(t => ({ name: `${t.name}`, value: t.id })),
+                    tournaments.map(t => ({ name: `${t.name}`, value: t.id.toString() })),
                 )
             } catch (err) {
                 console.log(err)

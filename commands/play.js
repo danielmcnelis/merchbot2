@@ -2,7 +2,7 @@
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { Daily, ForgedSet, Player, Stats, Wallet } from '../database/index.js'
 import { sendInventoryYDK } from '../functions/decks.js'
-import { awardPacks } from '../functions/packs.js'
+import { awardPacks, awardBox } from '../functions/packs.js'
 
 export default {
 	data: new SlashCommandBuilder()
@@ -47,7 +47,7 @@ export default {
             await Wallet.create({ playerId: player.id, playerName: player.name, starchips, stardust })
 
             const set = await ForgedSet.findOne({ where: { code: 'AOD' }})
-            await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 24 packs and us the command **/inventory** to view your inventory!` })
+            await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 24 packs and use the command **/inventory** to view your inventory!` })
             // await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 8 packs and a YDK file of your starting inventory!` })
             return await awardBox(interaction.channel, interaction.member, set, 24)
             // return await sendInventoryYDK(interaction, player)

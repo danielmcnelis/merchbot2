@@ -16,6 +16,7 @@ import buy from './buy.js'
 import checklist from './checklist.js'
 import close from './close.js'
 import daily from './daily.js'
+import deckchecks from './deckchecks.js'
 import decks from './decks.js'
 import drop from './drop.js'
 import dump from './dump.js'
@@ -61,6 +62,7 @@ export default {
         checklist,
         close,
         daily,
+        deckchecks,
         decks,
         drop,
         dump,

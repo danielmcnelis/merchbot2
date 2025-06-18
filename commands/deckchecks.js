@@ -37,31 +37,31 @@ export const getForgedIssues = async (player, deckArr) => {
     // const semiLimitedCards = []
     // const unrecognizedCards = []
 
-    // const totalQuantities = {}
+    const totalQuantities = {}
 
-    // const keys = Object.keys(deck)
-    // for (let i = 0; i < keys.length; i++) {
-    //     const key = keys[i]
-    //     let konamiCode = keys[i]
-    //     while (konamiCode.length < 8) konamiCode = '0' + konamiCode 
-    //     const card = await Card.findOne({ where: { [Op.or]: { konamiCode: konamiCode, ypdId: konamiCode } } })
+    const keys = Object.keys(deck)
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i]
+        let konamiCode = keys[i]
+        while (konamiCode.length < 8) konamiCode = '0' + konamiCode 
+        const card = await Card.findOne({ where: { [Op.or]: { konamiCode: konamiCode, ypdId: konamiCode } } })
 
-    //     totalQuantities[card.name] = deck[key]
+        totalQuantities[card.name] = deck[key]
 
-    //     if (!cardIds.includes(konamiCode)) {
-    //         if (card) {
-    //             illegalCards.push(card.name)
-    //         } else {
-    //             unrecognizedCards.push(konamiCode)
-    //         }
-    //     } else if (forbiddenIds.includes(konamiCode)) {
-    //         if (card) forbiddenCards.push(card.name)
-    //     } else if ((format.isHighlander || limitedIds.includes(konamiCode)) && deck[key] > 1) {
-    //         if (card) limitedCards.push(card.name)
-    //     } else if (semiIds.includes(konamiCode) && deck[key] > 2) {
-    //         if (card) semiLimitedCards.push(card.name)
-    //     }
-    // }
+        // if (!cardIds.includes(konamiCode)) {
+        //     if (card) {
+        //         illegalCards.push(card.name)
+        //     } else {
+        //         unrecognizedCards.push(konamiCode)
+        //     }
+        // } else if (forbiddenIds.includes(konamiCode)) {
+        //     if (card) forbiddenCards.push(card.name)
+        // } else if ((format.isHighlander || limitedIds.includes(konamiCode)) && deck[key] > 1) {
+        //     if (card) limitedCards.push(card.name)
+        // } else if (semiIds.includes(konamiCode) && deck[key] > 2) {
+        //     if (card) semiLimitedCards.push(card.name)
+        // }
+    }
 
     const quantityKeys = Object.keys(totalQuantities)
     const zeroCopiesOwned = []

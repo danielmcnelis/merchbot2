@@ -160,7 +160,7 @@ export default {
                     const side = ydk.split('!side')[1].split(/[\s]+/).map((e) => e.replace(/\D/g,'')).filter((e) => e.length)    
 
                     const deckArr = [...main, ...extra, ...side,]
-                    const issues = await getForgedIssues(player, deckArr, format)
+                    const issues = await getForgedIssues(entry.player, deckArr, format)
         
                     const { zeroCopiesOwned, oneCopyOwned, twoCopiesOwned } = issues
                     

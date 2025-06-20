@@ -2,27 +2,27 @@
     "decks": {
         "beast": {
             "url":"https://www.duelingbook.com/deck?id=17523618",
-            "screenshot":"https://i.imgur.com/HkFAa83.png"
+            "screenshot":"https://i.imgur.com/fymFsUh.jpeg"
         },
         "dragon": {
             "url":"https://www.duelingbook.com/deck?id=17525329",
-            "screenshot":"https://i.imgur.com/PLgePJY.jpeg"
+            "screenshot":"https://i.imgur.com/kVRZc4E.jpeg"
         },
         "machine": {
             "url":"https://www.duelingbook.com/deck?id=17523539",
-            "screenshot":"https://i.imgur.com/CjjRBaL.jpeg"
+            "screenshot":"https://i.imgur.com/DNIj2ZP.jpeg"
         },
         "spellcaster": {
             "url":"https://www.duelingbook.com/deck?id=17523396",
-            "screenshot":"https://i.imgur.com/midkxcl.png"
+            "screenshot":"https://i.imgur.com/5tgp64V.jpeg"
         },
         "warrior": {
             "url":"https://www.duelingbook.com/deck?id=17525225",
-            "screenshot":"https://i.imgur.com/jxSaaGl.jpeg"
+            "screenshot":"https://i.imgur.com/cV3Iy2j.jpeg"
         },
         "zombie": {
             "url":"https://www.duelingbook.com/deck?id=17525286",
-            "screenshot":"https://i.imgur.com/9choWtD.png"
+            "screenshot":"https://i.imgur.com/Cj67hqs.jpeg"
         }
     },
     "vouchers": {

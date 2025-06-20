@@ -2,7 +2,7 @@
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { Player, Wallet } from '../database/index.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const {FiC, stardust, starchips} = emojis
+const {FiC, stardust, starchips, mushrooms, gems, bolts, orbs, shields, skulls} = emojis
 
 export default {
 	data: new SlashCommandBuilder()

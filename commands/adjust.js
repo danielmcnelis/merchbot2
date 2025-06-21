@@ -77,7 +77,7 @@ export default {
             const filter = i => i.customId.startsWith(`Adjust-${timestamp}`) && i.user.id === interaction.user.id;
 
             try {
-                const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 60000 });
+                const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 10000 });
                     
                 if (confirmation.customId.includes('Yes')) {
                     await print.update({ marketPrice: newPrice })

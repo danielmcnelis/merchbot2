@@ -48,15 +48,13 @@ export default {
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
                 if (confirmation.customId.includes('Yes')) {
-                    await confirmation.update({ components: [] })
                     wallet.starchips -= x
                     wallet.stardust += x * 10
                     await wallet.save()
         
                     return interaction.editReply({ content: `You ground ${x}${starchips} into ${x * 10}${stardust}!`})
                 } else {
-                    await confirmation.update({ components: [] })
-                    await confirmation.editReply({ content: `Not a problem. No ${starchips} were ground into ${stardust}.`, components: [] })
+                    await interaction.editReply({ content: `Not a problem. No ${starchips} were ground into ${stardust}.`, components: [] })
                 }
             } catch (err) {
                 console.log(err)

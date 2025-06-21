@@ -97,7 +97,6 @@ export default {
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
                 if (confirmation.customId.includes('Yes')) {
-                    await confirmation.update({ components: [] })
                     if (inv) {
                         console.log('quantity', quantity)
                         console.log('inv.quantity', inv.quantity)
@@ -114,8 +113,7 @@ export default {
 
                     return interaction.editReply({ content: `Yikes! You stole ${quantity}${loot} from ${player.name}. ${robbed}`, components: [] });        
                 } else {
-                    await confirmation.update({ components: [] })
-                    await confirmation.editReply({ content: `Not a problem. No ${loot} was stolen from ${player.name}.`, components: [] })
+                    await interaction.editReply({ content: `Not a problem. No ${loot} was stolen from ${player.name}.`, components: [] })
                 }
             } catch (err) {
                 console.log(err)

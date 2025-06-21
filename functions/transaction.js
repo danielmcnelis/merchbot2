@@ -206,19 +206,17 @@ export const getTraderBConfirmation = async (interaction, proposalA, proposalB, 
 
             await proposalA.destroy()
             await proposalB.destroy()
-            await confirmation.update({ components: [] })
-            return confirmation.editReply({ content: `Success! <@${traderB.discordId}> traded:\n${traderBPackageSummary.join('\n')}\n\nTo <@${traderA.discordId}> for:\n${traderAPackageSummary.join('\n')}`, components: [] })
+            return interaction.editReply({ content: `Success! <@${traderB.discordId}> traded:\n${traderBPackageSummary.join('\n')}\n\nTo <@${traderA.discordId}> for:\n${traderAPackageSummary.join('\n')}`, components: [] })
         } else {
             await proposalA.destroy()
             await proposalB.destroy()
-            await confirmation.update({ components: [] })
-            return confirmation.editReply({ content: `Not a problem. The transaction with ${traderB.name} has been cancelled.`, components: [] })
+            return interaction.editReply({ content: `Not a problem. The transaction with ${traderB.name} has been cancelled.`, components: [] })
         }
     } catch (err) {
         console.log(err)
         await proposalA.destroy()
         await proposalB.destroy()
-        return interaction.channel.send({ content: `Sorry, time's up. The transaction with ${traderB.name} has been cancelled.`, components: [] });
+        return interaction.editReply({ content: `Sorry, time's up. The transaction with ${traderB.name} has been cancelled.`, components: [] });
     }   
 }
 
@@ -278,15 +276,13 @@ export const getSellerConfirmation = async (interaction, buyer, seller, quantity
             const newMarketPrice = calculateNewMarketPrice(quantity, price, print)
             await print.update({ marketPrice: newMarketPrice })
 
-            await confirmation.update({ components: [] })
-            return confirmation.editReply({ content: `<@${buyer.discordId}> bought ${quantity} ${card} from <@${sellerDiscordId}> for ${price}${stardust}!`})
+            return interaction.editReply({ content: `<@${buyer.discordId}> bought ${quantity} ${card} from <@${sellerDiscordId}> for ${price}${stardust}!`})
         } else {
-            await confirmation.update({ components: [] })
-            await confirmation.editReply({ content: `Not a problem. The transaction with ${buyer.name} has been cancelled.`, components: [] })
+            await interaction.editReply({ content: `Not a problem. The transaction with ${buyer.name} has been cancelled.`, components: [] })
         }
     } catch (err) {
         console.log(err)
-        await interaction.channel.send({ content: `Sorry, time's up. The transaction with ${buyer.name} has been cancelled.`, components: [] });
+        await interaction.editReply({ content: `Sorry, time's up. The transaction with ${buyer.name} has been cancelled.`, components: [] });
     }   
 }
 
@@ -344,15 +340,13 @@ export const getBuyerConfirmation = async (interaction, buyer, seller, quantity,
             const newMarketPrice = calculateNewMarketPrice(quantity, price, print)
             await print.update({ marketPrice: newMarketPrice })
 
-            await confirmation.update({ components: [] })
-            return confirmation.editReply({ content: `<@${buyerDiscordId}> bought ${quantity} ${card} from <@${seller.discordId}> for ${price}${stardust}!`})
+            return interaction.editReply({ content: `<@${buyerDiscordId}> bought ${quantity} ${card} from <@${seller.discordId}> for ${price}${stardust}!`})
         } else {
-            await confirmation.update({ components: [] })
-            await confirmation.editReply({ content: `Not a problem. The transaction with ${seller.name} has been cancelled.`, components: [] })
+            await interaction.editReply({ content: `Not a problem. The transaction with ${seller.name} has been cancelled.`, components: [] })
         }
     } catch (err) {
         console.log(err)
-        await interaction.channel.send({ content: `Sorry, time's up. The transaction with ${seller.name} has been cancelled.`, components: [] });
+        await interaction.editReply({ content: `Sorry, time's up. The transaction with ${seller.name} has been cancelled.`, components: [] });
     }
 }
 

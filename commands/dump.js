@@ -185,11 +185,10 @@ export default {
                         await print.update({ marketPrice: newMarketPrice })
                     }
 
-                    return await confirmation.update({ content: `You sold ${totalCards} ${setCode}${eval(setCode)} cards to The Shop ${merchant} for ${totalPrice}${stardust}!`, components: [] })
+                    return await interaction.editReply({ content: `You sold ${totalCards} ${setCode}${eval(setCode)} cards to The Shop ${merchant} for ${totalPrice}${stardust}!`, components: [] })
                     // return interaction.editReply({ , components: [] });        
                 } else {
-                    await confirmation.update({ components: [] })
-                    await confirmation.editReply({ content: `Not a problem. Nothing was sold to The Shop ${merchant}.`, components: [] })
+                    await interaction.editReply({ content: `Not a problem. Nothing was sold to The Shop ${merchant}.`, components: [] })
                 }
             } catch (err) {
                 console.log(err)

@@ -103,11 +103,7 @@ export default {
 
             const filter = i => i.customId.startsWith(`Barter-${timestamp}`) && i.user.id === interaction.user.id;
             
-            let confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 }).catch(async (err) => {
-                console.log(err)
-                await confirmation.update({ components: [] })
-                await interaction.editReply({ content: `Sorry, time's up. Nothing was exchanged with The Shop. ${merchant}`, components: [] });
-            })
+            const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
 
             try {
                 if (confirmation.customId.includes('Yes')) {
@@ -141,6 +137,7 @@ export default {
                 }
             } catch (err) {
                 console.log(err)
+                await interaction.editReply({ content: `Sorry, time's up. Nothing was exchanged with The Shop. ${merchant}`, components: [] });
             }                        
         } catch (err) {
             console.log(err)

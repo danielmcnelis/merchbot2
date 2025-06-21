@@ -577,13 +577,11 @@ export default {
                         return getTraderBConfirmation(interaction, yourProposal, existingProposal, traderA, traderB, traderAPackageSummary, traderBPackageSummary)
                     } else {
                         await existingProposal.destroy()
-                        await confirmation.update({ components: [] })
-                        await confirmation.editReply({ content: `Not a problem. The existing trading proposal from ${traderB.name} was destroyed and nothing was traded.`, components: [] })
+                        await interaction.editReply({ content: `Not a problem. The existing trading proposal from ${traderB.name} was destroyed and nothing was traded.`, components: [] })
                     }
                 } catch (err) {
                     console.log(err)
                     await existingProposal.destroy()
-                    await confirmation.update({ components: [] })
                     await interaction.editReply({ content: `Sorry, time's up. Nothing was traded to ${traderB.name}.`, components: [] });
                 }   
             } else {
@@ -632,13 +630,11 @@ export default {
                         return await interaction.channel.send(`<@${traderB.discordId}>, ${traderA.name} is offering you the following items listed below. Please use the **/trade** command to submit your side of the trade.\n${traderAPackageSummary.join('\n')}`)
                     } else {
                         await existingProposal.destroy()
-                        await confirmation.update({ components: [] })
-                        await confirmation.editReply({ content: `Not a problem. Nothing was traded to ${traderA.name}.`, components: [] })
+                        await interaction.editReply({ content: `Not a problem. Nothing was traded to ${traderA.name}.`, components: [] })
                     }
                 } catch (err) {
                     console.log(err)
                     await existingProposal.destroy()
-                    await confirmation.update({ components: [] })
                     await interaction.editReply({ content: `Sorry, time's up. Nothing was traded to ${traderA.name}.`, components: [] });
                 }   
             }

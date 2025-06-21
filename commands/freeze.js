@@ -78,9 +78,9 @@ export default {
                     
                 if (confirmation.customId.includes('Yes')) {
                     await print.update({ isFrozen: !print.isFrozen })
-                    await confirmation.update({ content: `The price of ${card} has been ${print.isFrozen ? 'frozen' : 'unfrozen'}.`, components: [] })
+                    await interaction.editReply({ content: `The price of ${card} has been ${print.isFrozen ? 'frozen' : 'unfrozen'}.`, components: [] })
                 } else {
-                    return await confirmation.update({ content: 'Not a problem. Nothing will be frozen/unfozen.', components: [] })
+                    return await interaction.editReply({ content: 'Not a problem. Nothing will be frozen/unfozen.', components: [] })
                 }
             } catch (err) {
                 await interaction.editReply({ content: 'Nothing will be frozen/unfozen.', components: [] });

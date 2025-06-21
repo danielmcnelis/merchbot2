@@ -66,7 +66,6 @@ export default {
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
                 if (confirmation.customId.includes('Yes')) {
-                    await confirmation.update({ components: [] })
                     wallet.stardust -= x
                     await wallet.save()
 
@@ -126,10 +125,9 @@ export default {
                     const enthusiasm = rarity === "com" ? `Ho-Hum.` : rarity === "rar" ? `Not bad.` : rarity === 'sup' ? `Cool beans!` : rarity === 'ult' ? `Now *that's* sick!` : `Holy $#%t balls!`
                     const emoji = rarity === "com" ? cavebob : rarity === "rar" ? dimmadome : rarity === 'sup' ? blue : rarity === 'ult' ? scheming : koolaid
                 
-                    interaction.editReply({ content: `1... 2...`})
+                    interaction.editReply({ content: `1... 2...`, components: []})
                     return setTimeout(() => interaction.channel.send({ content: `${enthusiasm} ${player.name} won ${eval(print.rarity)}${print.cardCode} - ${print.cardName} off their wager! ${emoji}`, files: [attachment] }), 2000)            
                 } else {
-                    await confirmation.update({ components: [] })
                     await interaction.editReply({ content: `Not a problem. No ${stardust} was wagered.`, components: [] })
                 }
             } catch (err) {

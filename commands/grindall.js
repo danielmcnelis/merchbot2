@@ -45,8 +45,7 @@ export default {
             
                 return interaction.editReply({ content: `Every player's ${starchips}s have been ground up into ${stardust}!`, components: []})
             } else {
-                await confirmation.update({ components: [] })
-                await confirmation.editReply({ content: `Not a problem. No ${starchips} were ground into ${stardust}.`, components: [] })
+                await interaction.editReply({ content: `Not a problem. No ${starchips} were ground into ${stardust}.`, components: [] })
             }
         } catch (err) {
             console.log(err)

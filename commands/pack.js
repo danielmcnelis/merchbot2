@@ -210,8 +210,7 @@ export default {
 
                     return
                 } else {
-                    await confirmation.update({ components: [] })
-                    await confirmation.editReply({ content: `Not a problem. No packs were purchased.`, components: [] })
+                    await interaction.editReply({ content: `Not a problem. No packs were purchased.`, components: [] })
                 }
             } catch (err) {
                 console.log(err)

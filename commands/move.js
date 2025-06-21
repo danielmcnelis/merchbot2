@@ -105,8 +105,7 @@ export default {
             
                     return await interaction.editReply({ content: `Okay, ${cardName} has been moved from ${oldStatus} to ${newStatus}.`, components: []})
                 } else {
-                    await confirmation.update({ components: [] })
-                    await confirmation.editReply({ content: `Not a problem. ${cardName} will remain ${oldStatus}.`, components: []})
+                    await interaction.editReply({ content: `Not a problem. ${cardName} will remain ${oldStatus}.`, components: []})
                 }
             } catch (err) {
                 console.log(err)

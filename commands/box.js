@@ -216,7 +216,6 @@ export default {
                     await set.save()
                     return
                 } else {
-                    await confirmation.update({ components: [] })
                     await confirmation.editReply({ content: `Not a problem. No box was purchased.`, components: [] })
                 }
             } catch (err) {

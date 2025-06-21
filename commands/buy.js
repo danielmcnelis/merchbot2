@@ -138,7 +138,6 @@ export default {
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
                 if (confirmation.customId.includes('Yes') && shopSale) {
-                    await confirmation.update({ components: [] })
                     if (buyersInv) {
                         buyersInv.quantity+=quantity
                         await buyersInv.save()
@@ -172,12 +171,10 @@ export default {
                     await interaction.editReply({ content: `Okay, waiting for ${seller.name}'s confirmation.`, components: [] });        
                     return getSellerConfirmation(interaction, buyer, seller, quantity, print, card, price, buyersInv, sellersInv, buyersWallet, sellersWallet)
                 } else {
-                    await confirmation.update({ components: [] })
-                    await confirmation.editReply({ content: `Not a problem. Nothing was purchased from ${shopSale ? `The Shop ${merchant}` : seller.name}.`, components: [] })
+                    await interaction.editReply({ content: `Not a problem. Nothing was purchased from ${shopSale ? `The Shop ${merchant}` : seller.name}.`, components: [] })
                 }
             } catch (err) {
                 console.log(err)
-                await confirmation.update({ components: [] })
                 await interaction.editReply({ content: `Sorry, time's up. Nothing was purchased from ${shopSale ? `The Shop ${merchant}` : seller.name}.`, components: [] });
             }                        
         } catch (err) {

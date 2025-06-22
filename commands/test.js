@@ -84,7 +84,9 @@ export default {
                 //     if (dup) console.log(`${inv.playerName} has a duplicate of ${inv.cardCode} - ${inv.cardName}`)
                 // }
 
-                await calcBoxPrice()
+                // await calcBoxPrice()
+
+                await applyPriceDecay()
 
                 await interaction.editReply('🧪')
             }

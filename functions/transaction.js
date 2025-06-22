@@ -284,8 +284,8 @@ export const getSellerConfirmation = async (interaction, buyer, seller, quantity
         }
     } catch (err) {
         console.log(err)
-        await msg?.update({ components: [] })
-        await msg?.editReply({ content: `Sorry, time's up. The transaction with ${buyer.name} has been cancelled.`, components: [] });
+        // await msg?.update({ components: [] })
+        await msg.edit({ content: `Sorry, time's up. The transaction with ${buyer.name} has been cancelled.`, components: [] });
     }   
 }
 

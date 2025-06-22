@@ -46,7 +46,7 @@ export const calcBoxPrice = async () => {
     
             const avgPackPrice = avgBoxPrice / set.packsPerBox
             const unitPrice = Math.round(avgPackPrice / 10) * 10
-            const boxPrice = Math.round(24 * set.unitPrice / 100) * 100
+            const boxPrice = Math.round(24 * unitPrice / 100) * 100
             console.log(`${set.name} avgPackPrice: ${avgPackPrice}, unitPrice: ${unitPrice}, boxPrice: ${boxPrice}`)
         }
     }

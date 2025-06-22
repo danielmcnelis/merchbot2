@@ -122,7 +122,7 @@ export const applyPriceDecay = async () => {
     
         if (shop_percent < 0.10) {
             const z_diff = ( 0.10 - shop_percent ) / 0.10
-            console.log(`${print.cardCode} - ${print.cardName} decayed UP (z_diff = ${z_diff}) from ${print.marketPrice} to ${print.marketPrice + (0.02 * currentPrice * z_diff)}`)
+            console.log(`${print.cardCode} - ${print.cardName} decayed UP (shop_percent = ${shop_percent}, z_diff = ${z_diff}) from ${print.marketPrice} to ${print.marketPrice + (0.02 * currentPrice * z_diff)}`)
             print.marketPrice += 0.02 * currentPrice * z_diff
             a++
             if (print.marketPrice >= 40 && z_diff > 0.3) {
@@ -134,7 +134,7 @@ export const applyPriceDecay = async () => {
             // await print.save()
         } else if (shop_percent >= 0.10) {
             const z_diff = ( shop_percent - 0.10 ) / 0.90
-            console.log(`${print.cardCode} - ${print.cardName} decayed DOWN (z_diff = ${z_diff}) from ${print.marketPrice} to ${print.marketPrice - (0.06 * currentPrice * z_diff)}`)
+            console.log(`${print.cardCode} - ${print.cardName} decayed DOWN (shop_percent = ${shop_percent}, z_diff = ${z_diff}) from ${print.marketPrice} to ${print.marketPrice - (0.06 * currentPrice * z_diff)}`)
             print.marketPrice -= 0.06 * currentPrice * z_diff
             b++ 
             if (print.marketPrice >= 40 && z_diff > 0.3) {

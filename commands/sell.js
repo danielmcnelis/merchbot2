@@ -168,11 +168,11 @@ export default {
                     await interaction.editReply({ content: `Okay, waiting for ${buyer.name}'s confirmation.`, components: [] });        
                     return getBuyerConfirmation(interaction, buyer, seller, quantity, print, card, price, buyersInv, sellersInv, buyersWallet, sellersWallet)
                 } else {
-                    await interaction.editReply({ content: `Not a problem. Nothing was sold to ${shopSale ? `The Shop ${merchant}` : seller.name}.`, components: [] })
+                    return interaction.editReply({ content: `Not a problem. Nothing was sold to ${shopSale ? `The Shop ${merchant}` : seller.name}.`, components: [] })
                 }
             } catch (err) {
                 console.log(err)
-                await interaction.editReply({ content: `Sorry, time's up. Nothing was sold to ${shopSale ? `The Shop ${merchant}` : seller.name}.`, components: [] });
+                return interaction.editReply({ content: `Sorry, time's up. Nothing was sold to ${shopSale ? `The Shop ${merchant}` : seller.name}.`, components: [] });
             }                        
         } catch (err) {
             console.log(err)

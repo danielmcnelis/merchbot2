@@ -242,7 +242,7 @@ export const getSellerConfirmation = async (interaction, buyer, seller, quantity
         )
 
     const msg = await interaction.channel.send({ content: `<@${sellerDiscordId}> are you sure you want to sell ${quantity}${card} to ${buyer.name} for ${price}${stardust}? ${hmmm}`, components: [row] })
-
+    console.log('msg', msg)
     const filter = i => i.customId.startsWith(`Sell-${timestamp}`) && i.user.id === sellerDiscordId
     
     try {

@@ -84,7 +84,7 @@ export const applyPriceDecay = async () => {
 
 	const prints = await ForgedPrint.findAll({ 
         where: {
-            isFroze: {[Op.not]: true}
+            isFrozen: {[Op.not]: true}
         },
         order: [["marketPrice", "DESC"]] 
     })

@@ -27,11 +27,11 @@ export const calcBoxPrice = async () => {
         const setCode = set.code
 
         if (set.type === 'core' || set.type === 'mini') {
-            const commons = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "com" } })].map((p) => Math.round(p.marketPrice) || 1)
-            const rares = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "rar" } })].map((p) => Math.round(p.marketPrice) || 1)
-            const supers = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "sup" } })].filter((p) => !p.cardCode.includes('-SE')).map((p) => Math.round(p.marketPrice) || 1)
-            const ultras = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "ult" } })].map((p) => Math.round(p.marketPrice) || 1)
-            const secrets = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "scr" } })].map((p) => Math.round(p.marketPrice) || 1)
+            const commons = [...await ForgedPrint.findAll({ where: { forgedSetCode: setCode, rarity: "com" } })].map((p) => Math.round(p.marketPrice) || 1)
+            const rares = [...await ForgedPrint.findAll({ where: { forgedSetCode: setCode, rarity: "rar" } })].map((p) => Math.round(p.marketPrice) || 1)
+            const supers = [...await ForgedPrint.findAll({ where: { forgedSetCode: setCode, rarity: "sup" } })].filter((p) => !p.cardCode.includes('-SE')).map((p) => Math.round(p.marketPrice) || 1)
+            const ultras = [...await ForgedPrint.findAll({ where: { forgedSetCode: setCode, rarity: "ult" } })].map((p) => Math.round(p.marketPrice) || 1)
+            const secrets = [...await ForgedPrint.findAll({ where: { forgedSetCode: setCode, rarity: "scr" } })].map((p) => Math.round(p.marketPrice) || 1)
             
             const avgComPrice = commons.length ? commons.reduce((a, b) => a + b) / commons.length : 0
             const avgRarPrice = rares.length ? rares.reduce((a, b) => a + b) / rares.length : 0

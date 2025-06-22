@@ -140,7 +140,7 @@ export default {
                 interaction.channel.send({ content: cards.slice(i, i+20).join("\n")})
             }
 
-            await interaction.channel.send({ content: `Dump confirmed?`, components: [row] })
+            const message = await interaction.channel.send({ content: `Dump confirmed?`, components: [row] })
 
             const filter = i => i.customId.startsWith(`Dump-${timestamp}`) && i.user.id === interaction.user.id;
 
@@ -185,14 +185,14 @@ export default {
                         await print.update({ marketPrice: newMarketPrice })
                     }
 
-                    return await interaction.editReply({ content: `You sold ${totalCards} ${setCode}${eval(setCode)} cards to The Shop ${merchant} for ${totalPrice}${stardust}!`, components: [] })
+                    return await message.edit({ content: `You sold ${totalCards} ${setCode}${eval(setCode)} cards to The Shop ${merchant} for ${totalPrice}${stardust}!`, components: [] })
                     // return interaction.editReply({ , components: [] });        
                 } else {
-                    await interaction.editReply({ content: `Not a problem. Nothing was sold to The Shop ${merchant}.`, components: [] })
+                    await message.edit({ content: `Not a problem. Nothing was sold to The Shop ${merchant}.`, components: [] })
                 }
             } catch (err) {
                 console.log(err)
-                await interaction.editReply({ content: `Sorry, time's up. Nothing was sold to The Shop ${merchant}.`, components: [] });
+                await message.edit({ content: `Sorry, time's up. Nothing was sold to The Shop ${merchant}.`, components: [] });
             }                        
         } catch (err) {
             console.log(err)

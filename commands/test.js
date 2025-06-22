@@ -14,6 +14,44 @@ import {applyPriceDecay} from '../functions/shop.js'
 // import { Stats } from '../../../models/src'
 // import { config } from '@fl/config'
 
+export const calcBoxPrice = async () => {
+    const sets = await ForgedSet.findAll({ where: {
+         currency: 'stardust',
+         forSale: true
+    } })
+
+    if(!sets.length) return	
+
+    for (let i = 0; i < sets.length; i++) {
+        const set = sets[i]
+        const setCode = set.code
+
+        if (set.type === 'core' || set.type === 'mini') {
+            const commons = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "com" } })].map((p) => Math.round(p.marketPrice) || 1)
+            const rares = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "rar" } })].map((p) => Math.round(p.marketPrice) || 1)
+            const supers = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "sup" } })].filter((p) => !p.cardCode.includes('-SE')).map((p) => Math.round(p.marketPrice) || 1)
+            const ultras = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "ult" } })].map((p) => Math.round(p.marketPrice) || 1)
+            const secrets = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "scr" } })].map((p) => Math.round(p.marketPrice) || 1)
+            
+            const avgComPrice = commons.length ? commons.reduce((a, b) => a + b) / commons.length : 0
+            const avgRarPrice = rares.length ? rares.reduce((a, b) => a + b) / rares.length : 0
+            const avgSupPrice = supers.length ? supers.reduce((a, b) => a + b) / supers.length : 0
+            const avgUltPrice = ultras.length ? ultras.reduce((a, b) => a + b) / ultras.length : 0
+            const avgScrPrice = secrets.length ? secrets.reduce((a, b) => a + b) / secrets.length : 0
+            const avgBoxPrice = (avgComPrice * set.commonsPerBox) 
+                + (avgRarPrice * set.raresPerBox)
+                + (avgSupPrice * set.supersPerBox)
+                + (avgUltPrice * set.ultrasPerBox)
+                + (avgScrPrice * set.secretsPerBox)
+    
+            const avgPackPrice = avgBoxPrice / set.packsPerBox
+            const unitPrice = Math.round(avgPackPrice / 10) * 10
+            const boxPrice = Math.round(24 * set.unitPrice / 100) * 100
+            console.log(`${set.name} avgPackPrice: ${avgPackPrice}, unitPrice: ${unitPrice}, boxPrice: ${boxPrice}`)
+        }
+    }
+}
+
 export default {
     data: new SlashCommandBuilder()
         .setName('test')
@@ -23,22 +61,24 @@ export default {
         try {
             await interaction.deferReply()
             if (isProgrammer(interaction.member)) {
-                const invs = await ForgedInventory.findAll({ 
-                    order: [['playerName', 'ASC'], ['cardCode', 'ASC']]
-                })
+                // const invs = await ForgedInventory.findAll({ 
+                //     order: [['playerName', 'ASC'], ['cardCode', 'ASC']]
+                // })
 
-                for (let i = 0; i < invs.length; i++) {
-                    const inv = invs[i]
-                    const dup = await ForgedInventory.findOne({
-                        where: {
-                            id: {[Op.not]: inv.id},
-                            cardCode: inv.cardCode,
-                            playerId: inv.playerId
-                        }
-                    })
+                // for (let i = 0; i < invs.length; i++) {
+                //     const inv = invs[i]
+                //     const dup = await ForgedInventory.findOne({
+                //         where: {
+                //             id: {[Op.not]: inv.id},
+                //             cardCode: inv.cardCode,
+                //             playerId: inv.playerId
+                //         }
+                //     })
 
-                    if (dup) console.log(`${inv.playerName} has a duplicate of ${inv.cardCode} - ${inv.cardName}`)
-                }
+                //     if (dup) console.log(`${inv.playerName} has a duplicate of ${inv.cardCode} - ${inv.cardName}`)
+                // }
+
+                await calcBoxPrice()
 
                 await interaction.editReply('🧪')
             }

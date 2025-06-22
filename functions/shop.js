@@ -82,7 +82,12 @@ export const applyPriceDecay = async () => {
         return setTimeout(async () => applyPriceDecay(), 24 * 60 * 60 * 1000)
     }
 
-	const prints = await ForgedPrint.findAll({ order: [["marketPrice", "DESC"]] })
+	const prints = await ForgedPrint.findAll({ 
+        where: {
+            isFroze: {[Op.not]: true}
+        },
+        order: [["marketPrice", "DESC"]] 
+    })
     let a = 0
     let b = 0
 
@@ -384,21 +389,21 @@ export const calcBoxPrice = async () => {
             const avgUltPrice = ultras.length ? ultras.reduce((a, b) => a + b) / ultras.length : 0
             const avgScrPrice = secrets.length ? secrets.reduce((a, b) => a + b) / secrets.length : 0
             const avgBoxPrice = (avgComPrice * set.commonsPerBox) 
-                + (avgRarPrice * set.raresPerBox) 
-                + (avgSupPrice * set.supersPerBox) 
-                + (avgUltPrice * set.ultrasPerBox) 
-                + (avgScrPrice * set.secretsPerBox) 
+                + (avgRarPrice * set.raresPerBox)
+                + (avgSupPrice * set.supersPerBox)
+                + (avgUltPrice * set.ultrasPerBox)
+                + (avgScrPrice * set.secretsPerBox)
     
             const avgPackPrice = avgBoxPrice / set.packsPerBox
-            set.unitPrice = Math.round(avgPackPrice / 10) * 10  
-            set.boxPrice = set.type === 'core' ? Math.round(21 * set.unitPrice / 100) * 100 : null
+            set.unitPrice = Math.round(avgPackPrice / 10) * 10
+            set.boxPrice = set.type === 'core' ? Math.round(28 * set.unitPrice / 100) * 100 : null
             await set.save()
         } else if (set.type === 'starter_deck') {
-            const prints = await ForgedPrint.findAll({ where: { setCode: setCode }})
-            let deck1Price = 0
-            let deck2Price = 0
-            let deck1
-            let deck2
+            // const prints = await ForgedPrint.findAll({ where: { setCode: setCode }})
+            // let deck1Price = 0
+            // let deck2Price = 0
+            // let deck1
+            // let deck2
 
             // const deckNames = Object.keys(decks)
             // deckNames.forEach((d) => {
@@ -417,9 +422,9 @@ export const calcBoxPrice = async () => {
             //     deck2Price += (d2quantity * marketPrice)
             // }
 
-            const avgDeckPrice = (deck1Price + deck2Price) / 2
-            set.unitPrice = Math.round(avgDeckPrice / 10) * 10
-            await set.save()
+            // const avgDeckPrice = (deck1Price + deck2Price) / 2
+            // set.unitPrice = Math.round(avgDeckPrice / 10) * 10
+            // await set.save()
         }
     }
 }

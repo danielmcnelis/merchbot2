@@ -34,19 +34,25 @@ export const calcBoxPrice = async () => {
             const secrets = [...await ForgedPrint.findAll({ where: { forgedSetCode: setCode, rarity: "scr" } })].map((p) => Math.round(p.marketPrice) || 1)
             
             const avgComPrice = commons.length ? commons.reduce((a, b) => a + b) / commons.length : 0
+            console.log('avgComPrice', avgComPrice)
             const avgRarPrice = rares.length ? rares.reduce((a, b) => a + b) / rares.length : 0
+            console.log('avgRarPrice', avgRarPrice)
             const avgSupPrice = supers.length ? supers.reduce((a, b) => a + b) / supers.length : 0
+            console.log('avgSupPrice', avgSupPrice)
             const avgUltPrice = ultras.length ? ultras.reduce((a, b) => a + b) / ultras.length : 0
+            console.log('avgUltPrice', avgUltPrice)
             const avgScrPrice = secrets.length ? secrets.reduce((a, b) => a + b) / secrets.length : 0
+            console.log('avgScrPrice', avgScrPrice)
             const avgBoxPrice = (avgComPrice * set.commonsPerBox) 
                 + (avgRarPrice * set.raresPerBox)
                 + (avgSupPrice * set.supersPerBox)
                 + (avgUltPrice * set.ultrasPerBox)
                 + (avgScrPrice * set.secretsPerBox)
-    
+            console.log('avgBoxPrice', avgBoxPrice)
+
             const avgPackPrice = avgBoxPrice / set.packsPerBox
             const unitPrice = Math.round(avgPackPrice / 10) * 10
-            const boxPrice = Math.round(24 * unitPrice / 100) * 100
+            const boxPrice = Math.round(20 * unitPrice / 100) * 100
             console.log(`${set.name} avgPackPrice: ${avgPackPrice}, unitPrice: ${unitPrice}, boxPrice: ${boxPrice}`)
         }
     }

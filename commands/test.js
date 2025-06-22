@@ -16,7 +16,7 @@ import {applyPriceDecay} from '../functions/shop.js'
 
 export const calcBoxPrice = async () => {
     const sets = await ForgedSet.findAll({ where: {
-         currency: 'stardust',
+        //  currency: 'stardust',
          forSale: true
     } })
 

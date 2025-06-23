@@ -9,7 +9,7 @@ import { ArenaProfile, Binder, ForgedInventory, Wishlist, ForgedPrint, ForgedSet
 import { Op } from 'sequelize'
 import {isProgrammer} from '../functions/utility.js'
 import {applyPriceDecay} from '../functions/shop.js'
-import {startRound} from '../functions/arena.js'
+import {startRound, postStandings} from '../functions/arena.js'
 // import axios from 'axios'
 // import { assignTournamentRoles, recalculateAllStats } from '../../../bot-functions/src'
 // import { Stats } from '../../../models/src'
@@ -89,7 +89,7 @@ export default {
 
                 const entries = await ArenaEntry.findAll()
 
-                await startRound(entries)
+                await postStandings(entries)
 
                 // await applyPriceDecay()
 

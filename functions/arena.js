@@ -568,11 +568,12 @@ export const checkArenaProgress = async () => {
         return setTimeout(() => startRound(arenaEntries), 3000)
     }
 
-    const scores = arenaEntries.map((arenaEntry) => arenaEntry.score)
+    // const scores = arenaEntries.map((arenaEntry) => arenaEntry.score)
     const progress_report = arenaEntries.map((arenaEntry) => arenaEntry.isPlaying)
-    const sum = scores.reduce((a, b) => a + b)
-
-    if (sum % 3 === 0 && !progress_report.includes(true)) return setTimeout(() => postStandings(arenaEntries), 3000)
+    // const sum = scores.reduce((a, b) => a + b)
+    
+    if (!progress_report.includes(true)) return setTimeout(() => postStandings(arenaEntries), 3000)
+    // if (sum % 3 === 0 && !progress_report.includes(true)) return setTimeout(() => postStandings(arenaEntries), 3000)
 }
 
 //GET ARENA CONFIRMATIONS

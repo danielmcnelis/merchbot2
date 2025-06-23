@@ -396,7 +396,8 @@ export const calcBoxPrice = async () => {
     
             const avgPackPrice = avgBoxPrice / set.packsPerBox
             set.unitPrice = Math.round(avgPackPrice / 10) * 10
-            set.boxPrice = set.type === 'core' ? Math.round(28 * set.unitPrice / 100) * 100 : null
+            const boxPrice = unitPrice < 150 ? Math.round(24 * unitPrice / 100) * 100 : 3600
+            set.boxPrice = set.type === 'core' ? boxPrice : null
             await set.save()
         } else if (set.type === 'starter_deck') {
             // const prints = await ForgedPrint.findAll({ where: { setCode: setCode }})

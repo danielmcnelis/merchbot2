@@ -5,7 +5,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 // import { client } from '../client'
 // import { s3FileExists } from '@fl/bot-functions'
 // import { Match, Tournament, Server, TriviaQuestion } from '@fl/models'
-import { ArenaProfile, Binder, ForgedInventory, Wishlist, ForgedPrint, ForgedSet, ArenaEntry } from '../database/index.js'
+import { ArenaProfile, Binder, ForgedInventory, Wishlist, Player, ForgedPrint, ForgedSet, ArenaEntry } from '../database/index.js'
 import { Op } from 'sequelize'
 import {isProgrammer} from '../functions/utility.js'
 import {applyPriceDecay} from '../functions/shop.js'
@@ -87,7 +87,7 @@ export default {
 
                 // await calcBoxPrice()
 
-                const entries = await ArenaEntry.findAll()
+                const entries = await ArenaEntry.findAll({ order: [['score', 'DESC']], include: Player })
 
                 await postStandings(entries)
 

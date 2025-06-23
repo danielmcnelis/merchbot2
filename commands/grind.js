@@ -52,7 +52,7 @@ export default {
                     wallet.stardust += x * 10
                     await wallet.save()
         
-                    return interaction.editReply({ content: `You ground ${x}${starchips} into ${x * 10}${stardust}!`})
+                    return interaction.editReply({ content: `You ground ${x}${starchips} into ${x * 10}${stardust}!`, components: [] })
                 } else {
                     await interaction.editReply({ content: `Not a problem. No ${starchips} were ground into ${stardust}.`, components: [] })
                 }

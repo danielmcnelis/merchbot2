@@ -5,10 +5,11 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 // import { client } from '../client'
 // import { s3FileExists } from '@fl/bot-functions'
 // import { Match, Tournament, Server, TriviaQuestion } from '@fl/models'
-import { ArenaProfile, Binder, ForgedInventory, Wishlist, ForgedPrint, ForgedSet } from '../database/index.js'
+import { ArenaProfile, Binder, ForgedInventory, Wishlist, ForgedPrint, ForgedSet, ArenaEntry } from '../database/index.js'
 import { Op } from 'sequelize'
 import {isProgrammer} from '../functions/utility.js'
 import {applyPriceDecay} from '../functions/shop.js'
+import {startRound} from '../functions/arena.js'
 // import axios from 'axios'
 // import { assignTournamentRoles, recalculateAllStats } from '../../../bot-functions/src'
 // import { Stats } from '../../../models/src'
@@ -86,7 +87,11 @@ export default {
 
                 // await calcBoxPrice()
 
-                await applyPriceDecay()
+                const entries = await ArenaEntry.findAll()
+
+                await startRound(entries)
+
+                // await applyPriceDecay()
 
                 await interaction.editReply('🧪')
             }

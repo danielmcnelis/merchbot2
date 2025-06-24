@@ -395,8 +395,8 @@ export const calcBoxPrice = async () => {
                 + (avgScrPrice * set.secretsPerBox)
     
             const avgPackPrice = avgBoxPrice / set.packsPerBox
-            set.unitPrice = Math.round(avgPackPrice / 10) * 10
-            const boxPrice = unitPrice < 150 ? Math.round(24 * unitPrice / 100) * 100 : 3600
+            set.unitPrice = avgPackPrice < 150 ? Math.round(avgPackPrice / 10) * 10 : 150
+            const boxPrice = avgPackPrice < 150 ? Math.round(20 * unitPrice / 100) * 100 : 3000
             set.boxPrice = set.type === 'core' ? boxPrice : null
             await set.save()
         } else if (set.type === 'starter_deck') {

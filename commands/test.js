@@ -68,24 +68,24 @@ export default {
         try {
             await interaction.deferReply()
             if (isProgrammer(interaction.member)) {
-                // const invs = await ForgedInventory.findAll({ 
-                //     order: [['playerName', 'ASC'], ['cardCode', 'ASC']]
-                // })
+                const invs = await ForgedInventory.findAll({ 
+                    order: [['playerName', 'ASC'], ['cardCode', 'ASC']]
+                })
 
-                // for (let i = 0; i < invs.length; i++) {
-                //     const inv = invs[i]
-                //     const dup = await ForgedInventory.findOne({
-                //         where: {
-                //             id: {[Op.not]: inv.id},
-                //             cardCode: inv.cardCode,
-                //             playerId: inv.playerId
-                //         }
-                //     })
+                for (let i = 0; i < invs.length; i++) {
+                    const inv = invs[i]
+                    const dup = await ForgedInventory.findOne({
+                        where: {
+                            id: {[Op.not]: inv.id},
+                            cardCode: inv.cardCode,
+                            playerId: inv.playerId
+                        }
+                    })
 
-                //     if (dup) console.log(`${inv.playerName} has a duplicate of ${inv.cardCode} - ${inv.cardName}`)
-                // }
+                    if (dup) console.log(`${inv.playerName} has a duplicate of ${inv.cardCode} - ${inv.cardName}`)
+                }
 
-                await calcBoxPrice()
+                // await calcBoxPrice()
 
                 // const entries = await ArenaEntry.findAll({ order: [['score', 'DESC']], include: Player })
 

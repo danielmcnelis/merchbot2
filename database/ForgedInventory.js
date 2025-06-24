@@ -16,6 +16,9 @@ export const ForgedInventory = db.define('forgedInventories', {
     cardName: {
         type: Sequelize.STRING,
     },
+    cardId: {
+        type: Sequelize.INTEGER,
+    },
     quantity: {
         type: Sequelize.INTEGER,
         defaultValue: 0,

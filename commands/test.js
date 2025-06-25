@@ -5,7 +5,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 // import { client } from '../client'
 // import { s3FileExists } from '@fl/bot-functions'
 // import { Match, Tournament, Server, TriviaQuestion } from '@fl/models'
-import { ArenaProfile, Binder, ForgedInventory, Wishlist, Player, ForgedPrint, ForgedSet, ArenaEntry } from '../database/index.js'
+import { ArenaProfile, Binder, Card, ForgedInventory, Wishlist, Player, ForgedPrint, ForgedSet, ArenaEntry } from '../database/index.js'
 import { Op } from 'sequelize'
 import {isProgrammer} from '../functions/utility.js'
 import {applyPriceDecay} from '../functions/shop.js'
@@ -74,15 +74,13 @@ export default {
 
                 for (let i = 0; i < invs.length; i++) {
                     const inv = invs[i]
-                    const dup = await ForgedInventory.findOne({
+                    const card = await Card.findOne({
                         where: {
-                            id: {[Op.not]: inv.id},
-                            cardCode: inv.cardCode,
-                            playerId: inv.playerId
+                            name: inv.cardName
                         }
                     })
 
-                    if (dup) console.log(`${inv.playerName} has a duplicate of ${inv.cardCode} - ${inv.cardName}`)
+                    if (card) await inv.update({ cardId: card.id })
                 }
 
                 // await calcBoxPrice()

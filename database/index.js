@@ -56,6 +56,9 @@ Bid.belongsTo(Player)
 Auction.hasMany(Bid)
 Bid.belongsTo(Auction)
 
+Card.hasMany(ForgedInventory)
+ForgedInventory.belongsTo(Card)
+
 Player.hasMany(ForgedInventory)
 ForgedInventory.belongsTo(Player)
 

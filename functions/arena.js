@@ -254,7 +254,7 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
     } catch (err) {
         console.log(err)
         member.send({ content: `Sorry, time's up. You have been removed from the Arena queue.`})
-        return await message.update({ components: [] })
+        return await message.edit({ components: [] }).catch((err) => console.log(err))
     }
 }
 

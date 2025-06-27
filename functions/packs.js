@@ -15,7 +15,7 @@ const { botSpamChannelId } = channels
 import { client } from '../static/clients.js'
 const merchbotId = '584215266586525696'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { AOD, beast, blue, bronze, cactus, cavebob, DRT, fiend, skull, familiar, battery, thunder, zombie, checkmark, com, credits, cultured, diamond, dinosaur, DOC, LPK, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, dimmadome, sup, tix, ult, wokefrog, yellow, yes, ygocard } = emojis
+const { AOD, FON, beast, blue, bronze, cactus, cavebob, DRT, fiend, skull, familiar, battery, thunder, zombie, checkmark, com, credits, cultured, diamond, dinosaur, DOC, LPK, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, dimmadome, sup, tix, ult, wokefrog, yellow, yes, ygocard } = emojis
 
 // AWARD PACKS
 export const awardPacks = async (channel, member, set, num = 1) => {

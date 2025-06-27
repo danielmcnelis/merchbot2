@@ -410,6 +410,15 @@ export const shuffleArray = (arr) => {
 //IS SAME DAY
 export const isSameDay = (d1, d2) => d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate()
 
+// IS YESTERDAY
+export const isYesterday = (date) => {  
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+  
+    return date.getDate() === yesterday.getDate() &&
+        date.getMonth() === yesterday.getMonth() &&
+        date.getFullYear() === yesterday.getFullYear()
+}
 
 //IS WITHIN X HOURS
 export const isWithinXHours = (x = 24, t1, t2) => Math.abs(t1 - t2) <= (x * 60 * 60 * 1000)

@@ -1,7 +1,7 @@
 
 import { AttachmentBuilder, InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { Daily, ForgedInventory, ForgedPrint, ForgedSet, Player } from '../database/index.js'
-import { drawCardImage, getRandomElement, isSameDay} from '../functions/utility.js'
+import { drawCardImage, getRandomElement, isSameDay, isYesterday} from '../functions/utility.js'
 import { awardBox, awardPacks } from '../functions/packs.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
 const { cavebob, dimmadome, blue, scheming, koolaid, com, rar, sup, ult, scr } = emojis
@@ -34,7 +34,9 @@ export default {
                 await daily.update({ isProcessing: true })
             }
 
-            const daysPassed = daily.lastDaily ? Math.round( ( date.setHours(0, 0, 0, 0) - daily.lastDaily.setHours(0, 0, 0, 0) ) / (1000*60*60*24) ) : 1
+            const cobbleProgress = isYesterday(daily.lastDaily) ? daily.cobbleProgress + 1 : 1
+
+            // const daysPassed = daily.lastDaily ? Math.round( ( date.setHours(0, 0, 0, 0) - daily.lastDaily.setHours(0, 0, 0, 0) ) / (1000*60*60*24) ) : 1
 
             const sets = await ForgedSet.findAll({ 
                 where: { 
@@ -127,7 +129,7 @@ export default {
             daily.lastDaily = date
             await daily.save()
             
-            if ((daily.cobbleProgress + daysPassed) >= 7) {
+            if (cobbleProgress >= 7) {
                 daily.cobbleProgress = 0
                 await daily.save()
 
@@ -153,7 +155,7 @@ export default {
                     return
                 }
             } else {
-                daily.cobbleProgress += daysPassed
+                daily.cobbleProgress = cobbleProgress
                 await daily.save()
 
                 const packImage = new AttachmentBuilder(`./public/${daily.cobbleProgress}outof7.png`, { name: `pack.png` })

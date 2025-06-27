@@ -4,7 +4,7 @@ import { Binder, ForgedInventory, ForgedPrint, ForgedSet, Info, Player, Wallet }
 import { calculateNewMarketPrice, getBuyerConfirmation } from '../functions/transaction.js'
 import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const {AOD, com, rar, sup, ult, scr, stardust, merchant, lipton} = emojis
+const {AOD, FON, com, rar, sup, ult, scr, stardust, merchant, lipton} = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const {botSpamChannelId} = channels
 

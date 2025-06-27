@@ -5,7 +5,7 @@ import { Op } from 'sequelize'
 import { drawPack } from '../functions/packs.js'
 import { getRandomElement, getRandomSubset } from '../functions/utility.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { AOD, com, rar, sup, ult, scr, starchips, stardust } = emojis
+const { AOD, FON, com, rar, sup, ult, scr, starchips, stardust } = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -208,6 +208,9 @@ export default {
                         const attachment = await drawPack(yourCardArtworkIds) || []
                         interaction.user.send({ content: `${results.join('\n').toString()}`, files: [attachment] }).catch((err) => console.log(err))
                     }
+
+                    const yourSpec = getRandomElement(specials)
+                    
 
                     return
                 } else {

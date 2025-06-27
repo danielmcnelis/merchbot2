@@ -3,7 +3,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 import { Daily, Player, Wallet, ForgedInventory, ForgedPrint, ForgedSet} from '../database/index.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
 import { drawCardImage, getRandomElement, isSameDay } from '../functions/utility.js'
-const { AOD, stardust, cavebob, dimmadome, blue, scheming, koolaid, com, rar, sup, ult, scr } = emojis
+const { AOD, FON, stardust, cavebob, dimmadome, blue, scheming, koolaid, com, rar, sup, ult, scr } = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -73,8 +73,8 @@ export default {
                     const matrix = new Array(3600)
                         matrix.fill(1, 0, 3463)
                         matrix.fill(2, 3463, 3559)
-                        matrix.fill(3, 3559, 3595)
-                        matrix.fill(4, 3595, 3599)
+                        matrix.fill(3, 3559, 3591)
+                        matrix.fill(4, 3591, 3599)
                         matrix.fill(5, 3599, 3600)
     
                     for (let i = 0; i < x; i++) {

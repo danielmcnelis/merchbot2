@@ -34,7 +34,7 @@ export default {
                 await daily.update({ isProcessing: true })
             }
 
-            const cobbleProgress = isYesterday(daily.lastDaily) ? daily?.cobbleProgress + 1 : 1
+            const cobbleProgress = daily.lastDaily && isYesterday(daily.lastDaily) ? daily.cobbleProgress + 1 : 1
 
             // const daysPassed = daily.lastDaily ? Math.round( ( date.setHours(0, 0, 0, 0) - daily.lastDaily.setHours(0, 0, 0, 0) ) / (1000*60*60*24) ) : 1
 

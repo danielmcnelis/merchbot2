@@ -68,22 +68,22 @@ export default {
         try {
             await interaction.deferReply()
             if (isProgrammer(interaction.member)) {
-                const invs = await ForgedInventory.findAll({ 
-                    order: [['playerName', 'ASC'], ['cardCode', 'ASC']]
-                })
+                // const invs = await ForgedInventory.findAll({ 
+                //     order: [['playerName', 'ASC'], ['cardCode', 'ASC']]
+                // })
 
-                for (let i = 0; i < invs.length; i++) {
-                    const inv = invs[i]
-                    const card = await Card.findOne({
-                        where: {
-                            name: inv.cardName
-                        }
-                    })
+                // for (let i = 0; i < invs.length; i++) {
+                //     const inv = invs[i]
+                //     const card = await Card.findOne({
+                //         where: {
+                //             name: inv.cardName
+                //         }
+                //     })
 
-                    if (card) await inv.update({ cardId: card.id })
-                }
+                //     if (card) await inv.update({ cardId: card.id })
+                // }
 
-                // await calcBoxPrice()
+                await calcBoxPrice()
 
                 // const entries = await ArenaEntry.findAll({ order: [['score', 'DESC']], include: Player })
 

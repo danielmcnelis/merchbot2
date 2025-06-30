@@ -50,6 +50,8 @@ export default {
             const set = await ForgedSet.findOne({ where: { code: code }})
             if (!set) return interaction.reply({ content: `Could not find set code: ${code}.`})
 
+            if (!set.specsForSale) return interaction.reply({ content: `Sorry, ${set.name} ${eval(set.code)} Special Edition boxes are not yet for sale.`})
+
             const commons = [...await ForgedPrint.findAll({ 
                 where: {
                     forgedSetId: set.id,
@@ -107,7 +109,7 @@ export default {
             const discount = 1
 
             const money = wallet[set.currency]
-            if (money < (Math.round(set.unitPrice * discount) * num)) return interaction.reply({ content: `Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${num > 1 ? `${num} ` : ''}${set.name} ${eval(set.emoji)} Packs cost ${Math.round(set.unitPrice * discount) * num}${eval(set.currency)}.`})
+            if (money < (Math.round(set.specPrice * discount))) return interaction.reply({ content: `Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${num > 1 ? `${num} ` : ''}${set.name} ${eval(set.emoji)} Packs cost ${Math.round(set.specPrice * discount)}${eval(set.currency)}.`})
             
             const timestamp = new Date().getTime()
 

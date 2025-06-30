@@ -116,14 +116,14 @@ export default {
 
             for (let i = 0; i < results.length; i += 30) {
                 if (results[i+31] && results[i+31].startsWith("\n")) {
-                    interaction.user.send({ content: results.slice(i, i+31).join('\n').toString()})
+                    interaction.user.send({ content: results.slice(i, i+31).join('\n').toString()}).catch((err) => console.log(err))
                     i++
                 } else {
-                    interaction.user.send({ content: results.slice(i, i+30).join('\n').toString()})
+                    interaction.user.send({ content: results.slice(i, i+30).join('\n').toString()}).catch((err) => console.log(err))
                 }
             }
 
-            interaction.user.send({ content: `Browse your Inventory: https://formatlibrary.com/forged-inventory/${player.id}` })
+            interaction.user.send({ content: `Browse your Inventory: https://formatlibrary.com/forged-inventory/${player.id}` }).catch((err) => console.log(err))
             return interaction.reply({ content: `I messaged you the Inventory you requested.`})
         } catch (err) {
             console.log(err)

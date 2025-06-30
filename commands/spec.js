@@ -148,7 +148,7 @@ export default {
                     set.unitSales += num
                     await set.save()
                     
-                    interaction.editReply({ content: `Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}.`, components: []})
+                    interaction.editReply({ content: `Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Special Edition box.`, components: []})
                         
                     for (let j = 0; j < num; j++) {
                         const results = [`\n${eval(set.emoji)} - ${set.name} Pack${num > 1 ? ` ${j + 1}` : ''} - ${eval(set.altEmoji)}`]

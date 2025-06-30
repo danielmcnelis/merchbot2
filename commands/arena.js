@@ -24,6 +24,9 @@ export default {
             const confirmationsInProgress = await ArenaEntry.count({ where: { status: 'confirming' }})
             if (confirmationsInProgress) return interaction.reply({ content: `Sorry, there are already 6 people going through the confirmation process.`})
                 
+            const arenaIsActive = await Info.count({ where: { element: 'arena', status: 'active' }})
+            if (arenaIsActive) return interaction.reply({ content: `Sorry, you cannot join The Arena queue while there is an active Arena.`})
+                
             if (!alreadyIn) {
                 const arenaEntry = await ArenaEntry.create({ 
                     playerName: player.name,

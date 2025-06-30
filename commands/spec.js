@@ -3,7 +3,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 import { Card, ForgedInventory, ForgedPrint, ForgedSet, Player, Wallet } from '../database/index.js'
 import { Op } from 'sequelize'
 import { drawPack } from '../functions/packs.js'
-import { getRandomElement, getRandomSubset } from '../functions/utility.js'
+import { drawCardImage, getRandomElement, getRandomSubset } from '../functions/utility.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
 const { AOD, FON, com, rar, sup, ult, scr, starchips, stardust } = emojis
 
@@ -113,20 +113,20 @@ export default {
 
             const row = new ActionRowBuilder()
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Pack-${timestamp}-Yes`)
+                    .setCustomId(`Spec-${timestamp}-Yes`)
                     .setLabel('Yes')
                     .setStyle(ButtonStyle.Primary)
                 )
 
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`Pack-${timestamp}-No`)
+                    .setCustomId(`Spec-${timestamp}-No`)
                     .setLabel('No')
                     .setStyle(ButtonStyle.Primary)
                 )
 
-            await interaction.reply({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.unitPrice * discount) * num}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`, components: [row] })
+            await interaction.reply({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.specPrice * discount) * num}${eval(set.currency)} on $a ${set.name} ${eval(set.emoji)} Special Edition box?`, components: [row] })
 
-            const filter = i => i.customId.startsWith(`Pack-${timestamp}`) && i.user.id === interaction.user.id;
+            const filter = i => i.customId.startsWith(`Spec-${timestamp}`) && i.user.id === interaction.user.id;
 
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
@@ -135,12 +135,12 @@ export default {
                     const updatedWallet = await Wallet.findOne({ where: { playerId: player.id }})
 
                     const updateMoney = updatedWallet[set.currency]
-                    if (updateMoney < (Math.round(set.unitPrice * discount) * num)) return interaction.editReply({ content: `Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${num > 1 ? `${num} ` : ''}${set.name} ${eval(set.emoji)} Packs cost ${Math.round(set.unitPrice * discount) * num}${eval(set.currency)}.`})
+                    if (updateMoney < Math.round(set.specPrice * discount)) return interaction.editReply({ content: `Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Special Edition boxes cost ${Math.round(set.specPrice * discount)}${eval(set.currency)}.`})
                     
-                    updatedWallet[set.currency] -= (Math.round(set.unitPrice * discount) * num)
+                    updatedWallet[set.currency] -= Math.round(set.specPrice * discount)
                     await updatedWallet.save()
 
-                    merchbotWallet.stardust += set.currency === 'stardust' ? set.unitPrice * discount * num : set.unitPrice * num * 10
+                    merchbotWallet.stardust += set.specPrice * 10
                     await merchbotWallet.save()
 
                     set.unitSales += num
@@ -180,7 +180,7 @@ export default {
                                 cardCode: yourPack[i]
                             }})
 
-                            if (!print.id) return interaction.reply({ content: `Error: ${yourPack[i]} does not exist in the Print database.`})
+                            if (!print.id) return interaction.reply({ content: `Error: ${yourPack[i]} does not exist in the print database.`})
                             results.push(`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`)
                         
                             const inv = await ForgedInventory.findOne({ where: { 
@@ -210,15 +210,15 @@ export default {
                     }
 
                     const yourSpec = getRandomElement(specials)
-                    
-
-                    return
+                    const yourSpecPrint = await ForgedPrint.findOne({ where: { cardCode: yourSpec }})
+                    const yourSpecAttachment = await drawCardImage(yourSpecPrint.cardName)
+                    return interaction.user.send({ content: `${eval(set.emoji)} - ${set.name} S.E. Promo - ${eval(set.altEmoji)}\n${eval(yourSpecPrint.rarity)}${yourSpecPrint.cardCode} - ${yourSpecPrint.cardName}`, files: [yourSpecAttachment] }).catch((err) => console.log(err))
                 } else {
-                    await interaction.editReply({ content: `Not a problem. No packs were purchased.`, components: [] })
+                    await interaction.editReply({ content: `Not a problem. No Special Edition box was purchased.`, components: [] })
                 }
             } catch (err) {
                 console.log(err)
-                await interaction.editReply({ content: `Sorry, time's up. No packs were purchased.`, components: [] });
+                await interaction.editReply({ content: `Sorry, time's up. No Special Edition box was purchased.`, components: [] });
             }
 
 

@@ -34,6 +34,7 @@ import queue from './queue.js'
 import search from './search.js'
 import sell from './sell.js'
 import shop from './shop.js'
+import spec from './spec.js'
 import steal from './steal.js'
 import test from './test.js'
 import trade from './trade.js'
@@ -80,6 +81,7 @@ export default {
         search,
         sell,
         shop,
+        spec,
         steal,
         test,
         trade,

@@ -126,7 +126,7 @@ export default {
                     .setStyle(ButtonStyle.Primary)
                 )
 
-            await interaction.reply({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.specPrice * discount) * num}${eval(set.currency)} on $a ${set.name} ${eval(set.emoji)} Special Edition box?`, components: [row] })
+            await interaction.reply({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.specPrice * discount) * num}${eval(set.currency)} on an ${set.name} ${eval(set.emoji)} Special Edition box?`, components: [row] })
 
             const filter = i => i.customId.startsWith(`Spec-${timestamp}`) && i.user.id === interaction.user.id;
 

@@ -64,9 +64,9 @@ export default {
             const card = await Card.findOne({ where: { name: cardName }})
             if (!card) return interaction.reply({ content: `I could not find "${cardName}" in the Format Library database.`})
         
-            if (await ForgedPrint.count({ where: { forgedSetCode: setCode, cardName: cardName }})) {
-                throw new Error(`${cardName} was already printed in ${setCode}`)
-            }
+            // if (await ForgedPrint.count({ where: { forgedSetCode: setCode, cardName: cardName }})) {
+            //     throw new Error(`${cardName} was already printed in ${setCode}`)
+            // }
 
             const currentPrints = await ForgedPrint.findAll({ where: { forgedSetCode: set.code }, order: [["cardSlot", "DESC"]]})
             const cardSlot = currentPrints.length ? currentPrints[0].cardSlot + 1 : set.type === 'core' ? 0 : 1

@@ -175,13 +175,9 @@ try {
             if (!interaction.isChatInputCommand()) return
         
             const command = interaction.client.commands.get(interaction.commandName)
-            if (!command) return console.error(`No command matching ${interaction.commandName} was found.`)
-        
-            if (command.data.name === 'card') {
-                return command.execute(interaction, fuzzyCards)
-            } else {
-                return command.execute(interaction)
-            }
+            if (!command) return console.error(`No command matching ${interaction.commandName} was found.`)                
+            
+            return command.execute(interaction).catch((err) => console.log(err))
         } catch (err) {
             console.log(err)
         }

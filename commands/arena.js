@@ -2,7 +2,7 @@
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 // import { isAdmin } from '../functions/utility.js'
 // import { closeShop } from '../functions/shop.js'
-import { ArenaEntry, Player } from '../database/index.js'
+import { ArenaEntry, Info, Player } from '../database/index.js'
 import { initiateArena } from '../functions/arena.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
 const { arena } = emojis

@@ -283,8 +283,6 @@ export const startRound = async (arenaEntries) => {
         await wallet.save()
         channel.send({ content: `<@${arenaEntries[1].player.discordId}> ${getRandomElement(verbs)} ${quantity} ${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
         
-        console.log('arenaEntries[0].tribe', arenaEntries[0].tribe)
-        console.log('arenaEntries[0].player', arenaEntries[0].player)
         const tribe = arenaEntries[0].tribe
         const playerId = arenaEntries[0].playerId
         const playerName = arenaEntries[0].playerName

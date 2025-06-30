@@ -213,6 +213,28 @@ export default {
 
                     const yourSpec = getRandomElement(specials)
                     const yourSpecPrint = await ForgedPrint.findOne({ where: { cardCode: yourSpec }})
+
+                    const inv = await ForgedInventory.findOne({ where: { 
+                        cardCode: yourSpecPrint.cardCode,
+                        forgedPrintId: yourSpecPrint.id,
+                        playerId: player.id
+                    }})
+
+                    if (inv) {
+                        inv.quantity++
+                        await inv.save()
+                    } else {
+                        await ForgedInventory.create({ 
+                            cardName: yourSpecPrint.cardName,
+                            cardCode: yourSpecPrint.cardCode,
+                            cardId: yourSpecPrint.cardId,
+                            quantity: 1,
+                            forgedPrintId: yourSpecPrint.id,
+                            playerName: player.name,
+                            playerId: player.id
+                        })
+                    }
+
                     const yourSpecAttachment = await drawCardImage(yourSpecPrint.cardName)
                     return interaction.user.send({ content: `${eval(set.emoji)} - ${set.name} S.E. Promo - ${eval(set.altEmoji)}\n${eval(yourSpecPrint.rarity)}${yourSpecPrint.cardCode} - ${yourSpecPrint.cardName}`, files: [yourSpecAttachment] }).catch((err) => console.log(err))
                 } else {

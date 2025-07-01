@@ -22,7 +22,7 @@
         },
         "pyro": {
             "url":"https://www.duelingbook.com/deck?id=18079896",
-            "screenshot":"https://i.imgur.com/Hb6ef1R.jpeg"
+            "screenshot":"https://i.imgur.com/ZFxH3hG.jpeg"
         },
         "rock": {
             "url":"https://www.duelingbook.com/deck?id=18079916",
@@ -59,24 +59,24 @@
         "zombie":"skulls"
     },
     "barters": {
-        "APC-004":"mushrooms",
+        "APC-001":"orbs",
         "APC-002":"gems",
         "APC-003":"bolts",
-        "APC-001":"orbs",
+        "APC-004":"mushrooms",
         "APC-005":"shields",
         "APC-006":"skulls",
         "APC-007":"moais",
-        "APC-008":"droplets",
-        "APC-009":"firecrackets",
-        "APC-010":"roses"
+        "APC-008":"roses",
+        "APC-009":"droplets",
+        "APC-010":"firecrackets"
     },
     "prizes": {
-        "aqua":"APC-008",
+        "aqua":"APC-009",
         "beast":"APC-004",
         "dragon":"APC-002",
         "machine":"APC-003",
-        "plant":"APC-010",
-        "pyro":"APC-009",
+        "plant":"APC-008",
+        "pyro":"APC-010",
         "rock":"APC-007",
         "spellcaster":"APC-001",
         "warrior":"APC-005",
@@ -100,12 +100,12 @@
         "zombie":"Today, you haunted your foes with the menace of a specter!"
     },
     "apcs": {
-        "aqua":"<:ult:845483716888887297>APC-008 - Mermail Shadow Squad",
+        "aqua":"<:ult:845483716888887297>APC-009 - Mermail Shadow Squad",
         "beast":"<:ult:845483716888887297>APC-004 - Kittytail, Mystical Beast of the Forest",
         "dragon":"<:ult:845483716888887297>APC-002 - Dragon Shrine",
         "machine":"<:ult:845483716888887297>APC-003 - Gizmek Taniguku, the Immobile Intellect",
-        "plant":"<:ult:845483716888887297>APC-010 - Miracle Fertilizer",
-        "pyro":"<:ult:845483716888887297>APC-009 - Bonfire",
+        "plant":"<:ult:845483716888887297>APC-008 - Baobaboon",
+        "pyro":"<:ult:845483716888887297>APC-010 - Bonfire",
         "rock":"<:ult:845483716888887297>APC-007 - Adamancipator Analyzer",
         "spellcaster":"<:ult:845483716888887297>APC-001 - Breaker the Magical Warrior",
         "warrior":"<:ult:845483716888887297>APC-005 - Reinforcement of the Army",

@@ -38,16 +38,23 @@ export default {
 
             // const daysPassed = daily.lastDaily ? Math.round( ( date.setHours(0, 0, 0, 0) - daily.lastDaily.setHours(0, 0, 0, 0) ) / (1000*60*60*24) ) : 1
 
-            const sets = await ForgedSet.findAll({ 
+            const coreSets = await ForgedSet.findAll({ 
                 where: { 
-                    code: 'AOD',
                     type: 'core',
                     forSale: true
                 },
                 order: [['createdAt', 'DESC']]
             })
 
-            const set = sets[0]
+            const aod = await ForgedSet.findOne({ 
+                where: { 
+                    code: 'AOD',
+                    type: 'core',
+                    forSale: true
+                }
+            })
+
+            const set = coreSets[0]
             if (!set) return interaction.editReply({ content: `No core set found.`})
 
             const commons = [...await ForgedPrint.findAll({ 
@@ -144,10 +151,10 @@ export default {
                     setTimeout(async () => {
                         await interaction.channel.send({ content: `Oh look, ${daily.playerName}, you cobbled together a pack!`, files: [packImage]})
                         if (num === 24) {
-                            await awardBox(interaction.channel, interaction.member, set)
+                            await awardBox(interaction.channel, interaction.member, aod)
                             return await daily.update({ isProcessing: false })
                         } else {
-                            await awardPacks(interaction.channel, interaction.member, set, num)
+                            await awardPacks(interaction.channel, interaction.member, aod, num)
                             return await daily.update({ isProcessing: false })
                         }
                     }, 4000)

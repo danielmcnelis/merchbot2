@@ -1,40 +1,58 @@
 {
     "decks": {
+        "aqua": {
+            "url":"https://www.duelingbook.com/deck?id=18079647",
+            "screenshot":"https://i.imgur.com/ryoV24x.jpeg"
+        },
         "beast": {
             "url":"https://www.duelingbook.com/deck?id=17523618",
-            "screenshot":"https://i.imgur.com/fymFsUh.jpeg"
+            "screenshot":"https://i.imgur.com/3Re9Cpb.jpeg"
         },
         "dragon": {
             "url":"https://www.duelingbook.com/deck?id=17525329",
-            "screenshot":"https://i.imgur.com/kVRZc4E.jpeg"
+            "screenshot":"https://i.imgur.com/G5SMALa.jpeg"
         },
         "machine": {
             "url":"https://www.duelingbook.com/deck?id=17523539",
-            "screenshot":"https://i.imgur.com/DNIj2ZP.jpeg"
+            "screenshot":"https://i.imgur.com/7B9aM7q.jpeg"
+        },
+        "plant": {
+            "url":"https://www.duelingbook.com/deck?id=18080051",
+            "screenshot":"https://i.imgur.com/Vz3NB0P.jpeg"
+        },
+        "pyro": {
+            "url":"https://www.duelingbook.com/deck?id=18079896",
+            "screenshot":"https://i.imgur.com/Hb6ef1R.jpeg"
+        },
+        "rock": {
+            "url":"https://www.duelingbook.com/deck?id=18079916",
+            "screenshot":"https://i.imgur.com/61Do4t9.jpeg"
         },
         "spellcaster": {
             "url":"https://www.duelingbook.com/deck?id=17523396",
-            "screenshot":"https://i.imgur.com/5tgp64V.jpeg"
+            "screenshot":"https://i.imgur.com/y9xNkIa.jpeg"
         },
         "warrior": {
             "url":"https://www.duelingbook.com/deck?id=17525225",
-            "screenshot":"https://i.imgur.com/cV3Iy2j.jpeg"
+            "screenshot":"https://i.imgur.com/AITEQW7.jpeg"
         },
         "zombie": {
             "url":"https://www.duelingbook.com/deck?id=17525286",
-            "screenshot":"https://i.imgur.com/Cj67hqs.jpeg"
+            "screenshot":"https://i.imgur.com/Bmx3XWR.jpeg"
         }
     },
     "vouchers": {
+        "aqua":"droplets",
         "beast":"mushrooms",
         "dinosaur":"egg",
         "dragon":"gems",
         "fiend":"familiar",
         "fish":"hook",
         "machine":"bolts",
-        "plant":"rose",
+        "plant":"roses",
+        "pyro":"firecrackers",
         "reptile":"cactus",
-        "rock":"moai",
+        "rock":"moais",
         "spellcaster":"orbs",
         "thunder":"battery",
         "warrior":"shields",
@@ -46,17 +64,26 @@
         "APC-003":"bolts",
         "APC-001":"orbs",
         "APC-005":"shields",
-        "APC-006":"zombie"
+        "APC-006":"skulls",
+        "APC-007":"moais",
+        "APC-008":"droplets",
+        "APC-009":"firecrackets",
+        "APC-010":"roses"
     },
     "prizes": {
+        "aqua":"APC-008",
         "beast":"APC-004",
         "dragon":"APC-002",
         "machine":"APC-003",
+        "plant":"APC-010",
+        "pyro":"APC-009",
+        "rock":"APC-007",
         "spellcaster":"APC-001",
         "warrior":"APC-005",
         "zombie":"APC-006"
     },
     "victories": {
+        "aqua":"Today, you drowned your foes with the bubbles of an octopus!",
         "beast":"Today, you attacked your foes with the ferocity of a tiger!",
         "dinosaur":"Today, you flattened your foes with the weight of a sauropod!",
         "dragon":"Today, you scorched your foes with the flames of legends!",
@@ -64,6 +91,7 @@
         "fish":"Today, you rushed your foes with the speed of a marlin!",
         "machine":"Today, you hammered your foes with the strength of an alloy!",
         "plant":"Today, you astonished your foes with the beauty of a princess!",
+        "pyro":"Today, you burned your foes with the heat of a blaze!",
         "reptile":"Today, you paralyzed your foes with the venom of a cobra!",
         "rock":"Today, you rolled over your foes with the ease of a boulder!",
         "spellcaster":"Today, you manipulated your foes with the trickery of a sorcerer!",
@@ -72,9 +100,13 @@
         "zombie":"Today, you haunted your foes with the menace of a specter!"
     },
     "apcs": {
+        "aqua":"<:ult:845483716888887297>APC-008 - Mermail Shadow Squad",
         "beast":"<:ult:845483716888887297>APC-004 - Kittytail, Mystical Beast of the Forest",
         "dragon":"<:ult:845483716888887297>APC-002 - Dragon Shrine",
         "machine":"<:ult:845483716888887297>APC-003 - Gizmek Taniguku, the Immobile Intellect",
+        "plant":"<:ult:845483716888887297>APC-010 - Miracle Fertilizer",
+        "pyro":"<:ult:845483716888887297>APC-009 - Bonfire",
+        "rock":"<:ult:845483716888887297>APC-007 - Adamancipator Analyzer",
         "spellcaster":"<:ult:845483716888887297>APC-001 - Breaker the Magical Warrior",
         "warrior":"<:ult:845483716888887297>APC-005 - Reinforcement of the Army",
         "zombie":"<:ult:845483716888887297>APC-006 -  Samurai Skull"

@@ -6,7 +6,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
 import roles from '../static/roles.json' with { type: 'json' }
 const { arenaRole } = roles
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { gladiators, foxy, shrine, cavebob, AOD, FON, king, arena, beast, dragon, warrior, spellcaster, machine, zombie, starchips, ult, mushrooms, gems, bolts, orbs, shields, skulls } = emojis
+const { gladiators, foxy, shrine, cavebob, AOD, FON, king, arena, aqua, beast, dragon, machine, plant, pyro, rock, spellcaster, warrior, zombie, starchips, ult, mushrooms, gems, bolts, orbs, shields, skulls } = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { arenaChannelId } = channels
 import arenas from '../static/arenas.json' with { type: 'json' }
@@ -181,6 +181,12 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
 
     const row1 = new ActionRowBuilder()
         .addComponents(new ButtonBuilder()
+            .setCustomId(`Arena-${timestamp}-Aqua`)
+            .setLabel('Aqua')
+            .setStyle(ButtonStyle.Primary)
+        )
+        
+        .addComponents(new ButtonBuilder()
             .setCustomId(`Arena-${timestamp}-Beast`)
             .setLabel('Beast')
             .setStyle(ButtonStyle.Primary)
@@ -199,12 +205,30 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
         )
 
         .addComponents(new ButtonBuilder()
-            .setCustomId(`Arena-${timestamp}-Spellcaster`)
-            .setLabel('Spellcaster')
+            .setCustomId(`Arena-${timestamp}-Plant`)
+            .setLabel('Plant')
             .setStyle(ButtonStyle.Primary)
         )
 
     const row2 = new ActionRowBuilder()
+            .addComponents(new ButtonBuilder()
+                .setCustomId(`Arena-${timestamp}-Pyro`)
+                .setLabel('Pyro')
+                .setStyle(ButtonStyle.Primary)
+            )
+
+            .addComponents(new ButtonBuilder()
+                .setCustomId(`Arena-${timestamp}-Rock`)
+                .setLabel('Rock')
+                .setStyle(ButtonStyle.Primary)
+            )
+
+            .addComponents(new ButtonBuilder()
+                .setCustomId(`Arena-${timestamp}-Spellcaster`)
+                .setLabel('Spellcaster')
+                .setStyle(ButtonStyle.Primary)
+            )
+
             .addComponents(new ButtonBuilder()
                 .setCustomId(`Arena-${timestamp}-Warrior`)
                 .setLabel('Warrior')
@@ -424,7 +448,7 @@ export const startRound = async (arenaEntries) => {
             info.round === 5 ? [[P1, P3], [P2, P5], [P4, P6]] : 
             null
     
-        const title = `${arena} - ${beast} ${dragon} ${machine} -- Arena Round ${info.round} - ${spellcaster} ${warrior} ${zombie} - ${arena}` 
+        const title = `${arena} - ${aqua} ${beast} ${dragon} ${machine} ${plant} -- Arena Round ${info.round} -  ${pyro} ${rock} ${spellcaster} ${warrior} ${zombie} - ${arena}` 
         const matches = pairings.map((pairing, index) => {
             if (pairing[0].isActive === false && pairing[1].isActive === false) {
                 setTimeout(() => doubleForfeit(pairing[0].playerId, pairing[1].playerId), index * 1000 + 1000)

@@ -240,14 +240,15 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
                 .setLabel('Zombie')
                 .setStyle(ButtonStyle.Primary)
             )
-            
+           
+    const row3 = new ActionRowBuilder() 
             .addComponents(new ButtonBuilder()
-            .setCustomId(`Arena-${timestamp}-No`)
-            .setLabel('No')
-            .setStyle(ButtonStyle.Danger)
-        )
+                .setCustomId(`Arena-${timestamp}-No`)
+                .setLabel('No')
+                .setStyle(ButtonStyle.Danger)
+            )
             
-    const message = await member.user.send({ content: `Please select a tribe for The Arena. ${arena} If you no longer want to play, press "No".`, components: [row1, row2] })
+    const message = await member.user.send({ content: `Please select a tribe for The Arena. ${arena} If you no longer want to play, press "No".`, components: [row1, row2, row3] })
 
     const filter = i => i.customId.includes(`Arena-${timestamp}`) && i.user.id === member.user.id;
     let confirmation

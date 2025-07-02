@@ -5,7 +5,7 @@ import { Op } from 'sequelize'
 import { isMod } from '../functions/utility.js'
 import { awardBox, awardPacks } from '../functions/packs.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const {AOD, FON, com, rar, sup, ult, scr, stardust, starchips, koolaid} = emojis
+const {AOD, FON, com, rar, sup, ult, scr, stardust, starchips, droplets, mushrooms, gems, bolts, roses, firecrackers, moais, orbs, shields, skulls, koolaid} = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -68,6 +68,46 @@ export default {
                     prints.push('StarDust')
                 }
 
+                if ('droplets'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Droplets')
+                }
+
+                if ('mushrooms'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Mushrooms')
+                }
+
+                if ('gems'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Gems')
+                }
+
+                if ('bolts'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Bolts')
+                }
+
+                if ('roses'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Roses')
+                }
+
+                if ('firecrackers'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Firecrackers')
+                }
+
+                if ('moais'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Moais')
+                }
+
+                if ('orbs'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Orbs')
+                }
+
+                if ('shields'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Shields')
+                }
+
+                if ('skulls'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Skulls')
+                }
+                
                 if ('pack(s) of '.includes(focusedValue.toLowerCase())) {
                     prints.push(...packs)
                 }
@@ -95,7 +135,10 @@ export default {
             const cardCode = item.includes('(') ? item.slice(-8, -1) : null
             const print = cardCode ? await ForgedPrint.findOne({ where: { cardCode }}) : null
             const card = print ? `${eval(print.rarity)}${print.cardCode} - ${print.cardName}` : null
-            const currency = item === 'StarDust' || item === 'StarChips' ? item.toLowerCase() : null
+            const currency = item === 'StarDust' || item === 'StarChips'  || item === 'Droplets'  || item === 'Mushrooms'
+                || item === 'Gems'  || item === 'Bolts'  || item === 'Roses'  || item === 'Firecrackers' 
+                || item === 'Moais'  || item === 'Orbs'  || item === 'Shields'  || item === 'Skulls' ? 
+                item.toLowerCase() : null
             const set = await ForgedSet.findOne({ where: { name: item.slice(11) }})
             const loot = card ? card :
                 currency ? eval(currency) :

@@ -21,6 +21,11 @@ export const Wallet = db.define('wallets', {
         defaultValue: 0,           
         allowNull: false
     },
+    droplets: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
     mushrooms: {
         type: Sequelize.INTEGER,  
         defaultValue: 0,           
@@ -32,6 +37,21 @@ export const Wallet = db.define('wallets', {
         allowNull: false
     },
     bolts: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
+    roses: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
+    firecrackets: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
+    moais: {
         type: Sequelize.INTEGER,  
         defaultValue: 0,           
         allowNull: false

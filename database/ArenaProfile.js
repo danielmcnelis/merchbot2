@@ -9,6 +9,10 @@ export const ArenaProfile = db.define('arenaProfiles', {
     playerId: {
         type: Sequelize.STRING
     },
+    aquaWins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
     beastWins: {
         type: Sequelize.INTEGER,
         defaultValue: 0
@@ -18,6 +22,18 @@ export const ArenaProfile = db.define('arenaProfiles', {
         defaultValue: 0
     },
     machineWins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
+    plantWins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
+    pyrotWins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
+    rockWins: {
         type: Sequelize.INTEGER,
         defaultValue: 0
     },

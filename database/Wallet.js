@@ -46,7 +46,7 @@ export const Wallet = db.define('wallets', {
         defaultValue: 0,           
         allowNull: false
     },
-    firecrackets: {
+    firecrackers: {
         type: Sequelize.INTEGER,  
         defaultValue: 0,           
         allowNull: false

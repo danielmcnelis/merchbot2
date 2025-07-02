@@ -2,7 +2,7 @@
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { Player, Wallet } from '../database/index.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const {FiC, stardust, starchips, mushrooms, gems, bolts, orbs, shields, skulls} = emojis
+const {FiC, stardust, starchips, mushrooms, gems, bolts, orbs, shields, skulls, droplets, roses, firecrackers, moais} = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -26,9 +26,13 @@ export default {
             const results = [`${FiC} --- ${wallet.playerName}'s Wallet --- ${FiC}`]
             results.push(`Starchips: ${wallet.starchips}${starchips}`)
             results.push(`Stardust: ${wallet.stardust}${stardust}`)
+            if (wallet.droplets) results.push(`Droplets: ${wallet.droplets}${droplets}`)
             if (wallet.mushrooms) results.push(`Mushrooms: ${wallet.mushrooms}${mushrooms}`)
             if (wallet.gems) results.push(`Gems: ${wallet.gems}${gems}`)
             if (wallet.bolts) results.push(`Bolts: ${wallet.bolts}${bolts}`)
+            if (wallet.roses) results.push(`Roses: ${wallet.roses}${roses}`)
+            if (wallet.firecrackers) results.push(`Firecrackers: ${wallet.firecrackers}${firecrackers}`)
+            if (wallet.moais) results.push(`Moais: ${wallet.moais}${moais}`)
             if (wallet.orbs) results.push(`Orbs: ${wallet.orbs}${orbs}`)
             if (wallet.shields) results.push(`Shields: ${wallet.shields}${shields}`)
             if (wallet.skulls) results.push(`Skulls: ${wallet.skulls}${skulls}`)

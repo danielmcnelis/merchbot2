@@ -135,10 +135,12 @@ export default {
             const cardCode = item.includes('(') ? item.slice(-8, -1) : null
             const print = cardCode ? await ForgedPrint.findOne({ where: { cardCode }}) : null
             const card = print ? `${eval(print.rarity)}${print.cardCode} - ${print.cardName}` : null
-            const currency = item === 'StarDust' || item === 'StarChips'  || item === 'Droplets'  || item === 'Mushrooms'
-                || item === 'Gems'  || item === 'Bolts'  || item === 'Roses'  || item === 'Firecrackers' 
-                || item === 'Moais'  || item === 'Orbs'  || item === 'Shields'  || item === 'Skulls' ? 
-                item.toLowerCase() : null
+            // const currency = item === 'StarDust' || item === 'StarChips'  || item === 'Droplets'  || item === 'Mushrooms'
+            //     || item === 'Gems'  || item === 'Bolts'  || item === 'Roses'  || item === 'Firecrackers' 
+            //     || item === 'Moais'  || item === 'Orbs'  || item === 'Shields'  || item === 'Skulls' ? 
+            //     item.toLowerCase() : null
+            
+            const currency = !print && item.toLowerCase().includes('pack') ? item.toLowerCase() : null
             const set = await ForgedSet.findOne({ where: { name: item.slice(11) }})
             const loot = card ? card :
                 currency ? eval(currency) :

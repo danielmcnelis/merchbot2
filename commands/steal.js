@@ -4,7 +4,7 @@ import { ForgedInventory, ForgedPrint, Player, Wallet } from '../database/index.
 import { Op } from 'sequelize'
 import { isMod } from '../functions/utility.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const {com, rar, sup, ult, scr, stardust, starchips, robbed} = emojis
+const {com, rar, sup, ult, scr, stardust, starchips, droplets, mushrooms, gems, bolts, roses, firecrackers, moais, orbs, shields, skulls, robbed} = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -45,7 +45,53 @@ export default {
                     order: [["cardName", "ASC"], ["createdAt", "ASC"]]
                 })].map((p) => `${p.cardName} (${p.cardCode})`)
 
-                prints.push('StarChips', 'StarDust')
+                if ('starchips'.includes(focusedValue.toLowerCase())) {
+                    prints.push('StarChips')
+                }
+
+                if ('stardust'.includes(focusedValue.toLowerCase())) {
+                    prints.push('StarDust')
+                }
+
+                if ('droplets'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Droplets')
+                }
+
+                if ('mushrooms'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Mushrooms')
+                }
+
+                if ('gems'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Gems')
+                }
+
+                if ('bolts'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Bolts')
+                }
+
+                if ('roses'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Roses')
+                }
+
+                if ('firecrackers'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Firecrackers')
+                }
+
+                if ('moais'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Moais')
+                }
+
+                if ('orbs'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Orbs')
+                }
+
+                if ('shields'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Shields')
+                }
+
+                if ('skulls'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Skulls')
+                }
 
                 await interaction.respond(
                     prints.map(print => ({ name: print, value: print })),

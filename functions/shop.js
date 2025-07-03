@@ -432,6 +432,7 @@ export const calcBoxPrice = async () => {
 
 // UPDATE SHOP
 export const updateShop = async () => {
+    console.log('updateShop()')
     await calcBoxPrice()
     const shopChannel = client.channels.cache.get(shopChannelId)
     shopChannel.bulkDelete(100).catch((err) => console.log(err))

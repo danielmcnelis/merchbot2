@@ -298,7 +298,7 @@ export const processBids = async () => {
 
         // if (print.rarity !== 'com' && print.rarity !== 'rar') completeTask(botSpamChannel, wallet.player.id, 'm5')
         // if (print.rarity === 'scr') completeTask(botSpamChannel, wallet.player.id, 'm4', 4000)
-        // if (print.setCode === 'APC' && winnerInv && winnerInv.quantity >= 3) completeTask(botSpamChannel, wallet.player.id, 'h5', 4000)
+        // if (print.forgedSetCode === 'APC' && winnerInv && winnerInv.quantity >= 3) completeTask(botSpamChannel, wallet.player.id, 'h5', 4000)
         results.push(`<@${wallet.player.discordId}> won a copy of ${eval(print.rarity)}${print.cardCode} - ${print.cardName} for ${bid.amount}${stardust}. Congratulations!`) 
     }
 
@@ -374,14 +374,14 @@ export const calcBoxPrice = async () => {
 
     for (let i = 0; i < sets.length; i++) {
         const set = sets[i]
-        const setCode = set.code
+        const forgedSetCode = set.code
 
         if (set.type === 'core' || set.type === 'mini') {
-            const commons = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "com" } })].map((p) => Math.round(p.marketPrice) || 1)
-            const rares = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "rar" } })].map((p) => Math.round(p.marketPrice) || 1)
-            const supers = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "sup" } })].filter((p) => !p.cardCode.includes('-SE')).map((p) => Math.round(p.marketPrice) || 1)
-            const ultras = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "ult" } })].map((p) => Math.round(p.marketPrice) || 1)
-            const secrets = [...await ForgedPrint.findAll({ where: { setCode: setCode, rarity: "scr" } })].map((p) => Math.round(p.marketPrice) || 1)
+            const commons = [...await ForgedPrint.findAll({ where: { forgedSetCode: forgedSetCode, rarity: "com" } })].map((p) => Math.round(p.marketPrice) || 1)
+            const rares = [...await ForgedPrint.findAll({ where: { forgedSetCode: forgedSetCode, rarity: "rar" } })].map((p) => Math.round(p.marketPrice) || 1)
+            const supers = [...await ForgedPrint.findAll({ where: { forgedSetCode: forgedSetCode, rarity: "sup" } })].filter((p) => !p.cardCode.includes('-SE')).map((p) => Math.round(p.marketPrice) || 1)
+            const ultras = [...await ForgedPrint.findAll({ where: { forgedSetCode: forgedSetCode, rarity: "ult" } })].map((p) => Math.round(p.marketPrice) || 1)
+            const secrets = [...await ForgedPrint.findAll({ where: { forgedSetCode: forgedSetCode, rarity: "scr" } })].map((p) => Math.round(p.marketPrice) || 1)
             
             const avgComPrice = commons.length ? commons.reduce((a, b) => a + b) / commons.length : 0
             const avgRarPrice = rares.length ? rares.reduce((a, b) => a + b) / rares.length : 0
@@ -400,7 +400,7 @@ export const calcBoxPrice = async () => {
             set.boxPrice = set.type === 'core' ? boxPrice : null
             await set.save()
         } else if (set.type === 'starter_deck') {
-            // const prints = await ForgedPrint.findAll({ where: { setCode: setCode }})
+            // const prints = await ForgedPrint.findAll({ where: { forgedSetCode: forgedSetCode }})
             // let deck1Price = 0
             // let deck2Price = 0
             // let deck1
@@ -408,7 +408,7 @@ export const calcBoxPrice = async () => {
 
             // const deckNames = Object.keys(decks)
             // deckNames.forEach((d) => {
-            //     if(decks[d].setCode === setCode) {
+            //     if(decks[d].forgedSetCode === forgedSetCode) {
             //         if (!deck1) deck1 = d
             //         else deck2 = d
             //     }
@@ -798,7 +798,7 @@ export const getExcludedPrintIds = async (message, rarity, set, exclusions, fuzz
 		const validCardCode = !!(cardCode.length === 7 && isFinite(cardCode.slice(-3)) && await ForgedSet.count({where: { code: cardCode.slice(0, 3) }}))
 	
 		const print = validCardCode ? await ForgedPrint.findOne({ where: { cardCode: cardCode }}) :
-                    cardName && set ? await ForgedPrint.findOne({ where: { cardName: cardName, setCode: set.code }}) :
+                    cardName && set ? await ForgedPrint.findOne({ where: { cardName: cardName, forgedSetCode: set.code }}) :
                     cardName && !set ? await selectPrint(message, playerId, cardName) :
                     null
 		

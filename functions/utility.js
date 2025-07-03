@@ -92,128 +92,128 @@ export const createPlayer = async (member, x = 0) => {
 }
 
 // RESET PLAYER
-// export const resetPlayer = async (message, player) => {
-//     const invs = await Inventory.findAll({ where: { playerId: player.id }, order: [["cardCode", "ASC"]] })
+export const resetPlayer = async (player) => {
+    const invs = await ForgedInventory.findAll({ where: { playerId: player.id }, order: [["cardCode", "ASC"]] })
 
-//     for (let i = 0; i < invs.length; i++) {
-//         const inv = invs[i]
-//         const quantity = inv.quantity
-//         const printId = inv.printId
-//         const cardCode = inv.cardCode
+    for (let i = 0; i < invs.length; i++) {
+        const inv = invs[i]
+        const quantity = inv.quantity
+        const printId = inv.printId
+        const cardCode = inv.cardCode
 
-//         const count = await Inventory.count({ 
-// 			where: { 
-// 				printId: printId,
-// 				playerId: merchbotId
-// 			}
-// 		})
+        const count = await Inventory.count({ 
+			where: { 
+				printId: printId,
+				playerId: merchbotId
+			}
+		})
 
-//         if (!count) {
-//             await Inventory.create({ 
-//                 cardCode: cardCode,
-//                 printId: printId,
-//                 playerId: merchbotId
-//             })
-//         }
+        if (!count) {
+            await Inventory.create({ 
+                cardCode: cardCode,
+                printId: printId,
+                playerId: merchbotId
+            })
+        }
 
-// 		const merchbot_inv = await Inventory.findOne({ 
-// 			where: { 
-// 				printId: printId,
-// 				playerId: merchbotId
-// 			}
-// 		})
+		const merchbot_inv = await Inventory.findOne({ 
+			where: { 
+				printId: printId,
+				playerId: merchbotId
+			}
+		})
 
-//         if (!merchbot_inv) return message.channel.send({ content: `Database error: Could not find or create MerchBot Inventory for: ${cardCode}.`})
+        if (!merchbot_inv) return message.channel.send({ content: `Database error: Could not find or create MerchBot Inventory for: ${cardCode}.`})
 
-//         if (merchbot_inv.quantity <= 0) {
-//             const auction = await Auction.findOne({ where: { cardCode: cardCode, printId: printId }})
-//             if (!auction) {
-//                 console.log(`Create Auction for ${cardCode}.`)
-//                 await Auction.create({
-//                     cardCode: cardCode,
-//                     quantity: quantity,
-//                     printId: printId
-//                 })
-//             } else {
-//                 auction.quantity += quantity
-//                 await auction.save()
-//             }
-//         }
+        if (merchbot_inv.quantity <= 0) {
+            const auction = await Auction.findOne({ where: { cardCode: cardCode, printId: printId }})
+            if (!auction) {
+                console.log(`Create Auction for ${cardCode}.`)
+                await Auction.create({
+                    cardCode: cardCode,
+                    quantity: quantity,
+                    printId: printId
+                })
+            } else {
+                auction.quantity += quantity
+                await auction.save()
+            }
+        }
 
-//         console.log(`Donating ${quantity} ${cardCode} to MerchBot.`)
-//         merchbot_inv.quantity += quantity
-//         await merchbot_inv.save()
+        console.log(`Donating ${quantity} ${cardCode} to MerchBot.`)
+        merchbot_inv.quantity += quantity
+        await merchbot_inv.save()
 
-//         console.log(`Destroying ${player.name}'s ${cardCode} Inventory.`)
-//         await inv.destroy()
-//     }
+        console.log(`Destroying ${player.name}'s ${cardCode} Inventory.`)
+        await inv.destroy()
+    }
 
-//     player.stats = 500
-//     player.backup = 0
-//     player.wins = 0
-//     player.losses = 0
-//     player.vanquished_foes = 0
-//     player.best_stats = 500
-//     player.current_streak = 0
-//     player.longest_streak = 0
-//     player.arena_wins = 0
-//     player.arena_losses = 0
-//     player.arena_stats = 500
-//     player.arena_backup = 0
-//     player.keeper_wins = 0
-//     player.keeper_losses = 0
-//     player.keeper_stats = 500
-//     player.keeper_backup = 0
-//     player.draft_wins = 0
-//     player.draft_losses = 0
-//     player.draft_stats = 500
-//     player.draft_backup = 0
-//     player.gauntlet_wins = 0
-//     player.gauntlet_losses = 0
-//     player.gauntlet_stats = 500
-//     player.gauntlet_backup = 0
-//     player.pauper_wins = 0
-//     player.pauper_losses = 0
-//     player.pauper_stats = 500
-//     player.pauper_backup = 0
-//     await player.save()
+    player.stats = 500
+    player.backup = 0
+    player.wins = 0
+    player.losses = 0
+    player.vanquished_foes = 0
+    player.best_stats = 500
+    player.current_streak = 0
+    player.longest_streak = 0
+    player.arena_wins = 0
+    player.arena_losses = 0
+    player.arena_stats = 500
+    player.arena_backup = 0
+    player.keeper_wins = 0
+    player.keeper_losses = 0
+    player.keeper_stats = 500
+    player.keeper_backup = 0
+    player.draft_wins = 0
+    player.draft_losses = 0
+    player.draft_stats = 500
+    player.draft_backup = 0
+    player.gauntlet_wins = 0
+    player.gauntlet_losses = 0
+    player.gauntlet_stats = 500
+    player.gauntlet_backup = 0
+    player.pauper_wins = 0
+    player.pauper_losses = 0
+    player.pauper_stats = 500
+    player.pauper_backup = 0
+    await player.save()
 
-//     const binder = await Binder.findOne({ where: { playerId: player.id }})
-//     if (binder) await binder.destroy()
+    const binder = await Binder.findOne({ where: { playerId: player.id }})
+    if (binder) await binder.destroy()
 
-//     const daily = await Daily.findOne({ where: { playerId: player.id }})
-//     if (daily) await daily.destroy()
+    const daily = await Daily.findOne({ where: { playerId: player.id }})
+    if (daily) await daily.destroy()
 
-//     // const diary = await Diary.findOne({ where: { playerId: player.id }})
-//     // if (diary) await diary.destroy()
+    // const diary = await Diary.findOne({ where: { playerId: player.id }})
+    // if (diary) await diary.destroy()
 
-//     // const knowledges = await Knowledge.findAll({ where: { playerId: player.id }})
+    // const knowledges = await Knowledge.findAll({ where: { playerId: player.id }})
     
-//     // for (let i = 0; i < knowledges.length; i++) {
-//     //     const knowledge = knowledges[i]
-//     //     await knowledge.destroy()
-//     // }
+    // for (let i = 0; i < knowledges.length; i++) {
+    //     const knowledge = knowledges[i]
+    //     await knowledge.destroy()
+    // }
 
-//     // const profile = await Profile.findOne({ where: { playerId: player.id }})
-//     // if (profile) await profile.destroy()
+    // const profile = await Profile.findOne({ where: { playerId: player.id }})
+    // if (profile) await profile.destroy()
 
-//     const wallet = await Wallet.findOne({ where: { playerId: player.id }})
-//     if (wallet) await wallet.destroy()
+    const wallet = await Wallet.findOne({ where: { playerId: player.id }})
+    if (wallet) await wallet.destroy()
 
-//     const wishlist = await Wishlist.findOne({ where: { playerId: player.id }})
-//     if (wishlist) await wishlist.destroy()
+    const wishlist = await Wishlist.findOne({ where: { playerId: player.id }})
+    if (wishlist) await wishlist.destroy()
 
-//     const date = new Date()
-//     await Reset.create({ 
-//         date: date,
-//         playerId: player.id
-//     })
+    const date = new Date()
+    await Reset.create({ 
+        date: date,
+        playerId: player.id
+    })
     
-//     player.lastReset = date
-//     await player.save()
+    player.lastReset = date
+    await player.save()
 
-//     return message.channel.send({ content: `Your account has been successfully reset. All your cards and progress have been wiped.`})
-// }
+    return message.channel.send({ content: `Your account has been successfully reset. All your cards and progress have been wiped.`})
+}
 
 //GET RANDOM STRING
 export const generateRandomString = (length, chars) => {

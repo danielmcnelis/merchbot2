@@ -29,7 +29,7 @@ export const ArenaProfile = db.define('arenaProfiles', {
         type: Sequelize.INTEGER,
         defaultValue: 0
     },
-    pyrotWins: {
+    pyroWins: {
         type: Sequelize.INTEGER,
         defaultValue: 0
     },

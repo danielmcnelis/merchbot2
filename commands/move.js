@@ -34,7 +34,7 @@ export default {
     
                 const cards = await Card.findAll({
                     where: {
-                        name: {[Op.iLike]: `${focusedValue}%`},
+                        name: {[Op.iLike]: `%${focusedValue}%`},
                     },
                     limit: 5,
                     order: [["name", "ASC"]]

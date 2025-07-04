@@ -30,8 +30,8 @@ export default {
                     where: {
                         cardCode: {[Op.startsWith]: "APC"},
                         [Op.or]: {
-                            cardName: {[Op.iLike]: `${focusedValue}%`},
-                            cardCode: {[Op.iLike]: `${focusedValue}%`}
+                            cardName: {[Op.iLike]: `%${focusedValue}%`},
+                            cardCode: {[Op.iLike]: `%${focusedValue}%`}
                         }
                     },
                     limit: 6,

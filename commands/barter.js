@@ -51,12 +51,16 @@ export default {
             console.log(printId)
             const print = await ForgedPrint.findOne({ where: { id: printId }})
             const card = `${eval(print.rarity)}${print.cardCode} - ${print.cardName}`
-            const voucher = print.cardCode === 'APC-004' ? 'mushrooms' :
+            const voucher = print.cardCode === 'APC-001' ? 'orbs' :
                     print.cardCode === 'APC-002' ? 'gems' :
                     print.cardCode === 'APC-003' ? 'bolts' :
-                    print.cardCode === 'APC-001' ? 'orbs' :
+                    print.cardCode === 'APC-004' ? 'mushrooms' :
                     print.cardCode === 'APC-005' ? 'shields' :
                     print.cardCode === 'APC-006' ? 'skulls' :
+                    print.cardCode === 'APC-007' ? 'moais' :
+                    print.cardCode === 'APC-008' ? 'roses' :
+                    print.cardCode === 'APC-009' ? 'droplets' :
+                    print.cardCode === 'APC-010' ? 'firecrackers' :
                     null 
 
             if (!voucher) return interaction.reply({ content: `Error: No voucher found for ${card}.` })

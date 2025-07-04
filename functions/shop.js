@@ -470,7 +470,7 @@ export const updateShop = async () => {
             const set = setsForSale[i]
             if (set.type === 'core') {
                 results.push(`${set.boxPrice}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Box`)
-                if (set.specs_forSale) results.push(`${set.specPrice}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - SE`)
+                if (set.specsForSale) results.push(`${set.specPrice}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - SE`)
                 results.push(`${set.unitPrice}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Pack`)
             } else if (set.type === 'mini') {
                 results.push(`${set.unitPrice}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Pack`)

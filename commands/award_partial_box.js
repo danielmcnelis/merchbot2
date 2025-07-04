@@ -33,7 +33,7 @@ export default {
             const award = `${quantity} Pack(s) from a partial Box of ${set.name} ${eval(set.code)}`
             const user = interaction.options.getUser('player')
             const discordId = user.id
-            if (interaction.user.id === discordId) return await interaction.editReply({ content: `You cannot award ${koolaid} things to yourself.`})
+            // if (interaction.user.id === discordId) return await interaction.editReply({ content: `You cannot award ${koolaid} things to yourself.`})
             const player = await Player.findByDiscordId(discordId)
             const member = interaction.guild.members.cache.get(discordId)
             

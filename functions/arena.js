@@ -400,7 +400,7 @@ export const startRound = async (arenaEntries) => {
                 for (let i = 0; i < arenaEntries.length; i++) {
                     const arenaEntry = arenaEntries[i]
                     const voucher = vouchers[arenaEntry.tribe]
-                    const quantity = i < 3 ? arenaEntry.score + 4 : arenaEntry.score
+                    const quantity = i < 3 ? arenaEntry.score + 4 : arenaEntry.score + 1
                     const wallet = await Wallet.findOne({ where: { playerId: arenaEntry.playerId }})
                     wallet[voucher] += quantity
                 await wallet.save()
@@ -415,7 +415,7 @@ export const startRound = async (arenaEntries) => {
             for (let i = 0; i < arenaEntries.length; i++) {
                 const arenaEntry = arenaEntries[i]
                 const voucher = vouchers[arenaEntry.tribe]
-                const quantity = i < 4 ? arenaEntry.score + 3 : arenaEntry.score
+                const quantity = i < 4 ? arenaEntry.score + 3 : arenaEntry.score + 1
                 const wallet = await Wallet.findOne({ where: { playerId: arenaEntry.playerId }})
                 wallet[voucher] += quantity
                 await wallet.save()

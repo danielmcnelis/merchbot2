@@ -409,13 +409,28 @@ export const startRound = async (arenaEntries) => {
     
                 channel.send({ content: `The shadows grew long over the battlefield, and the gladiators ${gladiators} had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena. ${arena}`})
                 return endArena(arenaEntries)
+        } else if ((arenaEntries[0].score === arenaEntries[1].score === arenaEntries[2].score === arenaEntries[3].score) && arenaEntries[3].score > arenaEntries[4].score) {
+            //4 way tie
+                // VOUCHERS
+                for (let i = 0; i < arenaEntries.length; i++) {
+                    const arenaEntry = arenaEntries[i]
+                    const voucher = vouchers[arenaEntry.tribe]
+                    const quantity = i < 4 ? arenaEntry.score + 3 : arenaEntry.score + 1
+                    const wallet = await Wallet.findOne({ where: { playerId: arenaEntry.playerId }})
+                    wallet[voucher] += quantity
+                    await wallet.save()
+                    channel.send({ content: `<@${arenaEntry.player.discordId}> ${getRandomElement(verbs)} ${quantity}${eval(voucher)} from the Arena. ${getRandomElement(encouragements)}`})
+                }
+    
+                channel.send({ content: `The shadows grew long over the battlefield, and the gladiators ${gladiators} had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena. ${arena}`})
+                return endArena(arenaEntries)
         } else {
         //4 way tie
             // VOUCHERS
             for (let i = 0; i < arenaEntries.length; i++) {
                 const arenaEntry = arenaEntries[i]
                 const voucher = vouchers[arenaEntry.tribe]
-                const quantity = i < 4 ? arenaEntry.score + 3 : arenaEntry.score + 1
+                const quantity = i < 5 ? arenaEntry.score + 2 : arenaEntry.score + 1
                 const wallet = await Wallet.findOne({ where: { playerId: arenaEntry.playerId }})
                 wallet[voucher] += quantity
                 await wallet.save()

@@ -45,8 +45,8 @@ export default {
                 const prints = await ForgedPrint.findAll({
                     where: {
                         [Op.or]: {
-                            cardName: {[Op.iLike]: `%${focusedValue}%`},
-                            cardCode: {[Op.iLike]: `%${focusedValue}%`}
+                            cardName: {[Op.iLike]: `${focusedValue}%`},
+                            cardCode: {[Op.iLike]: `${focusedValue}%`}
                         }
                     },
                     limit: 5,

@@ -396,7 +396,7 @@ export const calcBoxPrice = async () => {
     
             const avgPackPrice = avgBoxPrice / set.packsPerBox
             set.unitPrice = avgPackPrice < 150 ? Math.round(avgPackPrice / 10) * 10 : 150
-            const boxPrice = avgPackPrice < 150 ? Math.round(20 * unitPrice / 100) * 100 : 3000
+            const boxPrice = avgPackPrice < 150 ? Math.round(20 * set.unitPrice / 100) * 100 : 3000
             set.boxPrice = set.type === 'core' ? boxPrice : null
             await set.save()
         } else if (set.type === 'starter_deck') {

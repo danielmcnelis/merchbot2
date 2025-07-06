@@ -484,22 +484,22 @@ export const manageSubscriptions = async (client) => {
                 const player = players[i]
                 const member = await membersMap.get(player.discordId)
                 
-                if (player.isForgedSubscriber && player.discordId !== '194147938786738176' && player.discordId !== '192688367585067008' && player.discordId !== '379851431752237057' && player.discordId !== '626843317010694176' && player.discordId !== '332277643384979466' && !member?._roles.includes(benefactorRoleId) && !member?._roles.includes(patronRoleId) && !member?._roles.includes(supporterRoleId)) {
+                if (player.isForgedSubscriber && player.discordId !== '194147938786738176' && player.discordId !== '597814337637187617' && player.discordId !== '192688367585067008' && player.discordId !== '379851431752237057' && player.discordId !== '626843317010694176' && player.discordId !== '332277643384979466' && !member?._roles.includes(benefactorRoleId) && !member?._roles.includes(patronRoleId) && !member?._roles.includes(supporterRoleId)) {
                     await programmer.send({ content: `${player.name} is no longer a Subscriber (${player.forgedSubscriberTier}).`})
                     console.log(`${player.name} is no longer a Subscriber (${player.forgedSubscriberTier}).`)
                     await player.update({ isForgedSubscriber: false, forgedSubscriberTier: null })
                     b++
-                } else if (member?._roles.includes(benefactorRoleId) && (!player.isForgedSubscriber || player.forgedSubscriberTier !== 'Benefactor') && player.discordId !== '194147938786738176' && player.discordId !== '192688367585067008' && player.discordId !== '379851431752237057' && player.discordId !== '332277643384979466' && player.discordId !== '626843317010694176') {
+                } else if (member?._roles.includes(benefactorRoleId) && (!player.isForgedSubscriber || player.forgedSubscriberTier !== 'Benefactor') && player.discordId !== '194147938786738176' && player.discordId !== '597814337637187617' && player.discordId !== '192688367585067008' && player.discordId !== '379851431752237057' && player.discordId !== '332277643384979466' && player.discordId !== '626843317010694176') {
                     await programmer.send({ content: `Welcome ${player.name} to the Forged in Chaos Benefactor Tier!`})
                     console.log(`Welcome ${player.name} to the Forged in Chaos Benefactor Tier!`)
                     await player.update({ isForgedSubscriber: true, forgedSubscriberTier: 'Benefactor' })
                     a++
-                } else if (member?._roles.includes(patronRoleId) && (!player.isForgedSubscriber || player.forgedSubscriberTier !== 'Patron') && player.discordId !== '194147938786738176' && player.discordId !== '192688367585067008' && player.discordId !== '379851431752237057' && player.discordId !== '332277643384979466' && player.discordId !== '626843317010694176') {
+                } else if (member?._roles.includes(patronRoleId) && (!player.isForgedSubscriber || player.forgedSubscriberTier !== 'Patron') && player.discordId !== '194147938786738176' && player.discordId !== '597814337637187617' && player.discordId !== '192688367585067008' && player.discordId !== '379851431752237057' && player.discordId !== '332277643384979466' && player.discordId !== '626843317010694176') {
                     await programmer.send({ content: `Welcome ${player.name} to the Forged in Chaos Patron Tier!`})
                     console.log(`Welcome ${player.name} to the Forged in Chaos Patron Tier!`)
                     await player.update({ isForgedSubscriber: true, forgedSubscriberTier: 'Patron' })
                     a++
-                } else if (member?._roles.includes(supporterRoleId) && (!player.isForgedSubscriber || player.forgedSubscriberTier !== 'Supporter') && player.discordId !== '194147938786738176' && player.discordId !== '192688367585067008' && player.discordId !== '379851431752237057' && player.discordId !== '332277643384979466' && player.discordId !== '626843317010694176') {
+                } else if (member?._roles.includes(supporterRoleId) && (!player.isForgedSubscriber || player.forgedSubscriberTier !== 'Supporter') && player.discordId !== '194147938786738176' && player.discordId !== '597814337637187617' && player.discordId !== '192688367585067008' && player.discordId !== '379851431752237057' && player.discordId !== '332277643384979466' && player.discordId !== '626843317010694176') {
                     await programmer.send({ content: `Welcome ${player.name} to the Forged in Chaos Supporter Tier!`})
                     console.log(`Welcome ${player.name} to the Forged in Chaos Supporter Tier!`)
                     await player.update({ isForgedSubscriber: true, forgedSubscriberTier: 'Supporter' })

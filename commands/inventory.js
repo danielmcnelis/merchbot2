@@ -68,10 +68,11 @@ export default {
         },
 	async execute(interaction) {
         try {       
+            await interaction.deferReply()
             const discordId = interaction.options.getUser('user')?.id || interaction.user.id
             const inspectingOtherUser = discordId !== interaction.user.id
             const userIsMod = isMod(interaction.member)
-            if (!userIsMod && inspectingOtherUser) return await interaction.reply({ content: `You do not have permission to do that.` })
+            if (!userIsMod && inspectingOtherUser) return await interaction.editReply({ content: `You do not have permission to do that.` })
             const player = await Player.findByDiscordId(discordId)
             const setCode = interaction.options.getString('set')
             const cardName = interaction.options.getString('card')
@@ -124,7 +125,7 @@ export default {
             }
 
             interaction.user.send({ content: `Browse your Inventory: https://formatlibrary.com/forged-inventory/${player.id}` }).catch((err) => console.log(err))
-            return interaction.reply({ content: `I messaged you the Inventory you requested.`})
+            return interaction.editReply({ content: `I messaged you the Inventory you requested.`})
         } catch (err) {
             console.log(err)
         }

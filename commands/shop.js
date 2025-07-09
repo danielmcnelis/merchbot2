@@ -56,13 +56,16 @@ export default {
             }})
         
             const marketPrice = print.marketPrice
-            const shopBuyingPrice = Math.floor(marketPrice * 0.7) > 0 ? Math.floor(marketPrice * 0.7) : 1			
+            const shopBuyingFactor = print.isFrozen ? 1 : 0.7
+            const shopBuyingPrice = Math.floor(print.marketPrice * shopBuyingFactor) > 0 ? Math.floor(print.marketPrice * shopBuyingFactor) : 1	
             const shopSellingPrice = Math.floor(marketPrice * 1.1) > shopBuyingPrice ? Math.floor(marketPrice * 1.1) : shopBuyingPrice + 1
     
+            const symbol = print.isFrozen ? '- ❄️' : print.trendingUp ? `- ${rising}` : print.trendingDown ? `- ${falling}` : ''
+
             if (!inv) {
-                return interaction.reply({ content: `${shopSellingPrice}${stardust}| ${shopBuyingPrice}${stardust}-${card} - Out of Stock${print.trendingUp ? ` - ${rising}` : ''}${print.trendingDown ? ` - ${falling}` : ''}`})
+                return interaction.reply({ content: `${shopSellingPrice}${stardust}| ${shopBuyingPrice}${stardust}-${card} - Out of Stock${symbol}`})
             } else {
-                return interaction.reply({ content: `${shopSellingPrice}${stardust}| ${shopBuyingPrice}${stardust}-${card} - ${inv.quantity}${print.trendingUp ? ` - ${rising}` : ''}${print.trendingDown ? ` - ${falling}` : ''}`})
+                return interaction.reply({ content: `${shopSellingPrice}${stardust}| ${shopBuyingPrice}${stardust}-${card} - ${inv.quantity}${symbol}`})
             }
         } catch (err) {
             console.log(err)

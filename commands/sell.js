@@ -83,14 +83,15 @@ export default {
             const shopSale = buyerDiscordId === merchbotDiscordId
             const info = await Info.findOne({ where: { element: 'shop'} })
             if (shopSale && info.status === 'closed') return interaction.reply({ content: `Sorry, The Shop ${merchant} is currently closed.` })
-            const shopBuyingPrice = Math.floor(print.marketPrice * 0.7) > 0 ? Math.floor(print.marketPrice * 0.7) : 1			
+            const shopBuyingFactor = print.isFrozen ? 1 : 0.7
+            const shopBuyingPrice = Math.floor(print.marketPrice * shopBuyingFactor) > 0 ? Math.floor(print.marketPrice * shopBuyingFactor) : 1			
             const price = shopSale ? quantity * shopBuyingPrice : interaction.options.getNumber('price')
             if (price > buyersWallet.stardust) return interaction.reply({ content: `Sorry, ${buyer.name} only has ${buyersWallet.stardust}${stardust}.` })
             if (shopSale && interaction.options.getNumber('price') && interaction.options.getNumber('price') !== price) return interaction.reply({ content: `Please leave the "price" option blank when selling cards to The Shop. ${merchant}` })
             if (!shopSale && !price) return interaction.reply({ content: `Please specifiy the price.`})
-            const shopBuybackPrice = Math.ceil(print.marketPrice * 0.7)
+            // const shopBuybackPrice = Math.ceil(print.marketPrice * 0.7)
             if (price < 1) return interaction.reply({ content: `You cannot sell a card for less than 1${stardust}.` })
-            if (!shopSale && price < (shopBuybackPrice * quantity)) return interaction.reply({ content: `You cannot sell a card for less ${stardust} than The Shop ${merchant} would pay for it.` })
+            if (!shopSale && price < (shopBuyingPrice * quantity)) return interaction.reply({ content: `You cannot sell a card for less ${stardust} than The Shop ${merchant} would pay for it.` })
             if (price > buyersWallet.stardust) return interaction.reply({ content: `Sorry, ${buyer.name} only has ${buyersWallet.stardust}${stardust}.` })
             
             const sellersInv = await ForgedInventory.findOne({

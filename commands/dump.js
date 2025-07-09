@@ -150,7 +150,8 @@ export default {
                     for (let i = 0; i < sellersInvs.length; i++) {
                         const sellersInv = sellersInvs[i]
                         const difference = differences[i]
-                        const price = difference * Math.ceil(sellersInv.forgedPrint.marketPrice * 0.7)
+                        const factor = sellersInv.forgedPrint.isFrozen ? 1 : 0.7
+                        const price = difference * Math.ceil(sellersInv.forgedPrint.marketPrice * factor)
                         const print = sellersInv.forgedPrint
                         const buyersInv = await ForgedInventory.findOne({
                             where: {

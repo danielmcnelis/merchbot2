@@ -35,7 +35,7 @@ export default {
                 })
 
                 await interaction.respond(
-                    prints.map(print => ({ name: `${print.name} (${print.cardCode})`, value: print.id })),
+                    prints.map(print => ({ name: `${print.cardName} (${print.cardCode})`, value: print.id })),
                 )
             } catch (err) {
                 console.log(err)

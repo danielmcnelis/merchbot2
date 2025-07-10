@@ -69,7 +69,7 @@ export default {
 
             await interaction.reply({ content: `${player.name}, you have ${wallet.starchips}${starchips}. Do you want to spend 100${starchips} on a ${promo.cardName} - Series 1 Collector's Tin?`, components: [row] })
 
-            const filter = i => i.customId.startsWith(`Spec-${timestamp}`) && i.user.id === interaction.user.id;
+            const filter = i => i.customId.startsWith(`Tin-${timestamp}`) && i.user.id === interaction.user.id;
 
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })

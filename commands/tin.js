@@ -25,10 +25,10 @@ export default {
                 const prints = await ForgedPrint.findAll({
                     where: {
                         [Op.or]: {
-                            name: {[Op.iLike]: `${focusedValue}%`},
-                            code: {[Op.iLike]: `${focusedValue}%`}
+                            cardName: {[Op.iLike]: `${focusedValue}%`},
+                            cardCode: {[Op.iLike]: `${focusedValue}%`}
                         },
-                        code: {[Op.startsWith]: 'CT1-'}
+                        cardCode: {[Op.startsWith]: 'CT1-'}
                     },
                     limit: 6,
                     order: [["cardName", "ASC"]]

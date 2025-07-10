@@ -34,9 +34,9 @@ export default {
                 await daily.update({ isProcessing: true })
             }
 
-            const cobbleProgress = daily.lastDaily && isYesterday(daily.lastDaily) ? daily.cobbleProgress + 1 : 1
+            // const cobbleProgress = daily.lastDaily && isYesterday(daily.lastDaily) ? daily.cobbleProgress + 1 : 1
 
-            // const daysPassed = daily.lastDaily ? Math.round( ( date.setHours(0, 0, 0, 0) - daily.lastDaily.setHours(0, 0, 0, 0) ) / (1000*60*60*24) ) : 1
+            const daysPassed = daily.lastDaily ? Math.round( ( date.setHours(0, 0, 0, 0) - daily.lastDaily.setHours(0, 0, 0, 0) ) / (1000*60*60*24) ) : 1
 
             const coreSets = await ForgedSet.findAll({ 
                 where: { 
@@ -136,7 +136,8 @@ export default {
             daily.lastDaily = date
             await daily.save()
             
-            if (cobbleProgress >= 7) {
+            if ((daily.cobbleProgress + daysPassed) >= 7) {
+            // if (cobbleProgress >= 7) {
                 daily.cobbleProgress = 0
                 await daily.save()
 
@@ -162,7 +163,8 @@ export default {
                     return
                 }
             } else {
-                daily.cobbleProgress = cobbleProgress
+                // daily.cobbleProgress = cobbleProgress
+                daily.cobbleProgress += daysPassed
                 await daily.save()
 
                 const packImage = new AttachmentBuilder(`./public/${daily.cobbleProgress}outof7.png`, { name: `pack.png` })

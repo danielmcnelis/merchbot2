@@ -153,11 +153,11 @@ export default {
                         const yourSecrets = set1.secretsPerPack > 1 ? getRandomSubset(set1Secrets, set1.secretsPerPack) : set1.secretsPerPack === 1 ? [getRandomElement(set1Secrets)] :  []
 
                         const odds = []
-                        if (!yourCommons.length) for (let i = 0; i < set1.commonsPerBox; i++) odds.push("commons")
-                        if (!yourRares.length) for (let i = 0; i < set1.raresPerBox; i++) odds.push("rares")
-                        if (!yourSupers.length) for (let i = 0; i < set1.supersPerBox; i++) odds.push("supers")
-                        if (!yourUltras.length) for (let i = 0; i < set1.ultrasPerBox; i++) odds.push("ultras")
-                        if (!yourSecrets.length) for (let i = 0; i < set1.secretsPerBox; i++) odds.push("secrets")
+                        if (!yourCommons.length) for (let i = 0; i < set1.commonsPerBox; i++) odds.push("set1Commons")
+                        if (!yourRares.length) for (let i = 0; i < set1.raresPerBox; i++) odds.push("set1Rares")
+                        if (!yourSupers.length) for (let i = 0; i < set1.supersPerBox; i++) odds.push("set1Supers")
+                        if (!yourUltras.length) for (let i = 0; i < set1.ultrasPerBox; i++) odds.push("set1Ultras")
+                        if (!yourSecrets.length) for (let i = 0; i < set1.secretsPerBox; i++) odds.push("set1Secrets")
 
                         const luck = getRandomElement(odds)
                         const yourFoil = getRandomElement(eval(luck))
@@ -255,11 +255,11 @@ export default {
                         const yourSecrets = set2.secretsPerPack > 1 ? getRandomSubset(set2Secrets, set2.secretsPerPack) : set2.secretsPerPack === 1 ? [getRandomElement(set2Secrets)] :  []
 
                         const odds = []
-                        if (!yourCommons.length) for (let i = 0; i < set2.commonsPerBox; i++) odds.push("commons")
-                        if (!yourRares.length) for (let i = 0; i < set2.raresPerBox; i++) odds.push("rares")
-                        if (!yourSupers.length) for (let i = 0; i < set2.supersPerBox; i++) odds.push("supers")
-                        if (!yourUltras.length) for (let i = 0; i < set2.ultrasPerBox; i++) odds.push("ultras")
-                        if (!yourSecrets.length) for (let i = 0; i < set2.secretsPerBox; i++) odds.push("secrets")
+                        if (!yourCommons.length) for (let i = 0; i < set2.commonsPerBox; i++) odds.push("set2Commons")
+                        if (!yourRares.length) for (let i = 0; i < set2.raresPerBox; i++) odds.push("set2Rares")
+                        if (!yourSupers.length) for (let i = 0; i < set2.supersPerBox; i++) odds.push("set2Supers")
+                        if (!yourUltras.length) for (let i = 0; i < set2.ultrasPerBox; i++) odds.push("set2Ultras")
+                        if (!yourSecrets.length) for (let i = 0; i < set2.secretsPerBox; i++) odds.push("set2Secrets")
 
                         const luck = getRandomElement(odds)
                         const yourFoil = getRandomElement(eval(luck))

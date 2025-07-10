@@ -37,6 +37,7 @@ import shop from './shop.js'
 import spec from './spec.js'
 import steal from './steal.js'
 import test from './test.js'
+import tin from './tin.js'
 import trade from './trade.js'
 import update from './update.js'
 import wager from './wager.js'
@@ -84,6 +85,7 @@ export default {
         spec,
         steal,
         test,
+        tin,
         trade,
         update,
         wager,

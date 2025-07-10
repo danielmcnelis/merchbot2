@@ -5,7 +5,7 @@ import { Op } from 'sequelize'
 import { drawPack } from '../functions/packs.js'
 import { drawCardImage, getRandomElement, getRandomSubset } from '../functions/utility.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { AOD, FON, com, rar, sup, ult, scr, starchips, stardust } = emojis
+const { AOD, CTP, FON, com, rar, sup, ult, scr, starchips, stardust } = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -28,7 +28,7 @@ export default {
                             name: {[Op.iLike]: `${focusedValue}%`},
                             code: {[Op.iLike]: `${focusedValue}%`}
                         },
-                        code: {[Op.startsWith]: 'CTP-'}
+                        code: {[Op.startsWith]: 'CT1-'}
                     },
                     limit: 6,
                     order: [["cardName", "ASC"]]
@@ -76,98 +76,88 @@ export default {
                 if (confirmation.customId.includes('Yes')) {
 
                     const updatedWallet = await Wallet.findOne({ where: { playerId: player.id }})
-
-                    const updateMoney = updatedWallet[set.currency]
-                    if (updateMoney < Math.round(set.specPrice * discount)) return interaction.editReply({ content: `Sorry, ${player.name}, you only have ${money}${eval(set.currency)} and ${set.name} ${eval(set.emoji)} Special Edition boxes cost ${Math.round(set.specPrice * discount)}${eval(set.currency)}.`})
+                    if (updatedWallet.starchips < 100) return interaction.editReply({ content: `Sorry, ${player.name}, you only have ${updatedWallet.starchips}${starchips} and Series 1 Collector's Tins cost 100${starchips}.`})
                     
-                    updatedWallet[set.currency] -= Math.round(set.specPrice * discount)
+                    updatedWallet.starchips -= 100
                     await updatedWallet.save()
 
-                    merchbotWallet.stardust += set.specPrice * 10
+                    merchbotWallet.stardust += 1000
                     await merchbotWallet.save()
 
-                    set.unitSales += num
-                    await set.save()
-                    
-                    interaction.editReply({ content: `Thank you for your purchase! I'll send you the contents of your ${set.name} ${eval(set.emoji)} Special Edition box.`, components: []})
-                    
-                            
-
-
-
-
-
-
-                    const num = 3
-                    const code = interaction.options.getString('set')
-
-                    const set = await ForgedSet.findOne({ where: { code: code }})
-                    if (!set) return interaction.reply({ content: `Could not find set code: ${code}.`})
-
-                    if (!set.specsForSale) return interaction.reply({ content: `Sorry, ${set.name} ${eval(set.code)} Special Edition boxes are not yet for sale.`})
-
-                    const commons = [...await ForgedPrint.findAll({ 
+                    const set1 = await ForgedSet.findOne({
                         where: {
-                            forgedSetId: set.id,
+                            code: 'AOD'
+                        }
+                    })
+
+                    const set2 = await ForgedSet.findOne({
+                        where: {
+                            code: 'FON'
+                        }
+                    })
+
+                    set1.unitSales += 3
+                    await set1.save()
+
+                    set2.unitSales += 3
+                    await set2.save()
+                    
+                    interaction.editReply({ content: `Thank you for your purchase! I'll send you the contents of your Series 1 Collector's Tin.`, components: []})
+                    
+                    const set1Commons = [...await ForgedPrint.findAll({ 
+                        where: {
+                            forgedSetId: set1.id,
                             rarity: "com"
                         },
                         order: [['cardSlot', 'ASC']]
                     })].map((p) => p.cardCode)
 
-                    const rares = [...await ForgedPrint.findAll({ 
+                    const set1Rares = [...await ForgedPrint.findAll({ 
                         where: {
-                            forgedSetId: set.id,
+                            forgedSetId: set1.id,
                             rarity: "rar"
                         },
                         order: [['cardSlot', 'ASC']]
                     })].map((p) => p.cardCode)
 
-                    const supers = [...await ForgedPrint.findAll({ 
+                    const set1Supers = [...await ForgedPrint.findAll({ 
                         where: {
-                            forgedSetId: set.id,
+                            forgedSetId: set1.id,
                             rarity: "sup"
                         },
                         order: [['cardSlot', 'ASC']]
                     })].filter((p) => !p.cardCode.includes('-SE')).map((p) => p.cardCode)
 
-                    const specials = [...await ForgedPrint.findAll({ 
+                    const set1Ultras = [...await ForgedPrint.findAll({ 
                         where: {
-                            forgedSetId: set.id,
-                            rarity: "sup"
-                        },
-                        order: [['cardSlot', 'ASC']]
-                    })].filter((p) => p.cardCode.includes('-SE')).map((p) => p.cardCode)
-
-                    const ultras = [...await ForgedPrint.findAll({ 
-                        where: {
-                            forgedSetId: set.id,
+                            forgedSetId: set1.id,
                             rarity: "ult"
                         },
                         order: [['cardSlot', 'ASC']]
                     })].map((p) => p.cardCode)
 
-                    const secrets = [...await ForgedPrint.findAll({ 
+                    const set1Secrets = [...await ForgedPrint.findAll({ 
                         where: {
-                            forgedSetId: set.id,
+                            forgedSetId: set1.id,
                             rarity: "scr"
                         },
                         order: [['cardSlot', 'ASC']]
                     })].map((p) => p.cardCode)
 
-                    for (let j = 0; j < num; j++) {
-                        const results = [`\n${eval(set.emoji)} - ${set.name} Pack${num > 1 ? ` ${j + 1}` : ''} - ${eval(set.altEmoji)}`]
-                        const yourCommons = set.commonsPerPack > 1 ? getRandomSubset(commons, set.commonsPerPack) : set.commonsPerPack === 1 ? [getRandomElement(commons)] : []
-                        const yourRares = set.raresPerPack > 1 ? getRandomSubset(rares, set.raresPerPack) : set.raresPerPack === 1 ? [getRandomElement(rares)] : []
-                        const yourSupers = set.supersPerPack > 1 ? getRandomSubset(supers, set.supersPerPack) : set.supersPerPack === 1 ? [getRandomElement(supers)] : []
-                        const yourUltras = set.ultrasPerPack > 1 ? getRandomSubset(ultras, set.ultrasPerPack) : set.ultrasPerPack === 1 ? [getRandomElement(ultras)] : []
-                        const yourSecrets = set.secretsPerPack > 1 ? getRandomSubset(secrets, set.secretsPerPack) : set.secretsPerPack === 1 ? [getRandomElement(secrets)] :  []
+                    for (let j = 0; j < 3; j++) {
+                        const results = [`\n${eval(set1.emoji)} - ${set1.name} Pack ${j + 1} - ${eval(set1.altEmoji)}`]
+                        const yourCommons = set1.commonsPerPack > 1 ? getRandomSubset(set1Commons, set1.commonsPerPack) : set1.commonsPerPack === 1 ? [getRandomElement(set1Commons)] : []
+                        const yourRares = set1.raresPerPack > 1 ? getRandomSubset(set1Rares, set1.raresPerPack) : set1.raresPerPack === 1 ? [getRandomElement(set1Rares)] : []
+                        const yourSupers = set1.supersPerPack > 1 ? getRandomSubset(set1Supers, set1.supersPerPack) : set1.supersPerPack === 1 ? [getRandomElement(set1Supers)] : []
+                        const yourUltras = set1.ultrasPerPack > 1 ? getRandomSubset(set1Ultras, set1.ultrasPerPack) : set1.ultrasPerPack === 1 ? [getRandomElement(set1Ultras)] : []
+                        const yourSecrets = set1.secretsPerPack > 1 ? getRandomSubset(set1Secrets, set1.secretsPerPack) : set1.secretsPerPack === 1 ? [getRandomElement(set1Secrets)] :  []
 
                         const odds = []
-                        if (!yourCommons.length) for (let i = 0; i < set.commonsPerBox; i++) odds.push("commons")
-                        if (!yourRares.length) for (let i = 0; i < set.raresPerBox; i++) odds.push("rares")
-                        if (!yourSupers.length) for (let i = 0; i < set.supersPerBox; i++) odds.push("supers")
-                        if (!yourUltras.length) for (let i = 0; i < set.ultrasPerBox; i++) odds.push("ultras")
-                        if (!yourSecrets.length) for (let i = 0; i < set.secretsPerBox; i++) odds.push("secrets")
+                        if (!yourCommons.length) for (let i = 0; i < set1.commonsPerBox; i++) odds.push("commons")
+                        if (!yourRares.length) for (let i = 0; i < set1.raresPerBox; i++) odds.push("rares")
+                        if (!yourSupers.length) for (let i = 0; i < set1.supersPerBox; i++) odds.push("supers")
+                        if (!yourUltras.length) for (let i = 0; i < set1.ultrasPerBox; i++) odds.push("ultras")
+                        if (!yourSecrets.length) for (let i = 0; i < set1.secretsPerBox; i++) odds.push("secrets")
 
                         const luck = getRandomElement(odds)
                         const yourFoil = getRandomElement(eval(luck))
@@ -215,12 +205,111 @@ export default {
                         interaction.user.send({ content: `${results.join('\n').toString()}`, files: [attachment] }).catch((err) => console.log(err))
                     }
 
-                    const yourSpec = getRandomElement(specials)
-                    const yourSpecPrint = await ForgedPrint.findOne({ where: { cardCode: yourSpec }})
+
+                    const set2Commons = [...await ForgedPrint.findAll({ 
+                        where: {
+                            forgedSetId: set2.id,
+                            rarity: "com"
+                        },
+                        order: [['cardSlot', 'ASC']]
+                    })].map((p) => p.cardCode)
+
+                    const set2Rares = [...await ForgedPrint.findAll({ 
+                        where: {
+                            forgedSetId: set2.id,
+                            rarity: "rar"
+                        },
+                        order: [['cardSlot', 'ASC']]
+                    })].map((p) => p.cardCode)
+
+                    const set2Supers = [...await ForgedPrint.findAll({ 
+                        where: {
+                            forgedSetId: set2.id,
+                            rarity: "sup"
+                        },
+                        order: [['cardSlot', 'ASC']]
+                    })].filter((p) => !p.cardCode.includes('-SE')).map((p) => p.cardCode)
+
+                    const set2Ultras = [...await ForgedPrint.findAll({ 
+                        where: {
+                            forgedSetId: set2.id,
+                            rarity: "ult"
+                        },
+                        order: [['cardSlot', 'ASC']]
+                    })].map((p) => p.cardCode)
+
+                    const set2Secrets = [...await ForgedPrint.findAll({ 
+                        where: {
+                            forgedSetId: set2.id,
+                            rarity: "scr"
+                        },
+                        order: [['cardSlot', 'ASC']]
+                    })].map((p) => p.cardCode)
+
+                    for (let j = 0; j < 3; j++) {
+                        const results = [`\n${eval(set2.emoji)} - ${set2.name} Pack ${j + 1} - ${eval(set2.altEmoji)}`]
+                        const yourCommons = set2.commonsPerPack > 1 ? getRandomSubset(set2Commons, set2.commonsPerPack) : set2.commonsPerPack === 1 ? [getRandomElement(set2Commons)] : []
+                        const yourRares = set2.raresPerPack > 1 ? getRandomSubset(set2Rares, set2.raresPerPack) : set2.raresPerPack === 1 ? [getRandomElement(set2Rares)] : []
+                        const yourSupers = set2.supersPerPack > 1 ? getRandomSubset(set2Supers, set2.supersPerPack) : set2.supersPerPack === 1 ? [getRandomElement(set2Supers)] : []
+                        const yourUltras = set2.ultrasPerPack > 1 ? getRandomSubset(set2Ultras, set2.ultrasPerPack) : set2.ultrasPerPack === 1 ? [getRandomElement(set2Ultras)] : []
+                        const yourSecrets = set2.secretsPerPack > 1 ? getRandomSubset(set2Secrets, set2.secretsPerPack) : set2.secretsPerPack === 1 ? [getRandomElement(set2Secrets)] :  []
+
+                        const odds = []
+                        if (!yourCommons.length) for (let i = 0; i < set2.commonsPerBox; i++) odds.push("commons")
+                        if (!yourRares.length) for (let i = 0; i < set2.raresPerBox; i++) odds.push("rares")
+                        if (!yourSupers.length) for (let i = 0; i < set2.supersPerBox; i++) odds.push("supers")
+                        if (!yourUltras.length) for (let i = 0; i < set2.ultrasPerBox; i++) odds.push("ultras")
+                        if (!yourSecrets.length) for (let i = 0; i < set2.secretsPerBox; i++) odds.push("secrets")
+
+                        const luck = getRandomElement(odds)
+                        const yourFoil = getRandomElement(eval(luck))
+                        const yourPack = [...yourCommons.sort(), ...yourRares.sort(), ...yourSupers.sort(), ...yourUltras.sort(), ...yourSecrets.sort(), yourFoil].filter((e) => !!e)
+                        
+                        let yourCardArtworkIds = []
+                        for (let j = 0; j < yourPack.length; j++) {
+                            const cardCode = yourPack[j]
+                            const print = await ForgedPrint.findOne({ where: { cardCode }})
+                            const card = await Card.findOne({ where: { name: print.cardName }})
+                            yourCardArtworkIds.push(card.artworkId)
+                        }
+
+                        for (let i = 0; i < yourPack.length; i++) {
+                            const print = await ForgedPrint.findOne({ where: {
+                                cardCode: yourPack[i]
+                            }})
+
+                            if (!print.id) return interaction.reply({ content: `Error: ${yourPack[i]} does not exist in the print database.`})
+                            results.push(`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`)
+                        
+                            const inv = await ForgedInventory.findOne({ where: { 
+                                cardCode: print.cardCode,
+                                forgedPrintId: print.id,
+                                playerId: player.id
+                            }})
+
+                            if (inv) {
+                                inv.quantity++
+                                await inv.save()
+                            } else {
+                                await ForgedInventory.create({ 
+                                    cardName: print.cardName,
+                                    cardCode: print.cardCode,
+                                    cardId: print.cardId,
+                                    quantity: 1,
+                                    forgedPrintId: print.id,
+                                    playerName: player.name,
+                                    playerId: player.id
+                                })
+                            }
+                        }
+
+                        const attachment = await drawPack(yourCardArtworkIds) || []
+                        interaction.user.send({ content: `${results.join('\n').toString()}`, files: [attachment] }).catch((err) => console.log(err))
+                    }
 
                     const inv = await ForgedInventory.findOne({ where: { 
-                        cardCode: yourSpecPrint.cardCode,
-                        forgedPrintId: yourSpecPrint.id,
+                        cardCode: promo.cardCode,
+                        forgedPrintId: promo.id,
                         playerId: player.id
                     }})
 
@@ -229,32 +318,26 @@ export default {
                         await inv.save()
                     } else {
                         await ForgedInventory.create({ 
-                            cardName: yourSpecPrint.cardName,
-                            cardCode: yourSpecPrint.cardCode,
-                            cardId: yourSpecPrint.cardId,
+                            cardName: promo.cardName,
+                            cardCode: promo.cardCode,
+                            cardId: promo.cardId,
                             quantity: 1,
-                            forgedPrintId: yourSpecPrint.id,
+                            forgedPrintId: promo.id,
                             playerName: player.name,
                             playerId: player.id
                         })
                     }
 
-                    const yourSpecAttachment = await drawCardImage(yourSpecPrint.cardName)
-                    return interaction.user.send({ content: `${eval(set.emoji)} - ${set.name} S.E. Promo - ${eval(set.altEmoji)}\n${eval(yourSpecPrint.rarity)}${yourSpecPrint.cardCode} - ${yourSpecPrint.cardName}`, files: [yourSpecAttachment] }).catch((err) => console.log(err))
+                    const yourPromoAttachment = await drawCardImage(promo.cardName)
+                    return interaction.user.send({ content: `${CTP} - Series 1 Collector's Tin Promo - ${CTP}\n${eval(promo.rarity)}${promo.cardCode} - ${promo.cardName}`, files: [yourPromoAttachment] }).catch((err) => console.log(err))
                 } else {
-                    await interaction.editReply({ content: `Not a problem. No Special Edition box was purchased.`, components: [] })
+                    await interaction.editReply({ content: `Not a problem. No Collector's Tin was purchased.`, components: [] })
                 }
             } catch (err) {
                 console.log(err)
-                await interaction.editReply({ content: `Sorry, time's up. No Special Edition box was purchased.`, components: [] });
+                await interaction.editReply({ content: `Sorry, time's up. No Collector's Tin was purchased.`, components: [] });
             }
 
-
-
-
-
-
-            
             // const filter = m => m.author.id === message.author.id
             // interaction.reply({ content: `${player.name}, you have ${money}${eval(set.currency)}. Do you want to spend ${Math.round(set.unitPrice * discount) * num}${eval(set.currency)} on ${num > 1 ? num : 'a'} ${set.name} ${eval(set.emoji)} Pack${num > 1 ? 's' : ''}?`})
             // await message.channel.awaitMessages({ filter,

@@ -3,7 +3,7 @@ import { SlashCommandBuilder } from 'discord.js'
 import { ForgedInventory, ForgedPrint, ForgedSet, Player } from '../database/index.js'
 import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { AOD, FON, greenmark, com, emptybox, rar, scr, sup, tres, ult, arena } = emojis
+const { AOD, CTP, FON, greenmark, com, emptybox, rar, scr, sup, tres, ult, arena } = emojis
 
 export default {
 	data: new SlashCommandBuilder()

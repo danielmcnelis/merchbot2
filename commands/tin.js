@@ -33,7 +33,7 @@ export default {
                     limit: 6,
                     order: [["cardName", "ASC"]]
                 })
-                
+
 
                 await interaction.respond(
                     prints.map(print => ({ name: `${print.cardName} (${print.cardCode})`, value: print.id })),
@@ -51,7 +51,7 @@ export default {
             const merchbot = await Player.findOne( { where: { discordId: '584215266586525696' }, include: [Wallet] })
             const merchbotWallet = merchbot.wallet
             if (!wallet) return interaction.reply({ content: `You are not in the database. Type **/play** to begin the game.`})
-            if (wallet.starchips < 90) return interaction.reply({ content: `Sorry, ${player.name}, you only have ${money}${starchips} and Collector's Tins cost 90${starchips}.`})
+            if (wallet.starchips < 75) return interaction.reply({ content: `Sorry, ${player.name}, you only have ${wallet.starchips}${starchips} and Collector's Tins cost 75${starchips}.`})
             
             const timestamp = new Date().getTime()
 

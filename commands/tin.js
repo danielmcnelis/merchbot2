@@ -50,7 +50,7 @@ export default {
             const merchbot = await Player.findOne( { where: { discordId: '584215266586525696' }, include: [Wallet] })
             const merchbotWallet = merchbot.wallet
             if (!wallet) return interaction.reply({ content: `You are not in the database. Type **/play** to begin the game.`})
-            if (wallet.starchips < 100) return interaction.reply({ content: `Sorry, ${player.name}, you only have ${money}${starchips} and Collector's Tins cost 100${starchips}.`})
+            if (wallet.starchips < 90) return interaction.reply({ content: `Sorry, ${player.name}, you only have ${money}${starchips} and Collector's Tins cost 90${starchips}.`})
             
             const timestamp = new Date().getTime()
 
@@ -67,7 +67,7 @@ export default {
                     .setStyle(ButtonStyle.Primary)
                 )
 
-            await interaction.reply({ content: `${player.name}, you have ${wallet.starchips}${starchips}. Do you want to spend 100${starchips} on a ${promo.cardName} - Series 1 Collector's Tin?`, components: [row] })
+            await interaction.reply({ content: `${player.name}, you have ${wallet.starchips}${starchips}. Do you want to spend 75${starchips} on a ${promo.cardName} - Series 1 Collector's Tin?`, components: [row] })
 
             const filter = i => i.customId.startsWith(`Tin-${timestamp}`) && i.user.id === interaction.user.id;
 
@@ -76,12 +76,12 @@ export default {
                 if (confirmation.customId.includes('Yes')) {
 
                     const updatedWallet = await Wallet.findOne({ where: { playerId: player.id }})
-                    if (updatedWallet.starchips < 100) return interaction.editReply({ content: `Sorry, ${player.name}, you only have ${updatedWallet.starchips}${starchips} and Series 1 Collector's Tins cost 100${starchips}.`})
+                    if (updatedWallet.starchips < 75) return interaction.editReply({ content: `Sorry, ${player.name}, you only have ${updatedWallet.starchips}${starchips} and Series 1 Collector's Tins cost 75${starchips}.`})
                     
-                    updatedWallet.starchips -= 100
+                    updatedWallet.starchips -= 75
                     await updatedWallet.save()
 
-                    merchbotWallet.stardust += 1000
+                    merchbotWallet.stardust += 750
                     await merchbotWallet.save()
 
                     const set1 = await ForgedSet.findOne({

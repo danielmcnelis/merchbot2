@@ -33,6 +33,7 @@ export default {
                     limit: 6,
                     order: [["cardName", "ASC"]]
                 })
+                
 
                 await interaction.respond(
                     prints.map(print => ({ name: `${print.cardName} (${print.cardCode})`, value: print.id })),

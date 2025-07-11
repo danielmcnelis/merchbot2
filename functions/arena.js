@@ -496,7 +496,7 @@ export const forfeit = async (winnerId, loserId) => {
         const winningEntry = await ArenaEntry.findOne({ where: { playerId: winnerId }})
         if (!winningPlayer || !losingPlayer) return channel.send({ content: `Could not process forfeiture.`})
 		
-		winningPlayer.wallet.starchips += 7
+		winningPlayer.wallet.starchips += 8
 		await winningPlayer.wallet.save()
 
 		losingEntry.isPlaying = false
@@ -506,7 +506,7 @@ export const forfeit = async (winnerId, loserId) => {
 		winningEntry.isPlaying = false
 		await winningEntry.save()
 
-		channel.send({ content: `${losingEntry.playerName} (+0${starchips}), your Arena loss to ${winningEntry.playerName} (+7${starchips}) has been recorded.`})
+		channel.send({ content: `${losingEntry.playerName} (+0${starchips}), your Arena loss to ${winningEntry.playerName} (+8${starchips}) has been recorded.`})
 		return checkArenaProgress() 
 }
 

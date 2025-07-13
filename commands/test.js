@@ -18,7 +18,8 @@ import {startRound, postStandings} from '../functions/arena.js'
 export const calcBoxPrice = async () => {
     const sets = await ForgedSet.findAll({ where: {
         //  currency: 'stardust',
-         forSale: true
+         forSale: true,
+         type: {[Op.or]: ['core', 'mini']}
     } })
 
     if(!sets.length) return	

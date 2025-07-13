@@ -49,7 +49,8 @@ export default {
                             name: {[Op.iLike]: `${focusedValue}%`},
                             code: {[Op.iLike]: `${focusedValue}%`}
                         },
-                        forSale: true
+                        forSale: true,
+                        type: {[Op.or]: ['core', 'mini']}
                     },
                     limit: 5,
                     order: [["forSale", "DESC"], ["createdAt", "DESC"]]

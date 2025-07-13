@@ -463,7 +463,7 @@ export const updateShop = async () => {
             where: { 
                 forSale: true
              },
-             order: [['createdAt', 'DESC']]
+             order: [['type', 'ASC', 'createdAt', 'DESC']]
         })
 
         for (let i = 0; i < setsForSale.length; i++) {
@@ -474,6 +474,8 @@ export const updateShop = async () => {
                 results.push(`${set.unitPrice}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Pack`)
             } else if (set.type === 'mini') {
                 results.push(`${set.unitPrice}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Pack`)
+            } else if (set.type === 'tin') {
+                results.push(`${set.unitPrice}${eval(set.currency)} - ${set.name} ${eval(set.emoji)} - Tin`)
             }
         }
     

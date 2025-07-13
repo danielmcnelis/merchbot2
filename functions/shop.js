@@ -463,7 +463,7 @@ export const updateShop = async () => {
             where: { 
                 forSale: true
              },
-             order: [['type', 'ASC', 'createdAt', 'DESC']]
+             order: [['type', 'ASC'], ['createdAt', 'DESC']]
         })
 
         for (let i = 0; i < setsForSale.length; i++) {

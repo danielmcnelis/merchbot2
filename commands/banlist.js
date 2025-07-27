@@ -10,7 +10,7 @@ export default {
 		.setDescription('View the banlist! 🚫'),
 	async execute(interaction) {
         try {       
-            const banlist = 'July 2025'
+            const banlist = 'August 2025'
             const forbidden = [...await Status.findAll({  
                 where: { 
                     banlist, restriction: 'forbidden', category: 'Forged' 

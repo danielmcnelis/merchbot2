@@ -3,7 +3,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 import { Daily, Player, Wallet, ForgedInventory, ForgedPrint, ForgedSet} from '../database/index.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
 import { drawCardImage, getRandomElement, isSameDay } from '../functions/utility.js'
-const { AOD, CTP, FON, stardust, cavebob, dimmadome, blue, scheming, koolaid, com, rar, sup, ult, scr } = emojis
+const { AOD, COC, CTP, FON, stardust, cavebob, dimmadome, blue, scheming, koolaid, com, rar, sup, ult, scr } = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -88,13 +88,13 @@ export default {
                         best === 2 ? "rar" :
                         "com"
     
-                    const prints = await ForgedPrint.findAll({ 
+                    const prints = [...await ForgedPrint.findAll({ 
                         where: {
                             forgedSetId: set.id,
                             rarity: rarity
                         },
                         order: [['cardSlot', 'ASC']]
-                    })
+                    })].filter((p) => !p.cardCode.includes('-SE'))
     
                     const print = getRandomElement(prints)	
                 

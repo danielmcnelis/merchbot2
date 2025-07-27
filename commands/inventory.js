@@ -4,7 +4,7 @@ import { Card, ForgedInventory, ForgedPrint, ForgedSet, Player } from '../databa
 import { Op } from 'sequelize'
 import { isMod } from '../functions/utility.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const {com, rar, sup, ult, scr, AOD, CTP, FON, arena} = emojis
+const {com, rar, sup, ult, scr, AOD, COC, CTP, FON, arena} = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -40,7 +40,8 @@ export default {
                             [Op.or]: {
                                 name: {[Op.iLike]: `${focusedValue.value}%`},
                                 code: {[Op.iLike]: `${focusedValue.value}%`}
-                            }
+                            },
+                            forSale: true
                         },
                         limit: 5,
                         order: [["forSale", "DESC"], ["createdAt", "DESC"]]

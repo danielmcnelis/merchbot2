@@ -249,10 +249,12 @@ export const awardPacksToShop = async (num, core = true) => {
 
     const sets = core ? 
         await ForgedSet.findAll({ where: {
-            type: 'core'
+            type: 'core',
+            currency: 'starchips'
         }, order: [["createdAt", "DESC"]]}) :
         await ForgedSet.findAll({ where: {
-            type: 'mini'
+            type: 'mini',
+            currency: 'starchips'
         }, order: [["createdAt", "DESC"]]})
                 
     if (!sets.length) return botSpamChannel.send({ content: `No ${core ? 'core' : 'mini'} sets found.`})

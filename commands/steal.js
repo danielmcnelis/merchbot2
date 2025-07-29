@@ -106,7 +106,7 @@ export default {
             const quantity = interaction.options.getNumber('quantity')
             if (quantity < 1) return interaction.reply({ content: `You cannot steal ${robbed} less than 1 item.`})
             const item = interaction.options.getString('item')
-            const cardCode = item.slice(-8, -1)
+            const cardCode = item.slice(item.indexOf('('), -1)
             const print = cardCode ? await ForgedPrint.findOne({ where: { cardCode }}) : null
             const card = print ? `${eval(print.rarity)}${print.cardCode} - ${print.cardName}` : null
             const currency = !print ? item.toLowerCase() : null

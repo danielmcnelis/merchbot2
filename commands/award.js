@@ -133,7 +133,7 @@ export default {
             if (quantity < 1) return await interaction.editReply({ content: `You cannot award less than 1 item.`})
             const item = interaction.options.getString('item')
             if (item.includes('Pack(s) of ') && quantity > 24) return await interaction.editReply({ content: `You cannot award more than 24 packs at a time.`}) 
-            const cardCode = item.includes('(') ? item.slice(item.indexOf('('), -1) : null
+            const cardCode = item.includes('(') ? item.slice(item.indexOf('(') + 1, -1) : null
             const print = cardCode ? await ForgedPrint.findOne({ where: { cardCode }}) : null
             const card = print ? `${eval(print.rarity)}${print.cardCode} - ${print.cardName}` : null
             const currency = item === 'StarDust' || item === 'StarChips'  || item === 'Droplets'  || item === 'Mushrooms'

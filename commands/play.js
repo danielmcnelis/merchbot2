@@ -46,7 +46,7 @@ export default {
             if (stardust > 3000) stardust = 3000
             await Wallet.create({ playerId: player.id, playerName: player.name, starchips, stardust })
 
-            const set = await ForgedSet.findOne({ where: { code: 'FON' }})
+            const set = await ForgedSet.findOne({ where: { code: 'COC' }})
             await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 24 packs and use the command **/inventory** to view your inventory!` })
             // await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 8 packs and a YDK file of your starting inventory!` })
             return await awardBox(interaction.channel, interaction.member, set, 24)

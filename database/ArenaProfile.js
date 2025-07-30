@@ -21,6 +21,14 @@ export const ArenaProfile = db.define('arenaProfiles', {
         type: Sequelize.INTEGER,
         defaultValue: 0
     },
+    fairyWins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
+    fiendWins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
     machineWins: {
         type: Sequelize.INTEGER,
         defaultValue: 0

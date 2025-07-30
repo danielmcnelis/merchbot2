@@ -199,18 +199,30 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
         )
 
         .addComponents(new ButtonBuilder()
-            .setCustomId(`Arena-${timestamp}-Machine`)
-            .setLabel('Machine')
+            .setCustomId(`Arena-${timestamp}-Fairy`)
+            .setLabel('Fairy')
             .setStyle(ButtonStyle.Primary)
         )
 
         .addComponents(new ButtonBuilder()
-            .setCustomId(`Arena-${timestamp}-Plant`)
-            .setLabel('Plant')
+            .setCustomId(`Arena-${timestamp}-Fiend`)
+            .setLabel('Fiend')
             .setStyle(ButtonStyle.Primary)
         )
 
     const row2 = new ActionRowBuilder()
+            .addComponents(new ButtonBuilder()
+                .setCustomId(`Arena-${timestamp}-Machine`)
+                .setLabel('Machine')
+                .setStyle(ButtonStyle.Primary)
+            )
+
+            .addComponents(new ButtonBuilder()
+                .setCustomId(`Arena-${timestamp}-Plant`)
+                .setLabel('Plant')
+                .setStyle(ButtonStyle.Primary)
+            )
+            
             .addComponents(new ButtonBuilder()
                 .setCustomId(`Arena-${timestamp}-Pyro`)
                 .setLabel('Pyro')
@@ -228,7 +240,8 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
                 .setLabel('Spellcaster')
                 .setStyle(ButtonStyle.Primary)
             )
-
+           
+    const row3 = new ActionRowBuilder() 
             .addComponents(new ButtonBuilder()
                 .setCustomId(`Arena-${timestamp}-Warrior`)
                 .setLabel('Warrior')
@@ -240,8 +253,7 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
                 .setLabel('Zombie')
                 .setStyle(ButtonStyle.Primary)
             )
-           
-    const row3 = new ActionRowBuilder() 
+            
             .addComponents(new ButtonBuilder()
                 .setCustomId(`Arena-${timestamp}-No`)
                 .setLabel('No')

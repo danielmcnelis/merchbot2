@@ -6,7 +6,7 @@ import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
 import arenas from '../static/arenas.json' with { type: 'json' }
 const { vouchers } = arenas
-const {com, rar, sup, ult, scr, stardust, merchant, blue, mushrooms, gems, bolts, orbs, shields, skulls, droplets, firecrackers, moais, roses} = emojis
+const {com, rar, sup, ult, scr, stardust, merchant, blue, mushrooms, gems, bolts, orbs, shields, skulls, droplets, firecrackers, moais, roses, beads, familiars } = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { marketPlaceChannelId, botSpamChannelId } = channels
 
@@ -61,6 +61,8 @@ export default {
                     print.cardCode === 'APC-008' ? 'roses' :
                     print.cardCode === 'APC-009' ? 'droplets' :
                     print.cardCode === 'APC-010' ? 'firecrackers' :
+                    print.cardCode === 'APC-011' ? 'beads' :
+                    print.cardCode === 'APC-012' ? 'familiars' :
                     null 
 
             if (!voucher) return interaction.reply({ content: `Error: No voucher found for ${card}.` })

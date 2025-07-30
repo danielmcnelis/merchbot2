@@ -81,6 +81,14 @@ export default {
                     prints.push('Gems')
                 }
 
+                if ('beads'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Beads')
+                }
+
+                if ('familiars'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Familiars')
+                }
+
                 if ('bolts'.includes(focusedValue.toLowerCase())) {
                     prints.push('Bolts')
                 }
@@ -137,8 +145,8 @@ export default {
             const print = cardCode ? await ForgedPrint.findOne({ where: { cardCode }}) : null
             const card = print ? `${eval(print.rarity)}${print.cardCode} - ${print.cardName}` : null
             const currency = item === 'StarDust' || item === 'StarChips'  || item === 'Droplets'  || item === 'Mushrooms'
-                || item === 'Gems'  || item === 'Bolts'  || item === 'Roses'  || item === 'Firecrackers' 
-                || item === 'Moais'  || item === 'Orbs'  || item === 'Shields'  || item === 'Skulls' ? 
+                || item === 'Gems'  || item === 'Beads'  || item === 'Familiars'  || item === 'Bolts'  || item === 'Roses'  
+                || item === 'Firecrackers' || item === 'Moais'  || item === 'Orbs'  || item === 'Shields'  || item === 'Skulls' ? 
                 item.toLowerCase() : null
             
             const set = await ForgedSet.findOne({ where: { name: item.slice(11) }})

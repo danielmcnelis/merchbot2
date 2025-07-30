@@ -65,6 +65,14 @@ export default {
                     prints.push('Gems')
                 }
 
+                if ('beads'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Beads')
+                }
+
+                if ('familiars'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Familiars')
+                }
+
                 if ('bolts'.includes(focusedValue.toLowerCase())) {
                     prints.push('Bolts')
                 }

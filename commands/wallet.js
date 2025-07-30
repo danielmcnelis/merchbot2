@@ -2,7 +2,7 @@
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { Player, Wallet } from '../database/index.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const {FiC, stardust, starchips, mushrooms, gems, bolts, orbs, shields, skulls, droplets, roses, firecrackers, moais} = emojis
+const {FiC, stardust, starchips, mushrooms, gems, bolts, orbs, shields, skulls, droplets, roses, firecrackers, moais, beads, familiars} = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -29,6 +29,8 @@ export default {
             if (wallet.droplets) results.push(`Droplets: ${wallet.droplets}${droplets}`)
             if (wallet.mushrooms) results.push(`Mushrooms: ${wallet.mushrooms}${mushrooms}`)
             if (wallet.gems) results.push(`Gems: ${wallet.gems}${gems}`)
+            if (wallet.beads) results.push(`Beads: ${wallet.beads}${beads}`)
+            if (wallet.familiars) results.push(`Familiars: ${wallet.familiars}${familiars}`)
             if (wallet.bolts) results.push(`Bolts: ${wallet.bolts}${bolts}`)
             if (wallet.roses) results.push(`Roses: ${wallet.roses}${roses}`)
             if (wallet.firecrackers) results.push(`Firecrackers: ${wallet.firecrackers}${firecrackers}`)

@@ -36,6 +36,16 @@ export const Wallet = db.define('wallets', {
         defaultValue: 0,           
         allowNull: false
     },
+    beads: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
+    familiars: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
     bolts: {
         type: Sequelize.INTEGER,  
         defaultValue: 0,           

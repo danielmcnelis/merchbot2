@@ -270,7 +270,8 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
             })
                 
             await confirmation.update({ components: [] })
-            member.send({ content: `Thanks! This is your Arena deck. You may cut it down to 40 cards:\n${decks[tribe].url}\n${decks[tribe].screenshot}`})
+            // member.send({ content: `Thanks! This is your Arena deck. You may cut it down to 40 cards:\n${decks[tribe].url}\n${decks[tribe].screenshot}`})
+            member.send({ content: `Thanks! This is your Arena deck. You may use any of these cards to make a deck (min. 40) according to the banlist:\n${decks[tribe].url}`})
             return await arenaChannel.send({ content: `${arenaEntry.playerName} confirmed their participation in The Arena! ${arena}` })
         } else {
             await confirmation.update({ components: [] })

@@ -103,8 +103,8 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
     
         const wasSubscriber = oldRoles.has('1375131866847252544')
         const isSubscriber = newRoles.has('1375131866847252544')
-        const hadForgedFlamethrowers = oldRoles.has('1393779466148384829')
-        const gotForgedFlamethrowers = newRoles.has('1393779466148384829')
+        const hadForgedFlamethrowers = oldRoles.has('1401321734723862608')
+        const gotForgedFlamethrowers = newRoles.has('1401321734723862608')
 
         if (!hadForgedFlamethrowers && gotForgedFlamethrowers) {
             const set = await ForgedSet.findOne({

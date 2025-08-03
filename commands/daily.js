@@ -46,9 +46,9 @@ export default {
                 order: [['createdAt', 'DESC']]
             })
 
-            const fon = await ForgedSet.findOne({ 
+            const coc = await ForgedSet.findOne({ 
                 where: { 
-                    code: 'FON',
+                    code: 'COC',
                     type: 'core',
                     forSale: true
                 }
@@ -152,10 +152,10 @@ export default {
                     setTimeout(async () => {
                         await interaction.channel.send({ content: `Oh look, ${daily.playerName}, you cobbled together a pack!`, files: [packImage]})
                         if (num === 24) {
-                            await awardBox(interaction.channel, interaction.member, fon)
+                            await awardBox(interaction.channel, interaction.member, coc)
                             return await daily.update({ isProcessing: false })
                         } else {
-                            await awardPacks(interaction.channel, interaction.member, fon, num)
+                            await awardPacks(interaction.channel, interaction.member, coc, num)
                             return await daily.update({ isProcessing: false })
                         }
                     }, 4000)

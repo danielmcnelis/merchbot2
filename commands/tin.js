@@ -28,7 +28,7 @@ export default {
                             cardName: {[Op.iLike]: `%${focusedValue}%`},
                             cardCode: {[Op.iLike]: `%${focusedValue}%`}
                         },
-                        cardCode: {[Op.startsWith]: 'CT1-'}
+                        cardCode: {[Op.startsWith]: 'CT'}
                     },
                     limit: 6,
                     order: [["cardName", "ASC"]]
@@ -51,7 +51,12 @@ export default {
             const merchbot = await Player.findOne( { where: { discordId: '584215266586525696' }, include: [Wallet] })
             const merchbotWallet = merchbot.wallet
             if (!wallet) return interaction.reply({ content: `You are not in the database. Type **/play** to begin the game.`})
-            if (wallet.starchips < 75) return interaction.reply({ content: `Sorry, ${player.name}, you only have ${wallet.starchips}${starchips} and Collector's Tins cost 75${starchips}.`})
+
+            const newestSeries = promo.cardCode.startsWith('CT2-')
+            const seriesNumber = promo.cardCode.startsWith('CT2-') ? 2 : 1
+            const currency = newestSeries ? 'starchips' : 'stardust'
+            const price = newestSeries ? 75 : 1500
+            if (wallet[currency] < price) return interaction.reply({ content: `Sorry, ${player.name}, you only have ${wallet[currency]}${eval(currency)} and Series ${seriesNumber} Collector's Tins cost ${price}${eval(currency)}.`})
             
             const timestamp = new Date().getTime()
 
@@ -68,7 +73,7 @@ export default {
                     .setStyle(ButtonStyle.Primary)
                 )
 
-            await interaction.reply({ content: `${player.name}, you have ${wallet.starchips}${starchips}. Do you want to spend 75${starchips} on a ${promo.cardName} - Series 1 Collector's Tin?`, components: [row] })
+            await interaction.reply({ content: `${player.name}, you have ${wallet[currency]}${eval(currency)}. Do you want to spend ${price}${eval(currency)} on a ${promo.cardName} - Series ${seriesNumber} Collector's Tin?`, components: [row] })
 
             const filter = i => i.customId.startsWith(`Tin-${timestamp}`) && i.user.id === interaction.user.id;
 
@@ -77,23 +82,26 @@ export default {
                 if (confirmation.customId.includes('Yes')) {
 
                     const updatedWallet = await Wallet.findOne({ where: { playerId: player.id }})
-                    if (updatedWallet.starchips < 75) return interaction.editReply({ content: `Sorry, ${player.name}, you only have ${updatedWallet.starchips}${starchips} and Series 1 Collector's Tins cost 75${starchips}.`})
+                    if (updatedWallet[currency] < price) return interaction.editReply({ content: `Sorry, ${player.name}, you only have ${updatedWallet[currency]}${eval(currency)} and ${seriesNumber} Collector's Tins cost ${price}${eval(currency)}.`})
                     
-                    updatedWallet.starchips -= 75
+                    updatedWallet[currency] -= price
                     await updatedWallet.save()
 
                     merchbotWallet.stardust += 750
                     await merchbotWallet.save()
 
+                    const set1Code = seriesNumber === 2 ? 'FON' : 'AOD'
+                    const set2Code = seriesNumber === 2 ? 'COC' : 'FON'
+
                     const set1 = await ForgedSet.findOne({
                         where: {
-                            code: 'AOD'
+                            code: set1Code
                         }
                     })
 
                     const set2 = await ForgedSet.findOne({
                         where: {
-                            code: 'FON'
+                            code: set2Code
                         }
                     })
 
@@ -103,7 +111,7 @@ export default {
                     set2.unitSales += 3
                     await set2.save()
                     
-                    interaction.editReply({ content: `Thank you for your purchase! I'll send you the contents of your Series 1 Collector's Tin.`, components: []})
+                    interaction.editReply({ content: `Thank you for your purchase! I'll send you the contents of your ${seriesNumber} Collector's Tin.`, components: []})
                     
                     const set1Commons = [...await ForgedPrint.findAll({ 
                         where: {
@@ -330,7 +338,7 @@ export default {
                     }
 
                     const yourPromoAttachment = await drawCardImage(promo.cardName)
-                    return interaction.user.send({ content: `${CTP} - Series 1 Collector's Tin Promo - ${CTP}\n${eval(promo.rarity)}${promo.cardCode} - ${promo.cardName}`, files: [yourPromoAttachment] }).catch((err) => console.log(err))
+                    return interaction.user.send({ content: `${CTP} - Series ${seriesNumber} Collector's Tin Promo - ${CTP}\n${eval(promo.rarity)}${promo.cardCode} - ${promo.cardName}`, files: [yourPromoAttachment] }).catch((err) => console.log(err))
                 } else {
                     await interaction.editReply({ content: `Not a problem. No Collector's Tin was purchased.`, components: [] })
                 }

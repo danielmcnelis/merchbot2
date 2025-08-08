@@ -243,6 +243,66 @@ export const awardBox = async (channel, member, set, offset = 24) => {
     return channel.send({ content: `<@${member.user.id}> was awarded a ${partial ? 'partial ' : ''}Box of ${set.name}.${eval(set.code)} Congratulations!`})
 }
 
+export const awaitAwardPromosToShop = async () => {
+	const botSpamChannel = client.channels.cache.get(botSpamChannelId)
+    if (!botSpamChannel) return console.log('Could not find #bot-spam channel.')
+    const promos = await ForgedPrint.findAll({
+        where: {
+            code: {[Op.or]: ['CT1', 'CT2']}
+        }
+    })
+
+    for (let i = 0; i < promos.length; i++) {
+        const promo = promos[i]
+        
+        const inv = await ForgedInventory.findOne({ where: { 
+            forgedPrintId: promo.id,
+            playerId: 'ZXyLL1wTcEZXSZYtegEuTr'
+        }})
+
+        const auction = await Auction.findOne({ where: { 
+            cardCode: promo.cardCode
+        }})
+
+        if (auction) {
+            auction.quantity++
+            await auction.save()
+        }
+
+        if (!inv || inv.quantity === 0) {
+            await Auction.create({
+                cardCode: promo.cardCode,
+                cardName: promo.cardName,
+                forgedPrintId: promo.id,
+                quantity: 1
+            })
+        }
+
+        if (inv) {
+            inv.quantity++
+            await inv.save()
+        } else {
+            await ForgedInventory.create({ 
+                cardCode: promo.cardCode,
+                cardName: promo.cardName,
+                cardId: promo.cardId,
+                quantity: 1,
+                forgedPrintId: promo.id,
+                playerName: 'MerchBot',
+                playerId: 'ZXyLL1wTcEZXSZYtegEuTr'
+            })
+        }
+    }
+
+    botSpamChannel.send({ content: `<@${merchbotId}> received ${promos.length} Tin Promos!`})
+
+    for (let i = 0; i < promos.length; i += 30) {
+        const promo = promos[i]
+        botSpamChannel.send({ content: `1 ${eval(promo.rarity)} ${promo.cardCode} - ${promo.cardName}`})
+        i++
+    }
+}
+
 export const awardPacksToShop = async (num, core = true) => {
 	const botSpamChannel = client.channels.cache.get(botSpamChannelId)
     if (!botSpamChannel) return console.log('Could not find #bot-spam channel.')
@@ -258,11 +318,11 @@ export const awardPacksToShop = async (num, core = true) => {
         }, order: [["createdAt", "DESC"]]})
                 
     if (!sets.length) return botSpamChannel.send({ content: `No ${core ? 'core' : 'mini'} sets found.`})
-    const set_1 = sets[0]
-    const set_2 = sets[1] ? sets[1] : null
+    // const set_1 = sets[0]
+    // const set_2 = sets[1] ? sets[1] : null
 
-    for (let i = 0; i < 2; i++) {
-        const set = i === 0 ? set_1 : set_2
+    for (let i = 0; i < sets.length; i++) {
+        const set = sets[i]
         if (!set) continue
         const commons = [...await ForgedPrint.findAll({ 
             where: {

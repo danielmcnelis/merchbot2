@@ -356,10 +356,9 @@ export const restock = async () => {
     if (weightedCount < 1) weightedCount = 1
     const core_count = most_recent === 'core' ?  Math.ceil(weightedCount / 8) : Math.ceil(weightedCount / 16)
     const mini_count = Math.ceil(weightedCount * 3 / 32)
-    const corePacksAwarded = await awardPacksToShop(core_count, true)
-    const miniPacksAwarded = await awardPacksToShop(mini_count, false)
-    if (!corePacksAwarded) client.channels.cache.get(shopChannelId).send({ content: `Error awarding ${core_count} packs to shop.`})
-    if (!miniPacksAwarded) client.channels.cache.get(shopChannelId).send({ content: `Error awarding ${mini_count} packs to shop.`})
+    await awardPacksToShop(core_count, true)
+    await awardPacksToShop(mini_count, false)
+    await awaitAwardPromosToShop()
     else return postBids()
 }
 

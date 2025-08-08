@@ -359,7 +359,7 @@ export const restock = async () => {
     await awardPacksToShop(core_count, true)
     await awardPacksToShop(mini_count, false)
     await awaitAwardPromosToShop()
-    else return postBids()
+    return postBids()
 }
 
 // CALCULATE BOX PRICE

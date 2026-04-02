@@ -4,7 +4,7 @@ import {db} from './db.js'
 
 export const Trade = db.define('trades', {
     transactionId: {
-        type: Sequelize.STRING,        
+        type: Sequelize.INTEGER,        
         allowNull: false
     },
     itemName: {
@@ -28,11 +28,11 @@ export const Trade = db.define('trades', {
         type: Sequelize.STRING,        
         allowNull: false
     },
-    receiverId: {
+    recipientId: {
         type: Sequelize.STRING,        
         allowNull: false
     },
-    receiverName: {
+    recipientName: {
         type: Sequelize.STRING,        
         allowNull: false
     }

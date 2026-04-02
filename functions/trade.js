@@ -222,8 +222,8 @@ const processTrade = async (message, transactionId, initiatorSummary, receiverSu
 		const trade = await Trade.create({
 			senderName: initiatingPlayer.name,
 			senderId: initiatingPlayer.id,
-			receiverName: receivingPlayer.name,
-			receiverId: receivingPlayer.id,
+			recipientName: receivingPlayer.name,
+			recipientId: receivingPlayer.id,
 			transactionId: transactionId,
 			item: inv.cardCode,
 			quantity: quantity
@@ -233,7 +233,7 @@ const processTrade = async (message, transactionId, initiatorSummary, receiverSu
 		await inv.save()
 
 		await updateBinder(trade.senderId, print.id, quantity)
-		await updateWishlist(trade.receiverId, print.id, quantity)
+		await updateWishlist(trade.recipientId, print.id, quantity)
 	
 		const mirror_inv = await Inventory.findOne({ 
 			where: { 
@@ -270,8 +270,8 @@ const processTrade = async (message, transactionId, initiatorSummary, receiverSu
 		await Trade.create({
 			senderName: initiatingPlayer.name,
 			senderId: initiatingPlayer.id,
-			receiverName: receivingPlayer.name,
-			receiverId: receivingPlayer.id,
+			recipientName: receivingPlayer.name,
+			recipientId: receivingPlayer.id,
 			transactionId: transactionId,
 			item: field,
 			quantity: quantity
@@ -293,8 +293,8 @@ const processTrade = async (message, transactionId, initiatorSummary, receiverSu
 		await Trade.create({
 			senderName: receivingPlayer.name,
 			senderId: receivingPlayer.id,
-			receiverName: initiatingPlayer.name,
-			receiverId: initiatingPlayer.id,
+			recipientName: initiatingPlayer.name,
+			recipientId: initiatingPlayer.id,
 			transactionId: transactionId,
 			item: inv.cardCode,
 			quantity: quantity
@@ -340,8 +340,8 @@ const processTrade = async (message, transactionId, initiatorSummary, receiverSu
 		await Trade.create({
 			senderName: receivingPlayer.name,
 			senderId: receivingPlayer.id,
-			receiverName: initiatingPlayer.name,
-			receiverId: initiatingPlayer.id,
+			recipientName: initiatingPlayer.name,
+			recipientId: initiatingPlayer.id,
 			transactionId: transactionId,
 			item: field,
 			quantity: quantity

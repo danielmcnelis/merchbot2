@@ -25,6 +25,7 @@ import { Pool } from './Pool.js'
 import { Proposal } from './Proposal.js'
 import { Replay } from './Replay.js'
 import { Tournament } from './Tournament.js'
+import { Transaction } from './Transaction.js'
 import { Trade } from './Trade.js'
 import { Wallet } from './Wallet.js'
 import { Wishlist } from './Wishlist.js'
@@ -80,6 +81,9 @@ Auction.belongsTo(ForgedPrint)
 Tournament.hasMany(Entry)
 Entry.belongsTo(Tournament)
 
+Transaction.hasMany(Trade)
+Trade.belongsTo(Transaction)
+
 Player.hasOne(Daily)
 Daily.belongsTo(Player)
 
@@ -122,6 +126,7 @@ export {
   Proposal,
   Replay,
   Tournament,
+  Transaction,
   Trade,
   Wallet,
   Wishlist

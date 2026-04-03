@@ -62,7 +62,7 @@ export default {
 
             for (let i = 0; i < trades.length; i++) {
                 const trade = trades[i]
-                results.push(`- **__Transaction ${trades.length - i}__** ${trade.createdAt.toLocaleString()}\n${trade.transaction.description}`)
+                results.push(`- Transaction ${trades.length - i} - ${trade.createdAt.toLocaleString()}\n${trade.transaction.description}`)
             }
 
             for (let i = 0; i < results.length; i += 5) {

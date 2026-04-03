@@ -39,6 +39,7 @@ import steal from './steal.js'
 import test from './test.js'
 import tin from './tin.js'
 import trade from './trade.js'
+import transactions from './transactions.js'
 import update from './update.js'
 import wager from './wager.js'
 import wallet from './wallet.js'
@@ -87,6 +88,7 @@ export default {
         test,
         tin,
         trade,
+        transactions,
         update,
         wager,
         wallet,

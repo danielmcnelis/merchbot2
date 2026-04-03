@@ -3,7 +3,7 @@ import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { ForgedPrint, Trade, Transaction } from '../database/index.js'
 import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { FiC } = emojis
+const { FiC, com, rar, sup, ult, scr } = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { marketPlaceChannelId, botSpamChannelId } = channels
 

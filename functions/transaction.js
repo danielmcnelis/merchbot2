@@ -129,11 +129,14 @@ export const getTraderBConfirmation = async (interaction, proposalA, proposalB, 
     try {
         const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
         if (confirmation.customId.includes('Yes')) {
+            const description = `<@${traderB.discordId}> traded:\n${traderBPackageSummary.join('\n')}\n\nTo <@${traderA.discordId}> for:\n${traderAPackageSummary.join('\n')}`
+
             const transaction = await Transaction.create({
                 playerAName: traderA.name,
                 playerAId: traderA.id,
                 playerBName: traderB.name,
-                playerBId: traderB.id
+                playerBId: traderB.id,
+                description
             })
 
             // const processTradeComponent = async (interaction, transaction, sender, recipient, quantity, print) => {
@@ -246,6 +249,7 @@ export const getTraderBConfirmation = async (interaction, proposalA, proposalB, 
 
             await proposalA.destroy()
             await proposalB.destroy()
+
             await confirmation.update({ components: [] })
             return confirmation.editReply({ content: `Success! <@${traderB.discordId}> traded:\n${traderBPackageSummary.join('\n')}\n\nTo <@${traderA.discordId}> for:\n${traderAPackageSummary.join('\n')}`, components: [] })
         } else {
@@ -411,11 +415,14 @@ export const getBuyerConfirmation = async (interaction, buyer, seller, quantity,
             const newMarketPrice = calculateNewMarketPrice(quantity, price, print)
             await print.update({ marketPrice: newMarketPrice })
 
+            const description = `<@${buyerDiscordId}> bought ${quantity} ${card} from <@${seller.discordId}> for ${price}${stardust}.`
+
             const newTransaction = await Transaction.create({
                 playerAName: seller.name,
                 playerAId: seller.id,
                 playerBName: buyer.name,
-                playerBId: buyer.id
+                playerBId: buyer.id,
+                description
             })
 
             await Trade.create({

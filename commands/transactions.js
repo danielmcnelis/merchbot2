@@ -45,6 +45,8 @@ export default {
         try {
             if (interaction.channel.id !== botSpamChannelId && interaction.channel.id !== marketPlaceChannelId) return interaction.reply({ content: `Command not valid outside of <#${marketPlaceChannelId}> or <#${botSpamChannelId}>.` })
             const printId = interaction.options.getNumber('print')
+            const print = await ForgedPrint.findOne({ where: { id: printId }})
+            const card = `${eval(print.rarity)}${print.cardCode} - ${print.cardName}`
 
             const results = []
 
@@ -66,7 +68,7 @@ export default {
                 interaction.user.send({ content: results.slice(i, i+5).join('\n').toString()})
             }
 
-            return interaction.reply({ content: `I messaged you the transaction summaries you requested. ${FiC}`})            
+            return interaction.reply({ content: `I messaged you the transaction summaries for ${card}. ${FiC}`})            
         } catch (err) {
             console.log(err)
         }

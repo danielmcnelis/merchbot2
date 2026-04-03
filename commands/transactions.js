@@ -48,7 +48,7 @@ export default {
             const print = await ForgedPrint.findOne({ where: { id: printId }})
             const card = `${eval(print.rarity)}${print.cardCode} - ${print.cardName}`
 
-            const results = []
+            const results = [`**__${card} - Transaction History__**`]
 
             const trades = await Trade.findAll({
                 where: {
@@ -59,6 +59,7 @@ export default {
                 limit: 25
             })
             
+
             for (let i = 0; i < trades.length; i++) {
                 const trade = trades[i]
                 results.push(`- **__Transaction ${trades.length - i}__** ${trade.createdAt.toLocaleString()}\n${trade.transaction.description}`)

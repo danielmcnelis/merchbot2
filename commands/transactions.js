@@ -1,9 +1,9 @@
 
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
-import { ForgedInventory, ForgedPrint, Player, Trade, Transaction } from '../database/index.js'
+import { ForgedPrint, Trade, Transaction } from '../database/index.js'
 import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { com, rar, sup, ult, scr, starchips, stardust, falling, rising } = emojis
+const { FiC } = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { marketPlaceChannelId, botSpamChannelId } = channels
 
@@ -59,7 +59,7 @@ export default {
             
             for (let i = 0; i < trades.length; i++) {
                 const trade = trades[i]
-                results.push(`- **__Transaction ${i+1}__** ${trade.createdAt.toLocaleString()}\n${trade.transaction.description}`)
+                results.push(`- **__Transaction ${trades.length - i}__** ${trade.createdAt.toLocaleString()}\n${trade.transaction.description}`)
             }
 
             for (let i = 0; i < results.length; i += 5) {

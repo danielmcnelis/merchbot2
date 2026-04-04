@@ -10,7 +10,7 @@ import { Op } from 'sequelize'
 import {isProgrammer} from '../functions/utility.js'
 import {applyPriceDecay} from '../functions/shop.js'
 import {startRound, postStandings} from '../functions/arena.js'
-import {awaitAwardPromosToShop} from '../functions/packs.js'
+import {awardPromosToShop} from '../functions/packs.js'
 // import axios from 'axios'
 // import { assignTournamentRoles, recalculateAllStats } from '../../../bot-functions/src'
 // import { Stats } from '../../../models/src'
@@ -85,7 +85,7 @@ export default {
                 //     if (card) await inv.update({ cardId: card.id })
                 // }
 
-                await awaitAwardPromosToShop()
+                await awardPromosToShop()
 
                 // const entries = await ArenaEntry.findAll({ order: [['score', 'DESC']], include: Player })
 

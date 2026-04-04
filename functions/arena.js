@@ -172,7 +172,7 @@ export const initiateArena = async(interaction) => {
 //GET ARENA CONFIRMATION
 export const getArenaConfirmation = async (arenaEntry, contestant) => {
     const arenaChannel = client.channels.cache.get(arenaChannelId)
-    const guild = client.guilds.cache.get("1372580468297568458")
+    const guild = client.guilds.cache.get("1488566624536494364")
     const playerId = arenaEntry.player.discordId
     const member = await guild.members.fetch(playerId)
     if (!member) return arenaChannel.send({ content: `${arenaEntry.playerName} cannot be sent DMs.` })
@@ -298,7 +298,7 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
 
 //ASSIGN ARENA ROLES
 export const assignArenaRoles = async (arenaEntries) => {
-    const guild = client.guilds.cache.get("1372580468297568458")
+    const guild = client.guilds.cache.get("1488566624536494364")
     for (let i = 0; i < arenaEntries.length; i++) {
         const arenaEntry = arenaEntries[i]
         const member = await guild.members.fetch(arenaEntry.player.discordId)
@@ -310,7 +310,7 @@ export const assignArenaRoles = async (arenaEntries) => {
 export const startRound = async (arenaEntries) => {
     const info = await Info.findOne({ where: { element: 'arena' }})
     const channel = client.channels.cache.get(arenaChannelId)
-    const guild = client.guilds.cache.get("1372580468297568458")
+    const guild = client.guilds.cache.get("1488566624536494364")
 
     if (info.round === 7) {
         // VOUCHERS
@@ -575,7 +575,7 @@ export const endArena = async (arenaEntries) => {
     info.status = 'pending'
     info.round = null
     await info.save()
-    const guild = client.guilds.cache.get("1372580468297568458")
+    const guild = client.guilds.cache.get("1488566624536494364")
 
     for (let i = 0; i < arenaEntries.length; i++) {
         const arenaEntry = arenaEntries[i]
@@ -591,7 +591,7 @@ export const resetArena = async (arenaEntries) => {
     info.status = 'pending'
     info.round = null
     await info.save()
-    const guild = client.guilds.cache.get("1372580468297568458")
+    const guild = client.guilds.cache.get("1488566624536494364")
 
     for (let i = 0; i < arenaEntries.length; i++) {
         try {

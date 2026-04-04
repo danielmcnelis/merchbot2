@@ -97,7 +97,7 @@ client.on('ready', async () => {
 // SUBSCRIPTION
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
     try {
-        if (oldMember.guild.id !== '1372580468297568458') return
+        if (oldMember.guild.id !== '1488566624536494364') return
         const oldRoles = oldMember.roles.cache
         const newRoles = newMember.roles.cache
     
@@ -115,7 +115,7 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
                 order: [['createdAt', 'DESC']]
             })
 
-            const guild = client.guilds.cache.get('1372580468297568458')
+            const guild = client.guilds.cache.get('1488566624536494364')
             const channel = guild.channels.cache.get('1372580469039693976')
             awardPacks(channel, newMember, set, 3)
         }

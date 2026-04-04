@@ -243,7 +243,7 @@ export const awardBox = async (channel, member, set, offset = 24) => {
     return channel.send({ content: `<@${member.user.id}> was awarded a ${partial ? 'partial ' : ''}Box of ${set.name}.${eval(set.code)} Congratulations!`})
 }
 
-export const awaitAwardPromosToShop = async () => {
+export const awardPromosToShop = async () => {
 	const botSpamChannel = client.channels.cache.get(botSpamChannelId)
     if (!botSpamChannel) return console.log('Could not find #bot-spam channel.')
     const promos = await ForgedPrint.findAll({

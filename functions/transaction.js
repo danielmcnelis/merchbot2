@@ -129,7 +129,7 @@ export const getTraderBConfirmation = async (interaction, proposalA, proposalB, 
     try {
         const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
         if (confirmation.customId.includes('Yes')) {
-            const description = `<@${traderB.discordId}> traded:\n${traderBPackageSummary.join('\n')}\n\nTo <@${traderA.discordId}> for:\n${traderAPackageSummary.join('\n')}`
+            const description = `${traderB.name} traded:\n${traderBPackageSummary.join('\n')}\n\nTo ${traderA.name} for:\n${traderAPackageSummary.join('\n')}`
 
             const transaction = await Transaction.create({
                 playerAName: traderA.name,
@@ -415,7 +415,7 @@ export const getBuyerConfirmation = async (interaction, buyer, seller, quantity,
             const newMarketPrice = calculateNewMarketPrice(quantity, price, print)
             await print.update({ marketPrice: newMarketPrice })
 
-            const description = `<@${buyerDiscordId}> bought ${quantity} ${card} from <@${seller.discordId}> for ${price}${stardust}.`
+            const description = `${buyer.name} bought ${quantity} ${card} from ${seller.name}> for ${price}${stardust}.`
 
             const newTransaction = await Transaction.create({
                 playerAName: seller.name,

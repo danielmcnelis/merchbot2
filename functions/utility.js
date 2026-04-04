@@ -474,7 +474,7 @@ export const manageSubscriptions = async (client) => {
         const patronRoleId = '1375132712070811689'
         const supporterRoleId = '1375131869036810302'
 
-        const guild = await client.guilds.fetch('1372580468297568458')
+        const guild = await client.guilds.fetch('1488566624536494364')
         const membersMap = await guild.members.fetch()
         const programmer = await client.users.fetch('194147938786738176')
         const players = await Player.findAll()

@@ -8,7 +8,7 @@ import commands from '../static/commands.json' with { type: 'json' }
 const { nocom, yescom } = commands
 import emojis from '../static/emojis.json' with { type: "json" } 
 const { AOD, COC, CTP, FON, falling, rising, forgestone, gem, orb, swords, beast, blue, bronze, DRT, fiend, thunder, zombie, skull, familiar, battery, cactus, cavebob, checkmark, closed, com, credits, cultured, diamond, dinosaur, DOC, LPK, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, open, ORF, TEB, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, dimmadome, stonks, sup, tix, ult, wokefrog, yellow, yes, ygocard } = emojis
-import { awardPacksToShop, awaitAwardPromosToShop } from './packs.js'
+import { awardPacksToShop, awardPromosToShop } from './packs.js'
 // const adminId = '194147938786738176'
 import { client } from '../static/clients.js'
 import roles from '../static/roles.json' with { type: "json" }
@@ -355,10 +355,10 @@ export const restock = async () => {
 
     if (weightedCount < 1) weightedCount = 1
     const core_count = most_recent === 'core' ?  Math.ceil(weightedCount / 8) : Math.ceil(weightedCount / 16)
-    const mini_count = Math.ceil(weightedCount * 3 / 32)
+    // const mini_count = Math.ceil(weightedCount * 3 / 32)
     await awardPacksToShop(core_count, true)
-    await awardPacksToShop(mini_count, false)
-    await awaitAwardPromosToShop()
+    // await awardPacksToShop(mini_count, false)
+    // await awardPromosToShop()
     return postBids()
 }
 

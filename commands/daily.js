@@ -57,13 +57,13 @@ export default {
             const set = coreSets[0]
             if (!set) return interaction.editReply({ content: `No core set found.`})
 
-            const commons = [...await ForgedPrint.findAll({ 
-                where: {
-                    forgedSetId: set.id,
-                    rarity: "com"
-                },
-                order: [['cardSlot', 'ASC']]
-            })].map((p) => p.cardCode)
+            // const commons = [...await ForgedPrint.findAll({ 
+            //     where: {
+            //         forgedSetId: set.id,
+            //         rarity: "com"
+            //     },
+            //     order: [['cardSlot', 'ASC']]
+            // })].map((p) => p.cardCode)
 
             const rares = [...await ForgedPrint.findAll({ 
                 where: {
@@ -98,7 +98,7 @@ export default {
             })].map((p) => p.cardCode)
             
             const odds = []
-            for (let i = 0; i < set.commonsPerBox; i++) odds.push("commons")
+            // for (let i = 0; i < set.commonsPerBox; i++) odds.push("commons")
             for (let i = 0; i < set.raresPerBox; i++) odds.push("rares")
             for (let i = 0; i < set.supersPerBox; i++) odds.push("supers")
             for (let i = 0; i < set.ultrasPerBox; i++) odds.push("ultras")

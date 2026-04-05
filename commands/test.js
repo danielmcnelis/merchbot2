@@ -7,7 +7,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 // import { Match, Tournament, Server, TriviaQuestion } from '@fl/models'
 import { ArenaProfile, Binder, Card, ForgedInventory, Wishlist, Player, ForgedPrint, ForgedSet, ArenaEntry } from '../database/index.js'
 import { Op } from 'sequelize'
-import {isProgrammer} from '../functions/utility.js'
+import {isProgrammer, getRandomElement} from '../functions/utility.js'
 import {applyPriceDecay} from '../functions/shop.js'
 import {startRound, postStandings} from '../functions/arena.js'
 import {awardPromosToShop} from '../functions/packs.js'

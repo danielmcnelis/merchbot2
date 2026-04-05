@@ -70,29 +70,85 @@ export default {
         try {
             await interaction.deferReply()
             if (isProgrammer(interaction.member)) {
-                // const invs = await ForgedInventory.findAll({ 
-                //     order: [['playerName', 'ASC'], ['cardCode', 'ASC']]
-                // })
+                const coreSets = await ForgedSet.findAll({ 
+                    where: { 
+                        type: 'core',
+                        forSale: true
+                    },
+                    order: [['createdAt', 'DESC']]
+                })
+    
+                const coc = await ForgedSet.findOne({ 
+                    where: { 
+                        code: 'COC',
+                        type: 'core',
+                        forSale: true
+                    }
+                })
+    
+                const set = coreSets[0]
+                if (!set) return interaction.editReply({ content: `No core set found.`})
+    
+                // const commons = [...await ForgedPrint.findAll({ 
+                //     where: {
+                //         forgedSetId: set.id,
+                //         rarity: "com"
+                //     },
+                //     order: [['cardSlot', 'ASC']]
+                // })].map((p) => p.cardCode)
+    
+                const rares = [...await ForgedPrint.findAll({ 
+                    where: {
+                        forgedSetId: set.id,
+                        rarity: "rar"
+                    },
+                    order: [['cardSlot', 'ASC']]
+                })].map((p) => p.cardCode)
+    
+                const supers = [...await ForgedPrint.findAll({ 
+                    where: {
+                        forgedSetId: set.id,
+                        rarity: "sup"
+                    },
+                    order: [['cardSlot', 'ASC']]
+                })].filter((p) => !p.cardCode.includes('-SE')).map((p) => p.cardCode)
+    
+                const ultras = [...await ForgedPrint.findAll({ 
+                    where: {
+                        forgedSetId: set.id,
+                        rarity: "ult"
+                    },
+                    order: [['cardSlot', 'ASC']]
+                })].map((p) => p.cardCode)
+    
+                const secrets = [...await ForgedPrint.findAll({ 
+                    where: {
+                        forgedSetId: set.id,
+                        rarity: "scr"
+                    },
+                    order: [['cardSlot', 'ASC']]
+                })].map((p) => p.cardCode)
+                
+                const odds = []
+                // for (let i = 0; i < set.commonsPerBox; i++) odds.push("commons")
+                for (let i = 0; i < set.raresPerBox; i++) odds.push("rares")
+                for (let i = 0; i < set.supersPerBox; i++) odds.push("supers")
+                for (let i = 0; i < set.ultrasPerBox; i++) odds.push("ultras")
+                for (let i = 0; i < set.secretsPerBox; i++) odds.push("secrets")
+    
 
-                // for (let i = 0; i < invs.length; i++) {
-                //     const inv = invs[i]
-                //     const card = await Card.findOne({
-                //         where: {
-                //             name: inv.cardName
-                //         }
-                //     })
+                for (let i = 0; i < 1000; i++) {
+                    const luck = getRandomElement(odds)
+                    const yourCard = getRandomElement(eval(luck))
 
-                //     if (card) await inv.update({ cardId: card.id })
-                // }
+                    const print = await ForgedPrint.findOne({ where: {
+                        cardCode: yourCard
+                    }})
 
-                await awardPromosToShop()
+                    console.log(`(${print.rarity}) ${print.cardCode} - ${print.cardName}`)
+                }
 
-                // const entries = await ArenaEntry.findAll({ order: [['score', 'DESC']], include: Player })
-
-                // await postStandings(entries)
-
-                // await applyPriceDecay()
-
+                // await awardPromosToShop()
                 await interaction.editReply('🧪')
             }
         } catch (err) {

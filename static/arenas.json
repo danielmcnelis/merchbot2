@@ -1,22 +1,22 @@
 {
     "decks": {
         "destiny": {
-            "url":"https://www.duelingbook.com/deck?id=19857661",
+            "url":"https://www.duelingbook.com/deck?id=19857661"
         },
         "flip": {
-            "url":"https://www.duelingbook.com/deck?id=19857644",
+            "url":"https://www.duelingbook.com/deck?id=19857644"
         },
         "machine": {
-            "url":"https://www.duelingbook.com/deck?id=19857122",
+            "url":"https://www.duelingbook.com/deck?id=19857122"
         },
         "monarch": {
-            "url":"https://www.duelingbook.com/deck?id=19857618",
+            "url":"https://www.duelingbook.com/deck?id=19857618"
         },
         "reptile": {
-            "url":"https://www.duelingbook.com/deck?id=19857187",
+            "url":"https://www.duelingbook.com/deck?id=19857187"
         },
         "spellcaster": {
-            "url":"https://www.duelingbook.com/deck?id=19857141",
+            "url":"https://www.duelingbook.com/deck?id=19857141"
         }
     },
     "vouchers": {

@@ -21,6 +21,8 @@ export default {
             if (interaction.channel.id !== '1378129840691220631') return await interaction.reply({ content: `Try using **/arena** in the <#1378129840691220631> channel. ${arena}`})
             await interaction.deferReply()
             const winningUser = interaction.options.getUser('opponent')
+            const winningMember = await interaction.guild?.members.fetch(winningUser.id).catch((err) => console.log(err))
+            const losingMember = interaction.member
             const winningPlayer = await Player.findOne({ where: { discordId: winningUser.id } })
             const losingPlayer = await Player.findOne({ where: { discordId: interaction.user.id } })
             const winnersWallet = await Wallet.findOne({ where: { playerId: winningPlayer.id }})
@@ -69,12 +71,39 @@ export default {
             await winningEntry.update({ score: newScore, isPlaying: false })
             await losingEntry.update({ isPlaying: false })
 
-            const winnerNewChips = winnersWallet.starchips + 8
-            const loserNewChips = losersWallet.starchips + 5
-            await winnersWallet.update({ starchips: winnerNewChips })
-            await losersWallet.update({ starchips: loserNewChips })
+            let chipsWinner = 8
+            let chipsLoser = 5
+            const winnerIsSupporter = winningMember.roles.cache.has('1488934384827371731') || winningPlayer.forgedSubscriberTier === 'Supporter'
+            const winnerIsPatron = winningMember.roles.cache.has('1488935689189068870') || winningPlayer.forgedSubscriberTier === 'Patron'
+            const winnerIsBenefactor = winningMember.roles.cache.has('1488936887187013652') || winningPlayer.forgedSubscriberTier === 'Benefactor'
+            const loserIsSupporter = losingMember.roles.cache.has('1488934384827371731') || losingPlayer.forgedSubscriberTier === 'Supporter'
+            const loserIsPatron = losingMember.roles.cache.has('1488935689189068870') || losingPlayer.forgedSubscriberTier === 'Patron'
+            const loserIsBenefactor = losingMember.roles.cache.has('1488936887187013652') || losingPlayer.forgedSubscriberTier === 'Benefactor'
+            
+            const chipBonusWinner =  winnerIsBenefactor ? 2 :
+                winnerIsPatron ? 1.6 :
+                loserIsBenefactor ? 1.5 :
+                winnerIsSupporter ? 1.3 :
+                loserIsPatron ? 1.2 :
+                loserIsSupporter ? 1.1 :
+                1
+            
+            const chipBonusLoser =  loserIsBenefactor ? 2 :
+                loserIsPatron ? 1.6 :
+                loserIsSupporter ? 1.3 :
+                1
+                
+            chipsWinner = Math.round(chipsWinner * chipBonusWinner)
+            chipsLoser = Math.round(chipsLoser * chipBonusLoser)
+            if (chipsWinner <= chipsLoser) chipsWinner = chipsLoser + 1
+            
+            const newChipsWinner = winnersWallet.starchips + chipsWinner
+            const newChipsLoser = losersWallet.starchips + chipsLoser
 
-            const content = `${losingPlayer.name} (+5<:starchips:1374362231109718117>), your Arena ${arena} loss to <@${winningPlayer.discordId}> (+8<:starchips:1374362231109718117>) has been recorded.`
+            await winnersWallet.update({ starchips: newChipsWinner })
+            await losersWallet.update({ starchips: newChipsLoser })
+
+            const content = `${losingPlayer.name} (+${chipsLoser}<:starchips:1374362231109718117>), your Arena ${arena} loss to <@${winningPlayer.discordId}> (+${chipsWinner}<:starchips:1374362231109718117>) has been recorded.`
             await interaction.editReply({ content })
             return checkArenaProgress()
         } catch (err) {

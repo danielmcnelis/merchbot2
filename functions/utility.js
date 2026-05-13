@@ -470,9 +470,9 @@ export const manageSubscriptions = async (client) => {
     let b = 0
 
     try {
-        const benefactorRoleId = '1375133829521608784'
-        const patronRoleId = '1375132712070811689'
-        const supporterRoleId = '1375131869036810302'
+        const benefactorRoleId = '1488936887187013652'
+        const patronRoleId = '1488935689189068870'
+        const supporterRoleId = '1488934384827371731'
 
         const guild = await client.guilds.fetch('1488566624536494364')
         const membersMap = await guild.members.fetch()

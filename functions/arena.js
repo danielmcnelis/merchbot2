@@ -6,7 +6,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
 import roles from '../static/roles.json' with { type: 'json' }
 const { arenaRole } = roles
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { gladiators, foxy, shrine, cavebob, AOD, COC, CTP, FON, king, arena, aqua, beast, dragon, fairy, fiend, machine, plant, pyro, rock, spellcaster, warrior, zombie, starchips, ult, mushrooms, gems, bolts, orbs, shields, skulls, droplets, firecrackers, roses, moais, beads, familiars } = emojis
+const { gladiators, foxy, shrine, cavebob, AOD, COC, CTP, FON, king, arena, aqua, beast, destiny, dragon, fairy, fiend, flip, machine, monarch, plant, pyro, reptile, rock, spellcaster, warrior, zombie, starchips, ult, mushrooms, gems, bolts, orbs, shields, skulls, droplets, firecrackers, roses, moais, beads, familiars, amulets, sandals, crowns, cacti } = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { arenaChannelId } = channels
 import arenas from '../static/arenas.json' with { type: 'json' }
@@ -180,87 +180,50 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
     const timestamp = new Date().getTime()
 
     const row1 = new ActionRowBuilder()
-        .addComponents(new ButtonBuilder()
-            .setCustomId(`Arena-${timestamp}-Aqua`)
-            .setLabel('Aqua')
-            .setStyle(ButtonStyle.Primary)
-        )
-        
-        .addComponents(new ButtonBuilder()
-            .setCustomId(`Arena-${timestamp}-Beast`)
-            .setLabel('Beast')
-            .setStyle(ButtonStyle.Primary)
-        )
+            .addComponents(new ButtonBuilder()
+                .setCustomId(`Arena-${timestamp}-Destiny`)
+                .setLabel('Destiny')
+                .setStyle(ButtonStyle.Primary)
+            )
 
-        .addComponents(new ButtonBuilder()
-            .setCustomId(`Arena-${timestamp}-Dragon`)
-            .setLabel('Dragon')
-            .setStyle(ButtonStyle.Primary)
-        )
-
-        .addComponents(new ButtonBuilder()
-            .setCustomId(`Arena-${timestamp}-Fairy`)
-            .setLabel('Fairy')
-            .setStyle(ButtonStyle.Primary)
-        )
-
-        .addComponents(new ButtonBuilder()
-            .setCustomId(`Arena-${timestamp}-Fiend`)
-            .setLabel('Fiend')
-            .setStyle(ButtonStyle.Primary)
-        )
-
-    const row2 = new ActionRowBuilder()
+            .addComponents(new ButtonBuilder()
+                .setCustomId(`Arena-${timestamp}-Flip`)
+                .setLabel('Flip')
+                .setStyle(ButtonStyle.Primary)
+            )
+            
             .addComponents(new ButtonBuilder()
                 .setCustomId(`Arena-${timestamp}-Machine`)
                 .setLabel('Machine')
                 .setStyle(ButtonStyle.Primary)
             )
-
-            .addComponents(new ButtonBuilder()
-                .setCustomId(`Arena-${timestamp}-Plant`)
-                .setLabel('Plant')
-                .setStyle(ButtonStyle.Primary)
-            )
             
             .addComponents(new ButtonBuilder()
-                .setCustomId(`Arena-${timestamp}-Pyro`)
-                .setLabel('Pyro')
+                .setCustomId(`Arena-${timestamp}-Monarch`)
+                .setLabel('Monarch')
                 .setStyle(ButtonStyle.Primary)
             )
 
             .addComponents(new ButtonBuilder()
-                .setCustomId(`Arena-${timestamp}-Rock`)
-                .setLabel('Rock')
+                .setCustomId(`Arena-${timestamp}-Reptile`)
+                .setLabel('Reptile')
                 .setStyle(ButtonStyle.Primary)
             )
-
+           
+    const row2 = new ActionRowBuilder() 
             .addComponents(new ButtonBuilder()
                 .setCustomId(`Arena-${timestamp}-Spellcaster`)
                 .setLabel('Spellcaster')
                 .setStyle(ButtonStyle.Primary)
             )
-           
-    const row3 = new ActionRowBuilder() 
-            .addComponents(new ButtonBuilder()
-                .setCustomId(`Arena-${timestamp}-Warrior`)
-                .setLabel('Warrior')
-                .setStyle(ButtonStyle.Primary)
-            )
 
-            .addComponents(new ButtonBuilder()
-                .setCustomId(`Arena-${timestamp}-Zombie`)
-                .setLabel('Zombie')
-                .setStyle(ButtonStyle.Primary)
-            )
-            
             .addComponents(new ButtonBuilder()
                 .setCustomId(`Arena-${timestamp}-No`)
                 .setLabel('No')
                 .setStyle(ButtonStyle.Danger)
             )
             
-    const message = await member.user.send({ content: `Please select a tribe for The Arena. ${arena} If you no longer want to play, press "No".`, components: [row1, row2, row3] })
+    const message = await member.user.send({ content: `Please select a tribe for The Arena. ${arena} If you no longer want to play, press "No".`, components: [row1, row2] })
 
     const filter = i => i.customId.includes(`Arena-${timestamp}`) && i.user.id === member.user.id;
     let confirmation

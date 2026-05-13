@@ -141,9 +141,9 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
                 }
             })
     
-            const isSupporter = newRoles.has('1375131869036810302')
-            const isPatron = newRoles.has('1375132712070811689')
-            const isBenefactor = newRoles.has('1375133829521608784')
+            const isSupporter = newRoles.has('1488934384827371731')
+            const isPatron = newRoles.has('1488935689189068870')
+            const isBenefactor = newRoles.has('1488936887187013652')
             
             if (isSupporter) {
                 await player.update({ isForgedSubscriber: true, forgedSubscriberTier: 'Supporter' })

@@ -38,7 +38,7 @@ export default {
                 return daysDifference
               }
               
-            const previousDate = new Date('2025-05-31')
+            const previousDate = new Date('2025-05-13')
             const days = daysSince(previousDate)
             let starchips = 10 + (10 * days)
             if (starchips > 300) starchips = 300
@@ -46,11 +46,12 @@ export default {
             if (stardust > 3000) stardust = 3000
             await Wallet.create({ playerId: player.id, playerName: player.name, starchips, stardust })
 
-            const set = await ForgedSet.findOne({ where: { code: 'COC' }})
-            await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 24 packs and use the command **/inventory** to view your inventory!` })
-            // await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 8 packs and a YDK file of your starting inventory!` })
-            return await awardBox(interaction.channel, interaction.member, set, 24)
-            // return await sendInventoryYDK(interaction, player)
+            const set = await ForgedSet.findOne({ where: { code: 'LDM' }})
+            // await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 24 packs and use the command **/inventory** to view your inventory!` })
+            await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 12 packs and a YDK file of your starting inventory!` })
+            await awardPacks(interaction.channel, interaction.member, set, 8)
+            // return await awardBox(interaction.channel, interaction.member, set, 24)
+            return await sendInventoryYDK(interaction, player)
         } catch (err) {
             console.log(err)
         }

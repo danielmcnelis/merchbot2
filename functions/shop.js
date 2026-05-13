@@ -452,6 +452,19 @@ export const updateShop = async () => {
         shopChannel.bulkDelete(100).catch((err) => console.log(err))
     }, 8000)
 
+    setTimeout(() => {
+        shopChannel.bulkDelete(100).catch((err) => console.log(err))
+    }, 10000)
+
+    setTimeout(() => {
+        shopChannel.bulkDelete(100).catch((err) => console.log(err))
+    }, 12000)
+
+    setTimeout(() => {
+        shopChannel.bulkDelete(100).catch((err) => console.log(err))
+    }, 14000)
+
+
     setTimeout(async () => {
         const results = [
             `Good day, The Shop ${merchant} is open. ${open}`,
@@ -533,7 +546,7 @@ export const updateShop = async () => {
                console.log(err)
            }
         }
-    }, 9000)
+    }, 15000)
 }
 
 // POST BIDS
@@ -557,6 +570,18 @@ export const postBids = async () => {
     setTimeout(() => {
         shopChannel.bulkDelete(100).catch((err) => console.log(err))
     }, 8000)
+
+    setTimeout(() => {
+        shopChannel.bulkDelete(100).catch((err) => console.log(err))
+    }, 10000)
+
+    setTimeout(() => {
+        shopChannel.bulkDelete(100).catch((err) => console.log(err))
+    }, 12000)
+    
+    setTimeout(() => {
+        shopChannel.bulkDelete(100).catch((err) => console.log(err))
+    }, 14000)
 
     setTimeout(async () => {
         const results = [
@@ -658,7 +683,7 @@ export const postBids = async () => {
         for (let i = 0; i < results.length; i += 10) {
             shopChannel.send({ content: results.slice(i, i+10).join('\n').toString() })
         }
-    }, 9000)
+    }, 15000)
 }
 
 // ASK FOR DUMP CONFIRMATION

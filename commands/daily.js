@@ -143,7 +143,7 @@ export default {
 
                 const num = player.forgedSubscriberTier === 'Supporter' ? 3 :
                     player.forgedSubscriberTier === 'Patron' ? 6 :
-                    player.forgedSubscriberTier === 'Benefactor' /*|| player.id === 'Cc2FhYrRPctZ4y72Y79gKp'*/ ? 12 :
+                    player.forgedSubscriberTier === 'Benefactor' ? 12 :
                     1
 
                 const packImage = new AttachmentBuilder(`./public/7outof7.png`, { name: `pack.png` })
@@ -151,13 +151,13 @@ export default {
                 if (num) {
                     setTimeout(async () => {
                         await interaction.channel.send({ content: `Oh look, ${daily.playerName}, you cobbled together a pack!`, files: [packImage]})
-                        if (num === 24) {
-                            await awardBox(interaction.channel, interaction.member, coc)
-                            return await daily.update({ isProcessing: false })
-                        } else {
+                        // if (num === 24) {
+                        //     await awardBox(interaction.channel, interaction.member, coc)
+                        //     return await daily.update({ isProcessing: false })
+                        // } else {
                             await awardPacks(interaction.channel, interaction.member, coc, num)
                             return await daily.update({ isProcessing: false })
-                        }
+                        // }
                     }, 4000)
                 } else {
                     return
@@ -167,11 +167,11 @@ export default {
                 daily.cobbleProgress += daysPassed
                 await daily.save()
 
-                const packImage = new AttachmentBuilder(`./public/${daily.cobbleProgress}outof7.png`, { name: `pack.png` })
-                setTimeout(async() => {
-                    await interaction.channel.send({ content: `Hey, ${daily.playerName}, keep cobblin', buddy.`, files: [packImage]})
-                    return await daily.update({ isProcessing: false })
-                }, 4000)
+                // const packImage = new AttachmentBuilder(`./public/${daily.cobbleProgress}outof7.png`, { name: `pack.png` })
+                // setTimeout(async() => {
+                //     await interaction.channel.send({ content: `Hey, ${daily.playerName}, keep cobblin', buddy.`, files: [packImage]})
+                //     return await daily.update({ isProcessing: false })
+                // }, 4000)
             }
 
             const attachment = await drawCardImage(print.cardName)

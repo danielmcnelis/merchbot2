@@ -1,109 +1,60 @@
 {
     "decks": {
-        "aqua": {
-            "url":"https://www.duelingbook.com/deck?id=18079647",
-            "screenshot":""
+        "destiny": {
+            "url":"https://www.duelingbook.com/deck?id=19857661",
         },
-        "beast": {
-            "url":"https://www.duelingbook.com/deck?id=17523618",
-            "screenshot":""
-        },
-        "dragon": {
-            "url":"https://www.duelingbook.com/deck?id=17525329",
-            "screenshot":""
-        },
-        "fairy": {
-            "url":"https://www.duelingbook.com/deck?id=18220702",
-            "screenshot":""
-        },
-        "fiend": {
-            "url":"https://www.duelingbook.com/deck?id=18223067",
-            "screenshot":""
+        "flip": {
+            "url":"https://www.duelingbook.com/deck?id=19857644",
         },
         "machine": {
-            "url":"https://www.duelingbook.com/deck?id=17523539",
-            "screenshot":""
+            "url":"https://www.duelingbook.com/deck?id=19857122",
         },
-        "plant": {
-            "url":"https://www.duelingbook.com/deck?id=18080051",
-            "screenshot":""
+        "monarch": {
+            "url":"https://www.duelingbook.com/deck?id=19857618",
         },
-        "pyro": {
-            "url":"https://www.duelingbook.com/deck?id=18079896",
-            "screenshot":""
-        },
-        "rock": {
-            "url":"https://www.duelingbook.com/deck?id=18079916",
-            "screenshot":""
+        "reptile": {
+            "url":"https://www.duelingbook.com/deck?id=19857187",
         },
         "spellcaster": {
-            "url":"https://www.duelingbook.com/deck?id=17523396",
-            "screenshot":""
-        },
-        "warrior": {
-            "url":"https://www.duelingbook.com/deck?id=17525225",
-            "screenshot":""
-        },
-        "zombie": {
-            "url":"https://www.duelingbook.com/deck?id=17525286",
-            "screenshot":""
+            "url":"https://www.duelingbook.com/deck?id=19857141",
         }
     },
     "vouchers": {
-        "aqua":"droplets",
-        "beast":"mushrooms",
-        "dinosaur":"egg",
-        "dragon":"gems",
-        "fairy":"beads",
-        "fiend":"familiars",
-        "fish":"hook",
+        "destiny":"amulets",
+        "flip":"sandals",
         "machine":"bolts",
-        "plant":"roses",
-        "pyro":"firecrackers",
-        "reptile":"cactus",
-        "rock":"moais",
-        "spellcaster":"orbs",
-        "thunder":"battery",
-        "warrior":"shields",
-        "zombie":"skulls"
+        "monarch":"crowns",
+        "reptile":"cacti",
+        "spellcaster":"orbs"
     },
     "barters": {
-        "APC-001":"orbs",
-        "APC-002":"gems",
-        "APC-003":"bolts",
-        "APC-004":"mushrooms",
-        "APC-005":"shields",
-        "APC-006":"skulls",
-        "APC-007":"moais",
-        "APC-008":"roses",
-        "APC-009":"droplets",
-        "APC-010":"firecrackers",
-        "APC-011":"beads",
-        "APC-012":"familiars"
+        "APC-001":"orbs", 
+        "APC-002":"amulets",
+        "APC-003":"sandals",
+        "APC-004":"crowns",
+        "APC-005":"bolts",
+        "APC-006":"cacti"
     },
     "prizes": {
-        "aqua":"APC-009",
-        "beast":"APC-004",
-        "dragon":"APC-002",
-        "fairy":"APC-011",
-        "fiend":"APC-012",
-        "machine":"APC-003",
-        "plant":"APC-008",
-        "pyro":"APC-010",
-        "rock":"APC-007",
-        "spellcaster":"APC-001",
-        "warrior":"APC-005",
-        "zombie":"APC-006"
+        "destiny":"APC-002",
+        "flip":"APC-003",
+        "machine":"APC-005",
+        "monarch":"APC-004",
+        "reptile":"APC-006",
+        "spellcaster":"APC-001"
     },
     "victories": {
         "aqua":"Today, you drowned your foes with the bubbles of an octopus!",
         "beast":"Today, you attacked your foes with the ferocity of a tiger!",
+        "destiny":"Today, you vanquished your foes with the heart of a hero!",
         "dinosaur":"Today, you flattened your foes with the weight of a sauropod!",
         "dragon":"Today, you scorched your foes with the flames of legends!",
         "fairy":"Today, you dazzled your foes with the grace of an angel!",
         "fiend":"Today, you tormented your foes with the cruelty of a demon!",
         "fish":"Today, you rushed your foes with the speed of a marlin!",
+        "flip":"Today, you flipped your foes with the will of a spirit!",
         "machine":"Today, you hammered your foes with the strength of an alloy!",
+        "monarch":"Today, you ruled your foes with the divine right of an emperor!",
         "plant":"Today, you astonished your foes with the beauty of a princess!",
         "pyro":"Today, you burned your foes with the heat of a blaze!",
         "reptile":"Today, you paralyzed your foes with the venom of a cobra!",
@@ -114,18 +65,12 @@
         "zombie":"Today, you haunted your foes with the menace of a specter!"
     },
     "apcs": {
-        "aqua":"<:ult:845483716888887297>APC-009 - Mermail Shadow Squad",
-        "beast":"<:ult:845483716888887297>APC-004 - Kittytail, Mystical Beast of the Forest",
-        "dragon":"<:ult:845483716888887297>APC-002 - Dragon Shrine",
-        "fairy":"<:ult:845483716888887297>APC-011 - The Agent of Mystery - Earth",
-        "fiend":"<:ult:845483716888887297>APC-012 - Tour Guide from the Underworld",
-        "machine":"<:ult:845483716888887297>APC-003 - Gizmek Taniguku, the Immobile Intellect",
-        "plant":"<:ult:845483716888887297>APC-008 - Baobaboon",
-        "pyro":"<:ult:845483716888887297>APC-010 - Bonfire",
-        "rock":"<:ult:845483716888887297>APC-007 - Adamancipator Analyzer",
-        "spellcaster":"<:ult:845483716888887297>APC-001 - Breaker the Magical Warrior",
-        "warrior":"<:ult:845483716888887297>APC-005 - Reinforcement of the Army",
-        "zombie":"<:ult:845483716888887297>APC-006 -  Samurai Skull"
+        "destiny":"<:ult:1489275472469692596>APC-002 - Destiny HERO - Malicious",
+        "flip":"<:ult:1489275472469692596>APC-003 - Spirit of the Fall Wind",
+        "machine":"<:ult:1489275472469692596>APC-005 - Future Fusion",
+        "monarch":"<:ult:1489275472469692596>APC-004 - Swap Frog",
+        "reptile":"<:ult:1489275472469692596>APC-006 - Snake Rain",
+        "spellcaster":"<:ult:1489275472469692596>APC-001 - Altergeist Meluseek"
     },
     "verbs": [
         "absolutely deserved",

@@ -44,7 +44,7 @@ export const ArenaProfile = db.define('arenaProfiles', {
     monarchWins: {
         type: Sequelize.INTEGER,
         defaultValue: 0
-    },
+    }, 
     plantWins: {
         type: Sequelize.INTEGER,
         defaultValue: 0

@@ -167,11 +167,11 @@ export default {
                 daily.cobbleProgress += daysPassed
                 await daily.save()
 
-                // const packImage = new AttachmentBuilder(`./public/${daily.cobbleProgress}outof7.png`, { name: `pack.png` })
-                // setTimeout(async() => {
-                //     await interaction.channel.send({ content: `Hey, ${daily.playerName}, keep cobblin', buddy.`, files: [packImage]})
-                //     return await daily.update({ isProcessing: false })
-                // }, 4000)
+                const packImage = new AttachmentBuilder(`./public/${daily.cobbleProgress}outof7.png`, { name: `pack.png` })
+                setTimeout(async() => {
+                    await interaction.channel.send({ content: `Hey, ${daily.playerName}, keep cobblin', buddy.`, files: [packImage]})
+                    return await daily.update({ isProcessing: false })
+                }, 4000)
             }
 
             const attachment = await drawCardImage(print.cardName)

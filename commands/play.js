@@ -41,9 +41,9 @@ export default {
             const previousDate = new Date('2026-05-13')
             const days = daysSince(previousDate)
             let starchips = 50 + (20 * days)
-            if (starchips > 400) starchips = 400
+            if (starchips > 600) starchips = 600
             let stardust = 100 + 200 * days
-            if (stardust > 4000) stardust = 4000
+            if (stardust > 6000) stardust = 6000
             await Wallet.create({ playerId: player.id, playerName: player.name, starchips, stardust })
 
             const set = await ForgedSet.findOne({ where: { code: 'LDM' }})

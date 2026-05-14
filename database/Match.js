@@ -1,8 +1,14 @@
 
-import { Sequelize } from 'sequelize'
-import { db } from './db.js'
+import { Op, Sequelize } from 'sequelize'
+import { db } from './db'
 
 export const Match = db.define('matches', {
+    formatName: {
+        type: Sequelize.STRING
+    },
+    formatId: {
+      type: Sequelize.INTEGER
+    },
     winnerName: {
         type: Sequelize.STRING
     },
@@ -15,21 +21,17 @@ export const Match = db.define('matches', {
     loserId: {
         type: Sequelize.STRING
     },
+    classicDelta: {
+        type: Sequelize.FLOAT,  
+        defaultValue: 10.00
+    },
     winnerDelta: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,  
+        defaultValue: 10.00
     },
     loserDelta: {
-        type: Sequelize.FLOAT
-    },
-    isForgedMatch: {
-        type: Sequelize.BOOLEAN,   
-        defaultValue: false
-    },
-    winnerChips: {
-        type: Sequelize.INTEGER
-    },
-    loserChips: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT,  
+        defaultValue: 10.00
     },
     isTournament: {
         type: Sequelize.BOOLEAN,   
@@ -41,6 +43,9 @@ export const Match = db.define('matches', {
     challongeMatchId: {
         type: Sequelize.INTEGER
     },
+    challongeMatchRound: {
+        type: Sequelize.INTEGER
+    },
     round: {
         type: Sequelize.INTEGER
     },
@@ -50,9 +55,16 @@ export const Match = db.define('matches', {
     },
     pairingId: {
         type: Sequelize.INTEGER,
+    },
+    isInternal: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+    },
+    isSeasonal: {
+        type: Sequelize.BOOLEAN,   
+        defaultValue: false
     }
 })
-
 
 Match.checkIfVanquished = async (formatId, winnerId, loserId, createdAt) => createdAt ? 
     await Match.count({ 

@@ -40,14 +40,14 @@ export default {
               
             const previousDate = new Date('2026-05-13')
             const days = daysSince(previousDate)
-            let starchips = 10 + (10 * days)
-            if (starchips > 300) starchips = 300
-            let stardust = 100 + (100 * days)
+            let starchips = 48 + (12 * days)
+            if (starchips > 400) starchips = 400
+            let stardust = 100 * days
             if (stardust > 3000) stardust = 3000
             await Wallet.create({ playerId: player.id, playerName: player.name, starchips, stardust })
 
             const set = await ForgedSet.findOne({ where: { code: 'LDM' }})
-            // await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 24 packs and use the command **/inventory** to view your inventory!` })
+            // await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 12 packs and use the command **/inventory** to view your inventory!` })
             await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 8 packs and a YDK file of your starting inventory!` })
             await awardPacks(interaction.channel, interaction.member, set, 8)
             // await awardBox(interaction.channel, interaction.member, set, 24)

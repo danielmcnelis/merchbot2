@@ -1,6 +1,6 @@
 
-import { Op, Sequelize } from 'sequelize'
-import { db } from './db'
+import { Sequelize } from 'sequelize'
+import { db } from './db.js'
 
 export const Match = db.define('matches', {
     formatName: {

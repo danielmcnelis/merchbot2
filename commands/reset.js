@@ -6,8 +6,8 @@ import { awardPacks, awardBox } from '../functions/packs.js'
 
 export default {
 	data: new SlashCommandBuilder()
-		.setName('play')
-		.setDescription('Play the game! 🎮')
+		.setName('reset')
+		.setDescription('Reset the game! 🎮')
     	.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
         try {

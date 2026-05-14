@@ -36,10 +36,11 @@ export default {
                 const differenceInMilliseconds = currentTime - previousTime
                 let daysDifference = Math.floor(differenceInMilliseconds / (1000 * 60 * 60 * 24))
                 if (daysDifference < 0) daysDifference = 0
+                console.log('daysDifference', daysDifference)
                 return daysDifference
               }
               
-            const previousDate = new Date('2026-05-13')
+            const previousDate = new Date('2026-05-13 00:05:00+00')
             const days = daysSince(previousDate)
             let starchips = 50 + (10 * days)
             if (starchips > 600) starchips = 600

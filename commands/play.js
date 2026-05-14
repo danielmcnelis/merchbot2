@@ -14,7 +14,7 @@ export default {
             await interaction.deferReply()
             const player = await Player.findByDiscordId(interaction.member.user.id)
             const walletExists = await Wallet.count({ where: { playerId: player.id }})
-            if (walletExists) return await interaction.reply({ content: `Error: You already began the game!` })
+            if (walletExists) return await interaction.editReply({ content: `Error: You already began the game!` })
             await Daily.create({ playerId: player.id, playerName: player.name })
             await Stats.create({ 
                 playerId: player.id, 

@@ -49,8 +49,8 @@ export default {
             await Wallet.create({ playerId: player.id, playerName: player.name, starchips, stardust })
 
             const set = await ForgedSet.findOne({ where: { code: 'LDM' }})
-            // await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 12 packs, then use the command **/inventory** to view your inventory! Also, make sure to read <#1488566625690194075> and check out **/wallet**!` })
-            await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 8 packs and a YDK file of your starting inventory! Also, make sure to read <#1488566625690194075> and check out **/wallet**!` })
+            // await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 12 packs, then use the command **/inventory** to view your inventory! Also, make sure to read <#1488566625690194075> and check out your **/wallet**!` })
+            await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 8 packs and a YDK file of your starting inventory! Also, make sure to read <#1488566625690194075> and check out your **/wallet**!` })
             await awardPacks(interaction.channel, interaction.member, set, 8)
             // await awardBox(interaction.channel, interaction.member, set, 24)
             return await sendInventoryYDK(interaction, player)

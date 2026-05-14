@@ -34,7 +34,8 @@ export default {
                 const previousTime = previousDate.getTime()
                 const currentTime = currentDate.getTime()
                 const differenceInMilliseconds = currentTime - previousTime
-                const daysDifference = Math.floor(differenceInMilliseconds / (1000 * 60 * 60 * 24))
+                let daysDifference = Math.floor(differenceInMilliseconds / (1000 * 60 * 60 * 24))
+                if (daysDifference < 0) daysDifference = 0
                 return daysDifference
               }
               

@@ -149,15 +149,14 @@ export default {
                 // }
 
 
-                const matches = await Match.findAll({
-                    where: {
-                        formatName: 'Forged in Chaos'
-                    }
-                })
+                const forgedPrints = await ForgedPrint.findAll()
 
-                for (let i = 0; i < matches.length; i++) {
-                    const match = matches[i]
-                    await match.update({ isSeasonal: true })
+                for (let i = 0; i < forgedPrints.length; i++) {
+                    const forgedPrint = forgedPrints[i]
+                    const card = await Card.findOne({ where: {
+                        name: forgedPrint.cardName
+                    }})
+                    await forgedPrint.update({ cardId: card.id })
                 }
                 
                 // await awardPromosToShop()

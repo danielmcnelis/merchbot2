@@ -310,6 +310,7 @@ export const sendInventoryYDK = async (interaction, player) => {
     const konamiCodes = []
     const mainKonamiCodes = []
     const sideKonamiCodes = []
+    const extraKonamiCodes = []
 
     for (let i = 0; i < invs.length; i++) {
         const inv = invs[i]
@@ -324,16 +325,21 @@ export const sendInventoryYDK = async (interaction, player) => {
         }
     }
 
+    let mainDeckCount = 0
     for (let i = 0; i < konamiCodes.length; i++) {
         const konamiCode = konamiCodes[i]
-        if (i < 60) {
+        const card = await Card.findOne({ where: { konamiCode: konamiCode }})
+        if (card.isExtraDeck) {
+            extraKonamiCodes.push(konamiCode)
+        } else if (mainDeckCount < 60) {
+            mainDeckCount++
             mainKonamiCodes.push(konamiCode)
         } else {
             sideKonamiCodes.push(konamiCode)
         }
     }
 
-    const ydk = `#main\n${mainKonamiCodes.join('\n')}\n#extra\n!side\n${sideKonamiCodes.join('\n')}\n`
+    const ydk = `#main\n${mainKonamiCodes.join('\n')}\n#extra${extraKonamiCodes.join('\n')}\n!side\n${sideKonamiCodes.join('\n')}\n`
     const ydkFile = new AttachmentBuilder(Buffer.from(ydk), { name: `${player.name}_first_packs.ydk` })
     return interaction.user.send({ files: [ydkFile] })
 }

@@ -7,7 +7,7 @@ const { stardust, com, rar, sup, ult, scr } = emojis
 export default {
 	data: new SlashCommandBuilder()
 		.setName('bids')
-		.setDescription('Check your current bids for the auction!'),
+		.setDescription('Check your current bids for the auction! 🤑'),
 	async execute(interaction) {
         try {  
             if (interaction.guildId) return interaction.reply(`Try using **/bids** by DM'ing it to me.`)

@@ -7,7 +7,7 @@ import { capitalize } from '../functions/utility.js'
 export default {
     data: new SlashCommandBuilder()
         .setName('decks')
-        .setDescription('Post the Arena decks. 🇬🇧'),
+        .setDescription('Post the Arena decks. 🗃️'),
     async execute(interaction) {
         try {
             if (interaction.channel.name !== 'arena') return await interaction.reply({ content: `Try using **/decks** in channels like: <#1378129840691220631>.`})

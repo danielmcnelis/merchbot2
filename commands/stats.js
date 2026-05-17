@@ -31,6 +31,7 @@ export default {
                 if (!wallet && player.id !== interaction.user.id) return await interaction.editReply({ content: `That user is not in the database.`})
             
                 let networth = wallet.stardust * 0.1 + wallet.starchips
+                console.log('networth', networth)
                 let completeSets = []
                 let printCount = 0
                 let ldmCount = 0
@@ -42,7 +43,7 @@ export default {
                     const inv = invs[i]
                     networth += inv.quantity * inv.forgedPrint.marketPrice * 0.1
                     if (inv.quantity > 0) printCount++
-                    if ((inv.cardCode.startsWith('LDM-0') || inv.cardCode.startsWith('LDM-1')) && inv.quantity >= 3) ldmCount++
+                    if ((inv.cardCode.includes('LDM-0') || inv.cardCode.includes('LDM-1')) && inv.quantity >= 3) ldmCount++
                 }
 
                 const totalPlayers = await Wallet.count() - 1
@@ -64,11 +65,11 @@ export default {
                         networth += inv.quantity * inv.forgedPrint.marketPrice * 0.1
                     }
 
-                    console.log('neworth i', networth, i)
+                    console.log('networth i', networth, i)
                     allNetworths.push(networth)
                 }
 
-                allNetworths.sort()
+                allNetworths.sort((a, b) => b - a)
                 console.log('allNetworths', allNetworths)
                 const networkRanking = allNetworths.indexOf(networth) + 1
 
@@ -86,7 +87,7 @@ export default {
 
                 const results = [`${scheming} --- Marketplace Stats --- ${scheming}`]
                 results.push(`Name: ${player.name}`)
-                results.push(`Net Worth: ${networth} ${starchips}`)
+                results.push(`Net Worth: ${Math.round(networth)} ${starchips}`)
                 results.push(`Ranking: ${networkRanking} out of ${totalPlayers}`)
                 results.push(`Prints: ${printCount} out of ${printTotal}`)
                 results.push(`Complete Sets: ${completeSets.length ? completeSets.join(',') : 'N/A'}`)

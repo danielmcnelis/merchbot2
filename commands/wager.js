@@ -60,7 +60,7 @@ export default {
                     .setStyle(ButtonStyle.Primary)
                 )
 
-            let x = x - x % 3
+            x = x - x % 3
             console.log('x', x)
             await interaction.reply({ content: `Are you sure you want to wager ${x}${stardust} on a random ${set.code} ${eval(set.emoji)} card?`, components: [row] })
             const filter = i => i.customId.startsWith(`Wager-${timestamp}`) && i.user.id === interaction.user.id;

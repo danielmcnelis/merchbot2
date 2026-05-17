@@ -10,7 +10,7 @@ const { merchant, lipton, stoned, koolaid } = emojis
 export default {
     data: new SlashCommandBuilder()
         .setName('reset')
-        .setDescription('Reset the game! 🆕')
+        .setDescription('Reset the game! 🔁')
         .setContexts(InteractionContextType.Guild),
     async execute(interaction) {
         try {

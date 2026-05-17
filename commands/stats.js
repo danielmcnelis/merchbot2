@@ -88,7 +88,7 @@ export default {
 
             const medal = networthRanking <= 0.1 * allNetworths.length ? king :
                 networthRanking > 0.1 * allNetworths.length && networthRanking <= 0.2 * allNetworths.length ? master :
-                networthRanking > 0.2 * allNetworths.length && networthRanking <= 0.8 ? gold :
+                networthRanking > 0.2 * allNetworths.length && networthRanking <= 0.8 * allNetworths.length ? gold :
                 rock
 
             const results = [`${scheming} --- Marketplace Stats --- ${scheming}`]

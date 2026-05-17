@@ -70,7 +70,7 @@ export default {
 
                 allNetworths.sort()
                 console.log('allNetworths', allNetworths)
-                const networkRanking = findIndex(networth) + 1
+                const networkRanking = allNetworths.findIndex(networth) + 1
 
                 console.log('ldmCount', ldmCount)
                 if (ldmCount === 200) completeSets.push(`Linked Dimensions ${LDM}`)

@@ -2,7 +2,7 @@
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { Daily, ForgedSet, Player, Stats, Wallet } from '../database/index.js'
 import { sendInventoryYDK } from '../functions/decks.js'
-import { awardPacks, awardBox } from '../functions/packs.js'
+import { awardFirstEightPacks, awardPacks, awardBox } from '../functions/packs.js'
 
 export default {
 	data: new SlashCommandBuilder()
@@ -42,16 +42,16 @@ export default {
               
             const previousDate = new Date('2026-05-15 00:05:00+00')
             const days = daysSince(previousDate)
-            let starchips = 30 + (20 * days)
+            let starchips = 50 + (20 * (days - 1))
             if (starchips > 600) starchips = 600
-            let stardust = 100 + 100 * (days - 1)
+            let stardust = 100 + (100 * (days - 1))
             if (stardust > 6000) stardust = 6000
             await Wallet.create({ playerId: player.id, playerName: player.name, starchips, stardust })
 
             const set = await ForgedSet.findOne({ where: { code: 'LDM' }})
             // await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 12 packs, then use the command **/inventory** to view your inventory! Also, make sure to read <#1488566625690194075> and check out your **/wallet**!` })
             await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 8 packs and a YDK file of your starting inventory! Also, make sure to read <#1488566625690194075> and check out your **/wallet**!` })
-            await awardPacks(interaction.channel, interaction.member, set, 8)
+            await awardFirstEightPacks(interaction.channel, interaction.member, set)
             // await awardBox(interaction.channel, interaction.member, set, 24)
             return await sendInventoryYDK(interaction, player)
         } catch (err) {

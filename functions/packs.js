@@ -128,7 +128,100 @@ export const awardPacks = async (channel, member, set, num = 1) => {
     return channel.send({ content: `<@${member.user.id}> was awarded ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'} of ${set.name}.${eval(set.code)} Congratulations!`})
 }
 
-// AWARD PACKS
+
+// AWARD FIRST EIGHT PACKS
+export const awardFirstEightPacks = async (channel, member, set, num = 8) => {
+    const player = await Player.findByDiscordId(member.user.id)
+	
+    const commons = [...await ForgedPrint.findAll({ 
+        where: {
+            forgedSetId: set.id,
+            rarity: "com"
+        },
+        order: [['cardSlot', 'ASC']]
+    })].map((p) => p.cardCode)
+
+    const rares = [...await ForgedPrint.findAll({ 
+        where: {
+            forgedSetId: set.id,
+            rarity: "rar"
+        },
+        order: [['cardSlot', 'ASC']]
+    })].map((p) => p.cardCode)
+
+    const supers = [...await ForgedPrint.findAll({ 
+        where: {
+            forgedSetId: set.id,
+            rarity: "sup"
+        },
+        order: [['cardSlot', 'ASC']]
+    })].filter((p) => !p.cardCode.includes('-SE')).map((p) => p.cardCode)
+
+    const ultras = [...await ForgedPrint.findAll({ 
+        where: {
+            forgedSetId: set.id,
+            rarity: "ult"
+        },
+        order: [['cardSlot', 'ASC']]
+    })].map((p) => p.cardCode)
+
+    for (let j = 0; j < num; j++) {
+        try {
+            const results = [`\n${eval(set.emoji)} - ${set.name} Pack${num > 1 ? ` ${j + 1}` : ''} - ${eval(set.altEmoji)}`]            
+            const yourCommons = getRandomSubset(commons, set.commonsPerPack)
+            const yourRare = getRandomElement(rares)
+            const yourFoil = j < 6 ? getRandomElement(supers) : getRandomElement(ultras)
+            const yourPack = [...yourCommons.sort(), yourRare, yourFoil].filter((e) => !!e)
+            
+            let yourCardArtworkIds = []
+            for (let j = 0; j < yourPack.length; j++) {
+                const cardCode = yourPack[j]
+                const print = await ForgedPrint.findOne({ where: { cardCode }})
+                const card = await Card.findOne({ where: { name: print.cardName }})
+                yourCardArtworkIds.push(card.artworkId)
+            }
+    
+            for (let i = 0; i < yourPack.length; i++) {
+                const print = await ForgedPrint.findOne({ where: {
+                    cardCode: yourPack[i]
+                }})
+    
+                results.push(`${eval(print.rarity)}${print.cardCode} - ${print.cardName}`)
+            
+                const inv = await ForgedInventory.findOne({ where: { 
+                    cardCode: print.cardCode,
+                    forgedPrintId: print.id,
+                    playerId: player.id
+                }})
+    
+                if (inv) {
+                    inv.quantity++
+                    await inv.save()
+                } else {
+                    await ForgedInventory.create({ 
+                        cardName: print.cardName,
+                        cardCode: print.cardCode,
+                        cardId: print.cardId,
+                        quantity: 1,
+                        forgedPrintId: print.id,
+                        playerName: player.name,
+                        playerId: player.id
+                    })
+                }
+            }
+    
+            const attachment = await drawPack(yourCardArtworkIds) || []
+            member.send({ content: `${results.join('\n').toString()}`, files: [attachment] }).catch((err) => console.log(err))
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    return channel.send({ content: `<@${member.user.id}> was awarded ${num === 1 ? 'a' : num} ${num === 1 ? 'Pack' : 'Packs'} of ${set.name}.${eval(set.code)} Congratulations!`})
+}
+
+
+// AWARD BOX
 export const awardBox = async (channel, member, set, offset = 24) => {
     let j = 24 - offset
     const partial = offset !== 24

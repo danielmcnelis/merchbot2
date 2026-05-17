@@ -20,13 +20,14 @@ export default {
     	.setContexts(InteractionContextType.Guild),
         async execute(interaction) {
         try {
+            await interaction.deferReply()
             const user = interaction.options.getUser('player') || interaction.user
             const player = await Player.findOne({ where: { discordId: user?.id } })
 
             if (interaction.channelId === marketPlaceChannelId) {
                 const wallet = await Wallet.findOne({ where: { playerId: player.id }, include: Player})
-                if (!wallet && player.id === interaction.user.id) return await interaction.reply({ content: `You are not in the database. Type **/play** to begin the game.`})
-                if (!wallet && player.id !== interaction.user.id) return await interaction.reply({ content: `That user is not in the database.`})
+                if (!wallet && player.id === interaction.user.id) return await interaction.editReply({ content: `You are not in the database. Type **/play** to begin the game.`})
+                if (!wallet && player.id !== interaction.user.id) return await interaction.editReply({ content: `That user is not in the database.`})
             
                 let networth = wallet.stardust * 0.1 + wallet.starchips
                 let completeSets = []
@@ -89,7 +90,7 @@ export default {
                 results.push(`Complete Sets: ${completeSets.length ? completeSets.join(',') : 'N/A'}`)
                 results.push(`Trades: ${tradeCount} ${robbed}`)
             
-                return await interaction.reply({ content: results.join('\n').toString()})
+                return await interaction.editReply({ content: results.join('\n').toString()})
             } else if (interaction.channelId === arenaChannelId) {
                 console.log('arena stats')
             }

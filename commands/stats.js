@@ -20,6 +20,7 @@ export default {
     	.setContexts(InteractionContextType.Guild),
         async execute(interaction) {
         try {
+            console.log('?')
             await interaction.deferReply()
             const user = interaction.options.getUser('player') || interaction.user
             const player = await Player.findOne({ where: { discordId: user?.id } })
@@ -63,7 +64,8 @@ export default {
                         networth += inv.quantity * inv.forgedPrint.marketPrice * 0.1
                     }
 
-                    allNetworths.push(network)
+                    console.log('neworth i', networth, i)
+                    allNetworths.push(networth)
                 }
 
                 allNetworths.sort()

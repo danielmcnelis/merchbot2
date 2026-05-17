@@ -48,6 +48,7 @@ export default {
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
                 if (confirmation.customId.includes('Yes')) {
+                    await interaction.channel.send({ content: '🤔' , components: []})
                     const timestamp = new Date().getTime()
 
                     const row = new ActionRowBuilder()
@@ -63,7 +64,6 @@ export default {
                             .setStyle(ButtonStyle.Primary)
                         )
 
-                    await interaction.channel.send({ content: '🤔' , components: []})
                     const message = await interaction.channel.send({ content: `Are you ***ABSOLUTELY SURE*** you want to reset your progress and donate all your cards to The Shop? ${merchant}`, components: [row] })
 
                     const filter = i => i.customId.startsWith(`Reset-${timestamp}`) && i.user.id === interaction.user.id

@@ -13,6 +13,15 @@ export default {
         try {
             await interaction.deferReply()
             const player = await Player.findByDiscordId(interaction.member.user.id)
+            const fourteenDaysAgo = new Date(Date.now() - (14 * 24 * 60 * 60 * 1000))
+            const count = await Wallet.findOne({ 
+                where: {
+                    playerId: player.id,
+                    createdAt: {[Op.gte]: fourteenDaysAgo }
+                }
+            })
+
+            if (count) return await interaction.editReply({ content: `Sorry, you are only allowed one reset every 14 days.` })
             
             const invs = await ForgedInventory.findAll({ where: { playerId: player.id }, order: [["cardCode", "ASC"]] })
 
@@ -47,38 +56,11 @@ export default {
                 await inv.destroy()
             }
 
-            player.stats = 500
-            player.backup = 0
-            player.wins = 0
-            player.losses = 0
-            player.vanquished_foes = 0
-            player.best_stats = 500
-            player.current_streak = 0
-            player.longest_streak = 0
-            player.arena_wins = 0
-            player.arena_losses = 0
-            player.arena_stats = 500
-            player.arena_backup = 0
-            player.keeper_wins = 0
-            player.keeper_losses = 0
-            player.keeper_stats = 500
-            player.keeper_backup = 0
-            player.draft_wins = 0
-            player.draft_losses = 0
-            player.draft_stats = 500
-            player.draft_backup = 0
-            player.gauntlet_wins = 0
-            player.gauntlet_losses = 0
-            player.gauntlet_stats = 500
-            player.gauntlet_backup = 0
-            player.pauper_wins = 0
-            player.pauper_losses = 0
-            player.pauper_stats = 500
-            player.pauper_backup = 0
-            await player.save()
-
-            const binder = await Binder.findOne({ where: { playerId: player.id }})
-            if (binder) await binder.destroy()
+            const binders = await Binder.findAll({ where: { playerId: player.id }})
+            for (let i = 0; i < binders.length; i++) {
+                const binder = binders[i]
+                await binder.destroy()
+            }
 
             const daily = await Daily.findOne({ where: { playerId: player.id }})
             if (daily) await daily.destroy()
@@ -99,22 +81,13 @@ export default {
             const wallet = await Wallet.findOne({ where: { playerId: player.id }})
             if (wallet) await wallet.destroy()
 
-            const wishlist = await Wishlist.findOne({ where: { playerId: player.id }})
-            if (wishlist) await wishlist.destroy()
+            const wishlists = await Wishlist.findAll({ where: { playerId: player.id }})
+            for (let i = 0; i < wishlists.length; i++) {
+                const wishlist = wishlists[i]
+                await wishlist.destroy()
+            }
 
-            const date = new Date()
-            await Reset.create({ 
-                date: date,
-                playerId: player.id
-            })
-            
-            player.lastReset = date
-            await player.save()
-
-            // return message.channel.send({ content: `Your account has been successfully reset. All your cards and progress have been wiped.`})
-            
-            await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 24 packs and use the command **/inventory** to view your inventory!` })
-            return
+            return interaction.editReply({ content: `Your account has been successfully reset. All your cards have been donated to The Shop. Type **/play** to begin the game again`})    
         } catch (err) {
             console.log(err)
         }

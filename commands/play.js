@@ -38,14 +38,14 @@ export default {
                 if (daysDifference < 0) daysDifference = 0
                 console.log('daysDifference', daysDifference)
                 return daysDifference
-              }
+            }
               
             const previousDate = new Date('2026-05-15 00:05:00+00')
             const days = daysSince(previousDate)
-            let starchips = 50 + (20 * (days - 1))
-            if (starchips > 600) starchips = 600
-            let stardust = 100 + (100 * (days - 1))
-            if (stardust > 6000) stardust = 6000
+            let starchips = 10 + (20 * (days - 1))
+            if (starchips > 500) starchips = 500
+            let stardust = 100 + (200 * (days - 1))
+            if (stardust > 5000) stardust = 5000
             await Wallet.create({ playerId: player.id, playerName: player.name, starchips, stardust })
 
             const set = await ForgedSet.findOne({ where: { code: 'LDM' }})

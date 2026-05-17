@@ -65,7 +65,7 @@ export default {
         },
 	async execute(interaction) {
         try {
-            if (interaction.channel.id !== botSpamChannelId && interaction.channel.id !== marketPlaceChannelId) return interaction.reply({ content: `Command not valid outside of <#${marketPlaceChannelId}> or <#${botSpamChannelId}>.` })
+            // if (interaction.channel.id !== botSpamChannelId && interaction.channel.id !== marketPlaceChannelId) return interaction.reply({ content: `Command not valid outside of <#${marketPlaceChannelId}> or <#${botSpamChannelId}>.` })
             const user = interaction.options.getUser('player')
             const printId = interaction.options.getNumber('print')
             const quantity = interaction.options.getNumber('quantity') || 1

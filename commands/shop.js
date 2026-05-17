@@ -43,7 +43,7 @@ export default {
         },
 	async execute(interaction) {
         try {
-            if (interaction.channel.id !== botSpamChannelId && interaction.channel.id !== marketPlaceChannelId) return interaction.reply({ content: `Command not valid outside of <#${marketPlaceChannelId}> or <#${botSpamChannelId}>.` })
+            // if (interaction.channel.id !== botSpamChannelId && interaction.channel.id !== marketPlaceChannelId) return interaction.reply({ content: `Command not valid outside of <#${marketPlaceChannelId}> or <#${botSpamChannelId}>.` })
             const printId = interaction.options.getNumber('print')
             const print = await ForgedPrint.findOne({ where: { id: printId }})
             const merchbot = await Player.findOne({ where: { discordId: '584215266586525696' }})

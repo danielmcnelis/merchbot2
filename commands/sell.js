@@ -62,7 +62,7 @@ export default {
         },
 	async execute(interaction) {
         try {
-            if (interaction.channel.id !== botSpamChannelId && interaction.channel.id !== marketPlaceChannelId) return interaction.reply({ content: `Command not valid outside of <#${marketPlaceChannelId}> or <#${botSpamChannelId}>.` })
+            // if (interaction.channel.id !== botSpamChannelId && interaction.channel.id !== marketPlaceChannelId) return interaction.reply({ content: `Command not valid outside of <#${marketPlaceChannelId}> or <#${botSpamChannelId}>.` })
             const quantity = interaction.options.getNumber('quantity')
             if (quantity < 1) return interaction.reply({ content: `You cannot sell less than 1 card.`})
             const printId = interaction.options.getNumber('print')

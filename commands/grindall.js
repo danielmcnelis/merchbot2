@@ -20,7 +20,7 @@ export default {
                 .addComponents(new ButtonBuilder()
                     .setCustomId(`Grindall-${timestamp}-Yes`)
                     .setLabel('Yes')
-                    .setStyle(ButtonStyle.Primary)
+                    .setStyle(ButtonStyle.Danger)
                 )
 
                 .addComponents(new ButtonBuilder()

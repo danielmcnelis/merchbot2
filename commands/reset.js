@@ -1,7 +1,7 @@
 
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { Op } from 'sequelize'
-import { Daily, ForgedInventory, ForgedSet, Player, Stats, Wallet } from '../database/index.js'
+import { Daily, ForgedInventory, ForgedSet, Player, Stats, Wallet, Binder, Wishlist } from '../database/index.js'
 import { sendInventoryYDK } from '../functions/decks.js'
 import { awardPacks, awardBox } from '../functions/packs.js'
 import emojis from '../static/emojis.json' with { type: "json" } 

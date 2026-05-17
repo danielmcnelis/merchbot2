@@ -4,6 +4,8 @@ import { Op } from 'sequelize'
 import { Daily, ForgedInventory, ForgedSet, Player, Stats, Wallet } from '../database/index.js'
 import { sendInventoryYDK } from '../functions/decks.js'
 import { awardPacks, awardBox } from '../functions/packs.js'
+import emojis from '../static/emojis.json' with { type: "json" } 
+const { merchant } = emojis
 
 export default {
     data: new SlashCommandBuilder()

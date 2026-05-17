@@ -48,7 +48,7 @@ export default {
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
                 if (confirmation.customId.includes('Yes')) {
-                    await interaction.channel.send({ content: '🤔' , components: []})
+                    await interaction.editReply({ content: '🤔' , components: []})
                     const timestamp = new Date().getTime()
 
                     const row = new ActionRowBuilder()

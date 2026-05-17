@@ -99,7 +99,7 @@ export default {
                         await wishlist.destroy()
                     }
 
-                    return interaction.editReply({ content: `Your account has been successfully reset. All your cards have been donated to The Shop. Type **/play** to begin the game again` })
+                    return interaction.editReply({ content: `Your account has been successfully reset. All your cards have been donated to The Shop. Type **/play** to begin the game again`, components: [] })
                 } else {
                     await message.edit({ content: `Not a problem. Your progress was not reset. 🎮`, components: [] })
                 }

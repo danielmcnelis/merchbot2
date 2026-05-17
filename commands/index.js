@@ -25,6 +25,7 @@ import grind from './grind.js'
 import grindall from './grindall.js'
 import inventory from './inventory.js'
 import move from './move.js'
+import networth from './networth.js'
 import open from './open.js'
 import pack from './pack.js'
 import ping from './ping.js'
@@ -36,7 +37,6 @@ import search from './search.js'
 import sell from './sell.js'
 import shop from './shop.js'
 import spec from './spec.js'
-import stats from './stats.js'
 import steal from './steal.js'
 import test from './test.js'
 import tin from './tin.js'
@@ -76,6 +76,7 @@ export default {
         grindall,
         inventory,
         move,
+        networth,
         open,
         pack,
         ping,
@@ -87,7 +88,6 @@ export default {
         sell,
         shop,
         spec,
-        stats,
         steal,
         test,
         tin,

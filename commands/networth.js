@@ -3,7 +3,7 @@ import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { ForgedInventory, ForgedPrint, Player, Trade, Wallet } from '../database/index.js'
 import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { king, master, scheming, robbed, starchips, rock, gold, LDM } = emojis
+const { king, master, scheming, robbed, starchips, rock, gold, treasure, LDM } = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { marketPlaceChannelId, arenaChannelId } = channels
 
@@ -88,10 +88,10 @@ export default {
 
             const medal = networthRanking <= 0.1 * allNetworths.length ? king :
                 networthRanking > 0.1 * allNetworths.length && networthRanking <= 0.2 * allNetworths.length ? master :
-                networthRanking > 0.2 * allNetworths.length && networthRanking <= 0.8 * allNetworths.length ? gold :
+                networthRanking > 0.2 * allNetworths.length && networthRanking <= 0.8 * allNetworths.length ? scheming :
                 rock
 
-            const results = [`${scheming} --- Marketplace Stats --- ${scheming}`]
+            const results = [`${treasure} --- Net Worth Stats --- ${treasure}`]
             results.push(`Name: ${player.name}`)
             results.push(`Net Worth: ${Math.round(networth)} ${starchips}`)
             results.push(`Ranking: ${networthRanking} out of ${totalPlayers} ${medal}`)

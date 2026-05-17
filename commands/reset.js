@@ -31,13 +31,13 @@ export default {
             const row = new ActionRowBuilder()
                 .addComponents(new ButtonBuilder()
                     .setCustomId(`Reset-${timestamp}-Yes`)
-                    .setLabel('Reset')
+                    .setLabel('RESET')
                     .setStyle(ButtonStyle.Danger)
                 )
 
                 .addComponents(new ButtonBuilder()
                     .setCustomId(`Reset-${timestamp}-No`)
-                    .setLabel('Cancel')
+                    .setLabel('CANCEL')
                     .setStyle(ButtonStyle.Primary)
                 )
 
@@ -53,16 +53,17 @@ export default {
                     const row = new ActionRowBuilder()
                         .addComponents(new ButtonBuilder()
                             .setCustomId(`Reset-${timestamp}-Yes`)
-                            .setLabel('Reset')
+                            .setLabel('RESET')
                             .setStyle(ButtonStyle.Danger)
                         )
 
                         .addComponents(new ButtonBuilder()
                             .setCustomId(`Reset-${timestamp}-No`)
-                            .setLabel('Cancel')
+                            .setLabel('CANCEL')
                             .setStyle(ButtonStyle.Primary)
                         )
 
+                    await interaction.channel.send({ content: '🤔' , components: []})
                     const message = await interaction.channel.send({ content: `Are you ***ABSOLUTELY SURE*** you want to reset your progress and donate all your cards to The Shop? ${merchant}`, components: [row] })
 
                     const filter = i => i.customId.startsWith(`Reset-${timestamp}`) && i.user.id === interaction.user.id

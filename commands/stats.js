@@ -39,6 +39,7 @@ export default {
                 const printTotal = await ForgedPrint.count()
                 
                 const invs = await ForgedInventory.findAll({ where: { playerId: player.id }, include: [ForgedPrint] })
+                console.log('invs.length', invs.length)
                 for (let i = 0; i < invs.length; i++) {
                     const inv = invs[i]
                     networth += inv.quantity * inv.forgedPrint.marketPrice * 0.1

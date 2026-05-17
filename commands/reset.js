@@ -14,7 +14,7 @@ export default {
         .setContexts(InteractionContextType.Guild),
     async execute(interaction) {
         try {
-            await interaction.deferReply()
+            // await interaction.deferReply()
             const player = await Player.findByDiscordId(interaction.member.user.id)
             const fourteenDaysAgo = new Date(Date.now() - (14 * 24 * 60 * 60 * 1000))
             const count = await Wallet.findOne({
@@ -24,7 +24,7 @@ export default {
                 }
             })
 
-            if (count) return await interaction.editReply({ content: `Sorry, you are only allowed one reset every 14 days.` })
+            if (count) return await interaction.reply({ content: `Sorry, you are only allowed one reset every 14 days.` })
 
             const timestamp = new Date().getTime()
 
@@ -41,7 +41,7 @@ export default {
                     .setStyle(ButtonStyle.Primary)
                 )
 
-            const message = await interaction.channel.send({ content: `Are you ***ABSOLUTELY SURE*** you want to reset your progress and donate all your cards to The Shop? ${merchant}`, components: [row] })
+            const message = await interaction.reply({ content: `Are you ***ABSOLUTELY SURE*** you want to reset your progress and donate all your cards to The Shop? ${merchant}`, components: [row] })
 
             const filter = i => i.customId.startsWith(`Reset-${timestamp}`) && i.user.id === interaction.user.id
 
@@ -99,13 +99,13 @@ export default {
                         await wishlist.destroy()
                     }
 
-                    return interaction.editReply({ content: `Your account has been successfully reset. All your cards have been donated to The Shop. Type **/play** to begin the game again`, components: [] })
+                    return await confirmation.update({ content: `Your account has been successfully reset. All your cards have been donated to The Shop. Type **/play** to begin the game again`, components: [] })
                 } else {
-                    await message.edit({ content: `Not a problem. Your progress was not reset. 🎮`, components: [] })
+                    return await confirmation.update({ content: `Not a problem. Your progress was not reset. 🎮`, components: [] })
                 }
             } catch (err) {
                 console.log(err)
-                await message.edit({ content: `Sorry, time's up. Your progress was not reset. 🎮`, components: [] });
+                return await confirmation.update({ content: `Sorry, time's up. Your progress was not reset. 🎮`, components: [] });
             }
         } catch (err) {
             console.log(err)

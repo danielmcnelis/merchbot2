@@ -5,7 +5,7 @@ import { Daily, ForgedInventory, ForgedSet, Player, Stats, Wallet, Binder, Wishl
 import { sendInventoryYDK } from '../functions/decks.js'
 import { awardPacks, awardBox } from '../functions/packs.js'
 import emojis from '../static/emojis.json' with { type: "json" } 
-const { merchant, lipton, vince } = emojis
+const { merchant, lipton, stoned, koolaid } = emojis
 
 export default {
     data: new SlashCommandBuilder()
@@ -99,7 +99,7 @@ export default {
                         await wishlist.destroy()
                     }
 
-                    return await confirmation.update({ content: `Your account has been successfully reset. ${vince} All your cards have been donated to The Shop. ${merchant} Type **/play** to begin the game again! 🎮`, components: [] })
+                    return await confirmation.update({ content: `Your account has been successfully reset. ${stoned} All your cards have been donated to The Shop. ${merchant} Type **/play** to begin the game again! ${koolaid}`, components: [] })
                 } else {
                     return await confirmation.update({ content: `Not a problem. Your progress was not reset. ${lipton}`, components: [] })
                 }

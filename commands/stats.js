@@ -78,8 +78,8 @@ export default {
                 const tradeCount = await Trade.count({
                     where: {
                         [Op.or]: {
-                            recipientId: playerId,
-                            senderId: playerId
+                            recipientId: player.id,
+                            senderId: player.id
                         }
                     }
                 })

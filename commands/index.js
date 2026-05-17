@@ -36,6 +36,7 @@ import search from './search.js'
 import sell from './sell.js'
 import shop from './shop.js'
 import spec from './spec.js'
+import stats from './stats.js'
 import steal from './steal.js'
 import test from './test.js'
 import tin from './tin.js'
@@ -86,6 +87,7 @@ export default {
         sell,
         shop,
         spec,
+        stats,
         steal,
         test,
         tin,

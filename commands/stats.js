@@ -84,7 +84,7 @@ export default {
                     }
                 })
 
-                const results = `${scheming} --- Marketplace Stats --- ${scheming}`
+                const results = [`${scheming} --- Marketplace Stats --- ${scheming}`]
                 results.push(`Name: ${player.name}`)
                 results.push(`Net Worth: ${networth} ${starchips}`)
                 results.push(`Ranking: ${networkRanking} out of ${totalPlayers}`)

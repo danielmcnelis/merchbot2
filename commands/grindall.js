@@ -19,13 +19,13 @@ export default {
             const row = new ActionRowBuilder()
                 .addComponents(new ButtonBuilder()
                     .setCustomId(`Grindall-${timestamp}-Yes`)
-                    .setLabel('Yes')
+                    .setLabel('GRIND ALL')
                     .setStyle(ButtonStyle.Danger)
                 )
 
                 .addComponents(new ButtonBuilder()
                     .setCustomId(`Grindall-${timestamp}-No`)
-                    .setLabel('No')
+                    .setLabel('CANCEL')
                     .setStyle(ButtonStyle.Primary)
                 )
 

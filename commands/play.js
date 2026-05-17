@@ -3,6 +3,9 @@ import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { Daily, ForgedSet, Player, Stats, Wallet } from '../database/index.js'
 import { sendInventoryYDK } from '../functions/decks.js'
 import { awardFirstEightPacks, awardPacks, awardBox } from '../functions/packs.js'
+import emojis from '../static/emojis.json' with { type: "json" } 
+const { koolaid, cavebobcrop, blue, scheming } = emojis
+
 
 export default {
 	data: new SlashCommandBuilder()
@@ -50,7 +53,7 @@ export default {
 
             const set = await ForgedSet.findOne({ where: { code: 'LDM' }})
             // await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 12 packs, then use the command **/inventory** to view your inventory! Also, make sure to read <#1488566625690194075> and check out your **/wallet**!` })
-            await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 8 packs and a YDK file of your starting inventory! Also, make sure to read <#1488566625690194075> and check out your **/wallet**!` })
+            await interaction.editReply({ content: `${player.name} began the game! ${koolaid} Please check your DMs for your first 8 packs and a YDK file of your starting inventory! ${blue} Also, make sure to read <#1488566625690194075> ${cavebobcrop} and check out your **/wallet**! ${scheming}` })
             await awardFirstEightPacks(interaction.channel, interaction.member, set)
             // await awardBox(interaction.channel, interaction.member, set, 24)
             return await sendInventoryYDK(interaction, player)

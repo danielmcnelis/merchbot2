@@ -33,7 +33,7 @@ export default {
                 const difference = new Date() - wallet.createdAt
                 const remainingDays = 14 - Math.floor(difference / (1000 * 60 * 60 * 24))
 
-                return await interaction.reply({ content: `Sorry, you are only allowed one reset every 14 days. You have ${remainingDays} left before you can reset your account.` })
+                return await interaction.reply({ content: `Sorry, you are only allowed one reset every 14 days. You have ${remainingDays} days left to wait.` })
             }
 
             const timestamp = new Date().getTime()

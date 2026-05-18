@@ -14,7 +14,6 @@ export default {
         .setContexts(InteractionContextType.Guild),
     async execute(interaction) {
         try {
-            // await interaction.deferReply()
             const player = await Player.findByDiscordId(interaction.member.user.id)
             const fourteenDaysAgo = new Date(Date.now() - (14 * 24 * 60 * 60 * 1000))
             const count = await Wallet.findOne({
@@ -24,7 +23,18 @@ export default {
                 }
             })
 
-            if (count) return await interaction.reply({ content: `Sorry, you are only allowed one reset every 14 days.` })
+            if (count) {
+                const wallet = await Wallet.findOne({
+                    where: {
+                        playerId: player.id
+                    }
+                })
+
+                const difference = new Date() - wallet.createdAt
+                const remainingDays = 14 - Math.floor(difference / (1000 * 60 * 60 * 24))
+
+                return await interaction.reply({ content: `Sorry, you are only allowed one reset every 14 days. You have ${remainingDays} left before you can reset your account.` })
+            }
 
             const timestamp = new Date().getTime()
 

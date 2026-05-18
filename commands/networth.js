@@ -75,7 +75,7 @@ export default {
             allNetworths.sort((a, b) => b - a)
             const networthRanking = allNetworths.indexOf(networth) + 1
 
-            if (ldmCount === 200) completeSets.push(`Linked Dimensions ${LDM}`)
+            if (ldmCount === 200) completeSets.push(`LDM ${LDM}`)
 
             const tradeCount = await Trade.count({
                 where: {

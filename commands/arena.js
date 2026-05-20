@@ -14,7 +14,6 @@ export default {
     	.setContexts(InteractionContextType.Guild),
     async execute(interaction) {
         try {
-            if (interaction.channel.id !== '1378129840691220631') return await interaction.reply({ content: `Try using **/arena** in the <#1378129840691220631> channel. ${arena}`})
             const player = await Player.findOne({ where: { discordId: interaction.user.id }})
             const alreadyIn = await ArenaEntry.count({ where: { playerId: player.id }})
             

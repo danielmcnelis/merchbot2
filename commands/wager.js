@@ -18,7 +18,7 @@ export default {
     	.setContexts(InteractionContextType.Guild),
 	async execute(interaction) {
         try {
-            let x = interaction.options.getNumber('stardust')
+            const x = interaction.options.getNumber('stardust')
             if (!x || x < 1) return interaction.reply({ content: `Please provide the amount of ${stardust} that you wish to wager.`})
             if (x > 1000) return interaction.reply({ content: `You cannot wager more than 100${stardust}.`})
 
@@ -60,11 +60,9 @@ export default {
                     .setStyle(ButtonStyle.Primary)
                 )
 
-            x = Math.round(x / 2)
-            console.log('x', x)
             await interaction.reply({ content: `Are you sure you want to wager ${x}${stardust} on a random ${set.code} ${eval(set.emoji)} card?`, components: [row] })
             const filter = i => i.customId.startsWith(`Wager-${timestamp}`) && i.user.id === interaction.user.id;
-
+            
             try {
                 const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 30000 })
                 if (confirmation.customId.includes('Yes')) {
@@ -79,7 +77,7 @@ export default {
                         matrix.fill(4, 3591, 3599)
                         matrix.fill(5, 3599, 3600)
     
-                    for (let i = 0; i < (x / 3); i++) {
+                    for (let i = 0; i < (x / 2); i++) {
                         const sample = getRandomElement(matrix)
                         if (sample > best) best = sample
                     }

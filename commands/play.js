@@ -43,7 +43,7 @@ export default {
                 return daysDifference
             }
               
-            const previousDate = new Date('2026-05-17 00:00:00+00')
+            const previousDate = new Date('2026-05-20 23:00:00+00')
             const days = daysSince(previousDate)
             let starchips = 10 + (20 * (days))
             if (starchips > 500) starchips = 500

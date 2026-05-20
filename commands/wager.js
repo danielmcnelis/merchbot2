@@ -20,7 +20,7 @@ export default {
         try {
             const x = interaction.options.getNumber('stardust')
             if (!x || x < 1) return interaction.reply({ content: `Please provide the amount of ${stardust} that you wish to wager.`})
-            if (x > 1000) return interaction.reply({ content: `You cannot wager more than 100${stardust}.`})
+            if (x > 2000) return interaction.reply({ content: `You cannot wager more than 2000${stardust}.`})
 
             const player = await Player.findByDiscordId(interaction.user.id)
             const wallet = await Wallet.findOne({ where: { playerId: player.id } })

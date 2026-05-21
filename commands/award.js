@@ -5,7 +5,7 @@ import { Op } from 'sequelize'
 import { isMod } from '../functions/utility.js'
 import { awardBox, awardPacks } from '../functions/packs.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const {AOD, COC, CTP, FON, LDM, com, rar, sup, ult, scr, stardust, starchips, droplets, mushrooms, gems, bolts, roses, firecrackers, moais, orbs, shields, skulls, koolaid} = emojis
+const {AOD, COC, CTP, FON, LDM, com, rar, sup, ult, scr, stardust, starchips, amulets, bolts, cacti, crowns, orbs, sandals, koolaid} = emojis
 
 export default {
 	data: new SlashCommandBuilder()

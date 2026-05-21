@@ -458,7 +458,7 @@ export const drawCardImage = async (cardName) => {
 
 // RUN FREQUENT TASKS
 export const runFrequentTasks = async (client) => {
-    console.log('runSomewhatFrequentTasks()')
+    console.log('runFrequentTasks()')
     await manageSubscriptions(client)
 
     return setTimeout(() => runFrequentTasks(client), 10 * 60 * 1000)

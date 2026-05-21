@@ -50,7 +50,8 @@ client.on('ready', async () => {
 	
     try {
         // RUN FREQUENT TASKS
-        setTimeout(() => runFrequentTasks(client), 10 * 60 * 1000)
+        runFrequentTasks(client)
+        // setTimeout(() => runFrequentTasks(client), 10 * 60 * 1000)
     } catch (err) {
         console.log(err)
     }

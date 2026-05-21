@@ -471,6 +471,7 @@ export const manageSubscriptions = async (client) => {
 
     try {
         const benefactorRoleId = '1502092705591853188'
+        const zelleBenefactorRoleId = '1488566624536494368'
         const patronRoleId = '1488935689189068870'
         const supporterRoleId = '1488934384827371731'
 
@@ -492,6 +493,11 @@ export const manageSubscriptions = async (client) => {
                 } else if (member?._roles.includes(benefactorRoleId) && (!player.isForgedSubscriber || player.forgedSubscriberTier !== 'Benefactor') && player.discordId !== '194147938786738176' && player.discordId !== '597814337637187617' && player.discordId !== '192688367585067008' && player.discordId !== '379851431752237057' && player.discordId !== '332277643384979466' && player.discordId !== '626843317010694176') {
                     await programmer.send({ content: `Welcome ${player.name} to the Forged in Chaos Benefactor Tier!`})
                     console.log(`Welcome ${player.name} to the Forged in Chaos Benefactor Tier!`)
+                    await player.update({ isForgedSubscriber: true, forgedSubscriberTier: 'Benefactor' })
+                    a++
+                } else if (member?._roles.includes(zelleBenefactorRoleId) && (!player.isForgedSubscriber || player.forgedSubscriberTier !== 'Benefactor') && player.discordId !== '194147938786738176' && player.discordId !== '597814337637187617' && player.discordId !== '192688367585067008' && player.discordId !== '379851431752237057' && player.discordId !== '332277643384979466' && player.discordId !== '626843317010694176') {
+                    await programmer.send({ content: `Welcome ${player.name} to the Forged in Chaos Benefactor Tier (Zelle)!`})
+                    console.log(`Welcome ${player.name} to the Forged in Chaos Benefactor Tier (Zelle)!`)
                     await player.update({ isForgedSubscriber: true, forgedSubscriberTier: 'Benefactor' })
                     a++
                 } else if (member?._roles.includes(patronRoleId) && (!player.isForgedSubscriber || player.forgedSubscriberTier !== 'Patron') && player.discordId !== '194147938786738176' && player.discordId !== '597814337637187617' && player.discordId !== '192688367585067008' && player.discordId !== '379851431752237057' && player.discordId !== '332277643384979466' && player.discordId !== '626843317010694176') {

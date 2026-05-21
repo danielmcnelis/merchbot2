@@ -120,9 +120,8 @@ export default {
             const cardCode = item.includes('(') ? item.slice(item.indexOf('(') + 1, -1) : null
             const print = cardCode ? await ForgedPrint.findOne({ where: { cardCode }}) : null
             const card = print ? `${eval(print.rarity)}${print.cardCode} - ${print.cardName}` : null
-            const currency = item === 'StarDust' || item === 'StarChips'  || item === 'Droplets'  || item === 'Mushrooms'
-                || item === 'Gems'  || item === 'Beads'  || item === 'Familiars'  || item === 'Bolts'  || item === 'Roses'  
-                || item === 'Firecrackers' || item === 'Moais'  || item === 'Orbs'  || item === 'Shields'  || item === 'Skulls' ? 
+            const currency = item === 'StarDust' || item === 'StarChips'  || item === 'Amulets'  || item === 'Bolts'
+                || item === 'Cacti'  || item === 'Crowns'  || item === 'Orbs'  || item === 'Sandals' ? 
                 item.toLowerCase() : null
             
             const set = await ForgedSet.findOne({ where: { name: item.slice(11) }})

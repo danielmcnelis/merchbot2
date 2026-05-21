@@ -69,52 +69,28 @@ export default {
                     prints.push('StarDust')
                 }
 
-                if ('droplets'.includes(focusedValue.toLowerCase())) {
-                    prints.push('Droplets')
-                }
-
-                if ('mushrooms'.includes(focusedValue.toLowerCase())) {
-                    prints.push('Mushrooms')
-                }
-
-                if ('gems'.includes(focusedValue.toLowerCase())) {
-                    prints.push('Gems')
-                }
-
-                if ('beads'.includes(focusedValue.toLowerCase())) {
-                    prints.push('Beads')
-                }
-
-                if ('familiars'.includes(focusedValue.toLowerCase())) {
-                    prints.push('Familiars')
+                if ('amulets'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Amulets')
                 }
 
                 if ('bolts'.includes(focusedValue.toLowerCase())) {
                     prints.push('Bolts')
                 }
 
-                if ('roses'.includes(focusedValue.toLowerCase())) {
-                    prints.push('Roses')
+                if ('cacti'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Cacti')
                 }
 
-                if ('firecrackers'.includes(focusedValue.toLowerCase())) {
-                    prints.push('Firecrackers')
-                }
-
-                if ('moais'.includes(focusedValue.toLowerCase())) {
-                    prints.push('Moais')
+                if ('crowns'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Crowns')
                 }
 
                 if ('orbs'.includes(focusedValue.toLowerCase())) {
                     prints.push('Orbs')
                 }
 
-                if ('shields'.includes(focusedValue.toLowerCase())) {
-                    prints.push('Shields')
-                }
-
-                if ('skulls'.includes(focusedValue.toLowerCase())) {
-                    prints.push('Skulls')
+                if ('sandals'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Sandals')
                 }
                 
                 if ('pack(s) of '.includes(focusedValue.toLowerCase())) {

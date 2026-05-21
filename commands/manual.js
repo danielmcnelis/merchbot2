@@ -23,7 +23,7 @@ export default {
         ),
     async execute(interaction) {
         try {
-            if (interaction.channel.id !== '1378129840691220631') return await interaction.reply({ content: `Try using **/arena** in the <#1378129840691220631> channel. ${arena}`})
+            // if (interaction.channel.id !== '1378129840691220631') return await interaction.reply({ content: `Try using **/arena** in the <#1378129840691220631> channel. ${arena}`})
             await interaction.deferReply()
             const winningUser = interaction.options.getUser('winner')            
             const losingUser = interaction.options.getUser('loser')

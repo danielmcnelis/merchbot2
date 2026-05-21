@@ -71,8 +71,8 @@ export default {
             await winningEntry.update({ score: newScore, isPlaying: false })
             await losingEntry.update({ isPlaying: false })
 
-            let chipsWinner = 8
-            let chipsLoser = 5
+            let chipsWinner = 5
+            let chipsLoser = 3
             const winnerIsSupporter = winningMember.roles.cache.has('1488934384827371731') || winningPlayer.forgedSubscriberTier === 'Supporter'
             const winnerIsPatron = winningMember.roles.cache.has('1488935689189068870') || winningPlayer.forgedSubscriberTier === 'Patron'
             const winnerIsBenefactor = winningMember.roles.cache.has('1488936887187013652') || winningMember.roles.cache.has('1488566624536494368') || winningPlayer.forgedSubscriberTier === 'Benefactor'

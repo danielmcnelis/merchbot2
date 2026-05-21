@@ -485,7 +485,7 @@ export const manageSubscriptions = async (client) => {
                 const player = players[i]
                 const member = await membersMap.get(player.discordId)
                 
-                if (player.isForgedSubscriber && player.discordId !== '194147938786738176' && player.discordId !== '597814337637187617' && player.discordId !== '192688367585067008' && player.discordId !== '379851431752237057' && player.discordId !== '626843317010694176' && player.discordId !== '332277643384979466' && !member?._roles.includes(benefactorRoleId) && !member?._roles.includes(patronRoleId) && !member?._roles.includes(supporterRoleId)) {
+                if (player.isForgedSubscriber && !member?._roles.includes(benefactorRoleId) && !member?._roles.includes(zelleBenefactorRoleId) && !member?._roles.includes(patronRoleId) && !member?._roles.includes(supporterRoleId)) {
                     await programmer.send({ content: `${player.name} is no longer a Subscriber (${player.forgedSubscriberTier}).`})
                     console.log(`${player.name} is no longer a Subscriber (${player.forgedSubscriberTier}).`)
                     await player.update({ isForgedSubscriber: false, forgedSubscriberTier: null })

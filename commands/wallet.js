@@ -2,7 +2,7 @@
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { Player, Wallet } from '../database/index.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const {FiC, stardust, starchips, mushrooms, gems, bolts, orbs, shields, skulls, droplets, roses, firecrackers, moais, beads, familiars} = emojis
+const {FiC, stardust, starchips, amulets, bolts, cacti, crowns, orbs, sandals } = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -26,18 +26,12 @@ export default {
             const results = [`${FiC} --- ${wallet.playerName}'s Wallet --- ${FiC}`]
             results.push(`Starchips: ${wallet.starchips}${starchips}`)
             results.push(`Stardust: ${wallet.stardust}${stardust}`)
-            if (wallet.droplets) results.push(`Droplets: ${wallet.droplets}${droplets}`)
-            if (wallet.mushrooms) results.push(`Mushrooms: ${wallet.mushrooms}${mushrooms}`)
-            if (wallet.gems) results.push(`Gems: ${wallet.gems}${gems}`)
-            if (wallet.beads) results.push(`Beads: ${wallet.beads}${beads}`)
-            if (wallet.familiars) results.push(`Familiars: ${wallet.familiars}${familiars}`)
-            if (wallet.bolts) results.push(`Bolts: ${wallet.bolts}${bolts}`)
-            if (wallet.roses) results.push(`Roses: ${wallet.roses}${roses}`)
-            if (wallet.firecrackers) results.push(`Firecrackers: ${wallet.firecrackers}${firecrackers}`)
-            if (wallet.moais) results.push(`Moais: ${wallet.moais}${moais}`)
-            if (wallet.orbs) results.push(`Orbs: ${wallet.orbs}${orbs}`)
-            if (wallet.shields) results.push(`Shields: ${wallet.shields}${shields}`)
-            if (wallet.skulls) results.push(`Skulls: ${wallet.skulls}${skulls}`)
+            if (wallet.amulets) results.push(`Droplets: ${wallet.amulets}${amulets}`)
+            if (wallet.bolts) results.push(`Mushrooms: ${wallet.bolts}${bolts}`)
+            if (wallet.cacti) results.push(`Gems: ${wallet.cacti}${cacti}`)
+            if (wallet.crowns) results.push(`Beads: ${wallet.crowns}${crowns}`)
+            if (wallet.orbs) results.push(`Familiars: ${wallet.orbs}${orbs}`)
+            if (wallet.sandals) results.push(`Bolts: ${wallet.sandals}${sandals}`)
         
             return await interaction.reply({ content: results.join('\n').toString()})
         } catch (err) {

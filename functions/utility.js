@@ -470,7 +470,7 @@ export const manageSubscriptions = async (client) => {
     let b = 0
 
     try {
-        const benefactorRoleId = '1488936887187013652'
+        const benefactorRoleId = '1502092705591853188'
         const patronRoleId = '1488935689189068870'
         const supporterRoleId = '1488934384827371731'
 

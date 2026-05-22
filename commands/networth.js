@@ -84,7 +84,7 @@ export default {
                         playerBId: player.id
                     },
                     description: {
-                        [Op.includes]: 'traded'
+                        [Op.substring]: 'traded'
                     }
                 }
             })

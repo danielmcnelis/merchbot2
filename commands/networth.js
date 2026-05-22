@@ -1,6 +1,6 @@
 
 import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
-import { ForgedInventory, ForgedPrint, Player, Trade, Wallet } from '../database/index.js'
+import { ForgedInventory, ForgedPrint, Player, Transaction, Trade, Wallet } from '../database/index.js'
 import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
 const { king, master, scheming, robbed, starchips, rock, gold, treasure, LDM } = emojis

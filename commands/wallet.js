@@ -26,12 +26,12 @@ export default {
             const results = [`${FiC} --- ${wallet.playerName}'s Wallet --- ${FiC}`]
             results.push(`Starchips: ${wallet.starchips}${starchips}`)
             results.push(`Stardust: ${wallet.stardust}${stardust}`)
-            if (wallet.amulets) results.push(`Droplets: ${wallet.amulets}${amulets}`)
-            if (wallet.bolts) results.push(`Mushrooms: ${wallet.bolts}${bolts}`)
-            if (wallet.cacti) results.push(`Gems: ${wallet.cacti}${cacti}`)
-            if (wallet.crowns) results.push(`Beads: ${wallet.crowns}${crowns}`)
-            if (wallet.orbs) results.push(`Familiars: ${wallet.orbs}${orbs}`)
-            if (wallet.sandals) results.push(`Bolts: ${wallet.sandals}${sandals}`)
+            if (wallet.amulets) results.push(`Amulets: ${wallet.amulets}${amulets}`)
+            if (wallet.bolts) results.push(`Bolts: ${wallet.bolts}${bolts}`)
+            if (wallet.cacti) results.push(`Cacti: ${wallet.cacti}${cacti}`)
+            if (wallet.crowns) results.push(`Crowns: ${wallet.crowns}${crowns}`)
+            if (wallet.orbs) results.push(`Orbs: ${wallet.orbs}${orbs}`)
+            if (wallet.sandals) results.push(`Sandals: ${wallet.sandals}${sandals}`)
         
             return await interaction.reply({ content: results.join('\n').toString()})
         } catch (err) {

@@ -77,11 +77,14 @@ export default {
 
             if (ldmCount === 200) completeSets.push(`LDM ${LDM}`)
 
-            const tradeCount = await Trade.count({
+            const tradeCount = await Transaction.count({
                 where: {
                     [Op.or]: {
-                        recipientId: player.id,
-                        senderId: player.id
+                        playerAId: player.id,
+                        playerBId: player.id
+                    },
+                    description: {
+                        [Op.includes]: 'traded'
                     }
                 }
             })

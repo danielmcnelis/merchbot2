@@ -159,6 +159,16 @@ export default {
                     await forgedPrint.update({ cardId: card.id })
                 }
                 
+                const forgedInventories = await ForgedInventory.findAll()
+
+                for (let i = 0; i < forgedInventories.length; i++) {
+                    const forgedInventory = forgedInventories[i]
+                    const card = await Card.findOne({ where: {
+                        name: forgedInventory.cardName
+                    }})
+                    await forgedInventory.update({ cardId: card.id })
+                }
+
                 // await awardPromosToShop()
                 await interaction.editReply('🧪')
             }

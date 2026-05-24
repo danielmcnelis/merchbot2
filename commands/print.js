@@ -107,7 +107,6 @@ export default {
             }
 
             if (!rarity) return interaction.reply({ content: `Something is wrong with the rarity.`})
-                console.log('rarity', rarity)
         
             const marketPrice = rarity === 'com' ? 4 :
                 rarity === 'rar' ? 12 :

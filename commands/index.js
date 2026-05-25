@@ -45,6 +45,7 @@ import transactions from './transactions.js'
 import update from './update.js'
 import wager from './wager.js'
 import wallet from './wallet.js'
+import wins from './wins.js'
 import wishlist from './wishlist.js'
 
 export default {
@@ -96,6 +97,7 @@ export default {
         update,
         wager,
         wallet,
+        wins,
         wishlist
     }
 }

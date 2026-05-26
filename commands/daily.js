@@ -46,9 +46,9 @@ export default {
                 order: [['createdAt', 'DESC']]
             })
 
-            const coc = await ForgedSet.findOne({ 
+            const ldm = await ForgedSet.findOne({ 
                 where: { 
-                    code: 'COC',
+                    code: 'LDM',
                     type: 'core',
                     forSale: true
                 }
@@ -155,7 +155,7 @@ export default {
                         //     await awardBox(interaction.channel, interaction.member, coc)
                         //     return await daily.update({ isProcessing: false })
                         // } else {
-                            await awardPacks(interaction.channel, interaction.member, coc, num)
+                            await awardPacks(interaction.channel, interaction.member, ldm, num)
                             return await daily.update({ isProcessing: false })
                         // }
                     }, 4000)

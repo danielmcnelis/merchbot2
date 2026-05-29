@@ -15,11 +15,11 @@ export default {
     async execute(interaction) {
         try {
             const player = await Player.findByDiscordId(interaction.member.user.id)
-            const fourteenDaysAgo = new Date(Date.now() - (14 * 24 * 60 * 60 * 1000))
+            const sevenDaysAgo = new Date(Date.now() - (7 * 24 * 60 * 60 * 1000))
             const count = await Wallet.findOne({
                 where: {
                     playerId: player.id,
-                    createdAt: { [Op.gte]: fourteenDaysAgo }
+                    createdAt: { [Op.gte]: sevenDaysAgo }
                 }
             })
 

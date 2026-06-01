@@ -39,7 +39,6 @@ export default {
                 const differenceInMilliseconds = currentTime - previousTime
                 let daysDifference = Math.floor(differenceInMilliseconds / (1000 * 60 * 60 * 24))
                 if (daysDifference < 0) daysDifference = 0
-                console.log('daysDifference', daysDifference)
                 return daysDifference
             }
               
@@ -47,7 +46,7 @@ export default {
             const days = daysSince(previousDate)
             let starchips = 10 + (50 * (days))
             if (starchips > 500) starchips = 500
-            let stardust = 100 + (1000 * (days))
+            let stardust = 100 + (500 * (days))
             if (stardust > 10000) stardust = 10000
             await Wallet.create({ playerId: player.id, playerName: player.name, starchips, stardust })
 

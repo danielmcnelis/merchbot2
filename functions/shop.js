@@ -354,7 +354,7 @@ export const restock = async () => {
 	}
 
     if (weightedCount < 1) weightedCount = 1
-    const core_count = most_recent === 'core' ?  Math.ceil(weightedCount / 8) : Math.ceil(weightedCount / 16)
+    const core_count = most_recent === 'core' ?  Math.ceil(weightedCount / 10) : Math.ceil(weightedCount / 20)
     // const mini_count = Math.ceil(weightedCount * 3 / 32)
     await awardPacksToShop(core_count, true)
     // await awardPacksToShop(mini_count, false)

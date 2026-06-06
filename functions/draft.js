@@ -2,35 +2,34 @@
 
 
 import * as Canvas from 'canvas'
-const Discord = require('discord.js')
-const fs = require('fs')
-const { Card, Draft, Diary, Info, Player, Pool, Print, Profile, Set, Wallet, Match, Inventory } = require('../database/index.js')
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
+const { Card, Draft, DraftEntry, ForgedDraftPool, Info, Player, Print, Set, Wallet, DraftInventory } = require('../database/index.js')
 import { Op } from 'sequelize'
 const { yescom, nocom } = require('../static/commands.json')
-const { forgestone, galaxy, king, shrine, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, DRT, fiend, thunder, zombie, diamond, dinosaur, DOC, LPK, dragon, draft, egg, emptybox, evil, FiC, skull, familiar, battery, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, spellcaster, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, dimmadome, sup, tix, ult, wokefrog, yellow, yes, ygocard } = require('../static/emojis.json')
+const { draft, forgestone, galaxy, king, shrine, gem, orb, swords, beast, blue, bronze, cactus, cavebob, checkmark, com, credits, cultured, DRT, fiend, thunder, zombie, diamond, dinosaur, DOC, LPK, dragon, draft, egg, emptybox, evil, FiC, skull, familiar, battery, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, ORF, TEB, FON, warrior, spellcaster, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, dimmadome, sup, tix, ult, wokefrog, yellow, yes, ygocard } = require('../static/emojis.json')
 const { draftRole } = require('../static/roles.json')
 const { draftChannelId } = require('../static/channels.json')
 const { client } = require('../static/clients.js')
 const { findCard } = require('./search.js')
 const { shuffleArray, getRandomElement, getRandomSubset, capitalize } = require('./utility.js')
 
-//START DRAFT
-export const startDraft = async(fuzzyPrints) => {
+//INITIATE DRAFT
+export const initiateDraft = async(fuzzyPrints) => {
     const channel = client.channels.cache.get(draftChannelId)
     channel.send({ content: `Draft players, please check your DMs!`})
-    const entries = await Draft.findAll({ include: Player })
+    const draftEntries = await Draft.findAll({ include: Player })
     const contestants = shuffleArray(["P1", "P2", "P3", "P4"])
-
-    getConfirmation(entries[0], contestants[0])
-    getConfirmation(entries[1], contestants[1])
-    getConfirmation(entries[2], contestants[2])
-    getConfirmation(entries[3], contestants[3])
 
     const info = await Info.findOne({ where: {
         element: 'draft'
     }})
 
-    for (let i = 1; i < 12; i ++) {
+    getConfirmation(draftEntries[0], contestants[0])
+    getConfirmation(draftEntries[1], contestants[1])
+    getConfirmation(draftEntries[2], contestants[2])
+    getConfirmation(draftEntries[3], contestants[3])
+
+    for (let i = 1; i < 24; i ++) {
         setTimeout(async () => {
             const count = await Draft.count({ where: {
                 active: true
@@ -46,12 +45,11 @@ export const startDraft = async(fuzzyPrints) => {
                 info.round = 1
                 info.status = 'drafting'
                 await info.save()
-                assignDraftRoles(entries)
-                sendUniversalStaples(entries)
-                channel.send({ content: `<@&${draftRole}>, pay attention nerds! The Draft starts in 20 seconds. ${koolaid}`})
+                assignDraftRoles(draftEntries)
+                channel.send({ content: `<@&${draftRole}>, pay attention nerds! The Draft starts in 10 seconds. ${koolaid}`})
                 return setTimeout(() => {
                     return createPacks(fuzzyPrints)
-                }, 20000)
+                }, 10000)
             }
         }, i * 5000)
     }
@@ -75,7 +73,7 @@ export const startDraft = async(fuzzyPrints) => {
             })
 
             const names = missing.map((entry) => entry.player.name)
-            await resetDraft(info, entries)
+            await resetDraft(info, draftEntries)
 
             for (let i = 0; i < missing.length; i++) {
                 const entry = missing[i]
@@ -88,7 +86,7 @@ export const startDraft = async(fuzzyPrints) => {
             info.round = 1
             info.status = 'drafting'
             await info.save()
-            assignDraftRoles(entries)
+            assignDraftRoles(draftEntries)
             channel.send({ content: `<@&${draftRole}>, pay attention nerds! The Draft starts in 20 seconds. ${koolaid}`})
             return setTimeout(() => {
                 return createPacks(fuzzyPrints)
@@ -97,69 +95,85 @@ export const startDraft = async(fuzzyPrints) => {
     }, 61000)
 }
 
-//GET CONFIRMATION
-export const getConfirmation = async (entry, contestant) => {
+//GET DRAFT CONFIRMATION
+export const getDraftConfirmation = async (draftEntry, contestant) => {
     const draftChannel = client.channels.cache.get(draftChannelId)
-    const playerId = entry.playerId
-    const guild = client.guilds.cache.get("842476300022054913")
-    const member = guild.members.fetch(playerId)
-    if (!member || playerId !== member.user.id) return
-    const filter = m => m.author.id === playerId
-	const message = await member.send({ content: `Do you still wish to participate in the Draft?`}).catch((err) => console.log(err))
-	if (!message || !message.channel) return false
-    await message.channel.awaitMessages({ filter,
-		max: 1,
-		time: 60000
-	}).then(async (collected) => {
-        const count = await Info.count({ 
-            where: {
+    const guild = client.guilds.cache.get("1488566624536494364")
+    const playerId = draftEntry.player.discordId
+    const member = await guild.members.fetch(playerId)
+    if (!member) return draftChannel.send({ content: `${draftEntry.playerName} cannot be sent DMs.` })
+    
+    const timestamp = new Date().getTime()
+
+    const row1 = new ActionRowBuilder()
+            .addComponents(new ButtonBuilder()
+                .setCustomId(`Draft-${timestamp}-Yes`)
+                .setLabel('Yes')
+                .setStyle(ButtonStyle.Primary)
+            )
+
+            .addComponents(new ButtonBuilder()
+                .setCustomId(`Draft-${timestamp}-No`)
+                .setLabel('No')
+                .setStyle(ButtonStyle.Danger)
+            )
+            
+    const message = await member.user.send({ content: `Do you still wish to participate in the Draft? ${draft} If you no longer want to play, press "No".`, components: [row1] })
+
+    const filter = i => i.customId.includes(`Draft-${timestamp}`) && i.user.id === member.user.id;
+    let confirmation
+    try {
+        confirmation = await message.awaitMessageComponent({ filter, time: 120000 })
+        if (!confirmation.customId.includes('No')) {
+            const count = await Info.count({ where: {
                 element: 'draft',
                 status: 'confirming'
-            }
-        })
+            } })
 
-        if (!count) return member.send({ content: `Sorry, time expired.`})
+            if (!count) return member.send({ content: `Sorry, time expired.`})
 
-        const response = collected.first().content.toLowerCase()
-        if(yescom.includes(response)) {
-            entry.active = true
-            entry.contestant = contestant
-            await entry.save()
-            member.send({ content: `Thanks! The Draft will be starting soon. Look out for more DMs.`})
-            return draftChannel.send({ content: `${member.user.username} confirmed their participation in the Draft!`})
+            await draftEntry.update({
+                isConfirmed: true,
+                contestant: contestant
+            })
+                
+            await confirmation.update({ components: [] })
+            member.send({ content: `Thanks! The Draft ${draft} may be starting soon. Look out for more DMs.`})
+            return await draftChannel.send({ content: `${draftEntry.playerName} confirmed their participation in The Draft! ${draft}` })
         } else {
-            member.send({ content: `Okay, sorry to see you go!`})
-            return draftChannel.send({ content: `Yikes. ${member.user.username} dodged the Draft!`})
+            await confirmation.update({ components: [] })
+            return await draftChannel.send({ content: `Oh dear. ${draftEntry.playerName} ducked :duck: out of the Draft. ${draft}` })
         }
-	}).catch((err) => {
-		console.log(err)
-        return member.send({ content: `Sorry, time's up.`})
-	})
+    } catch (err) {
+        console.log(err)
+        member.send({ content: `Sorry, time's up. You have been removed from the Draft queue.`})
+        return await message.edit({ components: [] }).catch((err) => console.log(err))
+    }
 }
 
 //ASSIGN DRAFT ROLES
-export const assignDraftRoles = (entries) => {
-    const guild = client.guilds.cache.get("842476300022054913")
-    entries.forEach((entry) => {
-        const member = guild.members.fetch(entry.playerId)
+export const assignDraftRoles = async (arenaEntries) => {
+    const guild = client.guilds.cache.get("1488566624536494364")
+    for (let i = 0; i < draftEntries.length; i++) {
+        const draftEntry = draftEntries[i]
+        const member = await guild.members.fetch(draftEntry.player.discordId)
         member.roles.add(draftRole)
-    })
+    }
 }
-
 
 //CREATE PACKS
 export const createPacks = async (fuzzyPrints) => {
     const channel = client.channels.cache.get(draftChannelId)
-    const set = await Set.findOne({ where: { code: 'GL1' } })
+    const set = await Set.findOne({ where: { code: 'GP1' } })
     if (!set) return channel.send({ content: `Could not find set.`})
 
-    const old_pool = await Pool.findAll()
+    const old_pool = await ForgedDraftPool.findAll()
     for (let i = 0; i < old_pool.length; i++) {
         const pool = old_pool[i]
         await pool.destroy()
     }
 
-	const commons = [...await Print.findAll({ 
+	const commons = [...await ForgedPrint.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "com"
@@ -167,7 +181,7 @@ export const createPacks = async (fuzzyPrints) => {
 		order: [['cardSlot', 'ASC']]
 	})].map((p) => p.cardCode)
 
-	const rares = [...await Print.findAll({ 
+	const rares = [...await ForgedPrint.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "rar"
@@ -175,7 +189,7 @@ export const createPacks = async (fuzzyPrints) => {
 		order: [['cardSlot', 'ASC']]
 	})].map((p) => p.cardCode)
 
-	const supers = [...await Print.findAll({ 
+	const supers = [...await ForgedPrint.findAll({ 
 		where: {
 			setId: set.id,
 			rarity: "sup"
@@ -193,14 +207,14 @@ export const createPacks = async (fuzzyPrints) => {
 
         for (let i = 0; i < pack.length; i++) {
             const cardCode = pack[i]
-            const print = await Print.findOne({ where: { cardCode: cardCode }})
-            if (!print.id) return channel.send({ content: `${cardCode} does not exist in the Print database.`})
+            const forgedPrint = await ForgedPrint.findOne({ where: { cardCode: cardCode }})
+            if (!forgedPrint.id) return channel.send({ content: `${cardCode} does not exist in the Forged Print database.`})
     
-            const pool = await Pool.create({ 
+            const pool = await ForgedDraftPool.create({ 
                 packCode: packCode,
-                cardCode: print.cardCode,
-                cardName: print.cardName,
-                printId: print.id
+                cardCode: forgedPrint.cardCode,
+                cardName: forgedPrint.cardName,
+                forgedPrintId: forgedPrint.id
             })
 
             if (!pool) return channel.send({ content: `Error creating Draft Pool.`})
@@ -213,11 +227,11 @@ export const createPacks = async (fuzzyPrints) => {
 // DRAFT CARDS
 export const draftCards = async (fuzzyPrints) => {
     const info = await Info.findOne({ where: { element: 'draft' }})
-    const entries = await Draft.findAll({ include: Player, order: [['contestant', 'ASC']] })
-    const pack_1 = await Pool.findAll({ where: { packCode: 'pack_1' }, include: Print, order: [['id', 'ASC']] })
-    const pack_2 = await Pool.findAll({ where: { packCode: 'pack_2' }, include: Print, order: [['id', 'ASC']] })
-    const pack_3 = await Pool.findAll({ where: { packCode: 'pack_3' }, include: Print, order: [['id', 'ASC']] })
-    const pack_4 = await Pool.findAll({ where: { packCode: 'pack_4' }, include: Print, order: [['id', 'ASC']] })
+    const draftEntries = await Draft.findAll({ include: Player, order: [['contestant', 'ASC']] })
+    const pack_1 = await ForgedDraftPool.findAll({ where: { packCode: 'pack_1' }, include: ForgedPrint, order: [['id', 'ASC']] })
+    const pack_2 = await ForgedDraftPool.findAll({ where: { packCode: 'pack_2' }, include: ForgedPrint, order: [['id', 'ASC']] })
+    const pack_3 = await ForgedDraftPool.findAll({ where: { packCode: 'pack_3' }, include: ForgedPrint, order: [['id', 'ASC']] })
+    const pack_4 = await ForgedDraftPool.findAll({ where: { packCode: 'pack_4' }, include: ForgedPrint, order: [['id', 'ASC']] })
 
     const P1_pack = info.count % 4 === 1 ? pack_1 :
         info.count % 4 === 2 && info.round % 2 === 1 ? pack_2 :
@@ -247,10 +261,10 @@ export const draftCards = async (fuzzyPrints) => {
         info.count % 4 === 0 && info.round % 2 === 1 ? pack_3 :
         pack_1
         
-    getPick(fuzzyPrints, entries[0], P1_pack, info.count)
-    getPick(fuzzyPrints, entries[1], P2_pack, info.count)
-    getPick(fuzzyPrints, entries[2], P3_pack, info.count)
-    getPick(fuzzyPrints, entries[3], P4_pack, info.count)
+    getPick(fuzzyPrints, draftEntries[0], P1_pack, info.count)
+    getPick(fuzzyPrints, draftEntries[1], P2_pack, info.count)
+    getPick(fuzzyPrints, draftEntries[2], P3_pack, info.count)
+    getPick(fuzzyPrints, draftEntries[3], P4_pack, info.count)
 
     return setTimeout(async() => {
         if (info.count < 16) {
@@ -261,38 +275,37 @@ export const draftCards = async (fuzzyPrints) => {
             info.count = 1
             info.round++
             await info.save()
-            await sendInventories(entries, info.round)
+            await sendInventories(draftEntries, info.round)
             return setTimeout(async() => createPacks(fuzzyPrints), (20 + (info.round * 10)) * 1000)
         } else {
             info.count = null
             info.round = 1
             info.status = 'dueling'
             await info.save()
-            await sendInventories(entries, false)
-            return startDraftRound(info, entries)
+            await sendInventories(draftEntries, false)
+            return startDraftRound(info, draftEntries)
         }
     }, (27 - info.count) * 1000)
 }
 
 //SEND INVENTORIES
-export const sendInventories = async (entries, round) => {
+export const sendInventories = async (draftEntries, round) => {
     const guild = client.guilds.cache.get("842476300022054913")
 
-    for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i]
+    for (let i = 0; i < draftEntries.length; i++) {
+        const entry = draftEntries[i]
         const playerId = entry.playerId
         const name = entry.player.name
         const tag = entry.player.tag
         const results = [`${name}'s Draft Inventory:`, `${galaxy} - Galaxy Pack 1 - ${galaxy}`]
-        const invs = await Inventory.findAll({ 
+        const invs = await ForgedDraftInventory.findAll({ 
             where: {
                 playerId: playerId,
-                draft: true,
-                quantity: {
+                    quantity: {
                     [Op.gte]: 1
                 }
             },
-           include: Print,
+           include: [Card, ForgedPrint],
            order: [['cardCode', 'ASC']]
         })
 
@@ -301,25 +314,23 @@ export const sendInventories = async (entries, round) => {
         const oranges = []
         const greens = []
         const violets = []
-        const purples = []
 
 		for (let i = 0; i < invs.length; i++) {
 			const inv = invs[i]
 			const print = inv.print
 			results.push(`${eval(print.rarity)}${print.cardCode} - ${print.cardName} - ${inv.quantity}`)
 
-            const color = print.color
+            const color = print.card.color
             if (color === 'yellow') yellows.push(inv)
             if (color === 'orange') oranges.push(inv)
             if (color === 'green') greens.push(inv)
             if (color === 'violet') violets.push(inv)
-            if (color === 'purple') purples.push(inv)
 		}
 
         const compare = (a, b) => {
-            if (a.print.cardName > b.print.cardName) {
+            if (a.forgedPrint.cardName > b.forgedPrint.cardName) {
                 return 1
-            } else if (a.print.cardName < b.print.cardName) {
+            } else if (a.forgedPrint.cardName < b.forgedPrint.cardName) {
                 return -1
             } else {
                 return 0
@@ -330,7 +341,6 @@ export const sendInventories = async (entries, round) => {
         oranges.sort(compare)
         greens.sort(compare)
         violets.sort(compare)
-        purples.sort(compare)
 
         yellows.forEach((inv) => {
             for (let i = 0; i < inv.quantity; i++) {
@@ -364,12 +374,6 @@ export const sendInventories = async (entries, round) => {
             ydk.push('!side')
         }
 
-        purples.forEach((inv) => {
-            for (let i = 0; i < inv.quantity; i++) {
-                ydk.splice(ydk.indexOf('!side'), 0, inv.print.konamiCode)
-            }
-        })
-
         const header = ['#created by ...', '#main']
 		const file = [...header, ...ydk].join('\n') + '\n'
         const member = guild.members.fetch(playerId)
@@ -387,82 +391,8 @@ export const sendInventories = async (entries, round) => {
             }
         }
 
-        fs.writeFile(`./decks/drafts/${tag}_draft.ydk`, file, (err) => { 
-            if (err) console.log(err)
-        })
-
-        member.send({ content: `Download this .YDK file for DuelingBook! ${blue}`, files:[`./decks/drafts/${tag}_draft.ydk`] })
-    }
-}
-
-//SEND UNIVERSAL STAPLES
-export const sendUniversalStaples = async (entries) => {
-    const guild = client.guilds.cache.get("842476300022054913")
-
-    for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i]
-        const playerId = entry.playerId
-                
-        await Inventory.create({
-            cardCode: 'GL1-US1',
-            quantity: 1,
-            draft: true,
-            playerId: playerId,
-            printId: 1069
-        })
-
-        await Inventory.create({
-            cardCode: 'GL1-US2',
-            quantity: 1,
-            draft: true,
-            playerId: playerId,
-            printId: 1070
-        })
-
-        await Inventory.create({
-            cardCode: 'GL1-US3',
-            quantity: 1,
-            draft: true,
-            playerId: playerId,
-            printId: 1075
-        })
-
-        await Inventory.create({
-            cardCode: 'GL1-US4',
-            quantity: 1,
-            draft: true,
-            playerId: playerId,
-            printId: 1076
-        })
-
-        await Inventory.create({
-            cardCode: 'GL1-US5',
-            quantity: 1,
-            draft: true,
-            playerId: playerId,
-            printId: 1077
-        })
-
-        await Inventory.create({
-            cardCode: 'GL1-US6',
-            quantity: 1,
-            draft: true,
-            playerId: playerId,
-            printId: 1078
-        })
-
-        const member = guild.members.fetch(playerId)
-        if (!member || playerId !== member.user.id) continue
-        
-        const draft_inv = [...await Inventory.findAll({ 
-            where: {
-                draft: true,
-                playerId: playerId
-            },
-            include: Print
-        })].map((i) => `${eval(i.print.rarity)}${i.cardCode} - ${i.print.cardName} - ${i.quantity}`)
-
-        member.send({ content: `Your Draft Inventory begins with the 6 universal staples:\n` + draft_inv.join('\n') + `\n\nThere will be 4 rounds of opening and passing around Galaxy Packs ${galaxy}, in which each player selects 16 cards. At the end, you will have 64 drafted cards + 6 universal staples to construct a 40 card deck and side deck. Best of luck!`})
+        const ydkFile = new AttachmentBuilder(Buffer.from(file), { name: `${player.name}_draft.ydk` })
+        member.send({ content: `Download this .YDK file for DuelingBook! ${blue}`, files:[ydkFile] })
     }
 }
 
@@ -499,9 +429,7 @@ export const getPick = async (fuzzyPrints, entry, pack, count) => {
     const context = canvas.getContext('2d')
 
     for (let i = 0; i < pack.length; i++) {
-        const card = fs.existsSync(`./public/card_images/${images[i]}`) ? 
-        await Canvas.loadImage(`./public/card_images/${images[i]}`) :
-        await Canvas.loadImage(`https://ygoprodeck.com/pics/${images[i]}`)
+        await Canvas.loadImage(`https://cdn.formatlibrary.com/images/cards/${artworkId}.jpg`)
         const dx = i + 1 > cards_per_row && rowsPerPack > 1 ? card_width * (i - cards_per_row) : card_width * i
         const dy = i + 1 > cards_per_row && rowsPerPack > 1 ? 80 : 0
         if (canvas && context && card) context.drawImage(card, dx, dy, card_width, card_height)
@@ -550,9 +478,8 @@ export const getPick = async (fuzzyPrints, entry, pack, count) => {
 
         const card = `${eval(pool_selection.print.rarity)}${pool_selection.cardCode} - ${pool_selection.cardName}`
 
-        const inv = await Inventory.findOne({ where: {
+        const inv = await DraftInventory.findOne({ where: {
             cardCode: pool_selection.cardCode,
-            draft: true,
             printId: pool_selection.printId,
             playerId: playerId
         }})
@@ -561,11 +488,10 @@ export const getPick = async (fuzzyPrints, entry, pack, count) => {
             inv.quantity++
             await inv.save()
         } else {
-            await Inventory.create({ 
+            await DraftInventory.create({ 
                 cardCode: pool_selection.cardCode,
                 quantity: 1,
-                draft: true,
-                printId: pool_selection.printId,
+                    printId: pool_selection.printId,
                 playerId: playerId
             })
         }
@@ -577,9 +503,8 @@ export const getPick = async (fuzzyPrints, entry, pack, count) => {
         console.log(err)
         const pool_selection = await autoDraft(pack)
         const card = `${eval(pool_selection.print.rarity)}${pool_selection.cardCode} - ${pool_selection.cardName}`
-        const inv = await Inventory.findOne({ where: {
+        const inv = await DraftInventory.findOne({ where: {
             cardCode: pool_selection.cardCode,
-            draft: true,
             printId: pool_selection.printId,
             playerId: playerId
         }})
@@ -588,11 +513,10 @@ export const getPick = async (fuzzyPrints, entry, pack, count) => {
             inv.quantity++
             await inv.save()
         } else {
-            await Inventory.create({ 
+            await DraftInventory.create({ 
                 cardCode: pool_selection.cardCode,
                 quantity: 1,
-                draft: true,
-                printId: pool_selection.printId,
+                    printId: pool_selection.printId,
                 playerId: playerId
             })
         }
@@ -630,14 +554,14 @@ export const autoDraft = async (pack) => {
 
 
 //START DRAFT ROUND
-export const startDraftRound = async (info, entries) => {
+export const startDraftRound = async (info, draftEntries) => {
     const channel = client.channels.cache.get(draftChannelId)
 
     if (info.round === 4) {
-        if (entries[0].score > entries[1].score) {
+        if (draftEntries[0].score > draftEntries[1].score) {
         //1st place outright
-            for (let i = 1; i < entries.length; i++) {
-                const entry = entries[i]
+            for (let i = 1; i < draftEntries.length; i++) {
+                const entry = draftEntries[i]
                 const playerId = entry.playerId
                 const quantity = entry.score + 1
                 const wallet = await Wallet.findOne({ where: { playerId: playerId }})
@@ -646,7 +570,7 @@ export const startDraftRound = async (info, entries) => {
                 channel.send({ content: `<@${playerId}> harvested ${quantity} ${quantity > 1 ? 'Forgestones' : 'Forgestone'}${forgestone} from the Draft. Slick!`})
             }
 
-            const entry = entries[0]
+            const entry = draftEntries[0]
             const playerId = entry.playerId
             const quantity = entry.score + 7
             const player = await Player.findOne({ where: { id: playerId }, include: [Profile, Wallet] })
@@ -660,11 +584,11 @@ export const startDraftRound = async (info, entries) => {
             await wallet.save()
 
             channel.send({ content: `Congratulations to <@${playerId}> on a dazzling victory! You truly deserve these ${quantity} beautiful Forgestones${forgestone}! ${wokefrog}`})
-            return endDraft(info, entries)
-        } else if ((entries[0].score === entries[1].score) && entries[1].score > entries[2].score) {
+            return endDraft(info, draftEntries)
+        } else if ((draftEntries[0].score === draftEntries[1].score) && draftEntries[1].score > draftEntries[2].score) {
         //2 way tie
-            for (let i = 2; i < entries.length; i++) {
-                const entry = entries[i]
+            for (let i = 2; i < draftEntries.length; i++) {
+                const entry = draftEntries[i]
                 const playerId = entry.playerId
                 const quantity = entry.score + 1
                 const wallet = await Wallet.findOne({ where: { playerId: playerId }})
@@ -674,7 +598,7 @@ export const startDraftRound = async (info, entries) => {
             }
 
             for (let i = 0; i < 2; i++) {
-                const entry = entries[i]
+                const entry = draftEntries[i]
                 const playerId = entry.playerId
                 const quantity = entry.score + 4
                 const wallet = await Wallet.findOne({ where: { playerId: playerId }})
@@ -683,10 +607,10 @@ export const startDraftRound = async (info, entries) => {
                 channel.send({ content: `Congratulations to <@${playerId}> on a dazzling performance! You truly deserve these ${quantity} beautiful Forgestones${forgestone}! ${wokefrog}`})
             }
 
-            return endDraft(info, entries)
+            return endDraft(info, draftEntries)
         } else {
         //3 way tie 
-            const entry = entries[3]
+            const entry = draftEntries[3]
             const playerId = entry.playerId
             const quantity = entry.score + 1
             const wallet = await Wallet.findOne({ where: { playerId: playerId }})
@@ -695,7 +619,7 @@ export const startDraftRound = async (info, entries) => {
             channel.send({ content: `<@${playerId}> harvested ${quantity} ${quantity > 1 ? 'Forgestones' : 'Forgestone'}${forgestone} from the Draft. Slick!`})
 
             for (let i = 0; i < 3; i++) {
-                const entry = entries[i]
+                const entry = draftEntries[i]
                 const playerId = entry.playerId
                 const quantity = entry.score + 3
                 const wallet = await Wallet.findOne({ where: { playerId: playerId }})
@@ -704,7 +628,7 @@ export const startDraftRound = async (info, entries) => {
                 channel.send({ content: `Congratulations to <@${playerId}> on a dazzling performance! You truly deserve these ${quantity} beautiful Forgestones${forgestone}! ${wokefrog}`})
             }
 
-            return endDraft(info, entries)
+            return endDraft(info, draftEntries)
         }
     } else {
         const P1 = await Draft.findOne({ where: { contestant: "P1" }, include: Player})
@@ -784,17 +708,17 @@ const doubleForfeit = async (player1Id, player2Id) => {
 }
 
 //POST STANDINGS
-const postStandings = async (info, entries) => {
+const postStandings = async (info, draftEntries) => {
     const channel = client.channels.cache.get(draftChannelId)
 
-    for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i]
+    for (let i = 0; i < draftEntries.length; i++) {
+        const entry = draftEntries[i]
         entry.is_playing = true
         await entry.save()
     }
 
     const title = `${king}  ---  Draft Round ${info.round} Standings  ---  ${king} `
-    const standings = entries.map((entry, index) => {
+    const standings = draftEntries.map((entry, index) => {
         return `${index + 1}. ${entry.player.name} - ${entry.score} W`
     })
 
@@ -804,12 +728,12 @@ const postStandings = async (info, entries) => {
     channel.send({ content: `${title}\n${standings.join("\n")}`})
     
     return setTimeout(() => {
-        startDraftRound(info, entries)
+        startDraftRound(info, draftEntries)
     }, 10000)
 }
 
 //END DRAFT
-export const endDraft = async (info, entries) => {
+export const endDraft = async (info, draftEntries) => {
     const pools = await Pool.findAll()
 
     for (let i = 0; i < pools.length; i++) {
@@ -831,8 +755,8 @@ export const endDraft = async (info, entries) => {
     await info.save()
     const guild = client.guilds.cache.get("842476300022054913")
 
-    for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i]
+    for (let i = 0; i < draftEntries.length; i++) {
+        const entry = draftEntries[i]
         const member = guild.members.fetch(entry.playerId)
         member.roles.remove(draftRole)
         await entry.destroy()
@@ -840,14 +764,14 @@ export const endDraft = async (info, entries) => {
 }
 
 //RESET DRAFT
-export const resetDraft = async (info, entries) => {
+export const resetDraft = async (info, draftEntries) => {
     info.status = 'pending'
     info.round = null
     await info.save()
     const guild = client.guilds.cache.get("842476300022054913")
 
-    for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i]
+    for (let i = 0; i < draftEntries.length; i++) {
+        const entry = draftEntries[i]
         const member = guild.members.fetch(entry.playerId)
         member.roles.remove(draftRole)
         entry.active = false
@@ -859,18 +783,18 @@ export const resetDraft = async (info, entries) => {
 //CHECK DRAFT PROGRESS
 export const checkDraftProgress = async (info) => {
     const channel = client.channels.cache.get(draftChannelId)
-    const entries = await Draft.findAll({ include: Player, order: [["score", "DESC"]]})
-    if (!entries) return channel.send({ content: `Critical error. Missing entries in the database.`}) 
+    const draftEntries = await Draft.findAll({ include: Player, order: [["score", "DESC"]]})
+    if (!draftEntries) return channel.send({ content: `Critical error. Missing entries in the database.`}) 
 
     if (info.round === 4) {
         info.round = 5
         await info.save()
-        return setTimeout(() => startDraftRound(info, entries), 3000)
+        return setTimeout(() => startDraftRound(info, draftEntries), 3000)
     }
 
-    const scores = entries.map((entry) => entry.score)
-    const progress_report = entries.map((entry) => entry.is_playing)
+    const scores = draftEntries.map((entry) => entry.score)
+    const progress_report = draftEntries.map((entry) => entry.is_playing)
     const sum = scores.reduce((a, b) => a + b)
 
-    if (sum % 2 === 0 && !progress_report.includes(true)) return setTimeout(() => postStandings(info, entries), 3000)
+    if (sum % 2 === 0 && !progress_report.includes(true)) return setTimeout(() => postStandings(info, draftEntries), 3000)
 }

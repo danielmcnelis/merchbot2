@@ -9,6 +9,7 @@ import { Card } from './Card.js'
 import { Daily } from './Daily.js'
 import { Deck } from './Deck.js'
 import { DeckType } from './DeckType.js'
+import { DraftEntry } from './DraftEntry.js'
 import { Entry } from './Entry.js'
 import { Event } from './Event.js'
 import { ForgedInventory } from './ForgedInventory.js'
@@ -41,6 +42,9 @@ Player.hasOne(ArenaProfile)
 
 ArenaEntry.belongsTo(Player)
 Player.hasOne(ArenaEntry)
+
+DraftEntry.belongsTo(Player)
+Player.hasOne(DraftEntry)
 
 Entry.belongsTo(Player)
 Player.hasOne(Entry)
@@ -110,6 +114,7 @@ export {
   Daily,
   Deck,
   DeckType,
+  DraftEntry,
   Entry,
   Event,
   ForgedInventory,

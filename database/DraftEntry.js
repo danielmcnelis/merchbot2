@@ -1,0 +1,37 @@
+
+import { Sequelize } from 'sequelize'
+import {db} from './db.js'
+
+export const DraftEntry = db.define('draftEntries', {
+    playerName: {
+        type: Sequelize.STRING
+    },
+    playerId: {
+        type: Sequelize.STRING
+    },
+    isConfirmed: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+    },
+    isPlaying: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+    },
+    isActive: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true
+    },
+    status: {
+        type: Sequelize.STRING,   
+        defaultValue: 'pending'
+    },
+    score: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
+    contestant: {
+        type: Sequelize.STRING,
+        defaultValue: null
+    }
+})
+

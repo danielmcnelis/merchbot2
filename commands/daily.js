@@ -38,8 +38,9 @@ export default {
 
             const daysPassed = daily.lastDaily ? Math.round( ( date.setHours(0, 0, 0, 0) - daily.lastDaily.setHours(0, 0, 0, 0) ) / (1000*60*60*24) ) : 1
 
-            const coreSets = await ForgedSet.findAll({ 
+            const set = await ForgedSet.findAll({ 
                 where: { 
+                    code: 'LDM',
                     type: 'core',
                     forSale: true
                 },
@@ -54,7 +55,6 @@ export default {
                 }
             })
 
-            const set = coreSets[0]
             if (!set) return interaction.editReply({ content: `No core set found.`})
 
             // const commons = [...await ForgedPrint.findAll({ 

@@ -20,7 +20,7 @@ export default {
         try {
             const x = interaction.options.getNumber('stardust')
             if (!x || x < 1) return interaction.reply({ content: `Please provide the amount of ${stardust} that you wish to wager.`})
-            if (x > 1000) return interaction.reply({ content: `You cannot wager more than 2000${stardust}.`})
+            if (x > 1000) return interaction.reply({ content: `You cannot wager more than 1000${stardust}.`})
 
             const player = await Player.findByDiscordId(interaction.user.id)
             const wallet = await Wallet.findOne({ where: { playerId: player.id } })
@@ -34,15 +34,15 @@ export default {
 
             if (daily.lastWager && isSameDay(daily.lastWager, date)) return interaction.reply({ content: `You already used **/wager** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`})
 
-            const sets = await ForgedSet.findAll({ 
+            const set = await ForgedSet.findAll({ 
                 where: { 
+                    code: 'LDM',
                     type: 'core',
                     forSale: true
                 },
                 order: [['createdAt', 'DESC']]
             })
 
-            const set = sets[0]
             if (!set) return interaction.reply({ content: `No core set found.`})
 
             const timestamp = new Date().getTime()
@@ -70,14 +70,14 @@ export default {
                     await wallet.save()
 
                     let best = 1
-                    const matrix = new Array(1800)
-                        matrix.fill(1, 0, 1763)
-                        matrix.fill(2, 1763, 1859)
-                        matrix.fill(3, 1859, 1891)
-                        matrix.fill(4, 1791, 1799)
-                        matrix.fill(5, 1799, 1800)
+                    const matrix = new Array(3600)
+                        matrix.fill(1, 0, 3463)
+                        matrix.fill(2, 3463, 3559)
+                        matrix.fill(3, 3559, 3591)
+                        matrix.fill(4, 3591, 3599)
+                        matrix.fill(5, 3599, 3600)
     
-                    for (let i = 0; i < (x); i++) {
+                    for (let i = 0; i < (x / 4); i++) {
                         const sample = getRandomElement(matrix)
                         if (sample > best) best = sample
                     }

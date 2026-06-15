@@ -48,7 +48,7 @@ export default {
 
                 const packs = [...await ForgedSet.findAll({
                     where: {
-                        forSale: true,
+                        // forSale: true,
                         type: {[Op.or]: ['core', 'mini']}
                     },
                     order: [["createdAt", "DESC"]]

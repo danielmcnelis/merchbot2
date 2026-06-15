@@ -34,7 +34,7 @@ export default {
 
             if (daily.lastWager && isSameDay(daily.lastWager, date)) return interaction.reply({ content: `You already used **/wager** today. Try again in ${hoursLeftInDay} ${hoursLeftInDay === 1 ? 'hour' : 'hours'} and ${minsLeftInHour} ${minsLeftInHour === 1 ? 'minute' : 'minutes'}.`})
 
-            const set = await ForgedSet.findAll({ 
+            const set = await ForgedSet.findOne({ 
                 where: { 
                     code: 'WCR',
                     type: 'core',

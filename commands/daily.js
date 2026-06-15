@@ -38,7 +38,7 @@ export default {
 
             const daysPassed = daily.lastDaily ? Math.round( ( date.setHours(0, 0, 0, 0) - daily.lastDaily.setHours(0, 0, 0, 0) ) / (1000*60*60*24) ) : 1
 
-            const set = await ForgedSet.findAll({ 
+            const set = await ForgedSet.findOne({ 
                 where: { 
                     code: 'WCR',
                     type: 'core',

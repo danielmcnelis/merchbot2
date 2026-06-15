@@ -3,7 +3,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 import { Daily, Player, Wallet, ForgedInventory, ForgedPrint, ForgedSet} from '../database/index.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
 import { drawCardImage, getRandomElement, isSameDay } from '../functions/utility.js'
-const { AOD, COC, CTP, FON, LDM, stardust, cavebob, dimmadome, blue, scheming, koolaid, com, rar, sup, ult, scr } = emojis
+const { AOD, COC, CTP, FON, LDM, WCR, stardust, cavebob, dimmadome, blue, scheming, koolaid, com, rar, sup, ult, scr } = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -36,7 +36,7 @@ export default {
 
             const set = await ForgedSet.findAll({ 
                 where: { 
-                    code: 'LDM',
+                    code: 'WCR',
                     type: 'core',
                     forSale: true
                 },
@@ -77,7 +77,7 @@ export default {
                         matrix.fill(4, 3591, 3599)
                         matrix.fill(5, 3599, 3600)
     
-                    for (let i = 0; i < (x / 4); i++) {
+                    for (let i = 0; i < (x / 2); i++) {
                         const sample = getRandomElement(matrix)
                         if (sample > best) best = sample
                     }

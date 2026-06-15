@@ -40,16 +40,16 @@ export default {
 
             const set = await ForgedSet.findAll({ 
                 where: { 
-                    code: 'LDM',
+                    code: 'WCR',
                     type: 'core',
                     forSale: true
                 },
                 order: [['createdAt', 'DESC']]
             })
 
-            const ldm = await ForgedSet.findOne({ 
+            const wcr = await ForgedSet.findOne({ 
                 where: { 
-                    code: 'LDM',
+                    code: 'WCR',
                     type: 'core',
                     forSale: true
                 }
@@ -155,7 +155,7 @@ export default {
                         //     await awardBox(interaction.channel, interaction.member, coc)
                         //     return await daily.update({ isProcessing: false })
                         // } else {
-                            await awardPacks(interaction.channel, interaction.member, ldm, num)
+                            await awardPacks(interaction.channel, interaction.member, WCR, num)
                             return await daily.update({ isProcessing: false })
                         // }
                     }, 4000)

@@ -5,7 +5,7 @@ import { Op } from 'sequelize'
 import { drawPack } from '../functions/packs.js'
 import { getRandomElement, getRandomSubset } from '../functions/utility.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { AOD, COC, CTP, FON, LDM, com, rar, sup, ult, scr, starchips, stardust } = emojis
+const { AOD, COC, CTP, FON, LDM, WCR, com, rar, sup, ult, scr, starchips, stardust } = emojis
 
 export default {
 	data: new SlashCommandBuilder()

@@ -33,6 +33,7 @@ export default {
             let completeSets = []
             let printCount = 0
             let ldmCount = 0
+            let wcrCount = 0
 
             const printTotal = await ForgedPrint.count()
             
@@ -48,6 +49,7 @@ export default {
                 networth += inv.quantity * inv.forgedPrint.marketPrice * 0.1
                 if (inv.quantity > 0) printCount++
                 if ((inv.cardCode.includes('LDM-0') || inv.cardCode.includes('LDM-1')) && inv.quantity >= 3) ldmCount++
+                if ((inv.cardCode.includes('WCR-0') || inv.cardCode.includes('WCR-1')) && inv.quantity >= 3) wcrCount++
             }
 
             const totalPlayers = await Wallet.count() - 1
@@ -76,6 +78,7 @@ export default {
             const networthRanking = allNetworths.indexOf(networth) + 1
 
             if (ldmCount === 200) completeSets.push(`LDM ${LDM}`)
+            if (wcrCount === 200) completeSets.push(`WCR ${WCR}`)
 
             const tradeCount = await Transaction.count({
                 where: {

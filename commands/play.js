@@ -44,9 +44,9 @@ export default {
               
             const previousDate = new Date('2026-06-15 00:01:00+00')
             const days = daysSince(previousDate)
-            let starchips = 210 + (30 * (days))
+            let starchips = 240 + (30 * (days))
             if (starchips > 600) starchips = 600
-            let stardust = 9500 + (500 * (days))
+            let stardust = 10000 + (500 * (days))
             if (stardust > 20000) stardust = 20000
             await Wallet.create({ playerId: player.id, playerName: player.name, starchips, stardust })
 

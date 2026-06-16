@@ -11,6 +11,7 @@ import {isProgrammer, getRandomElement} from '../functions/utility.js'
 import {applyPriceDecay} from '../functions/shop.js'
 import {startRound, postStandings} from '../functions/arena.js'
 import {awardPromosToShop} from '../functions/packs.js'
+import emojis from '../static/emojis.json' with { type: "json" } 
 const { com, rar, sup, ult, scr, stardust } = emojis
 // import axios from 'axios'
 // import { assignTournamentRoles, recalculateAllStats } from '../../../bot-functions/src'

@@ -100,5 +100,25 @@ export const Wallet = db.define('wallets', {
         type: Sequelize.INTEGER,  
         defaultValue: 0,           
         allowNull: false
+    },
+    feathers: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
+    lotuses: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
+    capes: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
+    nets: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
     }
 })

@@ -6,7 +6,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
 import roles from '../static/roles.json' with { type: 'json' }
 const { arenaRole } = roles
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { gladiators, foxy, shrine, cavebob, AOD, COC, CTP, FON, LDM, WCR, king, arena, aqua, beast, destiny, dragon, fairy, fiend, flip, machine, monarch, plant, pyro, reptile, rock, spellcaster, warrior, zombie, starchips, ult, mushrooms, gems, bolts, orbs, shields, skulls, droplets, firecrackers, roses, moais, beads, familiars, amulets, sandals, crowns, cacti } = emojis
+const { gladiators, foxy, shrine, cavebob, AOD, COC, CTP, FON, LDM, WCR, king, arena, aqua, beast, destiny, dragon, fairy, fiend, flip, machine, monarch, plant, pyro, reptile, rock, spellcaster, warrior, zombie, starchips, ult, mushrooms, gems, bolts, orbs, shields, skulls, droplets, firecrackers, roses, moais, beads, familiars, amulets, sandals, crowns, cacti, blackwing, feathers, dragon, gems, frog, lotuses, hero, capes, insect, nets, plants, roses } = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { arenaChannelId } = channels
 import arenas from '../static/arenas.json' with { type: 'json' }
@@ -181,39 +181,39 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
 
     const row1 = new ActionRowBuilder()
             .addComponents(new ButtonBuilder()
-                .setCustomId(`Arena-${timestamp}-Destiny`)
-                .setLabel('Destiny')
+                .setCustomId(`Arena-${timestamp}-Blackwing`)
+                .setLabel('Blackwing')
                 .setStyle(ButtonStyle.Primary)
             )
 
             .addComponents(new ButtonBuilder()
-                .setCustomId(`Arena-${timestamp}-Flip`)
-                .setLabel('Flip')
+                .setCustomId(`Arena-${timestamp}-Dragon`)
+                .setLabel('Dragon')
                 .setStyle(ButtonStyle.Primary)
             )
             
             .addComponents(new ButtonBuilder()
-                .setCustomId(`Arena-${timestamp}-Machine`)
-                .setLabel('Machine')
+                .setCustomId(`Arena-${timestamp}-Frog`)
+                .setLabel('Frog')
                 .setStyle(ButtonStyle.Primary)
             )
             
             .addComponents(new ButtonBuilder()
-                .setCustomId(`Arena-${timestamp}-Monarch`)
-                .setLabel('Monarch')
+                .setCustomId(`Arena-${timestamp}-HERO`)
+                .setLabel('HERO')
                 .setStyle(ButtonStyle.Primary)
             )
 
             .addComponents(new ButtonBuilder()
-                .setCustomId(`Arena-${timestamp}-Reptile`)
-                .setLabel('Reptile')
+                .setCustomId(`Arena-${timestamp}-Insect`)
+                .setLabel('Insect')
                 .setStyle(ButtonStyle.Primary)
             )
            
     const row2 = new ActionRowBuilder() 
             .addComponents(new ButtonBuilder()
-                .setCustomId(`Arena-${timestamp}-Spellcaster`)
-                .setLabel('Spellcaster')
+                .setCustomId(`Arena-${timestamp}-Plant`)
+                .setLabel('Plant')
                 .setStyle(ButtonStyle.Primary)
             )
 
@@ -440,7 +440,7 @@ export const startRound = async (arenaEntries) => {
             info.round === 5 ? [[P1, P3], [P2, P5], [P4, P6]] : 
             null
     
-        const title = `${arena} - ${destiny}${flip}${machine} -- Arena Round ${info.round} -- ${monarch}${spellcaster}${reptile} - ${arena}` 
+        const title = `${arena} - ${blackwing}${dragon}${frog} -- Arena Round ${info.round} -- ${hero}${insect}${plant} - ${arena}` 
         const matches = pairings.map((pairing, index) => {
             if (pairing[0].isActive === false && pairing[1].isActive === false) {
                 setTimeout(() => doubleForfeit(pairing[0].playerId, pairing[1].playerId), index * 1000 + 1000)

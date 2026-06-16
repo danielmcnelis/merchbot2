@@ -3,7 +3,7 @@ import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { ArenaProfile } from '../database/index.js'
 import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { arena, destiny, flip, machine, monarch, reptile, spellcaster } = emojis
+const { arena, blackwing, dragon, frog, hero, insect, plant } = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -13,31 +13,31 @@ export default {
 	async execute(interaction) {
         try {
             const arenaProfiles = await ArenaProfile.findAll()
-            let destinyWins = 0
-            let flipWins = 0
-            let machineWins = 0
-            let monarchWins = 0
-            let reptileWins = 0
-            let spellcasterWins = 0
+            let blackwingWins = 0
+            let dragonWins = 0
+            let frogWins = 0
+            let heroWins = 0
+            let insectWins = 0
+            let plantWins = 0
 
             for (let i = 0; i < arenaProfiles.length; i++) {
                 const arenaProfile = arenaProfiles[i]
-                destinyWins += arenaProfile.destinyWins
-                flipWins += arenaProfile.flipWins
-                machineWins += arenaProfile.machineWins
-                monarchWins += arenaProfile.monarchWins
-                reptileWins += arenaProfile.reptileWins
-                spellcasterWins += arenaProfile.spellcasterWins
+                blackwingWins += arenaProfile.blackwingWins
+                dragonWins += arenaProfile.dragonWins
+                frogWins += arenaProfile.frogWins
+                heroWins += arenaProfile.heroWins
+                insectWins += arenaProfile.insectWins
+                plantWins += arenaProfile.plantWins
             }
 
             await interaction.reply({ content: 
                 `${arena} __**Arena Wins**__ 🥇` +
-                `\nDestiny Tribe ${destiny} - ${destinyWins}W` +
-                `\nFlip Tribe ${flip} - ${flipWins}W` +
-                `\nMachine Tribe ${machine} - ${machineWins}W` +
-                `\nMonarch Tribe ${monarch} - ${monarchWins}W` +
-                `\nReptile Tribe ${reptile} - ${reptileWins}W` +
-                `\nSpellcaster Tribe ${spellcaster} - ${spellcasterWins}W`
+                `\nblackwing Tribe ${blackwing} - ${blackwingWins}W` +
+                `\ndragon Tribe ${dragon} - ${dragonWins}W` +
+                `\nfrog Tribe ${frog} - ${frogWins}W` +
+                `\nhero Tribe ${hero} - ${heroWins}W` +
+                `\ninsect Tribe ${insect} - ${insectWins}W` +
+                `\nplant Tribe ${plant} - ${plantWins}W`
             })
         } catch (err) {
             console.log(err)

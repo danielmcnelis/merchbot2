@@ -14,7 +14,7 @@ export default {
     	.setContexts(InteractionContextType.Guild),
     async execute(interaction) {
         try {
-            return interaction.reply({ content: `The Arena is closed.`})
+            // return interaction.reply({ content: `The Arena is closed.`})
             const player = await Player.findOne({ where: { discordId: interaction.user.id }})
             const alreadyIn = await ArenaEntry.count({ where: { playerId: player.id }})
             

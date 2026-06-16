@@ -1,22 +1,22 @@
 {
     "decks": {
-        "destiny": {
-            "url":"https://www.duelingbook.com/deck?id=19857661"
+        "blackwing": {
+            "url":"https://www.duelingbook.com/deck?id=20073935"
         },
-        "flip": {
-            "url":"https://www.duelingbook.com/deck?id=19857644"
+        "dragon": {
+            "url":"https://www.duelingbook.com/deck?id=20073957"
         },
-        "machine": {
-            "url":"https://www.duelingbook.com/deck?id=19857122"
+        "frog": {
+            "url":"https://www.duelingbook.com/deck?id=20302555"
         },
-        "monarch": {
-            "url":"https://www.duelingbook.com/deck?id=19857618"
+        "hero": {
+            "url":"https://www.duelingbook.com/deck?id=20302572"
         },
-        "reptile": {
-            "url":"https://www.duelingbook.com/deck?id=19857187"
+        "insect": {
+            "url":"https://www.duelingbook.com/deck?id=20073936"
         },
-        "spellcaster": {
-            "url":"https://www.duelingbook.com/deck?id=19857141"
+        "plant": {
+            "url":"https://www.duelingbook.com/deck?id=20073939"
         }
     },
     "vouchers": {
@@ -25,7 +25,13 @@
         "machine":"bolts",
         "monarch":"crowns",
         "reptile":"cacti",
-        "spellcaster":"orbs"
+        "spellcaster":"orbs",
+        "blackwing":"feathers",
+        "dragon":"gems",
+        "frog":"lotuses",
+        "hero":"capes",
+        "insect":"nets",
+        "plant":"roses"
     },
     "barters": {
         "APC-001":"orbs", 
@@ -33,7 +39,13 @@
         "APC-003":"sandals",
         "APC-004":"crowns",
         "APC-005":"bolts",
-        "APC-006":"cacti"
+        "APC-006":"cacti",
+        "APC-007":"nets",
+        "APC-008":"roses",
+        "APC-009":"feathers",
+        "APC-010":"lotuses",
+        "APC-011":"gems",
+        "APC-012":"capes"
     },
     "prizes": {
         "destiny":"APC-002",
@@ -41,11 +53,18 @@
         "machine":"APC-005",
         "monarch":"APC-004",
         "reptile":"APC-006",
-        "spellcaster":"APC-001"
+        "spellcaster":"APC-001",
+        "blackwing":"APC-009",
+        "dragon":"APC-011",
+        "frog":"APC-010",
+        "hero":"APC-012",
+        "insect":"APC-007",
+        "plant":"APC-008"
     },
     "victories": {
         "aqua":"Today, you drowned your foes with the bubbles of an octopus!",
         "beast":"Today, you attacked your foes with the ferocity of a tiger!",
+        "blackwing":"Today, you dive-bombed your foes with the swiftness of a falcon!",
         "destiny":"Today, you vanquished your foes with the heart of a hero!",
         "dinosaur":"Today, you flattened your foes with the weight of a sauropod!",
         "dragon":"Today, you scorched your foes with the flames of legends!",
@@ -53,6 +72,9 @@
         "fiend":"Today, you tormented your foes with the cruelty of a demon!",
         "fish":"Today, you rushed your foes with the speed of a marlin!",
         "flip":"Today, you flipped your foes with the will of a spirit!",
+        "frog":"Today, you licked your foes with the tongue of a toad!",
+        "hero":"Today, you punched your foes with the power of justice!",
+        "insect":"Today, you stabbed your foes with the horns of a beetle!",
         "machine":"Today, you hammered your foes with the strength of an alloy!",
         "monarch":"Today, you ruled your foes with the divine right of an emperor!",
         "plant":"Today, you astonished your foes with the beauty of a princess!",
@@ -70,7 +92,13 @@
         "machine":"<:ult:1489275472469692596>APC-005 - Future Fusion",
         "monarch":"<:ult:1489275472469692596>APC-004 - Swap Frog",
         "reptile":"<:ult:1489275472469692596>APC-006 - Snake Rain",
-        "spellcaster":"<:ult:1489275472469692596>APC-001 - Altergeist Meluseek"
+        "spellcaster":"<:ult:1489275472469692596>APC-001 - Altergeist Meluseek",
+        "blackwing":"<:ult:1489275472469692596>APC-009 - Blackwing - Shura the Blue Flame",
+        "dragon":"<:ult:1489275472469692596>APC-011 - Dragon Shrine",
+        "frog":"<:ult:1489275472469692596>APC-010 - Substitoad",
+        "hero":"<:ult:1489275472469692596>APC-012 - Miracle Fusion",
+        "insect":"<:ult:1489275472469692596>APC-007 - Asset Mountis",
+        "plant":"<:ult:1489275472469692596>APC-008 - Baobaboon"
     },
     "verbs": [
         "absolutely deserved",
@@ -155,7 +183,7 @@
         "Hey it's something.",
         "Hey, keep cobblin', buddy.",
         "Hopefully you never have to play Livd again.",
-        "I bet Silver no-showed again.",
+        "I bet Birdman no-showed again.",
         "Jokes on you. It's a virtual representation of time that you'll never get back.",
         "Killer.",
         "Legit.",
@@ -164,9 +192,9 @@
         "Maybe Caleb will leave you alone now.",
         "Maybe dodge the Arenas with Kizaru next time...",
         "Maybe nobody will notice.",
-        "Maybe play Fish next time...",
+        "Maybe play Destiny next time...",
         "Maybe throw Jazz a tip!",
-        "<:mike:846480467057836092> 👍",
+        "<:mike:1516259873933754468> 👍",
         "Movin' on up!",
         "Nice job!",
         "No cap.",
@@ -174,7 +202,7 @@
         "Oy vey.",
         "Pretty sweet!",
         "Progress is progress.",
-        "Quick. Hit **!join** again before the vultures notice.",
+        "Quick. Hit **/arena** again before the vultures notice.",
         "Remember when this had Ring of Destruction, LOL!",
         "Send your complaints to Cameron.",
         "Sick score!",
@@ -183,15 +211,15 @@
         "That's solid.",
         "The farming was good today.",
         "These decks suck.",
-        "This is better than what you're gonna get with Daily tomorrow...",
+        "This is better than what you're gonna get with **/wager** tomorrow...",
         "Ugh.",
         "Very cool.",
         "We take those.",
         "Whatever happened to JMoney anyway?",
         "Who the hell writes these things?",
-        "Why is Snatch Steal in this game again?",
-        "<:yellow:862090086932545557>",
-        "You can sell them to james arc for like 20<:stardust:845483625298526258>",
+        "Why is Monster Reborn in this game again?",
+        "<:yellow:1488939974727438529>",
+        "You can sell them to james arc for like 20<:stardust:1488939841600098456>",
         "You can trade them for an APC that will be power-crept in like a week.",
         "You'll get 'em next time, kid.",
         "You're on your way to greatness.",

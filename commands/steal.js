@@ -4,7 +4,7 @@ import { ForgedInventory, ForgedPrint, Player, Wallet } from '../database/index.
 import { Op } from 'sequelize'
 import { isMod } from '../functions/utility.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const {com, rar, sup, ult, scr, stardust, starchips, amulets, bolts, cacti, crowns, orbs, sandals, robbed} = emojis
+const {com, rar, sup, ult, scr, stardust, starchips, amulets, bolts, cacti, crowns, orbs, sandals, robbed, feathers, gems, lotuses, capes, nets, roses} = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -65,12 +65,36 @@ export default {
                     prints.push('Cacti')
                 }
 
+                if ('capes'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Capes')
+                }
+
                 if ('crowns'.includes(focusedValue.toLowerCase())) {
                     prints.push('Crowns')
                 }
 
+                if ('feathers'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Feathers')
+                }
+
+                if ('gems'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Gems')
+                }
+
+                if ('lotuses'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Lotuses')
+                }
+
+                if ('nets'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Nets')
+                }
+
                 if ('orbs'.includes(focusedValue.toLowerCase())) {
                     prints.push('Orbs')
+                }
+
+                if ('roses'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Roses')
                 }
 
                 if ('sandals'.includes(focusedValue.toLowerCase())) {

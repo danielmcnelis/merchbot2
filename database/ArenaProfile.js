@@ -17,6 +17,10 @@ export const ArenaProfile = db.define('arenaProfiles', {
         type: Sequelize.INTEGER,
         defaultValue: 0
     },
+    blackwingWins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
     destinyWins: {
         type: Sequelize.INTEGER,
         defaultValue: 0
@@ -34,6 +38,18 @@ export const ArenaProfile = db.define('arenaProfiles', {
         defaultValue: 0
     },
     flipWins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
+    frogWins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
+    heroWins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
+    insectWins: {
         type: Sequelize.INTEGER,
         defaultValue: 0
     },

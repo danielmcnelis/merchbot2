@@ -5,7 +5,7 @@ import { Op } from 'sequelize'
 import { isMod } from '../functions/utility.js'
 import { awardBox, awardPacks } from '../functions/packs.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const {AOD, COC, CTP, FON, LDM, WCR, com, rar, sup, ult, scr, stardust, starchips, amulets, bolts, cacti, crowns, orbs, sandals, koolaid} = emojis
+const {AOD, COC, CTP, FON, LDM, WCR, com, rar, sup, ult, scr, stardust, starchips, amulets, bolts, cacti, crowns, orbs, sandals, koolaid, feathers, gems, lotuses, capes, nets, roses } = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -81,12 +81,36 @@ export default {
                     prints.push('Cacti')
                 }
 
+                if ('capes'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Capes')
+                }
+
                 if ('crowns'.includes(focusedValue.toLowerCase())) {
                     prints.push('Crowns')
                 }
 
+                if ('feathers'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Feathers')
+                }
+
+                if ('gems'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Gems')
+                }
+
+                if ('lotuses'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Lotuses')
+                }
+
+                if ('nets'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Nets')
+                }
+
                 if ('orbs'.includes(focusedValue.toLowerCase())) {
                     prints.push('Orbs')
+                }
+
+                if ('roses'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Roses')
                 }
 
                 if ('sandals'.includes(focusedValue.toLowerCase())) {
@@ -121,7 +145,8 @@ export default {
             const print = cardCode ? await ForgedPrint.findOne({ where: { cardCode }}) : null
             const card = print ? `${eval(print.rarity)}${print.cardCode} - ${print.cardName}` : null
             const currency = item === 'StarDust' || item === 'StarChips'  || item === 'Amulets'  || item === 'Bolts'
-                || item === 'Cacti'  || item === 'Crowns'  || item === 'Orbs'  || item === 'Sandals' ? 
+                || item === 'Cacti'  || item === 'Crowns'  || item === 'Orbs'  || item === 'Sandals' || item === 'Feathers'
+                || item === 'Gems'  || item === 'Lotuses'  || item === 'Capes'  || item === 'Nets'  || item === 'Roses' ? 
                 item.toLowerCase() : null
             
             const set = await ForgedSet.findOne({ where: { name: item.slice(11) }})

@@ -171,7 +171,7 @@ export default {
 
                 const matches = await Match.findAll({
                     where: {
-                        format: 'Forged in Chaos'
+                        formatName: 'Forged in Chaos'
                     }
                 })
 

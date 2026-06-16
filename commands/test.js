@@ -5,7 +5,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 // import { client } from '../client'
 // import { s3FileExists } from '@fl/bot-functions'
 // import { Match, Tournament, Server, TriviaQuestion } from '@fl/models'
-import { ArenaProfile, Binder, Card, ForgedInventory, Wishlist, Player, ForgedPrint, ForgedSet, ArenaEntry, Match } from '../database/index.js'
+import { ArenaProfile, Binder, Card, ForgedInventory, Match, Wishlist, Player, ForgedPrint, ForgedSet, ArenaEntry, Match } from '../database/index.js'
 import { Op } from 'sequelize'
 import {isProgrammer, getRandomElement} from '../functions/utility.js'
 import {applyPriceDecay} from '../functions/shop.js'
@@ -149,24 +149,35 @@ export default {
                 // }
 
 
-                const forgedPrints = await ForgedPrint.findAll()
+                // const forgedPrints = await ForgedPrint.findAll()
 
-                for (let i = 0; i < forgedPrints.length; i++) {
-                    const forgedPrint = forgedPrints[i]
-                    const card = await Card.findOne({ where: {
-                        name: forgedPrint.cardName
-                    }})
-                    await forgedPrint.update({ cardId: card.id })
-                }
+                // for (let i = 0; i < forgedPrints.length; i++) {
+                //     const forgedPrint = forgedPrints[i]
+                //     const card = await Card.findOne({ where: {
+                //         name: forgedPrint.cardName
+                //     }})
+                //     await forgedPrint.update({ cardId: card.id })
+                // }
                 
-                const forgedInventories = await ForgedInventory.findAll()
+                // const forgedInventories = await ForgedInventory.findAll()
 
-                for (let i = 0; i < forgedInventories.length; i++) {
-                    const forgedInventory = forgedInventories[i]
-                    const card = await Card.findOne({ where: {
-                        name: forgedInventory.cardName
-                    }})
-                    await forgedInventory.update({ cardId: card.id })
+                // for (let i = 0; i < forgedInventories.length; i++) {
+                //     const forgedInventory = forgedInventories[i]
+                //     const card = await Card.findOne({ where: {
+                //         name: forgedInventory.cardName
+                //     }})
+                //     await forgedInventory.update({ cardId: card.id })
+                // }
+
+                const matches = await Match.findAll({
+                    where: {
+                        format: 'Forged in Chaos'
+                    }
+                })
+
+                for (let i = 0; i < matches.length; i++) {
+                    const match = matches[i]
+                    await match.update({ isSeasonal: true })
                 }
 
                 // await awardPromosToShop()

@@ -5,7 +5,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 // import { client } from '../client'
 // import { s3FileExists } from '@fl/bot-functions'
 // import { Match, Tournament, Server, TriviaQuestion } from '@fl/models'
-import { ArenaProfile, Binder, Card, ForgedInventory, Wishlist, Player, ForgedPrint, ForgedSet, ArenaEntry, Match, Trade, Transaction } from '../database/index.js'
+import { ArenaProfile, Binder, Card, ForgedInventory, Wishlist, Pairing, Player, ForgedPrint, ForgedSet, ArenaEntry, Match, Trade, Transaction } from '../database/index.js'
 import { Op } from 'sequelize'
 import {isProgrammer, getRandomElement} from '../functions/utility.js'
 import {applyPriceDecay} from '../functions/shop.js'
@@ -182,16 +182,27 @@ export default {
                 //     await match.update({ isSeasonal: true })
                 // }
 
-                const transactions = await Transaction.findAll({
-                    where: {
-                        description: {[Op.substring]: '> for'}
-                    }
-                }) 
+                // const transactions = await Transaction.findAll({
+                //     where: {
+                //         description: {[Op.substring]: '> for'}
+                //     }
+                // }) 
 
-                for (let i = 0; i < transactions.length; i++) {
-                    const transaction = transactions[i]
-                    const replace = await transaction.description.replace('> for', ' for')
-                    await transaction.update({ description: replace })
+                // for (let i = 0; i < transactions.length; i++) {
+                //     const transaction = transactions[i]
+                //     const replace = await transaction.description.replace('> for', ' for')
+                //     await transaction.update({ description: replace })
+                // }
+
+                const pairings = await Pairing.findAll({
+                    where: {
+                        formatName: 'Forged in Chaos'
+                    }
+                })
+
+                for (let i = 0; i < pairings.length; i++){
+                    const pairing = pairings[i]
+                    await pairing.update({ serverId: '1488566624536494364' })
                 }
 
                 // await awardPromosToShop()

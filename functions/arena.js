@@ -6,7 +6,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
 import roles from '../static/roles.json' with { type: 'json' }
 const { arenaRole } = roles
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { gladiators, foxy, shrine, cavebob, AOD, COC, CTP, FON, LDM, WCR, king, arena, aqua, beast, destiny, dragon, fairy, fiend, flip, machine, monarch, plant, pyro, reptile, rock, spellcaster, warrior, zombie, starchips, ult, mushrooms, gems, bolts, orbs, shields, skulls, droplets, firecrackers, roses, moais, beads, familiars, amulets, sandals, crowns, cacti, blackwing, feathers, dragon, gems, frog, lotuses, hero, capes, insect, nets, plants, roses } = emojis
+const { gladiators, foxy, shrine, cavebob, AOD, COC, CTP, FON, LDM, WCR, king, arena, aqua, beast, destiny, fairy, fiend, flip, machine, monarch, pyro, reptile, rock, spellcaster, warrior, zombie, starchips, ult, mushrooms, gems, bolts, orbs, shields, skulls, droplets, firecrackers, roses, moais, beads, familiars, amulets, sandals, crowns, cacti, blackwing, feathers, dragon, gems, frog, lotuses, hero, capes, insect, nets, plants, roses } = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { arenaChannelId } = channels
 import arenas from '../static/arenas.json' with { type: 'json' }

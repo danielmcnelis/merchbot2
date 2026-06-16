@@ -5,7 +5,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 // import { client } from '../client'
 // import { s3FileExists } from '@fl/bot-functions'
 // import { Match, Tournament, Server, TriviaQuestion } from '@fl/models'
-import { ArenaProfile, Binder, Card, ForgedInventory, Wishlist, Player, ForgedPrint, ForgedSet, ArenaEntry, Match } from '../database/index.js'
+import { ArenaProfile, Binder, Card, ForgedInventory, Wishlist, Player, ForgedPrint, ForgedSet, ArenaEntry, Match, Trade, Transaction } from '../database/index.js'
 import { Op } from 'sequelize'
 import {isProgrammer, getRandomElement} from '../functions/utility.js'
 import {applyPriceDecay} from '../functions/shop.js'
@@ -169,15 +169,48 @@ export default {
                 //     await forgedInventory.update({ cardId: card.id })
                 // }
 
-                const matches = await Match.findAll({
-                    where: {
-                        formatName: 'Forged in Chaos'
-                    }
-                })
+                // const matches = await Match.findAll({
+                //     where: {
+                //         formatName: 'Forged in Chaos'
+                //     }
+                // })
 
-                for (let i = 0; i < matches.length; i++) {
-                    const match = matches[i]
-                    await match.update({ isSeasonal: true })
+                // for (let i = 0; i < matches.length; i++) {
+                //     const match = matches[i]
+                //     await match.update({ isSeasonal: true })
+                // }
+
+                const transactions = await Transaction.findAll({
+                    where: {
+                        description: null
+                    }
+                }) 
+
+                for (let i = 0; i < transactions.length; i++) {
+                    const transaction = transactions[i]
+                    const buyersSide = await Trade.findOne({
+                        where: {
+                            transactionId: transaction.id,
+                            itemName: 'stardust'
+                        }
+                    })
+
+                    const sellersSide = await Trade.findOne({
+                        where: {
+                            transactionId: transaction.id,
+                            itemName: {[Op.not]: 'stardust'}
+                        }
+                    })
+
+                    const forgedPrint = await ForgedPrint.findOne({
+                        where: {
+                            id: Number(sellersSide.itemName)
+                        }
+                    })
+
+                    const card = `${eval(forgedPrint.rarity)}${forgedPrint.cardCode} - ${forgedPrint.cardName}`
+                    const description = `${buyersSide.senderName} bought ${sellersSide.quantity} ${card} from ${sellersSide.senderName}> for ${buyersSide.quantity}${stardust}.`
+                    await transaction.update({ description })
                 }
 
                 // await awardPromosToShop()

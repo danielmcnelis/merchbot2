@@ -131,7 +131,7 @@ export const getTraderBConfirmation = async (interaction, proposalA, proposalB, 
         if (confirmation.customId.includes('Yes')) {
             const description = `${traderB.name} traded:\n${traderBPackageSummary.join('\n')}\n\nTo ${traderA.name} for:\n${traderAPackageSummary.join('\n')}`
 
-            const transaction = await Transaction.create({
+            const newTransaction = await Transaction.create({
                 playerAName: traderA.name,
                 playerAId: traderA.id,
                 playerBName: traderB.name,
@@ -139,39 +139,39 @@ export const getTraderBConfirmation = async (interaction, proposalA, proposalB, 
                 description
             })
 
-            // const processTradeComponent = async (interaction, transaction, sender, recipient, quantity, print) => {
+            // const processTradeComponent = async (interaction, newTransaction, sender, recipient, quantity, print) => {
 
             // PROCESS PROPOSAL A PRINT A TRADE COMPONENT
             const proposalAPrintA = await ForgedPrint.findOne({ where: { id: proposalA.forgedPrintAId }})
             const proposalAQuantityA = proposalA.quantityA
-            await processTradeComponent(interaction, transaction, traderA, traderB, proposalAQuantityA, proposalAPrintA)
+            await processTradeComponent(interaction, newTransaction, traderA, traderB, proposalAQuantityA, proposalAPrintA)
 
             if (proposalA.forgedPrintBId) {
                 // PROCESS PROPOSAL A PRINT B TRADE COMPONENT
                 const proposalAPrintB = await ForgedPrint.findOne({ where: { id: proposalA.forgedPrintBId }})
                 const proposalAQuantityB = proposalA.quantityB
-                await processTradeComponent(interaction, transaction, traderA, traderB, proposalAQuantityB, proposalAPrintB)
+                await processTradeComponent(interaction, newTransaction, traderA, traderB, proposalAQuantityB, proposalAPrintB)
             }
 
             if (proposalA.forgedPrintCId) {
                 // PROCESS PROPOSAL A PRINT C TRADE COMPONENT
                 const proposalAPrintC = await ForgedPrint.findOne({ where: { id: proposalA.forgedPrintCId }})
                 const proposalAQuantityC = proposalA.quantityC
-                await processTradeComponent(interaction, transaction, traderA, traderB, proposalAQuantityC, proposalAPrintC)
+                await processTradeComponent(interaction, newTransaction, traderA, traderB, proposalAQuantityC, proposalAPrintC)
             }
 
             if (proposalA.forgedPrintDId) {
                 // PRODESS PROPOSAL A PRINT D TRADE DOMPONENT
                 const proposalAPrintD = await ForgedPrint.findOne({ where: { id: proposalA.forgedPrintDId }})
                 const proposalAQuantityD = proposalA.quantityD
-                await processTradeComponent(interaction, transaction, traderA, traderB, proposalAQuantityD, proposalAPrintD)
+                await processTradeComponent(interaction, newTransaction, traderA, traderB, proposalAQuantityD, proposalAPrintD)
             }
 
             if (proposalA.forgedPrintEId) {
                 // PROEESS PROPOSAL A PRINT E TRAEE EOMPONENT
                 const proposalAPrintE = await ForgedPrint.findOne({ where: { id: proposalA.forgedPrintEId }})
                 const proposalAQuantityE = proposalA.quantityE
-                await processTradeComponent(interaction, transaction, traderA, traderB, proposalAQuantityE, proposalAPrintE)
+                await processTradeComponent(interaction, newTransaction, traderA, traderB, proposalAQuantityE, proposalAPrintE)
             }
 
             if (proposalA.stardustQuantity) {
@@ -183,7 +183,7 @@ export const getTraderBConfirmation = async (interaction, proposalA, proposalB, 
                 await traderBWallet.save()
 
                 await Trade.create({
-                    transactionId: transaction.id,
+                    transactionId: newTransaction.id,
                     itemName: 'stardust',
                     itemType: 'currency',
                     quantity: proposalA.stardustQuantity,
@@ -197,34 +197,34 @@ export const getTraderBConfirmation = async (interaction, proposalA, proposalB, 
             // PROCESS PROPOSAL B PRINT A TRADE COMPONENT
             const proposalBPrintA = await ForgedPrint.findOne({ where: { id: proposalB.forgedPrintAId }})
             const proposalBQuantityA = proposalB.quantityA
-            await processTradeComponent(interaction, transaction, traderB, traderA, proposalBQuantityA, proposalBPrintA)
+            await processTradeComponent(interaction, newTransaction, traderB, traderA, proposalBQuantityA, proposalBPrintA)
 
             if (proposalB.forgedPrintBId) {
                 // PROCESS PROPOSAL B PRINT B TRADE COMPONENT
                 const proposalBPrintB = await ForgedPrint.findOne({ where: { id: proposalB.forgedPrintBId }})
                 const proposalBQuantityB = proposalB.quantityB
-                await processTradeComponent(interaction, transaction, traderB, traderA, proposalBQuantityB, proposalBPrintB)
+                await processTradeComponent(interaction, newTransaction, traderB, traderA, proposalBQuantityB, proposalBPrintB)
             }
 
             if (proposalB.forgedPrintCId) {
                 // PROCESS PROPOSAL B PRINT C TRADE COMPONENT
                 const proposalBPrintC = await ForgedPrint.findOne({ where: { id: proposalB.forgedPrintCId }})
                 const proposalBQuantityC = proposalB.quantityC
-                await processTradeComponent(interaction, transaction, traderB, traderA, proposalBQuantityC, proposalBPrintC)
+                await processTradeComponent(interaction, newTransaction, traderB, traderA, proposalBQuantityC, proposalBPrintC)
             }
 
             if (proposalB.forgedPrintDId) {
                 // PRODESS PROPOSAL B PRINT D TRADE DOMPONENT
                 const proposalBPrintD = await ForgedPrint.findOne({ where: { id: proposalB.forgedPrintDId }})
                 const proposalBQuantityD = proposalB.quantityD
-                await processTradeComponent(interaction, transaction, traderB, traderA, proposalBQuantityD, proposalBPrintD)
+                await processTradeComponent(interaction, newTransaction, traderB, traderA, proposalBQuantityD, proposalBPrintD)
             }
 
             if (proposalB.forgedPrintEId) {
                 // PROEESS PROPOSAL B PRINT E TRAEE EOMPONENT
                 const proposalBPrintE = await ForgedPrint.findOne({ where: { id: proposalB.forgedPrintEId }})
                 const proposalBQuantityE = proposalB.quantityE
-                await processTradeComponent(interaction, transaction, traderB, traderA, proposalBQuantityE, proposalBPrintE)
+                await processTradeComponent(interaction, newTransaction, traderB, traderA, proposalBQuantityE, proposalBPrintE)
             }
 
             if (proposalB.stardustQuantity) {
@@ -236,7 +236,7 @@ export const getTraderBConfirmation = async (interaction, proposalA, proposalB, 
                 await traderBWallet.save()
 
                 await Trade.create({
-                    transactionId: transaction.id,
+                    transactionId: newTransaction.id,
                     itemName: 'stardust',
                     itemType: 'currency',
                     quantity: proposalB.stardustQuantity,
@@ -319,12 +319,14 @@ export const getSellerConfirmation = async (interaction, buyer, seller, quantity
 
             const newMarketPrice = calculateNewMarketPrice(quantity, price, print)
             await print.update({ marketPrice: newMarketPrice })
+            const description = `${buyer.name} bought ${quantity} ${card} from ${seller.name}> for ${price}${stardust}.`
 
             const newTransaction = await Transaction.create({
                 playerAName: seller.name,
                 playerAId: seller.id,
                 playerBName: buyer.name,
-                playerBId: buyer.id
+                playerBId: buyer.id,
+                description
             })
 
             await Trade.create({

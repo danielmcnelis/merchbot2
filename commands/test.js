@@ -184,35 +184,14 @@ export default {
 
                 const transactions = await Transaction.findAll({
                     where: {
-                        description: null
+                        description: {[Op.substring]: '> for'}
                     }
                 }) 
 
                 for (let i = 0; i < transactions.length; i++) {
                     const transaction = transactions[i]
-                    const buyersSide = await Trade.findOne({
-                        where: {
-                            transactionId: transaction.id,
-                            itemName: 'stardust'
-                        }
-                    })
-
-                    const sellersSide = await Trade.findOne({
-                        where: {
-                            transactionId: transaction.id,
-                            itemName: {[Op.not]: 'stardust'}
-                        }
-                    })
-
-                    const forgedPrint = await ForgedPrint.findOne({
-                        where: {
-                            id: Number(sellersSide.itemName)
-                        }
-                    })
-
-                    const card = `${eval(forgedPrint.rarity)}${forgedPrint.cardCode} - ${forgedPrint.cardName}`
-                    const description = `${buyersSide.senderName} bought ${sellersSide.quantity} ${card} from ${sellersSide.senderName}> for ${buyersSide.quantity}${stardust}.`
-                    await transaction.update({ description })
+                    const replace = await transaction.description.replace('> for', ' for')
+                    await transaction.update({ description: replace })
                 }
 
                 // await awardPromosToShop()

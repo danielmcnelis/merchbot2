@@ -21,6 +21,7 @@ import { Status } from './Status.js'
 import { Info } from './Info.js'
 import { Match } from './Match.js'
 import { Matchup } from './Matchup.js'
+import { Pairing } from './Pairing.js'
 import { Player } from './Player.js'
 import { Pool } from './Pool.js'
 import { Proposal } from './Proposal.js'
@@ -126,6 +127,7 @@ export {
   Info,
   Match,
   Matchup,
+  Pairing,
   Player,
   Pool,
   Proposal,

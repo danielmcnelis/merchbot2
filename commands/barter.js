@@ -6,7 +6,7 @@ import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
 import arenas from '../static/arenas.json' with { type: 'json' }
 const { vouchers } = arenas
-const {com, rar, sup, ult, scr, stardust, merchant, blue, mushrooms, gems, bolts, orbs, shields, skulls, droplets, firecrackers, moais, roses, beads, familiars, amulets, crowns, sandals, cacti, feathers, gems, lotuses, capes, nets, roses } = emojis
+const {com, rar, sup, ult, scr, stardust, merchant, blue, mushrooms, bolts, orbs, shields, skulls, droplets, firecrackers, moais, beads, familiars, amulets, crowns, sandals, cacti, feathers, gems, lotuses, capes, nets, roses } = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { marketPlaceChannelId, botSpamChannelId } = channels
 

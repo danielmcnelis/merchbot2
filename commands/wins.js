@@ -32,12 +32,12 @@ export default {
 
             await interaction.reply({ content: 
                 `${arena} __**Arena Wins**__ 🥇` +
-                `\nblackwing Tribe ${blackwing} - ${blackwingWins}W` +
-                `\ndragon Tribe ${dragon} - ${dragonWins}W` +
-                `\nfrog Tribe ${frog} - ${frogWins}W` +
-                `\nhero Tribe ${hero} - ${heroWins}W` +
-                `\ninsect Tribe ${insect} - ${insectWins}W` +
-                `\nplant Tribe ${plant} - ${plantWins}W`
+                `\nBlackwing Tribe ${blackwing} - ${blackwingWins}W` +
+                `\nDragon Tribe ${dragon} - ${dragonWins}W` +
+                `\nFrog Tribe ${frog} - ${frogWins}W` +
+                `\nHERO Tribe ${hero} - ${heroWins}W` +
+                `\nInsect Tribe ${insect} - ${insectWins}W` +
+                `\nPlant Tribe ${plant} - ${plantWins}W`
             })
         } catch (err) {
             console.log(err)

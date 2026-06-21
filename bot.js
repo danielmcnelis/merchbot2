@@ -102,8 +102,8 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
         const oldRoles = oldMember.roles.cache
         const newRoles = newMember.roles.cache
     
-        const wasSubscriber = oldRoles.has('1375131866847252544')
-        const isSubscriber = newRoles.has('1375131866847252544')
+        const wasSubscriber = oldRoles.has('1518396406090698885')
+        const isSubscriber = newRoles.has('1518396406090698885')
         const hadForgedEnchantments = oldRoles.has('1513574178165624932') || oldRoles.has('1511009496720478299')
         const gotForgedEnchantments = newRoles.has('1513574178165624932') || newRoles.has('1511009496720478299')
 

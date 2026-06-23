@@ -57,8 +57,6 @@ export default {
 
             const results = []
             const codes = []
-            const cards = inventory.map((inv) => inv.forgedPrint.cardCode)
-            const playsets = trips.map((trip) => trip.forgedPrint.cardCode)
 
             for (let i = 0; i < allPrints.length; i++) {
                 const row = allPrints[i]

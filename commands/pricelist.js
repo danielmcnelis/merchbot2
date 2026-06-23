@@ -50,7 +50,7 @@ export default {
                 where: {
                     forgedSetCode: setCode
                 },
-                order: [['marketPrice', 'DESC']]
+                order: [['cardCode', 'ASC']]
             })
 
             if (!allPrints) return interaction.reply({ content: `No prints found in the database.`})
@@ -96,12 +96,12 @@ export default {
                 }
             }
 
-            for (let i = 0; i < results.length; i += 20) {
-                if (results[i+21] && results[i+21].startsWith("\n")) {
-                    interaction.user.send({ content: results.slice(i, i+21).join('\n').toString()})
+            for (let i = 0; i < results.length; i += 10) {
+                if (results[i+11] && results[i+11].startsWith("\n")) {
+                    interaction.user.send({ content: results.slice(i, i+11).join('\n').toString()})
                     i++
                 } else {
-                    interaction.user.send({ content: results.slice(i, i+20).join('\n').toString()})
+                    interaction.user.send({ content: results.slice(i, i+10).join('\n').toString()})
                 }
             }
 

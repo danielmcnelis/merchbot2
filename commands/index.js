@@ -30,6 +30,7 @@ import open from './open.js'
 import pack from './pack.js'
 import ping from './ping.js'
 import play from './play.js'
+import pricelist from './pricelist.js'
 import print from './print.js'
 import queue from './queue.js'
 import reset from './reset.js'
@@ -82,6 +83,7 @@ export default {
         pack,
         ping,
         play,
+        pricelist,
         print,
         reset,
         queue,

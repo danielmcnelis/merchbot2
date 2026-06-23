@@ -535,7 +535,7 @@ export const updateShop = async () => {
             const shopBuyingFactor = print.isFrozen ? 1 : 0.7
             const shopBuyingPrice = Math.floor(marketPrice * shopBuyingFactor) > 0 ? Math.floor(marketPrice * shopBuyingFactor) : 1
             const shopSellingPrice = Math.floor(marketPrice * 1.1) > shopBuyingPrice ? Math.floor(marketPrice * 1.1) : shopBuyingPrice + 1
-            const symbol = excluded ? ` - ${no}` : print.isFrozen ? '- ❄️' : print.trendingUp ? `- ${rising}` : print.trendingDown ? `- ${falling}` : ''
+            const symbol = excluded ? ` - ${no}` : print.isFrozen ? ' - ❄️' : print.trendingUp ? ` - ${rising}` : print.trendingDown ? ` - ${falling}` : ''
             results.push(`${shopSellingPrice}${stardust}| ${shopBuyingPrice}${stardust}-${eval(print.rarity)}${inv.cardCode} - ${print.cardName} - ${inv.quantity}${symbol}`) 
         }
     

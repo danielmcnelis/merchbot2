@@ -60,7 +60,7 @@ export default {
             const shopBuyingPrice = Math.floor(print.marketPrice * shopBuyingFactor) > 0 ? Math.floor(print.marketPrice * shopBuyingFactor) : 1	
             const shopSellingPrice = Math.floor(marketPrice * 1.1) > shopBuyingPrice ? Math.floor(marketPrice * 1.1) : shopBuyingPrice + 1
     
-            const symbol = print.isFrozen ? '- ❄️' : print.trendingUp ? `- ${rising}` : print.trendingDown ? `- ${falling}` : ''
+            const symbol = print.isFrozen ? ' - ❄️' : print.trendingUp ? ` - ${rising}` : print.trendingDown ? ` - ${falling}` : ''
 
             if (!inv) {
                 return interaction.reply({ content: `${shopSellingPrice}${stardust}| ${shopBuyingPrice}${stardust}-${card} - Out of Stock${symbol}`})

@@ -84,6 +84,7 @@ export default {
         pack,
         ping,
         play,
+        populations,
         pricelist,
         print,
         reset,

@@ -84,14 +84,14 @@ export default {
 
                 for (let j = 0; j < invs.length; j++) {
                     const inv = invs[j]
-                    const quantity = invs.quantity
+                    const quantity = inv.quantity
                     population += quantity
                 }
                     
                 results.push(`${card} - ${population}`)
             }
 
-            for (let i = 0; i < results.length; i += 10) {
+            for (let i = 0; i < results.length; i += 20) {
                 if (results[i+21] && results[i+21].startsWith("\n")) {
                     interaction.user.send({ content: results.slice(i, i+21).join('\n').toString()})
                     i++

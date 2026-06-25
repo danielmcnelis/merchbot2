@@ -39,12 +39,13 @@ export default {
             }
         },
 	async execute(interaction) {
-        try {          
+        try {         
+            interaction.deferReply() 
             const setCode = interaction.options.getString('set')
-            if (!setCode) return interaction.reply({ content: `Please select a set from the auto-complete list.`})
+            if (!setCode) return interaction.editReply({ content: `Please select a set from the auto-complete list.`})
 
             const player = await Player.findOne({ where: {discordId: interaction.user.id} })
-            if (!player) return interaction.reply({ content: `You are not in the database.` })
+            if (!player) return interaction.editReply({ content: `You are not in the database.` })
 
             const allPrints = await ForgedPrint.findAll({ 
                 where: {
@@ -53,7 +54,7 @@ export default {
                 order: [['cardCode', 'ASC']]
             })
 
-            if (!allPrints) return interaction.reply({ content: `No prints found in the database.`})
+            if (!allPrints) return interaction.editReply({ content: `No prints found in the database.`})
 
             const results = []
             const codes = []
@@ -99,7 +100,7 @@ export default {
                 }
             }
 
-            return interaction.reply({ content: `I messaged you the Card Populations you requested.`})
+            return interaction.editReply({ content: `I messaged you the Card Populations you requested.`})
         } catch (err) {
             console.log(err)
         }

@@ -90,8 +90,8 @@ export default {
                     merchbotWallet.stardust += 750
                     await merchbotWallet.save()
 
-                    const set1Code = seriesNumber === 2 ? 'FON' : 'AOD'
-                    const set2Code = seriesNumber === 2 ? 'COC' : 'FON'
+                    const set1Code = seriesNumber === 2 ? 'LDM' : 'LDM'
+                    const set2Code = seriesNumber === 2 ? 'WCR' : 'WCR'
 
                     const set1 = await ForgedSet.findOne({
                         where: {

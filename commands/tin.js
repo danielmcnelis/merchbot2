@@ -52,7 +52,7 @@ export default {
             const merchbotWallet = merchbot.wallet
             if (!wallet) return interaction.reply({ content: `You are not in the database. Type **/play** to begin the game.`})
 
-            const newestSeries = promo.cardCode.startsWith('CT2-')
+            const newestSeries = promo.cardCode.startsWith('CT1-')
             const seriesNumber = promo.cardCode.startsWith('CT2-') ? 2 : 1
             const currency = newestSeries ? 'starchips' : 'stardust'
             const price = newestSeries ? 75 : 1500

@@ -194,16 +194,80 @@ export default {
                 //     await transaction.update({ description: replace })
                 // }
 
-                const pairings = await Pairing.findAll({
+                // const pairings = await Pairing.findAll({
+                //     where: {
+                //         formatName: 'Forged in Chaos'
+                //     }
+                // })
+
+                // for (let i = 0; i < pairings.length; i++){
+                //     const pairing = pairings[i]
+                //     await pairing.update({ serverId: '1488566624536494364' })
+                // }
+
+                const newAccount = await Player.findOne({
                     where: {
-                        formatName: 'Forged in Chaos'
+                        discordId: '1521762752815824979'
                     }
                 })
 
-                for (let i = 0; i < pairings.length; i++){
-                    const pairing = pairings[i]
-                    await pairing.update({ serverId: '1488566624536494364' })
+                const invs = await ForgedInventory.findAll({
+                    where: {
+                        playerId: 'HQ3ws4iAr7kEfo7KPs6886'
+                    }
+                })
+
+                for (let i = 0; i < invs.length; i++) {
+                    const inv = invs[i]
+                    await inv.update({
+                        playerName: newAccount.name,
+                        playerId: newAccount.id
+                    })
                 }
+
+                const arenaProfile = await ArenaProfile.findOne({
+                    where: {
+                        playerId: 'HQ3ws4iAr7kEfo7KPs6886'
+                    }
+                })
+
+                await arenaProfile.update({
+                    playerName: newAccount.name,
+                    playerId: newAccount.id
+                })
+
+                const binders = await Binder.findAll({
+                    where: {
+                        playerId: 'HQ3ws4iAr7kEfo7KPs6886'
+                    }
+                })
+
+                for (let i = 0; i < binders.length; i++) {
+                    const binder = binders[i]
+                    await binder.update({
+                        playerName: newAccount.name,
+                        playerId: newAccount.id
+                    })
+                }
+
+                const daily = await Daily.findOne({
+                    where: {
+                        playerId: 'HQ3ws4iAr7kEfo7KPs6886'
+                    }
+                })
+
+                await daily.update({
+                    playerName: newAccount.name,
+                    playerId: newAccount.id
+                })
+
+                const senderTrades = await Trade.findAll({
+                    where: {
+                        senderId: 'HQ3ws4iAr7kEfo7KPs6886'
+                    }
+                })
+
+                
 
                 // await awardPromosToShop()
                 await interaction.editReply('🧪')

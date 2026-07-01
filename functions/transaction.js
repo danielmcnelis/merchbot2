@@ -319,7 +319,7 @@ export const getSellerConfirmation = async (interaction, buyer, seller, quantity
 
             const newMarketPrice = calculateNewMarketPrice(quantity, price, print)
             await print.update({ marketPrice: newMarketPrice })
-            const description = `${buyer.name} bought ${quantity} ${card} from ${seller.name}> for ${price}${stardust}.`
+            const description = `${buyer.name} bought ${quantity} ${card} from ${seller.name} for ${price}${stardust}.`
 
             const newTransaction = await Transaction.create({
                 playerAName: seller.name,
@@ -417,7 +417,7 @@ export const getBuyerConfirmation = async (interaction, buyer, seller, quantity,
             const newMarketPrice = calculateNewMarketPrice(quantity, price, print)
             await print.update({ marketPrice: newMarketPrice })
 
-            const description = `${buyer.name} bought ${quantity} ${card} from ${seller.name}> for ${price}${stardust}.`
+            const description = `${buyer.name} bought ${quantity} ${card} from ${seller.name} for ${price}${stardust}.`
 
             const newTransaction = await Transaction.create({
                 playerAName: seller.name,

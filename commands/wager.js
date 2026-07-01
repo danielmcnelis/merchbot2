@@ -77,7 +77,7 @@ export default {
                         matrix.fill(4, 3591, 3599)
                         matrix.fill(5, 3599, 3600)
     
-                    for (let i = 0; i < (x / 2); i++) {
+                    for (let i = 0; i < x; i++) {
                         const sample = getRandomElement(matrix)
                         if (sample > best) best = sample
                     }

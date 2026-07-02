@@ -5,7 +5,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 // import { client } from '../client'
 // import { s3FileExists } from '@fl/bot-functions'
 // import { Match, Tournament, Server, TriviaQuestion } from '@fl/models'
-import { ArenaProfile, Binder, Card, ForgedInventory, Wishlist, Pairing, Player, ForgedPrint, ForgedSet, ArenaEntry, Match, Trade, Transaction } from '../database/index.js'
+import { ArenaProfile, Binder, Card, Daily, ForgedInventory, Wallet, Wishlist, Pairing, Player, ForgedPrint, ForgedSet, ArenaEntry, Match, Trade, Transaction } from '../database/index.js'
 import { Op } from 'sequelize'
 import {isProgrammer, getRandomElement} from '../functions/utility.js'
 import {applyPriceDecay} from '../functions/shop.js'
@@ -211,9 +211,15 @@ export default {
                     }
                 })
 
+                const oldAccount = await Player.findOne({
+                    where: {
+                        id: 'HQ3ws4iAr7kEfo7KPs6886'
+                    }
+                })
+
                 const invs = await ForgedInventory.findAll({
                     where: {
-                        playerId: 'HQ3ws4iAr7kEfo7KPs6886'
+                        playerId: oldAccount.id
                     }
                 })
 
@@ -227,7 +233,7 @@ export default {
 
                 const arenaProfile = await ArenaProfile.findOne({
                     where: {
-                        playerId: 'HQ3ws4iAr7kEfo7KPs6886'
+                        playerId: oldAccount.id
                     }
                 })
 
@@ -238,7 +244,7 @@ export default {
 
                 const binders = await Binder.findAll({
                     where: {
-                        playerId: 'HQ3ws4iAr7kEfo7KPs6886'
+                        playerId: oldAccount.id
                     }
                 })
 
@@ -252,7 +258,7 @@ export default {
 
                 const daily = await Daily.findOne({
                     where: {
-                        playerId: 'HQ3ws4iAr7kEfo7KPs6886'
+                        playerId: oldAccount.id
                     }
                 })
 
@@ -263,12 +269,85 @@ export default {
 
                 const senderTrades = await Trade.findAll({
                     where: {
-                        senderId: 'HQ3ws4iAr7kEfo7KPs6886'
+                        senderId: oldAccount.id
                     }
                 })
 
-                
+                for (let i = 0; i < senderTrades.length; i++) {
+                    const senderTrade = senderTrades[i]
+                    await senderTrade.update({
+                        senderName: newAccount.name,
+                        senderId: newAccount.id
+                    })
+                }
 
+                const recipientTrades = await Trade.findAll({
+                    where: {
+                        recipientId: oldAccount.id
+                    }
+                })
+
+                for (let i = 0; i < recipientTrades.length; i++) {
+                    const recipientTrade = recipientTrades[i]
+                    await recipientTrade.update({
+                        recipientName: newAccount.name,
+                        recipientId: newAccount.id
+                    })
+                }
+                
+                const playerATransactions = await Transaction.findAll({
+                    where: {
+                        playerAId: oldAccount.id
+                    }
+                })
+
+                for (let i = 0; i < playerATransactions.length; i++) {
+                    const playerATransaction = playerATransactions[i]
+                    await playerATransaction.update({
+                        playerAName: newAccount.name,
+                        playerAId: newAccount.id
+                    })
+                }
+
+                const playerBTransactions = await Transaction.findAll({
+                    where: {
+                        playerBId: oldAccount.id
+                    }
+                })
+
+                for (let i = 0; i < playerBTransactions.length; i++) {
+                    const playerBTransaction = playerBTransactions[i]
+                    await playerBTransaction.update({
+                        playerBName: newAccount.name,
+                        playerBId: newAccount.id
+                    })
+                }
+
+                const wallet = await Wallet.findOne({
+                    where: {
+                        playerId: oldAccount.id
+                    }
+                })
+
+                await wallet.update({
+                    playerName: newAccount.name,
+                    playerId: newAccount.id
+                })
+
+                const wishlists = await Wishlist.findAll({
+                    where: {
+                        playerId: oldAccount.id
+                    }
+                })
+
+                for (let i = 0; i < wishlists.length; i++) {
+                    const wishlist = wishlists[i]
+                    await wishlist.update({
+                        playerName: newAccount.name,
+                        playerId: newAccount.id
+                    })
+                }
+        
                 // await awardPromosToShop()
                 await interaction.editReply('🧪')
             }

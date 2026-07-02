@@ -207,13 +207,13 @@ export default {
 
                 const newAccount = await Player.findOne({
                     where: {
-                        discordId: '1521762752815824979'
+                        id: 'HQ3ws4iAr7kEfo7KPs6886'
                     }
                 })
 
                 const oldAccount = await Player.findOne({
                     where: {
-                        id: 'HQ3ws4iAr7kEfo7KPs6886'
+                        discordId: '1521762752815824979'
                     }
                 })
 

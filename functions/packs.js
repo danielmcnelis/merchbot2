@@ -341,7 +341,7 @@ export const awardPromosToShop = async () => {
     if (!botSpamChannel) return console.log('Could not find #bot-spam channel.')
     const promos = await ForgedPrint.findAll({
         where: {
-            forgedSletCode: {[Op.or]: ['CT1', 'CT2']}
+            forgedSetCode: {[Op.or]: ['CT1', 'CT2']}
         }
     })
 
@@ -367,7 +367,7 @@ export const awardPromosToShop = async () => {
                 cardCode: promo.cardCode,
                 cardName: promo.cardName,
                 forgedPrintId: promo.id,
-                quantity: 1
+                quantity: 3
             })
         }
 

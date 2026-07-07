@@ -205,150 +205,150 @@ export default {
                 //     await pairing.update({ serverId: '1488566624536494364' })
                 // }
 
-                const newAccount = await Player.findOne({
-                    where: {
-                        id: 'HQ3ws4iAr7kEfo7KPs6886'
-                    }
-                })
+                // const newAccount = await Player.findOne({
+                //     where: {
+                //         id: 'HQ3ws4iAr7kEfo7KPs6886'
+                //     }
+                // })
 
-                const oldAccount = await Player.findOne({
-                    where: {
-                        discordId: '1521762752815824979'
-                    }
-                })
+                // const oldAccount = await Player.findOne({
+                //     where: {
+                //         discordId: '1521762752815824979'
+                //     }
+                // })
 
-                const invs = await ForgedInventory.findAll({
-                    where: {
-                        playerId: oldAccount.id
-                    }
-                })
+                // const invs = await ForgedInventory.findAll({
+                //     where: {
+                //         playerId: oldAccount.id
+                //     }
+                // })
 
-                for (let i = 0; i < invs.length; i++) {
-                    const inv = invs[i]
-                    await inv.update({
-                        playerName: newAccount.name,
-                        playerId: newAccount.id
-                    })
-                }
+                // for (let i = 0; i < invs.length; i++) {
+                //     const inv = invs[i]
+                //     await inv.update({
+                //         playerName: newAccount.name,
+                //         playerId: newAccount.id
+                //     })
+                // }
 
-                const arenaProfile = await ArenaProfile.findOne({
-                    where: {
-                        playerId: oldAccount.id
-                    }
-                })
+                // const arenaProfile = await ArenaProfile.findOne({
+                //     where: {
+                //         playerId: oldAccount.id
+                //     }
+                // })
 
-                await arenaProfile.update({
-                    playerName: newAccount.name,
-                    playerId: newAccount.id
-                })
+                // await arenaProfile.update({
+                //     playerName: newAccount.name,
+                //     playerId: newAccount.id
+                // })
 
-                const binders = await Binder.findAll({
-                    where: {
-                        playerId: oldAccount.id
-                    }
-                })
+                // const binders = await Binder.findAll({
+                //     where: {
+                //         playerId: oldAccount.id
+                //     }
+                // })
 
-                for (let i = 0; i < binders.length; i++) {
-                    const binder = binders[i]
-                    await binder.update({
-                        playerName: newAccount.name,
-                        playerId: newAccount.id
-                    })
-                }
+                // for (let i = 0; i < binders.length; i++) {
+                //     const binder = binders[i]
+                //     await binder.update({
+                //         playerName: newAccount.name,
+                //         playerId: newAccount.id
+                //     })
+                // }
 
-                const daily = await Daily.findOne({
-                    where: {
-                        playerId: oldAccount.id
-                    }
-                })
+                // const daily = await Daily.findOne({
+                //     where: {
+                //         playerId: oldAccount.id
+                //     }
+                // })
 
-                await daily.update({
-                    playerName: newAccount.name,
-                    playerId: newAccount.id
-                })
+                // await daily.update({
+                //     playerName: newAccount.name,
+                //     playerId: newAccount.id
+                // })
 
-                const senderTrades = await Trade.findAll({
-                    where: {
-                        senderId: oldAccount.id
-                    }
-                })
+                // const senderTrades = await Trade.findAll({
+                //     where: {
+                //         senderId: oldAccount.id
+                //     }
+                // })
 
-                for (let i = 0; i < senderTrades.length; i++) {
-                    const senderTrade = senderTrades[i]
-                    await senderTrade.update({
-                        senderName: newAccount.name,
-                        senderId: newAccount.id
-                    })
-                }
+                // for (let i = 0; i < senderTrades.length; i++) {
+                //     const senderTrade = senderTrades[i]
+                //     await senderTrade.update({
+                //         senderName: newAccount.name,
+                //         senderId: newAccount.id
+                //     })
+                // }
 
-                const recipientTrades = await Trade.findAll({
-                    where: {
-                        recipientId: oldAccount.id
-                    }
-                })
+                // const recipientTrades = await Trade.findAll({
+                //     where: {
+                //         recipientId: oldAccount.id
+                //     }
+                // })
 
-                for (let i = 0; i < recipientTrades.length; i++) {
-                    const recipientTrade = recipientTrades[i]
-                    await recipientTrade.update({
-                        recipientName: newAccount.name,
-                        recipientId: newAccount.id
-                    })
-                }
+                // for (let i = 0; i < recipientTrades.length; i++) {
+                //     const recipientTrade = recipientTrades[i]
+                //     await recipientTrade.update({
+                //         recipientName: newAccount.name,
+                //         recipientId: newAccount.id
+                //     })
+                // }
                 
-                const playerATransactions = await Transaction.findAll({
-                    where: {
-                        playerAId: oldAccount.id
-                    }
-                })
+                // const playerATransactions = await Transaction.findAll({
+                //     where: {
+                //         playerAId: oldAccount.id
+                //     }
+                // })
 
-                for (let i = 0; i < playerATransactions.length; i++) {
-                    const playerATransaction = playerATransactions[i]
-                    await playerATransaction.update({
-                        playerAName: newAccount.name,
-                        playerAId: newAccount.id
-                    })
-                }
+                // for (let i = 0; i < playerATransactions.length; i++) {
+                //     const playerATransaction = playerATransactions[i]
+                //     await playerATransaction.update({
+                //         playerAName: newAccount.name,
+                //         playerAId: newAccount.id
+                //     })
+                // }
 
-                const playerBTransactions = await Transaction.findAll({
-                    where: {
-                        playerBId: oldAccount.id
-                    }
-                })
+                // const playerBTransactions = await Transaction.findAll({
+                //     where: {
+                //         playerBId: oldAccount.id
+                //     }
+                // })
 
-                for (let i = 0; i < playerBTransactions.length; i++) {
-                    const playerBTransaction = playerBTransactions[i]
-                    await playerBTransaction.update({
-                        playerBName: newAccount.name,
-                        playerBId: newAccount.id
-                    })
-                }
+                // for (let i = 0; i < playerBTransactions.length; i++) {
+                //     const playerBTransaction = playerBTransactions[i]
+                //     await playerBTransaction.update({
+                //         playerBName: newAccount.name,
+                //         playerBId: newAccount.id
+                //     })
+                // }
 
-                const wallet = await Wallet.findOne({
-                    where: {
-                        playerId: oldAccount.id
-                    }
-                })
+                // const wallet = await Wallet.findOne({
+                //     where: {
+                //         playerId: oldAccount.id
+                //     }
+                // })
 
-                await wallet.update({
-                    playerName: newAccount.name,
-                    playerId: newAccount.id
-                })
+                // await wallet.update({
+                //     playerName: newAccount.name,
+                //     playerId: newAccount.id
+                // })
 
-                const wishlists = await Wishlist.findAll({
-                    where: {
-                        playerId: oldAccount.id
-                    }
-                })
+                // const wishlists = await Wishlist.findAll({
+                //     where: {
+                //         playerId: oldAccount.id
+                //     }
+                // })
 
-                for (let i = 0; i < wishlists.length; i++) {
-                    const wishlist = wishlists[i]
-                    await wishlist.update({
-                        playerName: newAccount.name,
-                        playerId: newAccount.id
-                    })
-                }
+                // for (let i = 0; i < wishlists.length; i++) {
+                //     const wishlist = wishlists[i]
+                //     await wishlist.update({
+                //         playerName: newAccount.name,
+                //         playerId: newAccount.id
+                //     })
+                // }
         
-                // await awardPromosToShop()
+                await awardPromosToShop()
                 await interaction.editReply('🧪')
             }
         } catch (err) {

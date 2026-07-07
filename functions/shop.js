@@ -358,7 +358,7 @@ export const restock = async () => {
     // const mini_count = Math.ceil(weightedCount * 3 / 32)
     await awardPacksToShop(core_count, true)
     // await awardPacksToShop(mini_count, false)
-    // await awardPromosToShop()
+    await awardPromosToShop()
     return postBids()
 }
 

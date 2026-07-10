@@ -155,7 +155,7 @@ export default {
                         //     await awardBox(interaction.channel, interaction.member, coc)
                         //     return await daily.update({ isProcessing: false })
                         // } else {
-                            await awardPacks(interaction.channel, interaction.member, wcr, num)
+                            await awardPacks(interaction.channel, interaction.member, WCR, MYA, num)
                             return await daily.update({ isProcessing: false })
                         // }
                     }, 4000)

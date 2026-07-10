@@ -5,7 +5,7 @@ import { Op } from 'sequelize'
 import { drawPack } from '../functions/packs.js'
 import { drawCardImage, getRandomElement, getRandomSubset } from '../functions/utility.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { AOD, COC, CTP, FON, LDM, WCR, com, rar, sup, ult, scr, starchips, stardust } = emojis
+const { AOD, COC, CTP, FON, LDM, WCR, MYA, com, rar, sup, ult, scr, starchips, stardust } = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -90,8 +90,8 @@ export default {
                     merchbotWallet.stardust += 750
                     await merchbotWallet.save()
 
-                    const set1Code = seriesNumber === 2 ? 'LDM' : 'LDM'
-                    const set2Code = seriesNumber === 2 ? 'WCR' : 'WCR'
+                    const set1Code = seriesNumber === 2 ? 'WCR' : 'LDM'
+                    const set2Code = seriesNumber === 2 ? 'MYA' : 'WCR'
 
                     const set1 = await ForgedSet.findOne({
                         where: {

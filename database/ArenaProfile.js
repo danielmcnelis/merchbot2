@@ -21,7 +21,15 @@ export const ArenaProfile = db.define('arenaProfiles', {
         type: Sequelize.INTEGER,
         defaultValue: 0
     },
+    cyberDragonWins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
     destinyWins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
+    dinosaurWins: {
         type: Sequelize.INTEGER,
         defaultValue: 0
     },
@@ -34,6 +42,10 @@ export const ArenaProfile = db.define('arenaProfiles', {
         defaultValue: 0
     },
     fiendWins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
+    fishWins: {
         type: Sequelize.INTEGER,
         defaultValue: 0
     },
@@ -61,6 +73,10 @@ export const ArenaProfile = db.define('arenaProfiles', {
         type: Sequelize.INTEGER,
         defaultValue: 0
     },
+    paleozoicWins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
     plantWins: {
         type: Sequelize.INTEGER,
         defaultValue: 0
@@ -77,7 +93,15 @@ export const ArenaProfile = db.define('arenaProfiles', {
         type: Sequelize.INTEGER,
         defaultValue: 0
     },
+    shaddollWins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
     spellcasterWins: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
+    spiritWins: {
         type: Sequelize.INTEGER,
         defaultValue: 0
     },

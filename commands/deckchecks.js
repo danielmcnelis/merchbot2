@@ -6,7 +6,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, S
 // import { client } from '../client'
 // import { s3FileExists } from '@fl/bot-functions'
 // import { Match, Tournament, Server, TriviaQuestion } from '@fl/models'
-import { ArenaProfile, Binder, Card, Entry, ForgedInventory, ForgedPrint, Player, Status, Tournament, Wishlist } from '../database/index.js'
+import { ArenaProfile, Artwork, Binder, Card, Entry, ForgedInventory, ForgedPrint, Player, Status, Tournament, Wishlist } from '../database/index.js'
 import { Op } from 'sequelize'
 import {isProgrammer} from '../functions/utility.js'
 import {applyPriceDecay} from '../functions/shop.js'
@@ -43,8 +43,21 @@ export const getForgedIssues = async (player, deckArr) => {
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i]
         let konamiCode = keys[i]
-        while (konamiCode.length < 8) konamiCode = '0' + konamiCode 
-        const card = await Card.findOne({ where: { [Op.or]: { konamiCode: konamiCode, ypdId: konamiCode } } })
+        konamiCode = konamiCode.replace(/^0+/, '')
+        const artwork = await Artwork.findOne({
+            where: {
+                artworkId: konamiCode
+            }
+        })
+
+        const card = await Card.findOne({ 
+            where: { 
+                id: artwork?.cardId
+            }
+        })
+        
+        // while (konamiCode.length < 8) konamiCode = '0' + konamiCode 
+        // const card = await Card.findOne({ where: { [Op.or]: { konamiCode: konamiCode, ypdId: konamiCode } } })
 
         totalQuantities[card.name] = deck[key]
 

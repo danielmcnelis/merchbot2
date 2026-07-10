@@ -1,22 +1,22 @@
 {
     "decks": {
-        "blackwing": {
-            "url":"https://www.duelingbook.com/deck?id=20073935"
+        "cyberDragon": {
+            "url":"https://www.duelingbook.com/deck?id=20412465"
         },
-        "dragon": {
-            "url":"https://www.duelingbook.com/deck?id=20073957"
+        "dinosaur": {
+            "url":"https://www.duelingbook.com/deck?id=20412464"
         },
-        "frog": {
-            "url":"https://www.duelingbook.com/deck?id=20302555"
+        "fish": {
+            "url":"https://www.duelingbook.com/deck?id=20412461"
         },
-        "hero": {
-            "url":"https://www.duelingbook.com/deck?id=20302572"
+        "paleozoic": {
+            "url":"https://www.duelingbook.com/deck?id=20412463"
         },
-        "insect": {
-            "url":"https://www.duelingbook.com/deck?id=20073936"
+        "shaddoll": {
+            "url":"https://www.duelingbook.com/deck?id=20412460"
         },
-        "plant": {
-            "url":"https://www.duelingbook.com/deck?id=20073939"
+        "spirit": {
+            "url":"https://www.duelingbook.com/deck?id=20412458"
         }
     },
     "vouchers": {
@@ -31,7 +31,13 @@
         "frog":"lotuses",
         "hero":"capes",
         "insect":"nets",
-        "plant":"roses"
+        "plant":"roses",
+        "cyberDragon":"",
+        "dinosaur":"",
+        "fish":"",
+        "paleozoic":"",
+        "shaddoll":"",
+        "spirit":""
     },
     "barters": {
         "APC-001":"orbs", 
@@ -45,7 +51,13 @@
         "APC-009":"feathers",
         "APC-010":"lotuses",
         "APC-011":"gems",
-        "APC-012":"capes"
+        "APC-012":"capes",
+        "APC-013":"",
+        "APC-014":"",
+        "APC-015":"",
+        "APC-016":"",
+        "APC-017":"",
+        "APC-018":""
     },
     "prizes": {
         "destiny":"APC-002",
@@ -59,12 +71,19 @@
         "frog":"APC-010",
         "hero":"APC-012",
         "insect":"APC-007",
-        "plant":"APC-008"
+        "plant":"APC-008",
+        "cyberDragon":"",
+        "dinosaur":"",
+        "fish":"",
+        "paleozoic":"",
+        "shaddoll":"",
+        "spirit":""
     },
     "victories": {
         "aqua":"Today, you drowned your foes with the bubbles of an octopus!",
         "beast":"Today, you attacked your foes with the ferocity of a tiger!",
         "blackwing":"Today, you dive-bombed your foes with the swiftness of a falcon!",
+        "cyberDragon":"Today, you blasted your foes with the intensity of a laser!",
         "destiny":"Today, you vanquished your foes with the heart of a hero!",
         "dinosaur":"Today, you flattened your foes with the weight of a sauropod!",
         "dragon":"Today, you scorched your foes with the flames of legends!",
@@ -77,11 +96,14 @@
         "insect":"Today, you stabbed your foes with the horns of a beetle!",
         "machine":"Today, you hammered your foes with the strength of an alloy!",
         "monarch":"Today, you ruled your foes with the divine right of an emperor!",
+        "paleozoic":"Today, you overwhelmed your foes with the adaptation of an ancient organism!",
         "plant":"Today, you astonished your foes with the beauty of a princess!",
         "pyro":"Today, you burned your foes with the heat of a blaze!",
         "reptile":"Today, you paralyzed your foes with the venom of a cobra!",
         "rock":"Today, you rolled over your foes with the ease of a boulder!",
+        "shaddoll":"Today, you controlled your foes with the skill of a master puppeteer!",
         "spellcaster":"Today, you manipulated your foes with the trickery of a sorcerer!",
+        "spirit":"Today, you bedevilled your foes with the presence of a kami!",
         "thunder":"Today, you shocked your foes with the voltage of a dynamo!",
         "warrior":"Today, you conquered your foes with the heart of a champion!",
         "zombie":"Today, you haunted your foes with the menace of a specter!"
@@ -98,7 +120,13 @@
         "frog":"<:ult:1489275472469692596>APC-010 - Substitoad",
         "hero":"<:ult:1489275472469692596>APC-012 - Miracle Fusion",
         "insect":"<:ult:1489275472469692596>APC-007 - Asset Mountis",
-        "plant":"<:ult:1489275472469692596>APC-008 - Baobaboon"
+        "plant":"<:ult:1489275472469692596>APC-008 - Baobaboon",
+        "cyberDragon":"",
+        "dinosaur":"",
+        "fish":"",
+        "paleozoic":"",
+        "shaddoll":"",
+        "spirit":""
     },
     "verbs": [
         "absolutely deserved",

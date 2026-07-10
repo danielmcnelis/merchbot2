@@ -11,6 +11,7 @@ export default {
     async execute(interaction) {
         try {
             if (interaction.channel.name !== 'arena') return await interaction.reply({ content: `Try using **/decks** in channels like: <#1378129840691220631>.`})
+            return interaction.reply({ content: `The Arena is closed.`})
             const deckUrls = Object.entries(decks).map((e) => `${capitalize(e[0])} - <${e[1].url}>`)            
             return await interaction.reply({ content: `The Arena Decks:\n` + deckUrls.join('\n').toString() })
         } catch (err) {

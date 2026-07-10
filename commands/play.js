@@ -46,8 +46,8 @@ export default {
             const days = daysSince(previousDate)
             let starchips = 240 + (30 * (days))
             if (starchips > 600) starchips = 600
-            let stardust = 10000 + (500 * (days))
-            if (stardust > 20000) stardust = 20000
+            let stardust = 30000 + (800 * (days))
+            if (stardust > 50000) stardust = 50000
             await Wallet.create({ playerId: player.id, playerName: player.name, starchips, stardust })
 
             const set = await ForgedSet.findOne({ where: { code: 'WCR' }})

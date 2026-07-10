@@ -7,7 +7,7 @@ import { Op } from 'sequelize'
 import commands from '../static/commands.json' with { type: 'json' }
 const { nocom, yescom } = commands
 import emojis from '../static/emojis.json' with { type: "json" } 
-const { AOD, COC, CTP, FON, LDM, WCR, falling, rising, forgestone, gem, orb, swords, beast, blue, bronze, DRT, fiend, thunder, zombie, skull, familiar, battery, cactus, cavebob, checkmark, closed, com, credits, cultured, diamond, dinosaur, DOC, LPK, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, open, ORF, TEB, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, dimmadome, stonks, sup, tix, ult, wokefrog, yellow, yes, ygocard } = emojis
+const { AOD, COC, CTP, FON, LDM, WCR, MYA, falling, rising, forgestone, gem, orb, swords, beast, blue, bronze, DRT, fiend, thunder, zombie, skull, familiar, battery, cactus, cavebob, checkmark, closed, com, credits, cultured, diamond, dinosaur, DOC, LPK, egg, emptybox, evil, FiC, fire, fish, god, gold, hook, koolaid, leatherbound, legend, lmfao, mad, master, merchant, milleye, moai, mushroom, no, open, ORF, TEB, warrior, spellcaster, dragon, plant, platinum, rar, red, reptile, rock, rocks, rose, sad, scr, silver, soldier, starchips, stardust, stare, dimmadome, stonks, sup, tix, ult, wokefrog, yellow, yes, ygocard } = emojis
 import { awardPacksToShop, awardPromosToShop } from './packs.js'
 // const adminId = '194147938786738176'
 import { client } from '../static/clients.js'
@@ -320,7 +320,7 @@ export const processBids = async () => {
 
 // RESTOCK
 export const restock = async () => {
-	const allSetsForSale = await ForgedSet.findAll({ where: { forSale: true }, order: [['createdAt', 'DESC']]})
+	const allSetsForSale = await ForgedSet.findAll({ where: { forSale: true, currency: 'starchips' }, order: [['createdAt', 'DESC']]})
 
 	let weightedCount = 0
     let most_recent = false
@@ -329,24 +329,12 @@ export const restock = async () => {
 		const set = allSetsForSale[i]
 		if (set.type === 'core') {
             if (!most_recent) most_recent = 'core'
-			if (set.currency === 'starchips') {
-				weightedCount += set.unitSales
-			} else {
-				weightedCount += (set.unitSales / 2)
-			}
+			weightedCount += set.unitSales
 		} else if (set.type === 'starter_deck') {
-			if (set.currency === 'starchips') {
-				weightedCount += (set.unitSales * 5)
-			} else {
-				weightedCount += (set.unitSales * 5 / 2)
-			}
+			weightedCount += (set.unitSales * 5)
 		} else if (set.type === 'mini') {
             if (!most_recent) most_recent = 'mini'
-			if (set.currency === 'starchips') {
-				weightedCount += (set.unitSales * 2 / 3)
-			} else {
-				weightedCount += (set.unitSales / 3)
-			}
+			weightedCount += (set.unitSales * 2 / 3)
 		}
 
         set.unitSales = 0

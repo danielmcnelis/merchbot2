@@ -42,7 +42,7 @@ export default {
                 return daysDifference
             }
               
-            const previousDate = new Date('2026-06-15 00:01:00+00')
+            const previousDate = new Date('2026-07-10 00:01:00+00')
             const days = daysSince(previousDate)
             let starchips = 240 + (30 * (days))
             if (starchips > 600) starchips = 600
@@ -50,7 +50,7 @@ export default {
             if (stardust > 50000) stardust = 50000
             await Wallet.create({ playerId: player.id, playerName: player.name, starchips, stardust })
 
-            const set = await ForgedSet.findOne({ where: { code: 'WCR' }})
+            const set = await ForgedSet.findOne({ where: { code: 'MYA' }})
             // await interaction.editReply({ content: `${player.name} began the game! Please check your DMs for your first 12 packs, then use the command **/inventory** to view your inventory! Also, make sure to read <#1488566625690194075> and check out your **/wallet**!` })
             await interaction.editReply({ content: `${player.name} began the game! ${koolaid} Please check your DMs for your first 8 packs and a YDK file of your starting inventory! ${blue} Also, make sure to read <#1488566625690194075> ${cavebob} and check out your **/wallet**! ${scheming}` })
             await awardFirstEightPacks(interaction.channel, interaction.member, set)

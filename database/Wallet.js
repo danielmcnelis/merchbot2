@@ -120,5 +120,35 @@ export const Wallet = db.define('wallets', {
         type: Sequelize.INTEGER,  
         defaultValue: 0,           
         allowNull: false
+    },
+    magnets: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
+    eggs: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
+    hooks: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
+    fossils: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
+    threads: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
+    },
+    tomoe: {
+        type: Sequelize.INTEGER,  
+        defaultValue: 0,           
+        allowNull: false
     }
 })

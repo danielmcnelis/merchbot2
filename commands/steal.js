@@ -4,7 +4,7 @@ import { ForgedInventory, ForgedPrint, Player, Wallet } from '../database/index.
 import { Op } from 'sequelize'
 import { isMod } from '../functions/utility.js'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const {com, rar, sup, ult, scr, stardust, starchips, amulets, bolts, cacti, crowns, orbs, sandals, robbed, feathers, gems, lotuses, capes, nets, roses} = emojis
+const {com, rar, sup, ult, scr, stardust, starchips, amulets, bolts, cacti, crowns, orbs, sandals, robbed, feathers, gems, lotuses, capes, nets, roses, eggs, fossils, hooks, magnets, threads, tomoe } = emojis
 
 export default {
 	data: new SlashCommandBuilder()
@@ -73,16 +73,32 @@ export default {
                     prints.push('Crowns')
                 }
 
+                if ('eggs'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Eggs')
+                }
+
                 if ('feathers'.includes(focusedValue.toLowerCase())) {
                     prints.push('Feathers')
+                }
+
+                if ('fossils'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Fossils')
                 }
 
                 if ('gems'.includes(focusedValue.toLowerCase())) {
                     prints.push('Gems')
                 }
 
+                if ('hooks'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Hooks')
+                }
+
                 if ('lotuses'.includes(focusedValue.toLowerCase())) {
                     prints.push('Lotuses')
+                }
+
+                if ('magnets'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Magnets')
                 }
 
                 if ('nets'.includes(focusedValue.toLowerCase())) {
@@ -99,6 +115,14 @@ export default {
 
                 if ('sandals'.includes(focusedValue.toLowerCase())) {
                     prints.push('Sandals')
+                }
+
+                if ('threads'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Threads')
+                }
+
+                if ('tomoe'.includes(focusedValue.toLowerCase())) {
+                    prints.push('Tomoe')
                 }
 
                 await interaction.respond(

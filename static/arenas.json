@@ -1,6 +1,6 @@
 {
     "decks": {
-        "cyberDragon": {
+        "cydra": {
             "url":"https://www.duelingbook.com/deck?id=20412465"
         },
         "dinosaur": {
@@ -32,12 +32,12 @@
         "hero":"capes",
         "insect":"nets",
         "plant":"roses",
-        "cyberDragon":"",
-        "dinosaur":"",
-        "fish":"",
-        "paleozoic":"",
-        "shaddoll":"",
-        "spirit":""
+        "cydra":"magnets",
+        "dinosaur":"eggs",
+        "fish":"hooks",
+        "paleozoic":"fossils",
+        "shaddoll":"threads",
+        "spirit":"tomoe"
     },
     "barters": {
         "APC-001":"orbs", 
@@ -52,12 +52,12 @@
         "APC-010":"lotuses",
         "APC-011":"gems",
         "APC-012":"capes",
-        "APC-013":"",
-        "APC-014":"",
-        "APC-015":"",
-        "APC-016":"",
-        "APC-017":"",
-        "APC-018":""
+        "APC-013":"hooks",
+        "APC-014":"tomoe",
+        "APC-015":"eggs",
+        "APC-016":"threads",
+        "APC-017":"magnets",
+        "APC-018":"fossils"
     },
     "prizes": {
         "destiny":"APC-002",
@@ -72,18 +72,18 @@
         "hero":"APC-012",
         "insect":"APC-007",
         "plant":"APC-008",
-        "cyberDragon":"",
-        "dinosaur":"",
-        "fish":"",
-        "paleozoic":"",
-        "shaddoll":"",
-        "spirit":""
+        "cydra":"APC-017",
+        "dinosaur":"APC-015",
+        "fish":"APC-013",
+        "paleozoic":"APC-018",
+        "shaddoll":"APC-016",
+        "spirit":"APC-014"
     },
     "victories": {
         "aqua":"Today, you drowned your foes with the bubbles of an octopus!",
         "beast":"Today, you attacked your foes with the ferocity of a tiger!",
         "blackwing":"Today, you dive-bombed your foes with the swiftness of a falcon!",
-        "cyberDragon":"Today, you blasted your foes with the intensity of a laser!",
+        "cydra":"Today, you blasted your foes with the intensity of a laser!",
         "destiny":"Today, you vanquished your foes with the heart of a hero!",
         "dinosaur":"Today, you flattened your foes with the weight of a sauropod!",
         "dragon":"Today, you scorched your foes with the flames of legends!",
@@ -121,12 +121,12 @@
         "hero":"<:ult:1489275472469692596>APC-012 - Miracle Fusion",
         "insect":"<:ult:1489275472469692596>APC-007 - Asset Mountis",
         "plant":"<:ult:1489275472469692596>APC-008 - Baobaboon",
-        "cyberDragon":"",
-        "dinosaur":"",
-        "fish":"",
-        "paleozoic":"",
-        "shaddoll":"",
-        "spirit":""
+        "cydra":"<:ult:1489275472469692596>APC-017 - Cyber Dragon Nova",
+        "dinosaur":"<:ult:1489275472469692596>APC-015 Souleating Oviraptor",
+        "fish":"<:ult:1489275472469692596>APC-013 - Beautunaful Princess",
+        "paleozoic":"<:ult:1489275472469692596>APC-018 Paleozoic Opabinia",
+        "shaddoll":"<:ult:1489275472469692596>APC-016 - El Shaddoll Winda",
+        "spirit":"<:ult:1489275472469692596>APC-014 - Nikitama"
     },
     "verbs": [
         "absolutely deserved",

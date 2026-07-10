@@ -6,7 +6,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
 import roles from '../static/roles.json' with { type: 'json' }
 const { arenaRole } = roles
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { gladiators, foxy, shrine, cavebob, AOD, COC, CTP, FON, LDM, WCR, MYA, king, arena, aqua, beast, destiny, fairy, fiend, flip, machine, monarch, pyro, reptile, rock, spellcaster, warrior, zombie, starchips, ult, mushrooms, bolts, orbs, shields, skulls, droplets, firecrackers, moais, beads, familiars, amulets, sandals, crowns, cacti, blackwing, feathers, dragon, gems, frog, lotuses, hero, capes, insect, nets, plant, roses } = emojis
+const { gladiators, foxy, shrine, cavebob, AOD, COC, CTP, FON, LDM, WCR, MYA, king, arena, aqua, beast, destiny, fairy, fiend, flip, machine, monarch, pyro, reptile, rock, spellcaster, warrior, zombie, starchips, ult, mushrooms, bolts, orbs, shields, skulls, droplets, firecrackers, moais, beads, familiars, amulets, sandals, crowns, cacti, blackwing, feathers, dragon, gems, frog, lotuses, hero, capes, insect, nets, plant, roses, cydra, magnets, dinosaur, eggs, fish, hooks, paleozoic, fossils, shaddoll, threads, spirit, tomoe } = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { arenaChannelId } = channels
 import arenas from '../static/arenas.json' with { type: 'json' }
@@ -181,39 +181,39 @@ export const getArenaConfirmation = async (arenaEntry, contestant) => {
 
     const row1 = new ActionRowBuilder()
             .addComponents(new ButtonBuilder()
-                .setCustomId(`Arena-${timestamp}-Blackwing`)
-                .setLabel('Blackwing')
+                .setCustomId(`Arena-${timestamp}-Cydra`)
+                .setLabel('Cyber Dragon')
                 .setStyle(ButtonStyle.Primary)
             )
 
             .addComponents(new ButtonBuilder()
-                .setCustomId(`Arena-${timestamp}-Dragon`)
-                .setLabel('Dragon')
+                .setCustomId(`Arena-${timestamp}-Dinosaur`)
+                .setLabel('Dinosaur')
                 .setStyle(ButtonStyle.Primary)
             )
             
             .addComponents(new ButtonBuilder()
-                .setCustomId(`Arena-${timestamp}-Frog`)
-                .setLabel('Frog')
+                .setCustomId(`Arena-${timestamp}-Fish`)
+                .setLabel('Fish')
                 .setStyle(ButtonStyle.Primary)
             )
             
             .addComponents(new ButtonBuilder()
-                .setCustomId(`Arena-${timestamp}-HERO`)
-                .setLabel('HERO')
+                .setCustomId(`Arena-${timestamp}-Paleozoic`)
+                .setLabel('Paleozoic')
                 .setStyle(ButtonStyle.Primary)
             )
 
             .addComponents(new ButtonBuilder()
-                .setCustomId(`Arena-${timestamp}-Insect`)
-                .setLabel('Insect')
+                .setCustomId(`Arena-${timestamp}-Shaddoll`)
+                .setLabel('Shaddoll')
                 .setStyle(ButtonStyle.Primary)
             )
            
     const row2 = new ActionRowBuilder() 
             .addComponents(new ButtonBuilder()
-                .setCustomId(`Arena-${timestamp}-Plant`)
-                .setLabel('Plant')
+                .setCustomId(`Arena-${timestamp}-Spirit`)
+                .setLabel('Spirit')
                 .setStyle(ButtonStyle.Primary)
             )
 

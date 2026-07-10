@@ -40,16 +40,16 @@ export default {
 
             const set = await ForgedSet.findOne({ 
                 where: { 
-                    code: 'WCR',
+                    code: 'MYA',
                     type: 'core',
                     forSale: true
                 },
                 order: [['createdAt', 'DESC']]
             })
 
-            const wcr = await ForgedSet.findOne({ 
+            const mya = await ForgedSet.findOne({ 
                 where: { 
-                    code: 'WCR',
+                    code: 'MYA',
                     type: 'core',
                     forSale: true
                 }
@@ -155,7 +155,7 @@ export default {
                         //     await awardBox(interaction.channel, interaction.member, coc)
                         //     return await daily.update({ isProcessing: false })
                         // } else {
-                            await awardPacks(interaction.channel, interaction.member, WCR, MYA, num)
+                            await awardPacks(interaction.channel, interaction.member, mya, num)
                             return await daily.update({ isProcessing: false })
                         // }
                     }, 4000)

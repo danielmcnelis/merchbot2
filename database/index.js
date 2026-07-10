@@ -2,6 +2,7 @@
 import { db } from './db.js'
 import { ArenaEntry } from './ArenaEntry.js'
 import { ArenaProfile } from './ArenaProfile.js'
+import { Artwork } from './Artwork.js'
 import { Auction } from './Auction.js'
 import { Bid } from './Bid.js'
 import { Binder } from './Binder.js'
@@ -31,6 +32,9 @@ import { Transaction } from './Transaction.js'
 import { Trade } from './Trade.js'
 import { Wallet } from './Wallet.js'
 import { Wishlist } from './Wishlist.js'
+
+Artwork.belongsTo(Card)
+Card.hasMany(Artwork)
 
 Card.hasMany(ForgedPrint)
 ForgedPrint.belongsTo(Card)
@@ -108,6 +112,7 @@ export {
   db,
   ArenaEntry,
   ArenaProfile,
+  Artwork,
   Auction,
   Bid,
   Binder,

@@ -36,7 +36,7 @@ export default {
 
             const set = await ForgedSet.findOne({ 
                 where: { 
-                    code: 'WCR',
+                    code: 'MYA',
                     type: 'core',
                     forSale: true
                 },

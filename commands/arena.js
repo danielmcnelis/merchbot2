@@ -30,6 +30,7 @@ export default {
             const arenaIsActive = await Info.count({ where: { element: 'arena', status: 'active' }})
             // if (arenaIsActive) return interaction.reply({ content: `Sorry, you cannot join The Arena queue while there is an active Arena.`})
                 
+
             if (!alreadyIn) {
                 const arenaEntry = await ArenaEntry.create({ 
                     playerName: player.name,
@@ -39,12 +40,13 @@ export default {
                 })
 
                 const count = await ArenaEntry.count()
+                const count2 = await ArenaEntry.count({ where: { isConfirmed: false }})
                 if (count === 6 && !arenaIsActive) {
                     await interaction.reply({ content: `You joined the Arena queue. ${arena}`})
                     return initiateArena(interaction)
-                } else if (count > 6 && !arenaIsActive) {
+                } else if ((count > 6 && !arenaIsActive) || count2 > 6) {
                     await arenaEntry.destroy() 
-                    if (confirmationsInProgress) return interaction.reply({ content: `Sorry, there are already 6 people going through the confirmation process.`})
+                    if (confirmationsInProgress) return interaction.reply({ content: `Sorry, there are already 6 people in the Arena queue.`})
                 } else {
                     return interaction.reply({ content: `You joined the Arena queue. ${arena}`})
                 }

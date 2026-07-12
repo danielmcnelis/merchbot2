@@ -576,7 +576,7 @@ export const resetArena = async (arenaEntries) => {
 //CHECK ARENA PROGRESS
 export const checkArenaProgress = async () => {
     const info = await Info.findOne({ where: { element: 'arena' }})
-    const arenaEntries = await ArenaEntry.findAll({ include: Player, order: [["score", "DESC"]]})
+    const arenaEntries = await ArenaEntry.findAll({ where: { isConfirmed: true }, include: Player, order: [["score", "DESC"]]})
     // if (!arenaEntries) return channel.send({ content: `Critical error. Missing arenaEntries in the database.`}) 
 
     if (info.round === 6) {

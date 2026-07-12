@@ -9,7 +9,13 @@ export default {
     async execute(interaction) {
         try {
             if (interaction.channel.name !== 'arena') return await interaction.reply({ content: `Try using **/queue** in channels like: <#1378129840691220631>.`})
-            const queue = [...await ArenaEntry.findAll()].map((entry) => entry.playerName)
+            const confirmationsInProgress = await ArenaEntry.count({ where: { status: 'confirming' }})
+            let queue
+            if (confirmationsInProgress) {
+                queue = [...await ArenaEntry.findAll()].map((entry) => entry.playerName)
+            } else {
+                queue = [...await ArenaEntry.findAll({ where: { isConfirmed: false }})].map((entry) => entry.playerName)
+            }
             
             if (!queue.length) {
                 return await interaction.reply({ content: `The Arena queue is empty.`})

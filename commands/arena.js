@@ -21,6 +21,9 @@ export default {
             const isPlaying = await ArenaEntry.count({ where: { status: 'playing' }})
             if (isPlaying) return interaction.reply({ content: `Sorry, you cannot leave The Arena ${arena} after you have committed to it.` })
                 
+            const isConfirmed = await ArenaEntry.count({ where: { playerId: player.id, isConfirmed: true }})
+            if (isConfirmed) return interaction.reply({ content: `Sorry, you cannot join or leave The Arena ${arena} while you are confirmed or playing.` })
+                
             const confirmationsInProgress = await ArenaEntry.count({ where: { status: 'confirming' }})
             if (confirmationsInProgress) return interaction.reply({ content: `Sorry, there are already 6 people going through the confirmation process.`})
                 

@@ -1,6 +1,6 @@
 
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, SlashCommandBuilder } from 'discord.js'
-import { Card, Player, ForgedInventory, ForgedPrint, ForgedSet, Wallet } from '../database/index.js'
+import { Card, Player, ForgedInventory, ForgedPrint, ForgedSet, Info, Wallet } from '../database/index.js'
 import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
 import { getRandomElement, getRandomSubset } from '../functions/utility.js'
@@ -49,6 +49,18 @@ export default {
             const code = interaction.options.getString('set')
             const set = await ForgedSet.findOne({ where: { code: code }})
             if (!set) return interaction.reply({ content: `Could not find set code: ${code}.`})
+
+            const info = await Info.count({
+                where: {
+                    element: 'box'
+                }
+            })
+
+            if (info.status === 'processing') {
+                return interaction.editReply({ content: `A box is currently being delivered. Please try again in a moment.`})
+            } else {
+                await info.update({ status: 'processing' })
+            }
 
             const commons = [...await ForgedPrint.findAll({ 
                 where: {
@@ -215,13 +227,17 @@ export default {
 
                     set.unitSales += num
                     await set.save()
+
+                    await info.update({ status: 'pending' })
                     return
                 } else {
                     await confirmation.editReply({ content: `Not a problem. No box was purchased.`, components: [] })
+                    await info.update({ status: 'pending' })
                 }
             } catch (err) {
                 console.log(err)
-                await interaction.editReply({ content: `Sorry, time's up. No box was purchased.`, components: [] });
+                await interaction.editReply({ content: `Sorry, time's up. No box was purchased.`, components: [] })
+                await info.update({ status: 'pending' })
             }
         } catch (err) {
             console.log(err)

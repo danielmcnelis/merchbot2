@@ -50,7 +50,7 @@ export default {
             const set = await ForgedSet.findOne({ where: { code: code }})
             if (!set) return interaction.reply({ content: `Could not find set code: ${code}.`})
 
-            const info = await Info.count({
+            const info = await Info.findOne({
                 where: {
                     element: 'box'
                 }

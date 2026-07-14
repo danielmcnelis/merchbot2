@@ -370,7 +370,7 @@ export const startRound = async (arenaEntries) => {
             ` vs ${eval(arenaEntries[1].tribe)} <@${arenaEntries[1].player?.discordId}> ${eval(arenaEntries[1].tribe)}`
 
             return channel.send({ content: `${title}\n${match}`})
-        } else if ((arenaEntries[0].score === arenaEntries[1].score === arenaEntries[2].score) && arenaEntries[2].score > arenaEntries[3].score) {
+        } else if (arenaEntries[0].score === arenaEntries[1].score && arenaEntries[1].score === arenaEntries[2].score && arenaEntries[2].score > arenaEntries[3].score) {
             //3 way tie
                 console.log('3-way tie')
                 // VOUCHERS
@@ -386,7 +386,7 @@ export const startRound = async (arenaEntries) => {
     
                 channel.send({ content: `The shadows grew long over the battlefield, and the gladiators ${gladiators} had little more left to give. Being so, the elders of the Tribes briefly met to negotiate a temporary ceasefire. No winner could be determined in this Arena. ${arena}`})
                 return endArena(arenaEntries)
-        } else if ((arenaEntries[0].score === arenaEntries[1].score === arenaEntries[2].score === arenaEntries[3].score) && arenaEntries[3].score > arenaEntries[4].score) {
+        } else if (arenaEntries[0].score === arenaEntries[1].score && arenaEntries[1].score === arenaEntries[2].score && arenaEntries[2].score === arenaEntries[3].score && arenaEntries[3].score > arenaEntries[4].score) {
             //4 way tie
                 console.log('4-way tie')
                 // VOUCHERS

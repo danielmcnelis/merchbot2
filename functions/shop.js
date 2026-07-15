@@ -385,6 +385,15 @@ export const calcBoxPrice = async () => {
             set.unitPrice = Math.round(avgPackPrice / 10) * 10
             const boxPrice = Math.round(20 * set.unitPrice / 100) * 100
             set.boxPrice = set.type === 'core' ? boxPrice : null
+
+            if (set.specsForSale && set.currency === 'stardust') {
+                const specs = [...await ForgedPrint.findAll({ where: { forgedSetCode: forgedSetCode, rarity: "sup" } })].filter((p) => p.cardCode.includes('-SE')).map((p) => Math.round(p.marketPrice) || 1)
+                const avgSpecPrice = specs.length ? specs.reduce((a, b) => a + b) / specs.length : 0
+                if (avgSpecPrice) {
+                    set.specPrice = Math.round((3 * avgPackPrice + avgSpecPrice) / 100) * 100
+                }
+            }
+
             await set.save()
         } else if (set.type === 'starter_deck') {
             // const prints = await ForgedPrint.findAll({ where: { forgedSetCode: forgedSetCode }})

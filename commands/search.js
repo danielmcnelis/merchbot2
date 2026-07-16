@@ -43,7 +43,8 @@ export default {
         },
 	async execute(interaction) {
         try { 
-            // if (interaction.channel.id !== botSpamChannelId && interaction.channel.id !== marketPlaceChannelId) return interaction.reply({ content: `Command not valid outside of <#${marketPlaceChannelId}> or <#${botSpamChannelId}>.` })       
+            // if (interaction.channel.id !== botSpamChannelId && interaction.channel.id !== marketPlaceChannelId) return interaction.editReply({ content: `Command not valid outside of <#${marketPlaceChannelId}> or <#${botSpamChannelId}>.` })       
+            await interaction.deferReply()
             const printId = interaction.options.getNumber('print')
             const print = await ForgedPrint.findOne({ where: { id: printId }})
             const card = `${eval(print.rarity)}${print.cardCode} - ${print.cardName}`
@@ -59,7 +60,7 @@ export default {
             activePlayersWithPrintInBinder.sort()
             activePlayersWithPrintInWishlist.sort()
         
-            return interaction.reply({ content: `Search results for ${card}:\n**Binders:**\n${activePlayersWithPrintInBinder.length ? activePlayersWithPrintInBinder.join('\n') : 'N/A'}\n\n**Wishlists:**\n${activePlayersWithPrintInWishlist.length ? activePlayersWithPrintInWishlist.join('\n') : 'N/A'}`})
+            return interaction.editReply({ content: `Search results for ${card}:\n**Binders:**\n${activePlayersWithPrintInBinder.length ? activePlayersWithPrintInBinder.join('\n') : 'N/A'}\n\n**Wishlists:**\n${activePlayersWithPrintInWishlist.length ? activePlayersWithPrintInWishlist.join('\n') : 'N/A'}`})
         } catch (err) {
             console.log(err)
         }

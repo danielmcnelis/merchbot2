@@ -57,7 +57,7 @@ export default {
             })
 
             if (info.status === 'processing') {
-                return interaction.editReply({ content: `A box is currently being delivered. Please try again in a moment.`})
+                return interaction.reply({ content: `A box is currently being delivered. Please try again in a moment.`})
             } else {
                 await info.update({ status: 'processing' })
             }

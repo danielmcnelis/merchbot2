@@ -394,6 +394,8 @@ export const calcBoxPrice = async () => {
                 }
             }
 
+            
+
             await set.save()
         } else if (set.type === 'starter_deck') {
             // const prints = await ForgedPrint.findAll({ where: { forgedSetCode: forgedSetCode }})

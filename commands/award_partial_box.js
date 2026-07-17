@@ -59,8 +59,8 @@ export default {
             if (!isMod(interaction.member)) return await interaction.editReply({ content: "You do not have permission to do that."})
             const quantity = interaction.options.getNumber('quantity')
             if (quantity < 1) return await interaction.editReply({ content: `You cannot award less than 1 item.`})
-            const setName = interaction.options.getString('set')
-            const set = await ForgedSet.findOne({ where: { name: setName }})
+            const setCode = interaction.options.getString('set')
+            const set = await ForgedSet.findOne({ where: { code: setCode }})
             const award = `${quantity} Pack(s) from a partial Box of ${set.name} ${eval(set.code)}`
             const user = interaction.options.getUser('player')
             const discordId = user.id

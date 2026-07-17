@@ -22,14 +22,45 @@ export default {
                 .setName('player')
                 .setDescription('Tag the player to award.')
                 .setRequired(true)
-        ),
+        ).addStringOption(str =>
+            str
+                .setName('set')
+                .setDescription('Enter set query.')
+                .setAutocomplete(true)
+                .setRequired(true)
+        )
+    	.setContexts(InteractionContextType.Guild),
+        async autocomplete(interaction) {
+            try {
+                const focusedValue = interaction.options.getFocused()
+                const sets = await ForgedSet.findAll({
+                    where: {
+                        [Op.or]: {
+                            name: {[Op.iLike]: `${focusedValue}%`},
+                            code: {[Op.iLike]: `${focusedValue}%`}
+                        },
+                        forSale: true,
+                        type: {[Op.or]: ['core', 'mini']}
+                    },
+                    limit: 5,
+                    order: [["createdAt", "DESC"]]
+                })
+
+                await interaction.respond(
+                    sets.map(set => ({ name: `${set.name} (${set.code})`, value: set.code })),
+                )
+            } catch (err) {
+                console.log(err)
+            }
+        },
 	async execute(interaction) {
         try {      
             await interaction.deferReply()
             if (!isMod(interaction.member)) return await interaction.editReply({ content: "You do not have permission to do that."})
             const quantity = interaction.options.getNumber('quantity')
             if (quantity < 1) return await interaction.editReply({ content: `You cannot award less than 1 item.`})
-            const set = await ForgedSet.findOne({ where: { name: 'Ascent of Dragons' }})
+            const setName = interaction.options.getString('set')
+            const set = await ForgedSet.findOne({ where: { name: setName }})
             const award = `${quantity} Pack(s) from a partial Box of ${set.name} ${eval(set.code)}`
             const user = interaction.options.getUser('player')
             const discordId = user.id

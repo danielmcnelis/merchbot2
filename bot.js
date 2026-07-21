@@ -93,6 +93,13 @@ client.on('ready', async () => {
         const programmer = await client.users.fetch('194147938786738176')
         await programmer.send({ content: `${daily.playerName}'s daily (cobble progress ${daily.cobbleProgress}) was interrupted.` })
     }
+
+    // SET BOX INFO TO PENDING
+    const info = await Info.findOne({ where: {
+        element: 'box'
+    }})
+
+    await info.update({ status: 'pending' })
 })
 
 // SUBSCRIPTION

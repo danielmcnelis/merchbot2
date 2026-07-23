@@ -52,10 +52,10 @@ export default {
             const merchbotWallet = merchbot.wallet
             if (!wallet) return interaction.reply({ content: `You are not in the database. Type **/play** to begin the game.`})
 
-            const newestSeries = promo.cardCode.startsWith('CT1-')
+            const newestSeries = promo.cardCode.startsWith('CT2-')
             const seriesNumber = promo.cardCode.startsWith('CT2-') ? 2 : 1
             const currency = newestSeries ? 'starchips' : 'stardust'
-            const price = newestSeries ? 75 : 1500
+            const price = newestSeries ? 100 : 1500
             if (wallet[currency] < price) return interaction.reply({ content: `Sorry, ${player.name}, you only have ${wallet[currency]}${eval(currency)} and Series ${seriesNumber} Collector's Tins cost ${price}${eval(currency)}.`})
             
             const timestamp = new Date().getTime()
@@ -87,7 +87,7 @@ export default {
                     updatedWallet[currency] -= price
                     await updatedWallet.save()
 
-                    merchbotWallet.stardust += 750
+                    merchbotWallet.stardust += 1000
                     await merchbotWallet.save()
 
                     const set1Code = seriesNumber === 2 ? 'WCR' : 'LDM'

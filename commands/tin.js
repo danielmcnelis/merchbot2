@@ -111,7 +111,7 @@ export default {
                     set2.unitSales += 3
                     await set2.save()
                     
-                    interaction.editReply({ content: `Thank you for your purchase! I'll send you the contents of your Series ${seriesNumber} Collector's Tin. ${CT1}`, components: []})
+                    interaction.editReply({ content: `Thank you for your purchase! I'll send you the contents of your Series ${seriesNumber} Collector's Tin. ${CTP}`, components: []})
                     
                     const set1Commons = [...await ForgedPrint.findAll({ 
                         where: {

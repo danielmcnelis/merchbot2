@@ -55,7 +55,7 @@ export default {
             const newestSeries = promo.cardCode.startsWith('CT2-')
             const seriesNumber = promo.cardCode.startsWith('CT2-') ? 2 : 1
             const currency = newestSeries ? 'starchips' : 'stardust'
-            const price = newestSeries ? 100 : 1500
+            const price = newestSeries ? 90 : 1500
             if (wallet[currency] < price) return interaction.reply({ content: `Sorry, ${player.name}, you only have ${wallet[currency]}${eval(currency)} and Series ${seriesNumber} Collector's Tins cost ${price}${eval(currency)}.`})
             
             const timestamp = new Date().getTime()

@@ -23,7 +23,7 @@ const askForBidAmount = async (interaction, player, card, auction, wallet) => {
             if (isNaN(amount)) return interaction.user.send({ content: `Error: Please repeat the **/bid** command and reply with a number.`})
 
             if (wallet.stardust < amount) { 
-                return interaction.user.send({ content: `You cannot bid more ${stardust} than you have in your Wallet (${wallet.stardust}${stardust}).}`})
+                return interaction.user.send({ content: `You cannot bid more ${stardust} than you have in your Wallet (${wallet.stardust}${stardust}).`})
             } else if (amount < merchbotSalePrice) {
                 return interaction.user.send({ content: `${card} is sold for ${merchbotSalePrice}${stardust} in The Shop, ${merchant} so you cannot bid less ${stardust} than that.`})
             } else {

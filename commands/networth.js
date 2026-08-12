@@ -3,7 +3,7 @@ import { InteractionContextType, SlashCommandBuilder } from 'discord.js'
 import { ForgedInventory, ForgedPrint, Player, Transaction, Trade, Wallet } from '../database/index.js'
 import { Op } from 'sequelize'
 import emojis from '../static/emojis.json' with { type: 'json' }
-const { king, master, scheming, robbed, starchips, rock, gold, treasure, LDM } = emojis
+const { king, master, scheming, robbed, starchips, rock, gold, treasure, LDM, WCR, MYA } = emojis
 import channels from '../static/channels.json' with { type: 'json' }
 const { marketPlaceChannelId, arenaChannelId } = channels
 
@@ -50,6 +50,7 @@ export default {
                 if (inv.quantity > 0) printCount++
                 if ((inv.cardCode.includes('LDM-0') || inv.cardCode.includes('LDM-1')) && inv.quantity >= 3) ldmCount++
                 if ((inv.cardCode.includes('WCR-0') || inv.cardCode.includes('WCR-1')) && inv.quantity >= 3) wcrCount++
+                if ((inv.cardCode.includes('MYA-0') || inv.cardCode.includes('MYA-1')) && inv.quantity >= 3) myaCount++
             }
 
             const totalPlayers = await Wallet.count() - 1
@@ -79,6 +80,7 @@ export default {
 
             if (ldmCount === 200) completeSets.push(`LDM ${LDM}`)
             if (wcrCount === 200) completeSets.push(`WCR ${WCR}`)
+            if (myaCount === 200) completeSets.push(`MYA ${MYA}`)
 
             const tradeCount = await Transaction.count({
                 where: {

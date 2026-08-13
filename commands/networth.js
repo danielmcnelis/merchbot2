@@ -34,6 +34,7 @@ export default {
             let printCount = 0
             let ldmCount = 0
             let wcrCount = 0
+            let myaCount = 0
 
             const printTotal = await ForgedPrint.count()
             
